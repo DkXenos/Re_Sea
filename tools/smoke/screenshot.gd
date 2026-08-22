@@ -29,9 +29,17 @@ func _run() -> void:
 	game.start_run(4242)
 	for i in day - 1:
 		game.advance_day()
-	root.add_child(load(SCENES[key]).instantiate())
+	if key == "desk":
+		for item in game.current_day().item_pool:
+			game.add_to_inventory(item)
+	var scene: Node = load(SCENES[key]).instantiate()
+	root.add_child(scene)
 	for i in 20:
 		await process_frame
+	if args.size() > 3 and args[3] == "rulebook":
+		scene.get_node("UiLayer/Root/RulebookPanel").toggle(true)
+		for i in 5:
+			await process_frame
 	await process_frame
 	var img: Image = root.get_texture().get_image()
 	img.save_png(out)

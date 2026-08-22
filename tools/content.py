@@ -195,7 +195,8 @@ def as_json():
         rules=[dict(id=r["id"], text=r["text"], applies_when=r["when"],
                     forces_category=r["forces"], priority=r["priority"]) for r in RULES],
         tools=[dict(id=t["id"], display_name=t["name"], reveals_field=t["reveals"],
-                    default_charges=t["charges"], description=t["desc"]) for t in TOOLS],
+                    default_charges=t["charges"], description=t["desc"], sort_order=n)
+               for n, t in enumerate(TOOLS)],
         days=[dict(day_number=d["n"], quota=d["quota"], max_grabs=d["grabs"],
                    tools_enabled=d["tools_enabled"], tool_charges=d["charges"],
                    active_rules=d["rules"], item_pool=d["items"], intro_text=d["intro"],

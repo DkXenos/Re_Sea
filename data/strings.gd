@@ -53,6 +53,9 @@ const TABLE: Dictionary = {
 	"desk_empty": "Semua barang sudah dipilah",
 	"desk_finish": "Selesaikan Hari",
 	"desk_pick_item": "Pilih barang untuk diperiksa",
+	"desk_no_selection": "Pilih barang dulu sebelum membuang",
+	"desk_progress": "Terpilah {a} / {b}",
+	"desk_rulebook_button": "Buku Aturan (TAB)",
 	"desk_back": "Kembali ke daftar",
 	"inspect_title": "PEMERIKSAAN",
 	"inspect_zoom_hint": "Gulir untuk perbesar, seret untuk geser",
@@ -92,6 +95,7 @@ const TABLE: Dictionary = {
 	"rulebook_hint": "TAB untuk buka / tutup",
 	"rulebook_close": "Tutup",
 	"rulebook_empty": "Belum ada aturan khusus hari ini",
+	"rulebook_general": "UMUM",
 
 	# --- day report ---
 	"report_title": "LAPORAN HARI {n}",

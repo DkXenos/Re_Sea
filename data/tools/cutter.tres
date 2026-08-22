@@ -13,3 +13,4 @@ icon = ExtResource("2_onugn")
 reveals_field = "true_material"
 default_charges = 2
 description = "Menyayat sedikit bagian barang untuk melihat bahan aslinya dan lapisannya."
+sort_order = 3

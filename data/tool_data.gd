@@ -9,3 +9,6 @@ extends Resource
 @export var reveals_field: String ## field name on ItemData
 @export var default_charges: int = 3
 @export var description: String
+## Display order in the rack. Data rather than code so a new tool slots in
+## wherever its .tres says, with no change here.
+@export var sort_order: int = 0

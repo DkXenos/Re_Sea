@@ -109,6 +109,7 @@ func _gen_tools(raw: Array) -> void:
 		t.reveals_field = d["reveals_field"]
 		t.default_charges = int(d["default_charges"])
 		t.description = d["description"]
+		t.sort_order = int(d["sort_order"])
 		t.icon = _load_if("res://assets/tools/tool_%s.png" % id_str)
 		t.frames = _load_if("res://data/frames/tool_%s_frames.tres" % id_str)
 		_save(t, "res://data/tools/%s.tres" % id_str)

@@ -76,6 +76,7 @@ func _load_tools() -> void:
 		var tool_data: ToolData = load("res://data/tools/" + clean)
 		if tool_data != null:
 			tools.append(tool_data)
+	tools.sort_custom(func(a: ToolData, b: ToolData) -> bool: return a.sort_order < b.sort_order)
 
 
 func get_tool(tool_id: StringName) -> ToolData:
@@ -262,6 +263,19 @@ func play_sfx(sfx_name: StringName) -> void:
 			player.stream = stream
 			player.play()
 			return
+
+
+func stop_all_sfx() -> void:
+	for player: AudioStreamPlayer in _sfx_players:
+		player.stop()
+		player.stream = null
+	_sfx_cache.clear()
+
+
+## Without this a sound still playing at shutdown keeps its stream alive and
+## Godot reports it as a leaked instance.
+func _exit_tree() -> void:
+	stop_all_sfx()
 
 
 # -------------------------------------------------------------------- debug

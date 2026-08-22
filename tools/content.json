@@ -534,28 +534,32 @@
    "display_name": "Bilas",
    "reveals_field": "has_residue",
    "default_charges": 4,
-   "description": "Menyiram permukaan untuk melihat apakah masih ada sisa kotoran di baliknya."
+   "description": "Menyiram permukaan untuk melihat apakah masih ada sisa kotoran di baliknya.",
+   "sort_order": 0
   },
   {
    "id": "swab",
    "display_name": "Usap Kimia",
    "reveals_field": "residue_type",
    "default_charges": 3,
-   "description": "Mengusap sisa kotoran untuk mengetahui jenisnya."
+   "description": "Mengusap sisa kotoran untuk mengetahui jenisnya.",
+   "sort_order": 1
   },
   {
    "id": "magnifier",
    "display_name": "Kaca Pembesar",
    "reveals_field": "tag_text",
    "default_charges": 5,
-   "description": "Membaca kode daur ulang atau label kecil yang tercetak."
+   "description": "Membaca kode daur ulang atau label kecil yang tercetak.",
+   "sort_order": 2
   },
   {
    "id": "cutter",
    "display_name": "Pemotong",
    "reveals_field": "true_material",
    "default_charges": 2,
-   "description": "Menyayat sedikit bagian barang untuk melihat bahan aslinya dan lapisannya."
+   "description": "Menyayat sedikit bagian barang untuk melihat bahan aslinya dan lapisannya.",
+   "sort_order": 3
   }
  ],
  "days": [

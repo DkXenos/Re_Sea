@@ -12,3 +12,4 @@ frames = ExtResource("1_50dfa")
 icon = ExtResource("2_whw2b")
 reveals_field = "residue_type"
 description = "Mengusap sisa kotoran untuk mengetahui jenisnya."
+sort_order = 1

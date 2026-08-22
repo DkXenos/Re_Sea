@@ -51,4 +51,8 @@ func _run() -> void:
 	for e in game.inventory:
 		print("   carried %s (weight %.1f, grip %d%%)" % [e.data.id, e.data.weight,
 			int(round(clampf(1.0 - e.data.weight * 0.15, 0.25, 0.95) * 100.0))])
+	# This harness quits mid-frame, so release any sound still playing rather
+	# than letting Godot report it as a leaked stream.
+	game.stop_all_sfx()
+	await process_frame
 	quit()

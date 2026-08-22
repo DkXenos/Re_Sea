@@ -13,3 +13,4 @@ icon = ExtResource("2_n1chp")
 reveals_field = "tag_text"
 default_charges = 5
 description = "Membaca kode daur ulang atau label kecil yang tercetak."
+sort_order = 2

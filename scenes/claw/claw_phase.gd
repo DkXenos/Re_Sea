@@ -97,8 +97,7 @@ func _spawn_fish() -> void:
 
 ## The one visible thing wired to the VFX slider, so the slider is testable.
 func _rebuild_bubbles(intensity: float) -> void:
-	for child in _bubbles.get_children():
-		child.queue_free()
+	_clear(_bubbles)
 	_bubble_speeds.clear()
 	var texture: Texture2D = load("res://assets/env/bubble.png")
 	for i in int(round(14.0 * clampf(intensity, 0.0, 1.0))):
@@ -210,3 +209,11 @@ func _show_toast(text: String) -> void:
 	var tween := create_tween()
 	tween.tween_interval(1.3)
 	tween.tween_property(_toast, "modulate:a", 0.0, 0.6)
+
+
+## queue_free() alone leaves the old children in the tree for the rest of the
+## frame, so a list rebuilt twice in one frame would briefly show both sets.
+func _clear(node: Node) -> void:
+	for child in node.get_children():
+		node.remove_child(child)
+		child.queue_free()
