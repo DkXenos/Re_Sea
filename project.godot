@@ -55,6 +55,11 @@ inspect_use={
 }
 rulebook={
 "deadzone": 0.2,
+"events": [Object(InputEventKey,"device":-1,"physical_keycode":82)
+]
+}
+switch_view={
+"deadzone": 0.2,
 "events": [Object(InputEventKey,"device":-1,"physical_keycode":4194306)
 ]
 }

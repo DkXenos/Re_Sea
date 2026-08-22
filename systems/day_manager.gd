@@ -1,9 +1,13 @@
 ## The flow graph, kept out of main.gd so the scene switcher stays a switcher.
 ## Advancing the day is a deliberate state change made here, in one place.
 ##
-##   main_menu -> cutscene -> day_start -> claw -> desk -> report
-##                                            ^                |
-##                                            +-- next day ----+
+##   main_menu -> cutscene -> day_start -> shift -> report
+##                                  ^                  |
+##                                  +---- next day ----+
+##
+## Revision 1 collapsed `claw` and `desk` into one `shift`: they are sibling
+## views inside it, switchable at any time, sharing one budget and one
+## inventory. They are no longer phases and no longer appear here.
 class_name DayManager
 extends RefCounted
 
@@ -12,9 +16,8 @@ static func advance_from(key: StringName) -> StringName:
 	match key:
 		&"main_menu": return &"cutscene"
 		&"cutscene": return &"day_start"
-		&"day_start": return &"claw"
-		&"claw": return &"desk"
-		&"desk": return &"report"
+		&"day_start": return &"shift"
+		&"shift": return &"report"
 		&"report":
 			# The ocean bottoming out ends the run immediately; otherwise the
 			# run ends after the last day. Both land on the same scene, which

@@ -49,11 +49,12 @@ func _run() -> void:
 	print("inventory=%d budget %d -> %d" % [game.inventory.size(), spent, game.budget_left])
 
 	# reveal_all needs the desk scene, since it acts on the inspected item.
-	events.scene_change_requested.emit(&"desk")
+	events.scene_change_requested.emit(&"shift")
 	await process_frame
 	await process_frame
-	var desk: Node = _current(main)
-	assert(String(desk.name) == "DeskPhase", "desk did not load")
+	var shift: Node = _current(main)
+	assert(String(shift.name) == "ShiftPhase", "shift did not load")
+	var desk: Node = shift.get_node("DeskView")
 	var entry = desk.get_node("UiLayer/Root/InspectPanel").entry
 	assert(entry != null, "no item selected on the desk")
 	assert(entry.revealed.is_empty(), "item should start unrevealed")

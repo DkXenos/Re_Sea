@@ -43,6 +43,9 @@ const TABLE: Dictionary = {
 	"budget_cost": "biaya {n}",
 	"budget_too_low": "Waktu shift tidak cukup untuk itu",
 	"shift_end": "Akhiri Shift",
+	"shift_to_desk": "Ke Meja Pilah",
+	"shift_to_claw": "Ke Mesin Cakar",
+	"shift_unsorted": "{n} belum dipilah",
 	"shift_over": "Waktu shift habis",
 	"claw_grip_chance": "Peluang cengkeram: {n}%",
 	"claw_grip_none": "Arahkan cakar ke sebuah benda",
@@ -61,7 +64,7 @@ const TABLE: Dictionary = {
 	"desk_pick_item": "Pilih barang untuk diperiksa",
 	"desk_no_selection": "Pilih barang dulu sebelum membuang",
 	"desk_progress": "Terpilah {a} / {b}",
-	"desk_rulebook_button": "Buku Aturan (TAB)",
+	"desk_rulebook_button": "Buku Aturan (R)",
 	"desk_back": "Kembali ke daftar",
 	"inspect_title": "PEMERIKSAAN",
 	"inspect_zoom_hint": "Gulir untuk perbesar, seret untuk geser",
@@ -97,7 +100,7 @@ const TABLE: Dictionary = {
 
 	# --- rulebook ---
 	"rulebook_title": "BUKU ATURAN",
-	"rulebook_hint": "TAB untuk buka / tutup",
+	"rulebook_hint": "R untuk buka / tutup",
 	"rulebook_close": "Tutup",
 	"rulebook_empty": "Belum ada aturan khusus hari ini",
 	"rulebook_general": "UMUM",

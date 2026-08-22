@@ -31,6 +31,10 @@ enum State { IDLE, DESCEND, CLOSE, RISE }
 ## drive exactly the same code path.
 var button_axis: float = 0.0
 var can_drop: bool = true
+## False while the player is on the desk tab. An in-flight cycle still finishes
+## - you left the machine, you did not stop time - but the claw stops taking
+## input.
+var input_enabled: bool = true
 
 var state: State = State.IDLE
 var carried: Node2D = null
@@ -70,6 +74,8 @@ func _physics_process(delta: float) -> void:
 
 
 func _process_idle(delta: float) -> void:
+	if not input_enabled:
+		return
 	var axis := clampf(Input.get_axis(&"claw_left", &"claw_right") + button_axis, -1.0, 1.0)
 	if not is_zero_approx(axis):
 		position.x = clampf(position.x + axis * H_SPEED * delta, min_x, max_x)

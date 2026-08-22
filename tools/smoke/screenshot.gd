@@ -6,6 +6,7 @@ extends SceneTree
 const SCENES := {
 	"claw": "res://scenes/claw/claw_phase.tscn",
 	"desk": "res://scenes/desk/desk_phase.tscn",
+	"shift": "res://scenes/shift/shift_phase.tscn",
 	"menu": "res://scenes/main_menu/main_menu.tscn",
 	"settings": "res://scenes/settings/settings.tscn",
 	"cutscene": "res://scenes/cutscene/cutscene.tscn",
@@ -48,7 +49,7 @@ func _run() -> void:
 	game.start_run(4242)
 	for i in day - 1:
 		game.advance_day()
-	if key == "desk":
+	if key == "desk" or (key == "shift" and args.size() > 3 and args[3] == "desk"):
 		for item in game.current_day().item_pool:
 			game.add_to_inventory(item)
 	if key == "report":
@@ -57,6 +58,10 @@ func _run() -> void:
 	root.add_child(scene)
 	for i in 20:
 		await process_frame
+	if key == "shift" and args.size() > 3 and args[3] == "desk":
+		scene._toggle_view()
+		for i in 3:
+			await process_frame
 	if args.size() > 3 and args[3] == "rulebook":
 		scene.get_node("UiLayer/Root/RulebookPanel").toggle(true)
 		for i in 5:

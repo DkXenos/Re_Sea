@@ -12,12 +12,11 @@ const FISH_FRAMES: Array[String] = [
 	"res://data/frames/fish_bg_large_frames.tres",
 ]
 const MINIMAP_DOT := preload("res://assets/ui/minimap_item.png")
-const END_DELAY := 1.4
 ## The visible slice of the tank, in tank world units.
-const TANK_VIEW := Vector2(1000.0, 400.0)
+const TANK_VIEW := Vector2(1000.0, 368.0)
 ## Where items come to rest, and the depths fish drift at.
-const ITEM_REST_Y := Vector2(268.0, 300.0)
-const FISH_DEPTH_Y := Vector2(80.0, 230.0)
+const ITEM_REST_Y := Vector2(246.0, 278.0)
+const FISH_DEPTH_Y := Vector2(72.0, 208.0)
 ## Nearest-layer mouse parallax in pixels. Small numbers - enough to read as
 ## depth, not enough to distract.
 const PARALLAX := [2.0, 4.0, 6.0]
@@ -47,10 +46,6 @@ const BG_CAMERA_PARALLAX := 0.04
 @onready var _bubbles: Node2D = $GlassLayer/Bubbles
 @onready var _knob: TextureRect = $FrameLayer/JoystickKnob
 
-@onready var _day_label: Label = $HudLayer/HudRoot/Hud/DayLabel
-@onready var _quota_label: Label = $HudLayer/HudRoot/Hud/QuotaLabel
-@onready var _budget_label: Label = $HudLayer/HudRoot/Hud/BudgetLabel
-@onready var _collected_label: Label = $HudLayer/HudRoot/Hud/CollectedLabel
 @onready var _grip_label: Label = $HudLayer/HudRoot/GripLabel
 @onready var _toast: Label = $HudLayer/HudRoot/Toast
 @onready var _hint: Label = $HudLayer/HudRoot/Hint
@@ -60,7 +55,7 @@ const BG_CAMERA_PARALLAX := 0.04
 @onready var _map_claw: TextureRect = $HudLayer/HudRoot/Minimap/ClawMark
 
 var _day: DayData
-var _finished: bool = false
+var _active: bool = true
 ## Items that have not drifted in yet.
 var _pending: Array[ItemData] = []
 var _spawn_timer: float = 0.0
@@ -78,7 +73,6 @@ func _ready() -> void:
 	_setup_tank()
 	_claw.cycle_finished.connect(_on_cycle_finished)
 	_claw.drop_started.connect(_on_drop_started)
-	Events.budget_changed.connect(_on_budget_changed)
 	$FrameLayer/ArrowLeft.button_down.connect(func() -> void: _claw.button_axis = -1.0)
 	$FrameLayer/ArrowLeft.button_up.connect(func() -> void: _claw.button_axis = 0.0)
 	$FrameLayer/ArrowRight.button_down.connect(func() -> void: _claw.button_axis = 1.0)
@@ -88,14 +82,12 @@ func _ready() -> void:
 		{"n": Game.cost_of(&"drop")})
 	$FrameLayer/DropButton.tooltip_text = Strings.tf("budget_cost",
 		{"n": Game.cost_of(&"drop")})
-	Events.toast_requested.connect(_show_toast)
 	Events.vfx_intensity_changed.connect(_rebuild_bubbles)
 	_hint.text = Strings.t("claw_hint")
 	_toast.text = ""
 	_spawn_items()
 	_spawn_fish()
 	_rebuild_bubbles(Game.vfx_intensity)
-	_refresh_hud()
 
 
 ## Everything that depends on how wide the seabed is, in one place.
@@ -202,7 +194,7 @@ func _rebuild_bubbles(intensity: float) -> void:
 		var bubble := AnimatedSprite2D.new()
 		bubble.sprite_frames = frames
 		bubble.play(&"rise")
-		bubble.position = Vector2(randf_range(160.0, 1120.0), randf_range(50.0, 430.0))
+		bubble.position = Vector2(randf_range(160.0, 1120.0), randf_range(80.0, 428.0))
 		bubble.scale = Vector2.ONE * randf_range(0.5, 1.3)
 		_bubbles.add_child(bubble)
 		_bubble_speeds.append(randf_range(18.0, 46.0))
@@ -210,7 +202,7 @@ func _rebuild_bubbles(intensity: float) -> void:
 
 func _process(delta: float) -> void:
 	_update_spawning(delta)
-	_claw.can_drop = not _finished and Game.can_afford(&"drop")
+	_claw.can_drop = _active and Game.can_afford(&"drop")
 	$FrameLayer/DropButton.disabled = not _claw.can_drop
 	_camera.position.x = _claw.position.x
 	_update_parallax()
@@ -244,8 +236,8 @@ func _update_bubbles(delta: float) -> void:
 	for i in children.size():
 		var bubble: AnimatedSprite2D = children[i]
 		bubble.position.y -= _bubble_speeds[i] * delta
-		if bubble.position.y < 46.0:
-			bubble.position.y = 432.0
+		if bubble.position.y < 76.0:
+			bubble.position.y = 430.0
 			bubble.position.x = randf_range(160.0, 1120.0)
 
 
@@ -293,11 +285,6 @@ func _on_drop_started() -> void:
 	Game.stats["drops"] = int(Game.stats.get("drops", 0)) + 1
 
 
-func _on_budget_changed(_remaining: int, _maximum: int) -> void:
-	_refresh_hud()
-	_check_finished()
-
-
 func _on_cycle_finished(result: Dictionary) -> void:
 	if String(result["kind"]) == "item":
 		var item: ItemData = result["item"]
@@ -307,36 +294,22 @@ func _on_cycle_finished(result: Dictionary) -> void:
 		result["node"].queue_free()
 	else:
 		_show_toast(Strings.t("claw_slipped"))
-	_refresh_hud()
-	_check_finished()
 
 
-## The tank has nothing more to offer once the budget cannot buy another drop,
-## or once the pool is spent and the seabed is bare. Whatever budget remains
-## belongs to the desk.
-func _shift_exhausted() -> bool:
-	if not Game.can_afford(&"drop"):
-		return true
-	return _pending.is_empty() and _items.get_child_count() == 0
+## True while the tank can still produce something to grab. The shift asks
+## this; the tank does not decide when the day ends any more.
+func has_work() -> bool:
+	return not _pending.is_empty() or _items.get_child_count() > 0
 
 
-func _check_finished() -> void:
-	if _finished or not _shift_exhausted():
-		return
-	_finished = true
-	_claw.can_drop = false
-	_show_toast(Strings.t("shift_over"))
-	Events.sfx_requested.emit(&"day_end")
-	var timer := get_tree().create_timer(END_DELAY)
-	timer.timeout.connect(func() -> void: Events.phase_finished.emit())
-
-
-func _refresh_hud() -> void:
-	_day_label.text = Strings.tf("day_label", {"n": _day.day_number})
-	_quota_label.text = "%s %d" % [Strings.t("day_quota"), _day.quota]
-	_budget_label.text = "%s %d / %d" % [Strings.t("budget_label"),
-		Game.budget_left, Game.budget_max]
-	_collected_label.text = "%s %d" % [Strings.t("claw_inventory"), Game.inventory.size()]
+## Switching tabs costs nothing and stops nothing: items keep drifting in and a
+## cycle already in the air still lands. Only input and drawing are suspended.
+func set_view_active(active: bool) -> void:
+	_active = active
+	for child in get_children():
+		if child is CanvasLayer:
+			child.visible = active
+	_claw.input_enabled = active
 
 
 func _show_toast(text: String) -> void:

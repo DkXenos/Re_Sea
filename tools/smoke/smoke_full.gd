@@ -56,10 +56,8 @@ func _run() -> void:
 				scene._finish()
 			"DayStart":
 				scene.get_node("UiLayer/Root/BeginButton").pressed.emit()
-			"ClawPhase":
-				_drive_claw(scene)
-			"DeskPhase":
-				_drive_desk(scene)
+			"ShiftPhase":
+				_drive_shift(scene)
 			"DayReport":
 				if verbose:
 					var b: Dictionary = scene._result
@@ -82,11 +80,34 @@ func _run() -> void:
 	quit()
 
 
+## Works the shift the way a player would: stay at the tank while there is
+## something worth grabbing, switch to the desk when there is not, and switch
+## back when the desk is clear. Driving both views at once would never exercise
+## the tab switch, and the desk only refreshes its inventory when it becomes
+## the active view.
+func _drive_shift(shift: Node) -> void:
+	var claw_view: Node = shift.get_node("ClawView")
+	var desk_view: Node = shift.get_node("DeskView")
+	var unsorted: Array = game.unsorted_items()
+	var worth_grabbing: bool = game.can_afford(&"drop") and claw_view.has_work()
+	var on_claw: bool = shift._view == 0
+	if on_claw:
+		if worth_grabbing:
+			_drive_claw(claw_view)
+		elif not unsorted.is_empty():
+			shift._toggle_view()
+	else:
+		if not unsorted.is_empty():
+			_drive_desk(desk_view)
+		elif worth_grabbing:
+			shift._toggle_view()
+
+
 func _drive_claw(scene: Node) -> void:
 	var world: Node = scene.get_node("TankLayer/TankContainer/TankViewport/TankWorld")
 	var claw: Node2D = world.get_node("Claw")
 	var items: Node2D = world.get_node("Items")
-	if claw.state != 0 or not claw.can_drop:
+	if claw.state != 0 or not game.can_afford(&"drop"):
 		return
 	if items.get_child_count() > 0:
 		claw.position.x = clampf(items.get_child(0).position.x, claw.min_x, claw.max_x)
@@ -99,7 +120,7 @@ func _drive_desk(scene: Node) -> void:
 	var inspect: Control = scene.get_node("UiLayer/Root/InspectPanel")
 	var bins: Control = scene.get_node("UiLayer/Root/BinRow")
 	var entry = inspect.entry
-	if entry == null:
+	if entry == null or not game.can_afford(&"sort"):
 		return
 	var day = game.current_day()
 	var choice: int = int(RuleChecker.resolve(entry.data, day.active_rules)["category"])

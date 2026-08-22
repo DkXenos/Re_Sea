@@ -23,7 +23,7 @@ texture = ExtResource("6_bg")
 expand_mode = 1
 
 [node name="UiLayer" type="CanvasLayer" parent="."]
-layer = 100
+layer = 10
 
 [node name="Root" type="Control" parent="UiLayer"]
 anchor_right = 1.0
@@ -31,54 +31,17 @@ anchor_bottom = 1.0
 mouse_filter = 2
 theme = ExtResource("8_theme")
 
-[node name="TopPanel" type="NinePatchRect" parent="UiLayer/Root"]
-offset_left = 16.0
-offset_top = 10.0
-offset_right = 1264.0
-offset_bottom = 58.0
-mouse_filter = 2
-texture = ExtResource("7_pdark")
-patch_margin_left = 24
-patch_margin_top = 24
-patch_margin_right = 24
-patch_margin_bottom = 24
-
-[node name="TitleLabel" type="Label" parent="UiLayer/Root"]
-offset_left = 34.0
-offset_top = 16.0
-offset_right = 300.0
-offset_bottom = 52.0
-theme_override_font_sizes/font_size = 24
-
-[node name="DayLabel" type="Label" parent="UiLayer/Root"]
-offset_left = 320.0
-offset_top = 20.0
-offset_right = 480.0
-offset_bottom = 50.0
-
-[node name="ProgressLabel" type="Label" parent="UiLayer/Root"]
-offset_left = 470.0
-offset_top = 20.0
-offset_right = 840.0
-offset_bottom = 50.0
-
 [node name="RulebookButton" type="Button" parent="UiLayer/Root"]
-offset_left = 840.0
-offset_top = 14.0
-offset_right = 1050.0
-offset_bottom = 54.0
-
-[node name="FinishButton" type="Button" parent="UiLayer/Root"]
-offset_left = 1060.0
-offset_top = 14.0
-offset_right = 1252.0
-offset_bottom = 54.0
+offset_left = 1022.0
+offset_top = 52.0
+offset_right = 1264.0
+offset_bottom = 88.0
 
 [node name="InventoryBg" type="NinePatchRect" parent="UiLayer/Root"]
 offset_left = 16.0
-offset_top = 68.0
+offset_top = 52.0
 offset_right = 252.0
-offset_bottom = 696.0
+offset_bottom = 690.0
 mouse_filter = 2
 texture = ExtResource("7_pdark")
 patch_margin_left = 24
@@ -88,9 +51,9 @@ patch_margin_bottom = 24
 
 [node name="InventoryPanel" type="Control" parent="UiLayer/Root"]
 offset_left = 16.0
-offset_top = 68.0
+offset_top = 52.0
 offset_right = 252.0
-offset_bottom = 696.0
+offset_bottom = 690.0
 mouse_filter = 2
 script = ExtResource("2_inv")
 
@@ -122,9 +85,9 @@ theme_override_constants/v_separation = 8
 
 [node name="InspectBg" type="NinePatchRect" parent="UiLayer/Root"]
 offset_left = 260.0
-offset_top = 68.0
+offset_top = 94.0
 offset_right = 1264.0
-offset_bottom = 480.0
+offset_bottom = 494.0
 mouse_filter = 2
 texture = ExtResource("7_pdark")
 patch_margin_left = 24
@@ -134,9 +97,9 @@ patch_margin_bottom = 24
 
 [node name="InspectPanel" type="Control" parent="UiLayer/Root"]
 offset_left = 260.0
-offset_top = 68.0
+offset_top = 94.0
 offset_right = 1264.0
-offset_bottom = 480.0
+offset_bottom = 494.0
 mouse_filter = 2
 script = ExtResource("3_insp")
 
@@ -167,9 +130,9 @@ offset_bottom = 376.0
 
 [node name="ZoomHint" type="Label" parent="UiLayer/Root/InspectPanel"]
 offset_left = 12.0
-offset_top = 380.0
+offset_top = 372.0
 offset_right = 372.0
-offset_bottom = 404.0
+offset_bottom = 394.0
 theme_override_font_sizes/font_size = 14
 horizontal_alignment = 1
 
@@ -199,28 +162,32 @@ theme_override_constants/separation = 6
 
 [node name="BinRow" type="Control" parent="UiLayer/Root"]
 offset_left = 260.0
-offset_top = 484.0
+offset_top = 498.0
 offset_right = 1264.0
-offset_bottom = 696.0
+offset_bottom = 706.0
 mouse_filter = 2
 script = ExtResource("4_bins")
 
 [node name="Toast" type="Label" parent="UiLayer/Root"]
 offset_left = 16.0
-offset_top = 698.0
+offset_top = 696.0
 offset_right = 1264.0
-offset_bottom = 720.0
+offset_bottom = 718.0
 theme_override_font_sizes/font_size = 16
 horizontal_alignment = 1
 
-[node name="RulebookPanel" type="Control" parent="UiLayer/Root"]
+[node name="RulebookLayer" type="CanvasLayer" parent="."]
+layer = 100
+
+[node name="RulebookPanel" type="Control" parent="RulebookLayer"]
+theme = ExtResource("8_theme")
 offset_left = 220.0
 offset_top = 70.0
 offset_right = 1060.0
 offset_bottom = 650.0
 script = ExtResource("5_rule")
 
-[node name="Bg" type="NinePatchRect" parent="UiLayer/Root/RulebookPanel"]
+[node name="Bg" type="NinePatchRect" parent="RulebookLayer/RulebookPanel"]
 anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 2
@@ -230,24 +197,24 @@ patch_margin_top = 24
 patch_margin_right = 24
 patch_margin_bottom = 24
 
-[node name="Title" type="Label" parent="UiLayer/Root/RulebookPanel"]
+[node name="Title" type="Label" parent="RulebookLayer/RulebookPanel"]
 offset_left = 26.0
 offset_top = 18.0
 offset_right = 600.0
 offset_bottom = 54.0
 theme_override_font_sizes/font_size = 24
 
-[node name="Scroll" type="ScrollContainer" parent="UiLayer/Root/RulebookPanel"]
+[node name="Scroll" type="ScrollContainer" parent="RulebookLayer/RulebookPanel"]
 offset_left = 24.0
 offset_top = 62.0
 offset_right = 816.0
 offset_bottom = 512.0
 
-[node name="List" type="VBoxContainer" parent="UiLayer/Root/RulebookPanel/Scroll"]
+[node name="List" type="VBoxContainer" parent="RulebookLayer/RulebookPanel/Scroll"]
 custom_minimum_size = Vector2(780, 0)
 theme_override_constants/separation = 6
 
-[node name="CloseButton" type="Button" parent="UiLayer/Root/RulebookPanel"]
+[node name="CloseButton" type="Button" parent="RulebookLayer/RulebookPanel"]
 offset_left = 620.0
 offset_top = 522.0
 offset_right = 816.0

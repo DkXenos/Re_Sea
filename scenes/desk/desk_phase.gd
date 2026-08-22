@@ -5,40 +5,29 @@
 ## nothing here tells the player whether they were right.
 extends Node2D
 
-const END_DELAY := 1.0
-
 @onready var _inventory: Control = $UiLayer/Root/InventoryPanel
 @onready var _inspect: Control = $UiLayer/Root/InspectPanel
 @onready var _bins: Control = $UiLayer/Root/BinRow
-@onready var _rulebook: Control = $UiLayer/Root/RulebookPanel
-@onready var _title: Label = $UiLayer/Root/TitleLabel
-@onready var _day_label: Label = $UiLayer/Root/DayLabel
-@onready var _progress: Label = $UiLayer/Root/ProgressLabel
+@onready var _rulebook: Control = $RulebookLayer/RulebookPanel
 @onready var _toast: Label = $UiLayer/Root/Toast
 @onready var _rulebook_button: Button = $UiLayer/Root/RulebookButton
-@onready var _finish_button: Button = $UiLayer/Root/FinishButton
 
 var _day: DayData
-var _finished: bool = false
+var _active: bool = true
 
 
 func _ready() -> void:
 	_day = Game.current_day()
-	_title.text = Strings.t("desk_title")
 	_rulebook_button.text = Strings.t("desk_rulebook_button")
-	_finish_button.text = Strings.t("desk_finish")
 	_toast.text = ""
 	_inventory.item_selected.connect(_on_item_selected)
 	_bins.bin_chosen.connect(_on_bin_chosen)
 	_rulebook_button.pressed.connect(func() -> void: _rulebook.toggle(not _rulebook.visible))
-	_finish_button.pressed.connect(_finish)
 	Events.toast_requested.connect(_show_toast)
 	Events.debug_command.connect(_on_debug_command)
-	Events.budget_changed.connect(func(_r: int, _m: int) -> void: _refresh_header())
+
 	_inventory.refresh()
 	_inventory.select_first()
-	_refresh_header()
-	_check_shift_over()
 
 
 ## Only the debug command that needs the currently inspected item lands here.
@@ -53,7 +42,25 @@ func _on_debug_command(command: StringName, _arg: Variant) -> void:
 			_inventory.select_first()
 
 
+## The desk is a view inside the shift, not a phase: it never decides that the
+## day is over, and it keeps its state when the player switches to the tank.
+func set_view_active(active: bool) -> void:
+	_active = active
+	for child in get_children():
+		if child is CanvasLayer:
+			child.visible = active
+	if not active:
+		_rulebook.toggle(false)
+		_inspect.disarm()
+	else:
+		_inventory.refresh()
+		if _inspect.entry == null or _inspect.entry.sorted_to != -1:
+			_inventory.select_first()
+
+
 func _unhandled_input(event: InputEvent) -> void:
+	if not _active:
+		return
 	if event.is_action_pressed(&"rulebook"):
 		_rulebook.toggle(not _rulebook.visible)
 		get_viewport().set_input_as_handled()
@@ -69,8 +76,6 @@ func _on_item_selected(entry: CarriedItem) -> void:
 
 
 func _on_bin_chosen(category: int) -> void:
-	if _finished:
-		return
 	var entry: CarriedItem = _inspect.entry
 	if entry == null or entry.sorted_to != -1:
 		_bins.flash(category, false)
@@ -94,48 +99,6 @@ func _on_bin_chosen(category: int) -> void:
 	_inspect.disarm()
 	_inspect.clear()
 	_inventory.select_first()
-	_refresh_header()
-	_check_shift_over()
-
-
-## Sorting costs budget too, so the desk can run dry with items still in hand.
-## Leaving the player stuck in front of an inventory they cannot act on would be
-## a dead end.
-func _check_shift_over() -> void:
-	if Game.unsorted_items().is_empty():
-		_finish_after_delay()
-	elif not Game.can_afford(&"sort"):
-		_show_toast(Strings.t("shift_over"))
-		_finish_after_delay()
-
-
-func _refresh_header() -> void:
-	_day_label.text = Strings.tf("day_label", {"n": _day.day_number})
-	_progress.text = "%s          %s %d / %d" % [
-		Strings.tf("desk_progress", {"a": int(Game.stats.get("sorted", 0)), "b": _day.quota}),
-		Strings.t("budget_label"), Game.budget_left, Game.budget_max]
-
-
-func _finish_after_delay() -> void:
-	if _finished:
-		return
-	_finished = true
-	_show_toast(Strings.t("desk_empty"))
-	var timer := get_tree().create_timer(END_DELAY)
-	timer.timeout.connect(_emit_finished)
-
-
-func _finish() -> void:
-	if _finished:
-		return
-	_finished = true
-	_emit_finished()
-
-
-func _emit_finished() -> void:
-	_inspect.disarm()
-	Events.sfx_requested.emit(&"day_end")
-	Events.phase_finished.emit()
 
 
 func _show_toast(text: String) -> void:

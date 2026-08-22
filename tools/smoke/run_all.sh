@@ -5,12 +5,34 @@
 set -u
 cd "$(dirname "$0")/../.."
 
-BAD='SCRIPT ERROR|Parse Error|Failed loading|leaked|still in use|assertion failed|Condition .* is true'
+BAD='SCRIPT ERROR|Parse Error|Failed loading|leaked|still in use|assertion failed|Condition .* is true|TIMED OUT'
 fail=0
+
+# A failed GDScript assertion aborts the coroutine without ever reaching quit(),
+# so a broken check hangs forever instead of failing. macOS has no `timeout`, so
+# enforce a limit by hand and treat overrunning as a failure.
+LIMIT=${SMOKE_LIMIT:-180}
+
+run_limited() {
+  local log; log=$(mktemp)
+  "$@" >"$log" 2>&1 &
+  local pid=$!
+  local waited=0
+  while kill -0 "$pid" 2>/dev/null; do
+    if [ "$waited" -ge "$LIMIT" ]; then
+      kill -9 "$pid" 2>/dev/null
+      echo "TIMED OUT after ${LIMIT}s (a failed assertion never reaches quit)" >>"$log"
+      break
+    fi
+    sleep 1; waited=$((waited + 1))
+  done
+  wait "$pid" 2>/dev/null
+  cat "$log"; rm -f "$log"
+}
 
 check() {
   local name="$1"; shift
-  local out; out=$("$@" 2>&1)
+  local out; out=$(run_limited "$@" 2>&1)
   local hits; hits=$(printf '%s' "$out" | grep -icE "$BAD")
   if [ "$hits" -eq 0 ]; then
     printf '  PASS  %s\n' "$name"

@@ -41,7 +41,7 @@ func _run() -> void:
 
 	var inspect: Control = phase.get_node("UiLayer/Root/InspectPanel")
 	var bins: Control = phase.get_node("UiLayer/Root/BinRow")
-	var rulebook: Control = phase.get_node("UiLayer/Root/RulebookPanel")
+	var rulebook: Control = phase.get_node("RulebookLayer/RulebookPanel")
 
 	rulebook.toggle(true)
 	print("rulebook lines: %d" % rulebook.get_node("Scroll/List").get_child_count())
@@ -99,11 +99,9 @@ func _run() -> void:
 		[game.stats["sorted"], game.stats["correct"], game.stats["wrong"], deliberate_wrong,
 		game.budget_left])
 	assert(game.stats["wrong"] == deliberate_wrong, "rule checker disagreed with RuleChecker.resolve")
-	var waited := 0
-	while not finished and waited < 400:
-		waited += 1
-		await process_frame
-	print("phase_finished=%s" % finished)
+	# The desk is a view inside the shift now; it never ends the day itself.
+	assert(not finished, "the desk view must not end the shift on its own")
+	print("desk view correctly left the shift-ending decision to the shift")
 	# This harness quits mid-frame, so release any sound still playing rather
 	# than letting Godot report it as a leaked stream.
 	game.stop_all_sfx()

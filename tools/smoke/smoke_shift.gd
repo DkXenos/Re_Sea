@@ -13,6 +13,12 @@ func _init() -> void:
 	_run()
 
 
+## The claw refuses input on the desk tab, so the harness asks the budget
+## directly rather than the view's own can_drop flag.
+func Game_can_drop(game: Node) -> bool:
+	return game.can_afford(&"drop")
+
+
 func _run() -> void:
 	await process_frame
 	var game: Node = root.get_node("/root/Game")
@@ -25,9 +31,10 @@ func _run() -> void:
 		game.advance_day()
 	var day = game.current_day()
 
-	var phase: Node = load("res://scenes/claw/claw_phase.tscn").instantiate()
-	root.add_child(phase)
+	var shift: Node = load("res://scenes/shift/shift_phase.tscn").instantiate()
+	root.add_child(shift)
 	await physics_frame
+	var phase: Node = shift.get_node("ClawView")
 	var world: Node = phase.get_node("TankLayer/TankContainer/TankViewport/TankWorld")
 	var claw: Node2D = world.get_node("Claw")
 	var items: Node2D = world.get_node("Items")
@@ -53,8 +60,12 @@ func _run() -> void:
 			worst_available = mini(worst_available, available)
 			if available < day.min_available_items:
 				starved_frames += 1
+		# Switching tabs must cost nothing, so do it often and check later that
+		# the budget only moved by the actions taken.
+		if guard % 40 == 0:
+			shift._toggle_view()
 		# Alternate between grabbing and sorting so both costs are exercised.
-		if claw.state == 0 and claw.can_drop and items.get_child_count() > 0:
+		if claw.state == 0 and Game_can_drop(game) and items.get_child_count() > 0:
 			claw.position.x = clampf(items.get_child(0).position.x, claw.min_x, claw.max_x)
 			claw.start_drop()
 		var unsorted: Array = game.unsorted_items()
