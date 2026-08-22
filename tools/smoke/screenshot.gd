@@ -19,6 +19,25 @@ func _init() -> void:
 	_run()
 
 
+## Sorts a day's worth of items, getting some of them wrong, so the report has
+## real mistakes to explain.
+func _play_a_messy_day(game: Node) -> void:
+	var day = game.current_day()
+	var rules: Array[RuleData] = day.active_rules
+	var n: int = 0
+	for item in day.item_pool:
+		var entry = game.add_to_inventory(item)
+		n += 1
+		var choice: int = int(RuleChecker.resolve(item, rules)["category"])
+		if n % 3 == 0:
+			choice = (choice + 2) % 4
+		var correct := RuleChecker.judge(entry, choice, rules)
+		game.stats["sorted"] = int(game.stats["sorted"]) + 1
+		var key := "correct" if correct else "wrong"
+		game.stats[key] = int(game.stats[key]) + 1
+	game.stats["fish"] = 2
+
+
 func _run() -> void:
 	await process_frame
 	var args := OS.get_cmdline_user_args()
@@ -32,6 +51,8 @@ func _run() -> void:
 	if key == "desk":
 		for item in game.current_day().item_pool:
 			game.add_to_inventory(item)
+	if key == "report":
+		_play_a_messy_day(game)
 	var scene: Node = load(SCENES[key]).instantiate()
 	root.add_child(scene)
 	for i in 20:
@@ -44,4 +65,7 @@ func _run() -> void:
 	var img: Image = root.get_texture().get_image()
 	img.save_png(out)
 	print("saved ", out, " ", img.get_size())
+	game.stop_all_sfx()
+	for i in 10:
+		await process_frame
 	quit()
