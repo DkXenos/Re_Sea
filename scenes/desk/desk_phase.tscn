@@ -57,9 +57,9 @@ offset_right = 480.0
 offset_bottom = 50.0
 
 [node name="ProgressLabel" type="Label" parent="UiLayer/Root"]
-offset_left = 500.0
+offset_left = 470.0
 offset_top = 20.0
-offset_right = 760.0
+offset_right = 840.0
 offset_bottom = 50.0
 
 [node name="RulebookButton" type="Button" parent="UiLayer/Root"]

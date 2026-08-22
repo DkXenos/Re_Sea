@@ -52,9 +52,11 @@ func _run() -> void:
 	var day: DayData = DayData.new()
 	day.day_number = 6
 	day.quota = 1
-	day.max_grabs = 4
-	day.tools_enabled = true
-	day.tool_charges = {&"cutter": 3}
+	day.budget = 40
+	var day_tools: Array[StringName] = [&"cutter"]
+	day.available_tools = day_tools
+	day.initial_seed_fraction = 1.0
+	day.min_available_items = 1
 	day.intro_text = "Hari uji."
 	var rules: Array[RuleData] = [load(RULE_PATH)]
 	day.active_rules = rules

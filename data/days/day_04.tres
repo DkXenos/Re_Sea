@@ -26,12 +26,6 @@ day_number = 4
 active_rules = Array[ExtResource("1_vrvol")]([ExtResource("2_45bwo"), ExtResource("3_4fpem"), ExtResource("4_sypw1"), ExtResource("5_2hp76")])
 item_pool = Array[ExtResource("6_mfa1n")]([ExtResource("7_x6s1c"), ExtResource("8_3m8qg"), ExtResource("9_2ljcg"), ExtResource("10_xht3m"), ExtResource("11_n0wqy"), ExtResource("12_ov6ou"), ExtResource("13_yqadk"), ExtResource("14_ypmxn"), ExtResource("15_hfpnv"), ExtResource("16_qu4ep"), ExtResource("17_q5vjj"), ExtResource("18_8ffi4")])
 quota = 10
-max_grabs = 14
-tools_enabled = true
-tool_charges = {
-&"cutter": 2,
-&"magnifier": 4,
-&"rinse": 4,
-&"swab": 3
-}
-intro_text = "Pemotong tersedia, hanya dua kali pakai. Yang terlihat seperti kertas belum tentu kertas."
+budget = 150
+available_tools = Array[StringName]([&"rinse", &"magnifier", &"swab", &"cutter"])
+intro_text = "Pemotong tersedia. Yang terlihat seperti kertas belum tentu kertas - tapi setiap pemeriksaan mengurangi jatah cakar."

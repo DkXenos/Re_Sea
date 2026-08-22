@@ -26,8 +26,8 @@ func toggle(open: bool) -> void:
 func _build() -> void:
 	var list: VBoxContainer = $Panel/List
 	_button(list, "Skip to next day", func() -> void: Events.debug_command.emit(&"skip_day", null))
-	_button(list, "Refill all tool charges",
-		func() -> void: Events.debug_command.emit(&"refill_charges", null))
+	_button(list, "Refill shift budget",
+		func() -> void: Events.debug_command.emit(&"refill_budget", null))
 	_button(list, "Reveal all on current item",
 		func() -> void: Events.debug_command.emit(&"reveal_all", null))
 	_button(list, "Fill inventory with 6 items",

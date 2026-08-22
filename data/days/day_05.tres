@@ -30,12 +30,6 @@ day_number = 5
 active_rules = Array[ExtResource("1_iock1")]([ExtResource("2_2mgca"), ExtResource("3_7iw8q"), ExtResource("4_rt1rh"), ExtResource("5_ncpma"), ExtResource("6_be1lu"), ExtResource("7_ucesi")])
 item_pool = Array[ExtResource("8_tqqxb")]([ExtResource("9_8qpwf"), ExtResource("10_axbku"), ExtResource("11_r621r"), ExtResource("12_wksii"), ExtResource("13_oboq6"), ExtResource("14_4j7ba"), ExtResource("15_vlya8"), ExtResource("16_tnx5v"), ExtResource("17_jaaxc"), ExtResource("18_f3gij"), ExtResource("19_05fvb"), ExtResource("20_uw8fa"), ExtResource("21_cxlrb"), ExtResource("22_srjg0")])
 quota = 12
-max_grabs = 15
-tools_enabled = true
-tool_charges = {
-&"cutter": 1,
-&"magnifier": 3,
-&"rinse": 3,
-&"swab": 2
-}
-intro_text = "Aturan bertambah, jatah alat berkurang. Perhatikan aturan aluminium yang baru."
+budget = 160
+available_tools = Array[StringName]([&"rinse", &"magnifier", &"swab", &"cutter"])
+intro_text = "Aturan bertambah dan barang bertambah, tapi waktu shift hampir sama. Perhatikan aturan aluminium yang baru."

@@ -261,11 +261,6 @@ def gen_ui():
         save(img, "ui/%s.png" % name, "Ocean health meter %s. Fill is clipped by width." %
              name.split("_")[1])
 
-    for name, col in (("pip_full", (240, 200, 84)), ("pip_empty", (70, 80, 92))):
-        img, d = canvas(16, 16)
-        outlined(d, "ellipse", [1, 1, 14, 14], col, width=2)
-        save(img, "ui/%s.png" % name, "Budget pip (%s)" % name.split("_")[1])
-
     for name, ang in (("arrow_left", 180), ("arrow_right", 0)):
         img, d = canvas(96, 96)
         outlined(d, "ellipse", [4, 4, 91, 91], (58, 92, 118), width=3)

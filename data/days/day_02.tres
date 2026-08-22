@@ -20,10 +20,6 @@ day_number = 2
 active_rules = Array[ExtResource("1_p0xa3")]([ExtResource("2_m3wj7"), ExtResource("3_1ipuw")])
 item_pool = Array[ExtResource("4_100ek")]([ExtResource("5_80l45"), ExtResource("6_bnhly"), ExtResource("7_e51uk"), ExtResource("8_he6va"), ExtResource("9_30eif"), ExtResource("10_m3vtm"), ExtResource("11_br5qx"), ExtResource("12_46dms")])
 quota = 6
-max_grabs = 10
-tools_enabled = true
-tool_charges = {
-&"magnifier": 3,
-&"rinse": 3
-}
-intro_text = "Alat periksa datang. Bilas untuk melihat sisa kotoran, kaca pembesar untuk membaca kode."
+budget = 110
+available_tools = Array[StringName]([&"rinse", &"magnifier"])
+intro_text = "Alat periksa datang. Bilas untuk melihat sisa kotoran, kaca pembesar untuk membaca kode. Keduanya memakai waktu shift."

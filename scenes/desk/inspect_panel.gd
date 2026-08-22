@@ -15,8 +15,6 @@ const MIN_ZOOM := 1.0
 const MAX_ZOOM := 3.0
 const CHIP_SURFACE := preload("res://assets/ui/chip_surface.png")
 const CHIP_REVEAL := preload("res://assets/ui/chip_reveal.png")
-const PIP_FULL := preload("res://assets/ui/pip_full.png")
-const PIP_EMPTY := preload("res://assets/ui/pip_empty.png")
 
 @onready var _view: SubViewport = $ViewportBox/ItemViewport
 @onready var _item_root: Node2D = $ViewportBox/ItemViewport/ItemRoot
@@ -33,10 +31,11 @@ var _zoom: float = 1.0
 var _pan: Vector2 = Vector2.ZERO
 var _dragging: bool = false
 var _armed: StringName = &""
-var _tool_nodes: Dictionary = {} ## tool id -> {"sprite":…, "pips":…, "button":…}
+var _tool_nodes: Dictionary = {} ## tool id -> {"sprite":…, "cost":…, "button":…}
 
 
 func _ready() -> void:
+	Events.budget_changed.connect(func(_r: int, _m: int) -> void: _refresh_rack())
 	_zoom_hint.text = Strings.t("inspect_zoom_hint")
 	_evidence_title.text = Strings.t("evidence_title")
 	_surface.gui_input.connect(_on_surface_input)
@@ -71,10 +70,12 @@ func _make_tool_entry(tool_data: ToolData) -> Control:
 	name_label.add_theme_font_size_override("font_size", 19)
 	row.add_child(name_label)
 
-	var pips := HBoxContainer.new()
-	pips.position = Vector2(90, 46)
-	pips.add_theme_constant_override("separation", 5)
-	row.add_child(pips)
+	var cost_label := Label.new()
+	cost_label.text = Strings.tf("tools_cost_label", {"n": Game.cost_of(&"tool")})
+	cost_label.position = Vector2(90, 48)
+	cost_label.add_theme_font_size_override("font_size", 15)
+	cost_label.add_theme_color_override("font_color", Color(0.72, 0.78, 0.85))
+	row.add_child(cost_label)
 
 	# Invisible hit area over the artwork. The visible tool is the PNG above;
 	# this only carries the click and the focus ring.
@@ -84,32 +85,33 @@ func _make_tool_entry(tool_data: ToolData) -> Control:
 	button.pressed.connect(_on_tool_pressed.bind(tool_data.id))
 	row.add_child(button)
 
-	_tool_nodes[tool_data.id] = {"sprite": sprite, "pips": pips, "button": button,
-		"label": name_label}
+	_tool_nodes[tool_data.id] = {"sprite": sprite, "cost": cost_label,
+		"button": button, "label": name_label}
 	return row
 
 
+## A tool is greyed out either because today has no such tool, or because the
+## shift budget cannot pay for it - and the tooltip says which. §5 requires the
+## reason to be visible, not just the disabled state.
 func _refresh_rack() -> void:
 	for tool_id: StringName in _tool_nodes:
 		var parts: Dictionary = _tool_nodes[tool_id]
-		var available: bool = Game.tool_available(tool_id)
-		var charges: int = Game.charges_for(tool_id)
-		var tool_data := Game.get_tool(tool_id)
-		var pips: HBoxContainer = parts["pips"]
-		_clear(pips)
-		var total: int = tool_data.default_charges if tool_data != null else 0
-		if available:
-			var day := Game.current_day()
-			total = int(day.tool_charges.get(tool_id, total))
-		for i in total:
-			var pip := TextureRect.new()
-			pip.texture = PIP_FULL if i < charges else PIP_EMPTY
-			pips.add_child(pip)
-		parts["button"].disabled = not available or charges <= 0
+		var unlocked: bool = Game.tool_unlocked(tool_id)
+		var affordable: bool = Game.can_afford(&"tool")
+		var usable := unlocked and affordable
+		var button: Button = parts["button"]
+		button.disabled = not usable
+		if not unlocked:
+			button.tooltip_text = Strings.t("tools_locked")
+		elif not affordable:
+			button.tooltip_text = Strings.t("budget_too_low")
+		else:
+			button.tooltip_text = Strings.tf("tools_cost_label", {"n": Game.cost_of(&"tool")})
 		var sprite: AnimatedSprite2D = parts["sprite"]
 		sprite.play(&"using" if _armed == tool_id else &"idle")
-		sprite.modulate.a = 1.0 if available and charges > 0 else 0.4
-		parts["label"].modulate.a = 1.0 if available else 0.4
+		sprite.modulate.a = 1.0 if usable else 0.35
+		parts["label"].modulate.a = 1.0 if unlocked else 0.35
+		parts["cost"].modulate.a = 1.0 if usable else 0.35
 
 
 func _on_tool_pressed(tool_id: StringName) -> void:
@@ -196,14 +198,13 @@ func _use_tool_at(point: Vector2) -> void:
 	if entry == null:
 		return
 	var tool_id := _armed
-	if not Game.tool_available(tool_id):
+	if not Game.tool_unlocked(tool_id):
 		Events.toast_requested.emit(Strings.t("tools_locked"))
 		return
-	var tool_data := Game.get_tool(tool_id)
-	if not Game.spend_charge(tool_id):
-		Events.toast_requested.emit(Strings.tf("tools_no_charge",
-			{"tool": tool_data.display_name}))
+	if not Game.spend(&"tool"):
+		Events.toast_requested.emit(Strings.t("budget_too_low"))
 		return
+	Game.stats["tool_uses"] = int(Game.stats.get("tool_uses", 0)) + 1
 	Events.sfx_requested.emit(&"tool_use")
 	var normalized := _to_normalized(point)
 	var field := _hotspot_field(normalized, tool_id)

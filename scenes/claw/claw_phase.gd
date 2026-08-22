@@ -49,7 +49,7 @@ const BG_CAMERA_PARALLAX := 0.04
 
 @onready var _day_label: Label = $HudLayer/HudRoot/Hud/DayLabel
 @onready var _quota_label: Label = $HudLayer/HudRoot/Hud/QuotaLabel
-@onready var _grabs_label: Label = $HudLayer/HudRoot/Hud/GrabsLabel
+@onready var _budget_label: Label = $HudLayer/HudRoot/Hud/BudgetLabel
 @onready var _collected_label: Label = $HudLayer/HudRoot/Hud/CollectedLabel
 @onready var _grip_label: Label = $HudLayer/HudRoot/GripLabel
 @onready var _toast: Label = $HudLayer/HudRoot/Toast
@@ -60,8 +60,10 @@ const BG_CAMERA_PARALLAX := 0.04
 @onready var _map_claw: TextureRect = $HudLayer/HudRoot/Minimap/ClawMark
 
 var _day: DayData
-var _grabs_left: int = 0
 var _finished: bool = false
+## Items that have not drifted in yet.
+var _pending: Array[ItemData] = []
+var _spawn_timer: float = 0.0
 var _knob_home: Vector2
 var _bubble_speeds: Array[float] = []
 var _dots: Array[TextureRect] = []
@@ -72,16 +74,20 @@ func _ready() -> void:
 	if _day == null:
 		push_warning("Claw phase started with no day loaded")
 		return
-	_grabs_left = _day.max_grabs
 	_knob_home = _knob.position
 	_setup_tank()
 	_claw.cycle_finished.connect(_on_cycle_finished)
+	_claw.drop_started.connect(_on_drop_started)
+	Events.budget_changed.connect(_on_budget_changed)
 	$FrameLayer/ArrowLeft.button_down.connect(func() -> void: _claw.button_axis = -1.0)
 	$FrameLayer/ArrowLeft.button_up.connect(func() -> void: _claw.button_axis = 0.0)
 	$FrameLayer/ArrowRight.button_down.connect(func() -> void: _claw.button_axis = 1.0)
 	$FrameLayer/ArrowRight.button_up.connect(func() -> void: _claw.button_axis = 0.0)
 	$FrameLayer/DropButton.pressed.connect(_claw.start_drop)
-	$FrameLayer/DropButton.text = Strings.t("claw_drop_button")
+	$FrameLayer/DropButton.text = Strings.tf("claw_drop_button",
+		{"n": Game.cost_of(&"drop")})
+	$FrameLayer/DropButton.tooltip_text = Strings.tf("budget_cost",
+		{"n": Game.cost_of(&"drop")})
 	Events.toast_requested.connect(_show_toast)
 	Events.vfx_intensity_changed.connect(_rebuild_bubbles)
 	_hint.text = Strings.t("claw_hint")
@@ -114,19 +120,61 @@ func _setup_tank() -> void:
 	_camera.reset_smoothing()
 
 
+## The seabed opens partly stocked and fills up over the shift. Starting empty
+## would mean waiting, and waiting is dead time; starting full would mean there
+## is no reason to keep watching the tank.
 func _spawn_items() -> void:
-	var count := _day.item_pool.size()
+	var pool := _day.item_pool.duplicate()
+	_shuffle(pool)
+	# The fraction is the intent, but the availability floor wins: on a small
+	# pool a 40% seed would open below min_available_items and the player would
+	# start by waiting.
+	var seeded := mini(pool.size(),
+		maxi(_day.min_available_items, int(round(pool.size() * _day.initial_seed_fraction))))
 	var usable := seabed_width - 240.0
-	var lane := usable / maxf(1.0, float(count))
-	for i in count:
-		var node: Area2D = ITEM_SCENE.instantiate()
-		_items.add_child(node)
-		node.setup(_day.item_pool[i])
-		node.add_to_group(&"tank_item")
+	var lane := usable / maxf(1.0, float(seeded))
+	for i in seeded:
+		var node := _make_item(pool[i])
 		node.position = Vector2(
-			120.0 + lane * i + Game.rng.randf_range(-lane * 0.22, lane * 0.22),
+			120.0 + lane * i + Game.rng.randf_range(-lane * 0.25, lane * 0.25),
 			Game.rng.randf_range(ITEM_REST_Y.x, ITEM_REST_Y.y))
 		node.home_y = node.position.y
+	_pending.assign(pool.slice(seeded))
+	_reset_spawn_timer()
+
+
+func _make_item(data: ItemData) -> Area2D:
+	var node: Area2D = ITEM_SCENE.instantiate()
+	_items.add_child(node)
+	node.setup(data)
+	node.add_to_group(&"tank_item")
+	return node
+
+
+func _shuffle(list: Array) -> void:
+	for i in range(list.size() - 1, 0, -1):
+		var j := Game.rng.randi_range(0, i)
+		var swap: Variant = list[i]
+		list[i] = list[j]
+		list[j] = swap
+
+
+func _reset_spawn_timer() -> void:
+	_spawn_timer = Game.rng.randf_range(_day.spawn_interval_min, _day.spawn_interval_max)
+
+
+## The next item arrives on its timer, or immediately if the tank has dropped
+## below the day's floor - the player must never have a reason to sit and wait.
+func _update_spawning(delta: float) -> void:
+	if _pending.is_empty():
+		return
+	_spawn_timer -= delta
+	if _spawn_timer > 0.0 and _items.get_child_count() >= _day.min_available_items:
+		return
+	var node := _make_item(_pending.pop_front())
+	node.drift_in(Game.rng.randf_range(140.0, seabed_width - 140.0),
+		Game.rng.randf_range(ITEM_REST_Y.x, ITEM_REST_Y.y))
+	_reset_spawn_timer()
 
 
 func _spawn_fish() -> void:
@@ -161,6 +209,9 @@ func _rebuild_bubbles(intensity: float) -> void:
 
 
 func _process(delta: float) -> void:
+	_update_spawning(delta)
+	_claw.can_drop = not _finished and Game.can_afford(&"drop")
+	$FrameLayer/DropButton.disabled = not _claw.can_drop
 	_camera.position.x = _claw.position.x
 	_update_parallax()
 	_update_bubbles(delta)
@@ -236,10 +287,18 @@ func _update_minimap() -> void:
 			_dots[i].position = Vector2(item.position.x * scale_x - 5.0, 9.0)
 
 
+## The claw does not know what a drop costs; the tank charges the shift.
+func _on_drop_started() -> void:
+	Game.spend(&"drop")
+	Game.stats["drops"] = int(Game.stats.get("drops", 0)) + 1
+
+
+func _on_budget_changed(_remaining: int, _maximum: int) -> void:
+	_refresh_hud()
+	_check_finished()
+
+
 func _on_cycle_finished(result: Dictionary) -> void:
-	_grabs_left -= 1
-	Game.stats["grabs_used"] = int(Game.stats.get("grabs_used", 0)) + 1
-	Events.grabs_changed.emit(_grabs_left)
 	if String(result["kind"]) == "item":
 		var item: ItemData = result["item"]
 		Game.add_to_inventory(item)
@@ -252,14 +311,21 @@ func _on_cycle_finished(result: Dictionary) -> void:
 	_check_finished()
 
 
+## The tank has nothing more to offer once the budget cannot buy another drop,
+## or once the pool is spent and the seabed is bare. Whatever budget remains
+## belongs to the desk.
+func _shift_exhausted() -> bool:
+	if not Game.can_afford(&"drop"):
+		return true
+	return _pending.is_empty() and _items.get_child_count() == 0
+
+
 func _check_finished() -> void:
-	if _finished:
-		return
-	if _grabs_left > 0 and _items.get_child_count() > 0:
+	if _finished or not _shift_exhausted():
 		return
 	_finished = true
 	_claw.can_drop = false
-	_show_toast(Strings.t("claw_finished"))
+	_show_toast(Strings.t("shift_over"))
 	Events.sfx_requested.emit(&"day_end")
 	var timer := get_tree().create_timer(END_DELAY)
 	timer.timeout.connect(func() -> void: Events.phase_finished.emit())
@@ -268,7 +334,8 @@ func _check_finished() -> void:
 func _refresh_hud() -> void:
 	_day_label.text = Strings.tf("day_label", {"n": _day.day_number})
 	_quota_label.text = "%s %d" % [Strings.t("day_quota"), _day.quota]
-	_grabs_label.text = "%s %d" % [Strings.t("claw_grabs_left"), _grabs_left]
+	_budget_label.text = "%s %d / %d" % [Strings.t("budget_label"),
+		Game.budget_left, Game.budget_max]
 	_collected_label.text = "%s %d" % [Strings.t("claw_inventory"), Game.inventory.size()]
 
 

@@ -34,9 +34,11 @@ func _ready() -> void:
 	_finish_button.pressed.connect(_finish)
 	Events.toast_requested.connect(_show_toast)
 	Events.debug_command.connect(_on_debug_command)
+	Events.budget_changed.connect(func(_r: int, _m: int) -> void: _refresh_header())
 	_inventory.refresh()
 	_inventory.select_first()
 	_refresh_header()
+	_check_shift_over()
 
 
 ## Only the debug command that needs the currently inspected item lands here.
@@ -75,6 +77,11 @@ func _on_bin_chosen(category: int) -> void:
 		Events.sfx_requested.emit(&"bin_reject")
 		_show_toast(Strings.t("desk_no_selection"))
 		return
+	if not Game.spend(&"sort"):
+		_bins.flash(category, false)
+		Events.sfx_requested.emit(&"bin_reject")
+		_show_toast(Strings.t("budget_too_low"))
+		return
 	# The verdict is recorded but deliberately not shown. The day report is
 	# where the player finds out, and that delay is the point.
 	var correct := RuleChecker.judge(entry, category, _day.active_rules)
@@ -88,14 +95,25 @@ func _on_bin_chosen(category: int) -> void:
 	_inspect.clear()
 	_inventory.select_first()
 	_refresh_header()
+	_check_shift_over()
+
+
+## Sorting costs budget too, so the desk can run dry with items still in hand.
+## Leaving the player stuck in front of an inventory they cannot act on would be
+## a dead end.
+func _check_shift_over() -> void:
 	if Game.unsorted_items().is_empty():
+		_finish_after_delay()
+	elif not Game.can_afford(&"sort"):
+		_show_toast(Strings.t("shift_over"))
 		_finish_after_delay()
 
 
 func _refresh_header() -> void:
 	_day_label.text = Strings.tf("day_label", {"n": _day.day_number})
-	_progress.text = Strings.tf("desk_progress",
-		{"a": int(Game.stats.get("sorted", 0)), "b": _day.quota})
+	_progress.text = "%s          %s %d / %d" % [
+		Strings.tf("desk_progress", {"a": int(Game.stats.get("sorted", 0)), "b": _day.quota}),
+		Strings.t("budget_label"), Game.budget_left, Game.budget_max]
 
 
 func _finish_after_delay() -> void:

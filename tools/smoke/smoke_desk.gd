@@ -30,8 +30,8 @@ func _run() -> void:
 	var day = game.current_day()
 	for item in day.item_pool:
 		game.add_to_inventory(item)
-	print("day %d | inventory %d | charges %s" % [day.day_number, game.inventory.size(),
-		day.tool_charges])
+	print("day %d | inventory %d | budget %d | tools %s" % [day.day_number,
+		game.inventory.size(), game.budget_left, day.available_tools])
 
 	events.phase_finished.connect(func() -> void: finished = true)
 	var phase: Node = load("res://scenes/desk/desk_phase.tscn").instantiate()
@@ -50,8 +50,14 @@ func _run() -> void:
 	var hits := 0
 	var misses := 0
 	var guard := 0
+	var stopped_broke := false
 	while not game.unsorted_items().is_empty() and guard < 60:
 		guard += 1
+		# Sorting costs budget too, so a shift can run out mid-desk. That is the
+		# model working, not a failure - stop and report it.
+		if not game.can_afford(&"sort"):
+			stopped_broke = true
+			break
 		var entry = inspect.entry
 		if entry == null:
 			break
@@ -59,34 +65,39 @@ func _run() -> void:
 		# tool this item actually has a hotspot for.
 		for spot: Dictionary in entry.data.hotspots:
 			var tool_id := StringName(spot["tool"])
-			if game.charges_for(tool_id) <= 0:
+			if not game.can_afford(&"tool") or not game.tool_unlocked(tool_id):
 				continue
 			inspect._armed = tool_id
 			var before: int = entry.revealed.size()
 			inspect._use_tool_at(_point_for(spot["pos"]))
 			if entry.revealed.size() > before:
 				hits += 1
-			if game.charges_for(tool_id) > 0:
-				var charge_before: int = game.charges_for(tool_id)
+			if game.can_afford(&"tool"):
+				var budget_before: int = game.budget_left
 				inspect._armed = tool_id
 				inspect._use_tool_at(_point_for(Vector2(0.03, 0.03)))
-				if game.charges_for(tool_id) == charge_before - 1:
+				if game.budget_left == budget_before - game.cost_of(&"tool"):
 					misses += 1
 		inspect._armed = &""
 		var chips: int = inspect.get_node("EvidenceScroll/EvidenceLog").get_child_count()
 		print("  %-16s revealed=%d chips=%d" % [entry.data.id, entry.revealed.size(), chips])
 		var verdict := RuleChecker.resolve(entry.data, day.active_rules)
 		var choice: int = int(verdict["category"])
-		if guard % 4 == 0:
+		var intended_wrong := guard % 4 == 0
+		if intended_wrong:
 			choice = (choice + 1) % 4  # deliberate mistake, to exercise the wrong path
-			deliberate_wrong += 1
+		var sorted_before: int = int(game.stats["sorted"])
 		bins.bin_chosen.emit(choice)
+		# Only count it if the bin actually accepted it.
+		if int(game.stats["sorted"]) > sorted_before and intended_wrong:
+			deliberate_wrong += 1
 		await process_frame
 
-	print("hotspot hits=%d  charge-burning misses=%d" % [hits, misses])
-	print("sorted=%d correct=%d wrong=%d (deliberate mistakes %d) | charges left %s" %
+	print("hotspot hits=%d  budget-burning misses=%d%s" % [hits, misses,
+		"  (shift ran out of budget mid-desk)" if stopped_broke else ""])
+	print("sorted=%d correct=%d wrong=%d (deliberate mistakes %d) | budget left %d" %
 		[game.stats["sorted"], game.stats["correct"], game.stats["wrong"], deliberate_wrong,
-		game.tool_charges])
+		game.budget_left])
 	assert(game.stats["wrong"] == deliberate_wrong, "rule checker disagreed with RuleChecker.resolve")
 	var waited := 0
 	while not finished and waited < 400:

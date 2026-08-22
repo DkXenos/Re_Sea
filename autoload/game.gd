@@ -9,6 +9,22 @@ const SFX_POOL_SIZE := 6
 ## Paid once for a day with no mis-sorts that also met quota. Tuning candidate.
 const CLEAN_DAY_BONUS := 5
 
+## What each action spends from the shift budget.
+##
+## Time is spent by ACTIONS, never by the clock - there is no real-time
+## countdown anywhere in this game. That is deliberate: a ticking timer would
+## destroy the careful inspection the whole design is built around, while an
+## action-cost budget creates the intended tension, "do I grab another item, or
+## spend that on examining what I already have?". Thinking, panning, zooming,
+## moving the camera and reading the rulebook are all free.
+##
+## All three numbers are tuning candidates.
+const ACTION_COST: Dictionary = {
+	&"drop": 6,
+	&"tool": 4,
+	&"sort": 1,
+}
+
 # --- run ---
 var run_seed: int = 0
 var rng := RandomNumberGenerator.new()
@@ -18,9 +34,10 @@ var ocean_health: int = 100
 
 # --- current day ---
 var inventory: Array[CarriedItem] = []
-var tool_charges: Dictionary = {} ## tool id -> remaining
 var tools: Array[ToolData] = []
 var stats: Dictionary = {}
+var budget_max: int = 0
+var budget_left: int = 0
 
 # --- settings ---
 var settings: Dictionary = {}
@@ -112,12 +129,11 @@ func current_day() -> DayData:
 
 func begin_day() -> void:
 	inventory.clear()
-	stats = {"correct": 0, "wrong": 0, "sorted": 0, "grabs_used": 0}
-	tool_charges.clear()
+	stats = {"correct": 0, "wrong": 0, "sorted": 0, "drops": 0, "tool_uses": 0, "spent": 0}
 	var day := current_day()
-	if day != null:
-		for tool_id: StringName in day.tool_charges:
-			tool_charges[tool_id] = int(day.tool_charges[tool_id])
+	budget_max = day.budget if day != null else 0
+	budget_left = budget_max
+	Events.budget_changed.emit(budget_left, budget_max)
 	# Each day re-derives its stream from the run seed, so a seed reproduces the
 	# whole run and any single day of it.
 	rng.seed = run_seed + day_index * 7919
@@ -160,33 +176,44 @@ func unsorted_items() -> Array[CarriedItem]:
 	return out
 
 
-# ----------------------------------------------------------------- tool charges
+# ---------------------------------------------------------------- shift budget
 
-func charges_for(tool_id: StringName) -> int:
-	return int(tool_charges.get(tool_id, 0))
+func cost_of(action: StringName) -> int:
+	return int(ACTION_COST.get(action, 0))
 
 
-func tool_available(tool_id: StringName) -> bool:
-	var day := current_day()
-	if day == null or not day.tools_enabled:
+func can_afford(action: StringName) -> bool:
+	return budget_left >= cost_of(action)
+
+
+## Always spends, including when a tool click reveals nothing. That is the risk.
+func spend(action: StringName) -> bool:
+	var cost := cost_of(action)
+	if budget_left < cost:
 		return false
-	return tool_charges.has(tool_id)
-
-
-## Always spends, even when the click reveals nothing. That is the risk.
-func spend_charge(tool_id: StringName) -> bool:
-	if charges_for(tool_id) <= 0:
-		return false
-	tool_charges[tool_id] = charges_for(tool_id) - 1
+	budget_left -= cost
+	stats["spent"] = int(stats.get("spent", 0)) + cost
+	Events.budget_changed.emit(budget_left, budget_max)
 	return true
 
 
-func refill_charges() -> void:
+## True while the player can still do something that changes the outcome. Being
+## unable to afford a drop is not the end of the shift if there is still
+## sorting to do.
+func can_still_act() -> bool:
+	if can_afford(&"drop"):
+		return true
+	return not unsorted_items().is_empty() and can_afford(&"sort")
+
+
+func tool_unlocked(tool_id: StringName) -> bool:
 	var day := current_day()
-	if day == null:
-		return
-	for tool_id: StringName in day.tool_charges:
-		tool_charges[tool_id] = int(day.tool_charges[tool_id])
+	return day != null and tool_id in day.available_tools
+
+
+func refill_budget() -> void:
+	budget_left = budget_max
+	Events.budget_changed.emit(budget_left, budget_max)
 
 
 # ---------------------------------------------------------------- ocean health
@@ -307,7 +334,7 @@ func _exit_tree() -> void:
 
 func _on_debug_command(command: StringName, arg: Variant) -> void:
 	match command:
-		&"refill_charges": refill_charges()
+		&"refill_budget": refill_budget()
 		&"fill_inventory": fill_inventory(int(arg))
 		&"set_health": set_ocean_health(int(arg))
 		&"force_grip": force_grip = int(arg)

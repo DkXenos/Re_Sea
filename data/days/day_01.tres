@@ -15,4 +15,4 @@
 script = ExtResource("10_hfwts")
 active_rules = Array[ExtResource("1_g6g5r")]([ExtResource("2_ybjb6")])
 item_pool = Array[ExtResource("3_mq4mg")]([ExtResource("4_8ckkq"), ExtResource("5_sujy3"), ExtResource("6_sin3q"), ExtResource("7_cdv4y"), ExtResource("8_gtn0j"), ExtResource("9_xj3eh")])
-intro_text = "Hari pertama. Pilah dari yang terlihat saja - belum ada alat periksa."
+intro_text = "Hari pertama. Pilah dari yang terlihat saja - alat periksa belum ada. Setiap cakar, periksa dan buang memakai waktu shift; berpikir gratis."

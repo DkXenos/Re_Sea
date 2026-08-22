@@ -28,8 +28,9 @@ func _run() -> void:
 	var world: Node = phase.get_node("TankLayer/TankContainer/TankViewport/TankWorld")
 	var claw: Node2D = world.get_node("Claw")
 	var items: Node2D = world.get_node("Items")
-	print("spawned items=%d background fish=%d max_grabs=%d" % [items.get_child_count(),
-		world.get_node("FishHolder").get_child_count(), game.current_day().max_grabs])
+	print("seeded items=%d background fish=%d budget=%d (drop costs %d)" %
+		[items.get_child_count(), world.get_node("FishHolder").get_child_count(),
+		game.budget_left, game.cost_of(&"drop")])
 	# Fish are background now: no Area2D anywhere in the fish holder, so the
 	# claw physically cannot catch one.
 	for f in world.get_node("FishHolder").get_children():
@@ -52,9 +53,9 @@ func _run() -> void:
 				claw.position.x = clampf(target_holder.get_child(0).position.x,
 					claw.min_x, claw.max_x)
 			claw.start_drop()
-	print("finished=%s frames=%d inventory=%d grabs_used=%d items_left=%d" %
-		[finished, guard, game.inventory.size(),
-		game.stats["grabs_used"], items.get_child_count()])
+	print("finished=%s frames=%d inventory=%d drops=%d budget_left=%d items_left=%d" %
+		[finished, guard, game.inventory.size(), game.stats["drops"],
+		game.budget_left, items.get_child_count()])
 	for e in game.inventory:
 		print("   carried %s (weight %.1f, grip %d%%)" % [e.data.id, e.data.weight,
 			int(round(clampf(1.0 - e.data.weight * 0.15, 0.25, 0.95) * 100.0))])

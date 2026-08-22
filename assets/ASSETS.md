@@ -213,8 +213,6 @@ files are drawn programmatically by `tools/gen_placeholders.py` and
 | `assets/ui/minimap_claw.png` | 12x20 | Minimap marker for the claw |
 | `assets/ui/meter_bg.png` | 320x32 | Ocean health meter bg. Fill is clipped by width. |
 | `assets/ui/meter_fill.png` | 320x32 | Ocean health meter fill. Fill is clipped by width. |
-| `assets/ui/pip_full.png` | 16x16 | Budget pip (full) |
-| `assets/ui/pip_empty.png` | 16x16 | Budget pip (empty) |
 | `assets/ui/arrow_left.png` | 96x96 | Console arrow button (left) |
 | `assets/ui/arrow_right.png` | 96x96 | Console arrow button (right) |
 | `assets/ui/joystick_base.png` | 128x128 | Console joystick base |
@@ -230,6 +228,6 @@ files are drawn programmatically by `tools/gen_placeholders.py` and
 | `assets/env/cutscene_03.png` | 960x540 | Cutscene still 3 (placeholder) |
 | `assets/env/logo.png` | 640x200 | Title logo |
 
-_87 PNGs, 74 animations across 27 SpriteFrames resources._
+_85 PNGs, 74 animations across 27 SpriteFrames resources._
 _Hotspot overlays are generated separately — see above._
 _Regenerate with_ `python3 tools/gen_placeholders.py`.

@@ -184,7 +184,8 @@ theme_override_font_sizes/font_size = 24
 
 [node name="QuotaLabel" type="Label" parent="HudLayer/HudRoot/Hud"]
 
-[node name="GrabsLabel" type="Label" parent="HudLayer/HudRoot/Hud"]
+[node name="BudgetLabel" type="Label" parent="HudLayer/HudRoot/Hud"]
+theme_override_font_sizes/font_size = 21
 
 [node name="CollectedLabel" type="Label" parent="HudLayer/HudRoot/Hud"]
 

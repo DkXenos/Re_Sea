@@ -10,8 +10,13 @@
 extends Area2D
 
 const FALL_SPEED := 300.0
+## Drifting in on the current: slow, with a gentle sway.
+const DRIFT_SPEED := 52.0
+const DRIFT_SWAY := 26.0
+const DRIFT_SWAY_RATE := 1.1
+const DRIFT_START_Y := -70.0
 
-enum State { SETTLED, CARRIED, FALLING }
+enum State { SETTLED, CARRIED, FALLING, DRIFTING }
 
 var data: ItemData
 var home_y: float = 0.0
@@ -21,6 +26,8 @@ var state: State = State.SETTLED
 ## slipped item always returns to the item holder rather than wherever the claw
 ## happened to be parented.
 var _home_parent: Node = null
+var _drift_x: float = 0.0
+var _drift_t: float = 0.0
 
 @onready var sprite: AnimatedSprite2D = $Sprite
 
@@ -36,6 +43,19 @@ func setup(item: ItemData) -> void:
 	if item.frames != null:
 		sprite.sprite_frames = item.frames
 	sprite.play(&"idle")
+
+
+## Arrives from above and sinks on a curved path to its resting height.
+## Drifting rather than popping into place is physically plausible, shows the
+## player that trash arrives from somewhere, and sets up the source_batch field
+## for a future "trace the polluter" arc. It is grabbable the whole way down.
+func drift_in(target_x: float, rest_y: float) -> void:
+	home_y = rest_y
+	_drift_x = target_x
+	_drift_t = randf() * TAU
+	position = Vector2(target_x, DRIFT_START_Y)
+	state = State.DRIFTING
+	sprite.play(&"sinking")
 
 
 func grip_chance() -> float:
@@ -61,10 +81,20 @@ func drop_into() -> void:
 
 
 func _process(delta: float) -> void:
-	if state != State.FALLING:
-		return
-	position.y = minf(position.y + FALL_SPEED * delta, home_y)
-	if position.y >= home_y:
-		state = State.SETTLED
-		monitorable = true
-		sprite.play(&"idle")
+	match state:
+		State.FALLING:
+			position.y = minf(position.y + FALL_SPEED * delta, home_y)
+			if position.y >= home_y:
+				_settle()
+		State.DRIFTING:
+			_drift_t += delta
+			position.y = minf(position.y + DRIFT_SPEED * delta, home_y)
+			position.x = _drift_x + sin(_drift_t * DRIFT_SWAY_RATE) * DRIFT_SWAY
+			if position.y >= home_y:
+				_settle()
+
+
+func _settle() -> void:
+	state = State.SETTLED
+	monitorable = true
+	sprite.play(&"idle")

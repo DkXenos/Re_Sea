@@ -7,6 +7,9 @@
 extends Node2D
 
 signal cycle_finished(result: Dictionary)
+## Emitted the moment a drop commits, so the tank can charge the shift budget.
+## The claw does not know what a drop costs.
+signal drop_started()
 
 const H_SPEED := 220.0
 const DESCEND_SPEED := 160.0
@@ -84,6 +87,7 @@ func start_drop() -> void:
 		return
 	state = State.DESCEND
 	sprite.play(&"open")
+	drop_started.emit()
 	Events.sfx_requested.emit(&"claw_drop")
 
 

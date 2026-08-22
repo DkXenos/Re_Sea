@@ -12,7 +12,7 @@ func _ready() -> void:
 	root.get_node("SeedLabel").text = Strings.tf("day_seed", {"n": Game.run_seed})
 	root.get_node("StatsLabel").text = "%s %d          %s %d          %s %s" % [
 		Strings.t("day_quota"), day.quota,
-		Strings.t("day_grabs"), day.max_grabs,
+		Strings.t("day_budget"), day.budget,
 		Strings.t("day_tools"), _tools_summary(day)]
 	var list: VBoxContainer = root.get_node("RulesScroll/RulesList")
 	for rule: RuleData in day.active_rules:
@@ -30,12 +30,12 @@ func _ready() -> void:
 
 
 func _tools_summary(day: DayData) -> String:
-	if not day.tools_enabled or day.tool_charges.is_empty():
+	if not day.tools_enabled():
 		return Strings.t("day_tools_locked")
 	var parts: Array[String] = []
 	for tool_data: ToolData in Game.tools:
-		if day.tool_charges.has(tool_data.id):
-			parts.append("%s %d" % [tool_data.display_name, int(day.tool_charges[tool_data.id])])
+		if tool_data.id in day.available_tools:
+			parts.append(tool_data.display_name)
 	return ", ".join(parts)
 
 

@@ -10,7 +10,7 @@ signal day_started(day: DayData)
 signal phase_finished()
 
 # --- claw phase ---
-signal grabs_changed(remaining: int)
+signal budget_changed(remaining: int, maximum: int)
 signal item_grabbed(item: ItemData)
 signal grip_failed(item: ItemData)
 signal grip_preview_changed(chance: float, item: ItemData)

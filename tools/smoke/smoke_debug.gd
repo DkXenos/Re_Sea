@@ -40,12 +40,13 @@ func _run() -> void:
 	game.advance_day() # day 2 has tool charges
 	events.debug_command.emit(&"fill_inventory", 6)
 	assert(game.inventory.size() == 6, "fill_inventory failed")
-	game.spend_charge(&"rinse")
-	var spent: int = game.charges_for(&"rinse")
-	events.debug_command.emit(&"refill_charges", null)
-	assert(game.charges_for(&"rinse") > spent, "refill_charges failed")
-	print("inventory=%d rinse charges %d -> %d" % [game.inventory.size(), spent,
-		game.charges_for(&"rinse")])
+	game.spend(&"tool")
+	game.spend(&"drop")
+	var spent: int = game.budget_left
+	events.debug_command.emit(&"refill_budget", null)
+	assert(game.budget_left > spent, "refill_budget failed")
+	assert(game.budget_left == game.budget_max, "refill_budget did not restore the full shift")
+	print("inventory=%d budget %d -> %d" % [game.inventory.size(), spent, game.budget_left])
 
 	# reveal_all needs the desk scene, since it acts on the inspected item.
 	events.scene_change_requested.emit(&"desk")
