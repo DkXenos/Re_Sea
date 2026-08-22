@@ -6,3 +6,4 @@
 script = ExtResource("1_dmnmj")
 id = &"r_baseline"
 text = "Pilah dari bahannya: bahan alami masuk ORGANIK; plastik, logam, kaca dan kertas yang bersih masuk DAUR ULANG; bahan kimia masuk B3; sisanya masuk RESIDU."
+short_text = "Bahannya menentukan tempatnya"

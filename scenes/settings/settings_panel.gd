@@ -16,6 +16,23 @@ const ROWS: Array = [
 func _ready() -> void:
 	for row: Array in ROWS:
 		_list.add_child(_make_row(row[0], Strings.t(row[1])))
+	_list.add_child(_make_toggle("hotspots", Strings.t("settings_hotspots")))
+
+
+## The hotspot rings are an accessibility option, not a difficulty setting: the
+## final art is meant to draw the hotspot into the item itself.
+func _make_toggle(key: String, label_text: String) -> Control:
+	var row := HBoxContainer.new()
+	var name_label := Label.new()
+	name_label.text = label_text
+	name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	name_label.add_theme_font_size_override("font_size", 19)
+	row.add_child(name_label)
+	var toggle := CheckButton.new()
+	toggle.button_pressed = bool(Game.settings.get(key, true))
+	toggle.toggled.connect(func(on: bool) -> void: Game.apply_toggle(key, on))
+	row.add_child(toggle)
+	return row
 
 
 func _make_row(key: String, label_text: String) -> Control:

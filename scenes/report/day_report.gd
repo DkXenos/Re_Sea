@@ -7,16 +7,6 @@
 ## the player has to be able to trace it.
 extends Node2D
 
-## A rule keys off an ItemData property; the player learns that property by
-## revealing a field. They are not always the same name - is_multilayer is
-## learned by cutting the item open, which reveals true_material.
-const RULE_KEY_TO_REVEAL: Dictionary = {
-	"has_residue": "has_residue",
-	"residue_type": "residue_type",
-	"true_material": "true_material",
-	"is_multilayer": "true_material",
-	"tag_text": "tag_text",
-}
 const FIELD_LABELS: Dictionary = {
 	"has_residue": "chip_residue",
 	"residue_type": "chip_residue_type",
@@ -121,9 +111,9 @@ func _missed_properties(entry: CarriedItem) -> Array[String]:
 		return out
 	var seen: Dictionary = {}
 	for key: String in entry.broken_rule.applies_when:
-		if not RULE_KEY_TO_REVEAL.has(key):
+		if not RuleChecker.RULE_KEY_TO_REVEAL.has(key):
 			continue
-		var field: String = RULE_KEY_TO_REVEAL[key]
+		var field: String = RuleChecker.RULE_KEY_TO_REVEAL[key]
 		if entry.is_revealed(field) or seen.has(field):
 			continue
 		seen[field] = true

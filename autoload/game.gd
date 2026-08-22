@@ -42,6 +42,8 @@ var budget_left: int = 0
 # --- settings ---
 var settings: Dictionary = {}
 var vfx_intensity: float = 1.0
+## Whether the hotspot ring overlay is drawn on items in the inspect panel.
+var show_hotspots: bool = true
 
 # --- debug switches (only ever set by the F1 overlay) ---
 var force_grip: int = 0 ## 1 = always succeed, -1 = always fail, 0 = roll
@@ -58,7 +60,10 @@ func _ready() -> void:
 	_build_sfx_pool()
 	settings = SaveSettings.load_all()
 	for key: String in settings:
-		apply_setting(key, settings[key], false)
+		if SaveSettings.TOGGLES.has(key):
+			apply_toggle(key, bool(settings[key]), false)
+		else:
+			apply_setting(key, float(settings[key]), false)
 	_load_days()
 	_load_tools()
 	Events.sfx_requested.connect(play_sfx)
@@ -282,6 +287,18 @@ func apply_setting(key: String, value: float, persist: bool = true) -> void:
 		SaveSettings.save_all(settings)
 
 
+## On/off settings, kept separate from the sliders so a bool never gets clamped
+## into a float.
+func apply_toggle(key: String, value: bool, persist: bool = true) -> void:
+	settings[key] = value
+	match key:
+		"hotspots":
+			show_hotspots = value
+			Events.hotspots_visible_changed.emit(show_hotspots)
+	if persist:
+		SaveSettings.save_all(settings)
+
+
 func _set_bus(bus_name: String, value: float) -> void:
 	var idx := AudioServer.get_bus_index(bus_name)
 	if idx < 0:
@@ -341,3 +358,4 @@ func _on_debug_command(command: StringName, arg: Variant) -> void:
 		&"set_seed":
 			run_seed = int(arg)
 			rng.seed = run_seed
+		&"toggle_hotspots": apply_toggle("hotspots", not show_hotspots)

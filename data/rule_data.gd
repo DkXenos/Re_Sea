@@ -6,6 +6,11 @@ extends Resource
 
 @export var id: StringName
 @export var text: String ## shown verbatim in the rulebook
+## Compact form for the always-visible checklist in the inspect panel, e.g.
+## "Ada sisa kotoran -> RESIDU". The rulebook still shows `text` verbatim; this
+## exists because a six-sentence list will not fit beside the item, and it is
+## data rather than a truncation rule in code. Falls back to `text`.
+@export var short_text: String = ""
 ## Property name on ItemData -> required value. An Array value means "any of".
 ## e.g. {"has_residue": true}
 @export var applies_when: Dictionary = {}
@@ -15,6 +20,10 @@ extends Resource
 ## An empty applies_when means this rule is rulebook text only and never
 ## overrides anything - that is how the day 1 baseline rule states the default
 ## without special-casing it in code.
+func label() -> String:
+	return short_text if short_text != "" else text
+
+
 func matches(item: ItemData) -> bool:
 	if applies_when.is_empty():
 		return false

@@ -6,6 +6,7 @@
 script = ExtResource("1_efgsv")
 id = &"r_alu_always"
 text = "Mulai hari ini aluminium selalu bisa didaur ulang, walaupun masih ada sisa kotoran. Aturan ini mengalahkan aturan sisa kotoran."
+short_text = "Aluminium  ->  DAUR ULANG"
 applies_when = {
 "visible_material": ["aluminium"]
 }

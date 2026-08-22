@@ -103,10 +103,18 @@ offset_bottom = 494.0
 mouse_filter = 2
 script = ExtResource("3_insp")
 
+[node name="Question" type="Label" parent="UiLayer/Root/InspectPanel"]
+offset_left = 14.0
+offset_top = 6.0
+offset_right = 352.0
+offset_bottom = 52.0
+theme_override_font_sizes/font_size = 16
+autowrap_mode = 3
+
 [node name="ViewportBox" type="SubViewportContainer" parent="UiLayer/Root/InspectPanel"]
-offset_left = 12.0
-offset_top = 16.0
-offset_right = 372.0
+offset_left = 16.0
+offset_top = 56.0
+offset_right = 336.0
 offset_bottom = 376.0
 mouse_filter = 2
 
@@ -114,51 +122,75 @@ mouse_filter = 2
 transparent_bg = true
 handle_input_locally = false
 gui_disable_input = true
-size = Vector2i(360, 360)
+size = Vector2i(320, 320)
 render_target_update_mode = 4
 
 [node name="ItemRoot" type="Node2D" parent="UiLayer/Root/InspectPanel/ViewportBox/ItemViewport"]
-position = Vector2(180, 180)
+position = Vector2(160, 160)
 
 [node name="Sprite" type="Sprite2D" parent="UiLayer/Root/InspectPanel/ViewportBox/ItemViewport/ItemRoot"]
 
+[node name="Hotspots" type="Sprite2D" parent="UiLayer/Root/InspectPanel/ViewportBox/ItemViewport/ItemRoot"]
+
 [node name="Surface" type="Control" parent="UiLayer/Root/InspectPanel"]
-offset_left = 12.0
-offset_top = 16.0
-offset_right = 372.0
+offset_left = 16.0
+offset_top = 56.0
+offset_right = 336.0
 offset_bottom = 376.0
 
 [node name="ZoomHint" type="Label" parent="UiLayer/Root/InspectPanel"]
-offset_left = 12.0
-offset_top = 372.0
-offset_right = 372.0
-offset_bottom = 394.0
-theme_override_font_sizes/font_size = 14
+offset_left = 16.0
+offset_top = 378.0
+offset_right = 352.0
+offset_bottom = 396.0
+theme_override_font_sizes/font_size = 12
 horizontal_alignment = 1
 
 [node name="ToolRack" type="VBoxContainer" parent="UiLayer/Root/InspectPanel"]
-offset_left = 388.0
-offset_top = 16.0
-offset_right = 638.0
-offset_bottom = 404.0
-theme_override_constants/separation = 8
+offset_left = 364.0
+offset_top = 50.0
+offset_right = 574.0
+offset_bottom = 330.0
+theme_override_constants/separation = 6
+
+[node name="Feedback" type="Label" parent="UiLayer/Root/InspectPanel"]
+offset_left = 364.0
+offset_top = 336.0
+offset_right = 578.0
+offset_bottom = 396.0
+theme_override_font_sizes/font_size = 13
+autowrap_mode = 3
+
+[node name="RulesTitle" type="Label" parent="UiLayer/Root/InspectPanel"]
+offset_left = 590.0
+offset_top = 6.0
+offset_right = 992.0
+offset_bottom = 28.0
+theme_override_font_sizes/font_size = 15
+
+[node name="RulesList" type="VBoxContainer" parent="UiLayer/Root/InspectPanel"]
+offset_left = 590.0
+offset_top = 32.0
+offset_right = 992.0
+offset_bottom = 172.0
+theme_override_constants/separation = 3
 
 [node name="EvidenceTitle" type="Label" parent="UiLayer/Root/InspectPanel"]
-offset_left = 654.0
-offset_top = 16.0
+offset_left = 590.0
+offset_top = 176.0
 offset_right = 992.0
-offset_bottom = 44.0
-theme_override_font_sizes/font_size = 18
+offset_bottom = 202.0
+theme_override_font_sizes/font_size = 15
 
 [node name="EvidenceScroll" type="ScrollContainer" parent="UiLayer/Root/InspectPanel"]
-offset_left = 654.0
-offset_top = 48.0
+offset_left = 590.0
+offset_top = 200.0
 offset_right = 992.0
-offset_bottom = 404.0
+offset_bottom = 396.0
 
 [node name="EvidenceLog" type="VBoxContainer" parent="UiLayer/Root/InspectPanel/EvidenceScroll"]
-custom_minimum_size = Vector2(330, 0)
-theme_override_constants/separation = 6
+custom_minimum_size = Vector2(392, 0)
+theme_override_constants/separation = 4
 
 [node name="BinRow" type="Control" parent="UiLayer/Root"]
 offset_left = 260.0

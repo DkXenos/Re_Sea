@@ -19,6 +19,7 @@ const TABLE: Dictionary = {
 	"settings_music": "Musik",
 	"settings_sfx": "Efek Suara",
 	"settings_vfx": "Intensitas Efek Visual",
+	"settings_hotspots": "Tampilkan tanda titik periksa",
 	"settings_back": "Kembali",
 
 	# --- cutscene ---
@@ -74,7 +75,13 @@ const TABLE: Dictionary = {
 	"evidence_title": "CATATAN BUKTI",
 	"bins_title": "Buang ke",
 	"reveal_success": "Ditemukan sesuatu!",
-	"reveal_nothing": "Tidak ada apa-apa di titik itu. Jatah tetap terpakai.",
+	"reveal_nothing": "Bersih di titik ini - tidak ada yang bisa dibaca.",
+	"inspect_found": "Ditemukan: {v}   (waktu shift -{n})",
+	"inspect_nothing": "Bersih di titik ini. Tidak ada temuan, waktu shift tetap terpakai -{n}.",
+	"inspect_rules_title": "ATURAN AKTIF HARI INI",
+	"inspect_question": "Terlihat seperti {mat}. Percaya?",
+	"inspect_question_labeled": "Tertulis {label}, terlihat seperti {mat}. Percaya?",
+	"inspect_pick_first": "Pilih barang dari daftar di kiri.",
 	"tools_cost_label": "biaya {n}",
 
 	# --- evidence chips ---

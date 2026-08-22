@@ -49,7 +49,7 @@ func _run() -> void:
 	game.start_run(4242)
 	for i in day - 1:
 		game.advance_day()
-	if key == "desk" or (key == "shift" and args.size() > 3 and args[3] == "desk"):
+	if key == "desk" or (key == "shift" and args.size() > 3 and args[3] in ["desk", "evidence"]):
 		for item in game.current_day().item_pool:
 			game.add_to_inventory(item)
 	if key == "report":
@@ -58,6 +58,21 @@ func _run() -> void:
 	root.add_child(scene)
 	for i in 20:
 		await process_frame
+	if key == "shift" and args.size() > 3 and args[3] == "evidence":
+		scene._toggle_view()
+		for i in 3:
+			await process_frame
+		var inspect: Control = scene.get_node("DeskView/UiLayer/Root/InspectPanel")
+		for e in game.inventory:
+			if e.data.id == &"oil_jerrycan":
+				inspect.show_entry(e)
+				inspect._armed = &"rinse"
+				inspect._use_tool_at(Vector2(160, 160) + (Vector2(0.38, 0.70) - Vector2(0.5, 0.5)) * 288.0)
+				inspect._armed = &"swab"
+				inspect._use_tool_at(Vector2(160, 160) + (Vector2(0.62, 0.60) - Vector2(0.5, 0.5)) * 288.0)
+				inspect._armed = &""
+		for i in 5:
+			await process_frame
 	if key == "shift" and args.size() > 3 and args[3] == "desk":
 		scene._toggle_view()
 		for i in 3:

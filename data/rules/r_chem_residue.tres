@@ -6,6 +6,7 @@
 script = ExtResource("1_aglgl")
 id = &"r_chem_residue"
 text = "Sisa oli, cat pelarut atau obat kadaluarsa membuat wadahnya menjadi limbah B3. Aturan ini mengalahkan aturan sisa kotoran."
+short_text = "Sisa oli / cat / obat  ->  B3"
 applies_when = {
 "residue_type": ["oli mesin", "cat berbasis pelarut", "sisa obat kadaluarsa"]
 }

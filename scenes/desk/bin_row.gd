@@ -12,6 +12,7 @@ const CATEGORY_ASSETS: Array[String] = ["organic", "recyclable", "hazard", "land
 const CATEGORY_KEYS: Array[String] = ["bin_organic", "bin_recyclable", "bin_hazard", "bin_landfill"]
 
 var _sprites: Array[AnimatedSprite2D] = []
+var _highlighted: int = -1
 
 
 func _ready() -> void:
@@ -43,6 +44,17 @@ func _ready() -> void:
 		add_child(button)
 
 
+## Marks the bin the player's own revealed evidence currently points at. This
+## is the other half of the chip highlight: the reasoning and its conclusion
+## light up together.
+func highlight(category: int) -> void:
+	for i in _sprites.size():
+		var sprite := _sprites[i]
+		if sprite.animation in [&"accept", &"reject"]:
+			continue  # a flash is playing; leave it alone
+		sprite.play(&"highlight" if i == category else &"idle")
+
+
 func flash(category: int, accepted: bool) -> void:
 	if category < 0 or category >= _sprites.size():
 		return
@@ -52,3 +64,4 @@ func flash(category: int, accepted: bool) -> void:
 	timer.timeout.connect(func() -> void:
 		if is_instance_valid(sprite):
 			sprite.play(&"idle"))
+	_highlighted = -1

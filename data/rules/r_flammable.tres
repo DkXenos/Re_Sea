@@ -6,6 +6,7 @@
 script = ExtResource("1_ctqyg")
 id = &"r_flammable"
 text = "Barang dengan label MUDAH TERBAKAR selalu masuk B3, walaupun terlihat kosong."
+short_text = "Label MUDAH TERBAKAR  ->  B3"
 applies_when = {
 "tag_text": ["MUDAH TERBAKAR - jangan ditusuk"]
 }

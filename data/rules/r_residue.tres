@@ -6,6 +6,7 @@
 script = ExtResource("1_f88a7")
 id = &"r_residue"
 text = "Barang yang masih ada sisa kotoran tidak bisa didaur ulang. Buang ke RESIDU."
+short_text = "Ada sisa kotoran  ->  RESIDU"
 applies_when = {
 "has_residue": true
 }

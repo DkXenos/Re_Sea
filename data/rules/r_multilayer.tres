@@ -6,6 +6,7 @@
 script = ExtResource("1_13lgy")
 id = &"r_multilayer"
 text = "Kemasan berlapis (kertas, plastik dan aluminium yang menyatu) tidak bisa dipisah. Buang ke RESIDU."
+short_text = "Kemasan berlapis  ->  RESIDU"
 applies_when = {
 "is_multilayer": true
 }

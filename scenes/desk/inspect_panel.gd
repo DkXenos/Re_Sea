@@ -1,27 +1,48 @@
-## The inspect panel: item viewport, tool rack, evidence log.
+## The inspect panel: question, item viewport, tool rack, active-rule checklist
+## and evidence log.
+##
+## Revision 1 §7 rebuilt this for legibility. The systems already worked; what
+## was missing was any signal to the player about what game they were playing.
+## Five things carry that now:
+##
+##   1. The active rules sit beside the item, so the rules are never a memory
+##      test and the player never has to leave the item to check them.
+##   2. Evidence chips light up when they satisfy an active rule, and the bin
+##      that rule forces lights up with them - the player watches their own
+##      reasoning assemble.
+##   3. A question line frames the decision from surface info alone.
+##   4. A tool that finds nothing says so, and says what it cost.
+##   5. Hotspot rings are a separate overlay that can be switched off.
 ##
 ## The zoom and pan are purely tactile - no gameplay depends on zoom level. It
-## exists so examining feels like examining. It uses a SubViewport rather than a
-## scaled TextureRect so clipping and pan bounds come free.
-##
-## Reveals are hotspot-based. Using a tool on empty area spends the charge and
-## reveals nothing, and that is never prevented: the risk is the whole design.
+## uses a SubViewport rather than a scaled TextureRect so clipping and pan
+## bounds come free.
 extends Control
 
 signal reveal_happened(field: String, hit: bool)
+## The bin the revealed evidence currently points at, or -1 for none.
+signal bin_hint_changed(category: int)
 
-const BASE_SCALE := 2.0
+const BASE_SCALE := 1.8
 const MIN_ZOOM := 1.0
 const MAX_ZOOM := 3.0
+const ITEM_SIZE := 160.0
 const CHIP_SURFACE := preload("res://assets/ui/chip_surface.png")
 const CHIP_REVEAL := preload("res://assets/ui/chip_reveal.png")
+const CHIP_MATCH := preload("res://assets/ui/chip_match.png")
+const TOOL_ROW_HEIGHT := 64
 
 @onready var _view: SubViewport = $ViewportBox/ItemViewport
 @onready var _item_root: Node2D = $ViewportBox/ItemViewport/ItemRoot
 @onready var _item_sprite: Sprite2D = $ViewportBox/ItemViewport/ItemRoot/Sprite
+@onready var _hotspot_sprite: Sprite2D = $ViewportBox/ItemViewport/ItemRoot/Hotspots
 @onready var _surface: Control = $Surface
+@onready var _question: Label = $Question
 @onready var _zoom_hint: Label = $ZoomHint
 @onready var _rack: VBoxContainer = $ToolRack
+@onready var _feedback: Label = $Feedback
+@onready var _rules_title: Label = $RulesTitle
+@onready var _rules_list: VBoxContainer = $RulesList
 @onready var _evidence_title: Label = $EvidenceTitle
 @onready var _log: VBoxContainer = $EvidenceScroll/EvidenceLog
 
@@ -31,15 +52,21 @@ var _zoom: float = 1.0
 var _pan: Vector2 = Vector2.ZERO
 var _dragging: bool = false
 var _armed: StringName = &""
-var _tool_nodes: Dictionary = {} ## tool id -> {"sprite":…, "cost":…, "button":…}
+var _tool_nodes: Dictionary = {}
 
 
 func _ready() -> void:
-	Events.budget_changed.connect(func(_r: int, _m: int) -> void: _refresh_rack())
 	_zoom_hint.text = Strings.t("inspect_zoom_hint")
 	_evidence_title.text = Strings.t("evidence_title")
+	_rules_title.text = Strings.t("inspect_rules_title")
+	_question.text = Strings.t("inspect_pick_first")
+	_feedback.text = ""
 	_surface.gui_input.connect(_on_surface_input)
+	Events.budget_changed.connect(func(_r: int, _m: int) -> void: _refresh_rack())
+	Events.hotspots_visible_changed.connect(_set_hotspots_visible)
+	_set_hotspots_visible(Game.show_hotspots)
 	_build_rack()
+	_rebuild_rules()
 
 
 # ------------------------------------------------------------------ tool rack
@@ -54,26 +81,27 @@ func _build_rack() -> void:
 
 func _make_tool_entry(tool_data: ToolData) -> Control:
 	var row := Control.new()
-	row.custom_minimum_size = Vector2(0, 86)
+	row.custom_minimum_size = Vector2(0, TOOL_ROW_HEIGHT)
 
 	# The visible tool is an AnimatedSprite2D from the start (idle/using), so
 	# animating it later is a matter of adding frames, not replacing the node.
 	var sprite := AnimatedSprite2D.new()
 	sprite.sprite_frames = tool_data.frames
 	sprite.play(&"idle")
-	sprite.position = Vector2(44, 44)
+	sprite.scale = Vector2(0.62, 0.62)
+	sprite.position = Vector2(30, 32)
 	row.add_child(sprite)
 
 	var name_label := Label.new()
 	name_label.text = tool_data.display_name
-	name_label.position = Vector2(90, 12)
-	name_label.add_theme_font_size_override("font_size", 19)
+	name_label.position = Vector2(66, 6)
+	name_label.add_theme_font_size_override("font_size", 17)
 	row.add_child(name_label)
 
 	var cost_label := Label.new()
 	cost_label.text = Strings.tf("tools_cost_label", {"n": Game.cost_of(&"tool")})
-	cost_label.position = Vector2(90, 48)
-	cost_label.add_theme_font_size_override("font_size", 15)
+	cost_label.position = Vector2(66, 32)
+	cost_label.add_theme_font_size_override("font_size", 13)
 	cost_label.add_theme_color_override("font_color", Color(0.72, 0.78, 0.85))
 	row.add_child(cost_label)
 
@@ -91,8 +119,7 @@ func _make_tool_entry(tool_data: ToolData) -> Control:
 
 
 ## A tool is greyed out either because today has no such tool, or because the
-## shift budget cannot pay for it - and the tooltip says which. §5 requires the
-## reason to be visible, not just the disabled state.
+## shift budget cannot pay for it - and the tooltip says which.
 func _refresh_rack() -> void:
 	for tool_id: StringName in _tool_nodes:
 		var parts: Dictionary = _tool_nodes[tool_id]
@@ -140,21 +167,46 @@ func show_entry(new_entry: CarriedItem) -> void:
 	entry = new_entry
 	_zoom = 1.0
 	_pan = Vector2.ZERO
+	_feedback.text = ""
 	_item_sprite.texture = entry.data.texture if entry != null else null
+	_hotspot_sprite.texture = entry.data.hotspot_overlay if entry != null else null
+	_question.text = _question_for(entry)
 	_apply_transform()
 	_rebuild_log()
+	_rebuild_rules()
 	_refresh_rack()
 
 
 func clear() -> void:
 	entry = null
 	_item_sprite.texture = null
+	_hotspot_sprite.texture = null
+	_question.text = Strings.t("inspect_pick_first")
+	_feedback.text = ""
 	_rebuild_log()
+	_rebuild_rules()
+	bin_hint_changed.emit(-1)
+
+
+func _set_hotspots_visible(value: bool) -> void:
+	if _hotspot_sprite != null:
+		_hotspot_sprite.visible = value
+
+
+## One sentence framing the decision from surface info alone. It tells the
+## player what game they are playing: not "which bin" but "do I believe this?".
+func _question_for(target: CarriedItem) -> String:
+	if target == null:
+		return Strings.t("inspect_pick_first")
+	if target.data.visible_label != "":
+		return Strings.tf("inspect_question_labeled",
+			{"label": target.data.visible_label, "mat": target.data.visible_material})
+	return Strings.tf("inspect_question", {"mat": target.data.visible_material})
 
 
 func _apply_transform() -> void:
 	var view_size := Vector2(_view.size)
-	var span := 160.0 * BASE_SCALE * _zoom
+	var span := ITEM_SIZE * BASE_SCALE * _zoom
 	var slack := maxf(0.0, (span - view_size.x) * 0.5)
 	_pan = _pan.clamp(Vector2(-slack, -slack), Vector2(slack, slack))
 	_item_root.position = view_size * 0.5 + _pan
@@ -187,9 +239,10 @@ func _on_surface_input(event: InputEvent) -> void:
 
 
 ## Screen point inside the inspect surface -> normalized texture coordinates,
-## which is the space hotspots are authored in.
+## which is the space hotspots are authored in. Zooming therefore never moves a
+## hotspot relative to the artwork.
 func _to_normalized(point: Vector2) -> Vector2:
-	var span := 160.0 * BASE_SCALE * _zoom
+	var span := ITEM_SIZE * BASE_SCALE * _zoom
 	var origin := Vector2(_view.size) * 0.5 + _pan
 	return (point - origin) / span + Vector2(0.5, 0.5)
 
@@ -206,22 +259,31 @@ func _use_tool_at(point: Vector2) -> void:
 		return
 	Game.stats["tool_uses"] = int(Game.stats.get("tool_uses", 0)) + 1
 	Events.sfx_requested.emit(&"tool_use")
-	var normalized := _to_normalized(point)
-	var field := _hotspot_field(normalized, tool_id)
+	var cost := Game.cost_of(&"tool")
+	var field := _hotspot_field(_to_normalized(point), tool_id)
 	if field.is_empty():
 		# Missed. The charge is gone anyway - that is the risk, and it must
-		# never be prevented.
+		# never be prevented. But spending for nothing has to *read* as an
+		# outcome; a dead click reads as a bug.
 		Events.sfx_requested.emit(&"reveal_nothing")
+		_set_feedback(Strings.tf("inspect_nothing", {"n": cost}), Color(0.95, 0.72, 0.55))
 		Events.toast_requested.emit(Strings.t("reveal_nothing"))
 		reveal_happened.emit("", false)
 	else:
 		entry.reveal(field)
 		Events.sfx_requested.emit(&"reveal_success")
-		Events.toast_requested.emit(Strings.t("reveal_success"))
+		_set_feedback(Strings.tf("inspect_found",
+			{"v": entry.data.get_field_text(field), "n": cost}), Color(0.6, 0.92, 0.72))
 		Events.tool_used.emit(tool_id, field)
 		reveal_happened.emit(field, true)
 		_rebuild_log()
+		_rebuild_rules()
 	_refresh_rack()
+
+
+func _set_feedback(text: String, color: Color) -> void:
+	_feedback.text = text
+	_feedback.add_theme_color_override("font_color", color)
 
 
 func _hotspot_field(normalized: Vector2, tool_id: StringName) -> String:
@@ -233,35 +295,89 @@ func _hotspot_field(normalized: Vector2, tool_id: StringName) -> String:
 	return ""
 
 
-# --------------------------------------------------------------- evidence log
+# ------------------------------------------------------- rules and evidence
+
+func _active_rules() -> Array[RuleData]:
+	var day := Game.current_day()
+	return day.active_rules if day != null else [] as Array[RuleData]
+
+
+## Which evidence the player has actually proved, and where it points.
+## Returns {"lit": {chip_key: true}, "bin": int, "rules": {rule_id: true}}
+func _evidence_state() -> Dictionary:
+	var lit := {}
+	var fired := {}
+	var bin := -1
+	if entry == null:
+		return {"lit": lit, "bin": bin, "rules": fired}
+	for rule: RuleData in RuleChecker.supported_rules(entry, _active_rules()):
+		fired[rule.id] = true
+		bin = rule.forces_category  # sorted by priority, so the last one wins
+		for key: String in rule.applies_when:
+			if key in RuleChecker.SURFACE_KEYS:
+				lit[key] = true
+			elif RuleChecker.RULE_KEY_TO_REVEAL.has(key):
+				lit[RuleChecker.RULE_KEY_TO_REVEAL[key]] = true
+	return {"lit": lit, "bin": bin, "rules": fired}
+
+
+## Today's rules, always visible beside the item. The ones the player has proved
+## apply are picked out, so the list doubles as a record of their reasoning.
+func _rebuild_rules() -> void:
+	_clear(_rules_list)
+	var state := _evidence_state()
+	var fired: Dictionary = state["rules"]
+	for rule: RuleData in _active_rules():
+		var label := Label.new()
+		var active: bool = fired.has(rule.id)
+		label.text = ("+  " if active else "-  ") + rule.label()
+		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		label.add_theme_font_size_override("font_size", 14)
+		label.add_theme_color_override("font_color",
+			Color(0.55, 0.95, 0.72) if active else Color(0.62, 0.68, 0.76))
+		_rules_list.add_child(label)
+	bin_hint_changed.emit(int(state["bin"]))
+
 
 func _rebuild_log() -> void:
 	_clear(_log)
 	if entry == null:
 		return
+	var lit: Dictionary = _evidence_state()["lit"]
 	var item := entry.data
 	# Surface info is free and always shown.
-	_add_chip(Strings.tf("chip_material", {"v": item.visible_material}), false)
-	_add_chip(Strings.tf("chip_label", {"v": item.visible_label if item.visible_label != ""
-		else Strings.t("chip_no_label")}), false)
-	_add_chip(Strings.tf("chip_weight", {"v": "%.1f" % item.weight}), false)
-	# Everything below cost a tool charge.
+	_add_chip("visible_material", Strings.tf("chip_material", {"v": item.visible_material}),
+		false, lit)
+	_add_chip("visible_label", Strings.tf("chip_label",
+		{"v": item.visible_label if item.visible_label != "" else Strings.t("chip_no_label")}),
+		false, lit)
+	_add_chip("weight", Strings.tf("chip_weight", {"v": "%.1f" % item.weight}), false, lit)
+	# Everything below cost part of the shift.
 	if entry.is_revealed("has_residue"):
-		_add_chip(Strings.tf("chip_residue", {"v": item.get_field_text("has_residue")}), true)
+		_add_chip("has_residue", Strings.tf("chip_residue",
+			{"v": item.get_field_text("has_residue")}), true, lit)
 	if entry.is_revealed("residue_type"):
-		_add_chip(Strings.tf("chip_residue_type", {"v": item.get_field_text("residue_type")}), true)
+		_add_chip("residue_type", Strings.tf("chip_residue_type",
+			{"v": item.get_field_text("residue_type")}), true, lit)
 	if entry.is_revealed("true_material"):
-		_add_chip(Strings.tf("chip_true_material", {"v": item.get_field_text("true_material")}), true)
+		_add_chip("true_material", Strings.tf("chip_true_material",
+			{"v": item.get_field_text("true_material")}), true, lit)
 	if entry.is_revealed("tag_text"):
-		_add_chip(Strings.tf("chip_tag", {"v": item.get_field_text("tag_text")}), true)
+		_add_chip("tag_text", Strings.tf("chip_tag", {"v": item.get_field_text("tag_text")}),
+			true, lit)
 
 
-func _add_chip(text: String, revealed: bool) -> void:
+func _add_chip(key: String, text: String, revealed: bool, lit: Dictionary) -> void:
 	var chip := NinePatchRect.new()
-	chip.texture = CHIP_REVEAL if revealed else CHIP_SURFACE
+	# A chip that satisfies an active rule is the whole point of this panel, so
+	# it gets its own colour rather than a subtler tint.
+	if lit.has(key):
+		chip.texture = CHIP_MATCH
+	else:
+		chip.texture = CHIP_REVEAL if revealed else CHIP_SURFACE
 	for side: String in ["left", "top", "right", "bottom"]:
 		chip.set("patch_margin_" + side, 12)
-	chip.custom_minimum_size = Vector2(0, 38)
+	chip.custom_minimum_size = Vector2(0, 32)
 	var label := Label.new()
 	label.text = text
 	label.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -269,7 +385,7 @@ func _add_chip(text: String, revealed: bool) -> void:
 	label.offset_right = -10
 	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	label.add_theme_font_size_override("font_size", 16)
+	label.add_theme_font_size_override("font_size", 14)
 	chip.add_child(label)
 	_log.add_child(chip)
 

@@ -22,6 +22,7 @@ func _ready() -> void:
 	_toast.text = ""
 	_inventory.item_selected.connect(_on_item_selected)
 	_bins.bin_chosen.connect(_on_bin_chosen)
+	_inspect.bin_hint_changed.connect(_bins.highlight)
 	_rulebook_button.pressed.connect(func() -> void: _rulebook.toggle(not _rulebook.visible))
 	Events.toast_requested.connect(_show_toast)
 	Events.debug_command.connect(_on_debug_command)
