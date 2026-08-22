@@ -45,6 +45,7 @@ func _run() -> void:
 	var out: String = args[1] if args.size() > 1 else "/tmp/shot.png"
 	var day: int = int(args[2]) if args.size() > 2 else 1
 	var game: Node = root.get_node("/root/Game")
+	game.sfx_enabled = false  # see Game.sfx_enabled
 	game.start_run(4242)
 	for i in day - 1:
 		game.advance_day()

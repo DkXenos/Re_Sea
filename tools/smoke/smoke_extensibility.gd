@@ -16,6 +16,7 @@ func _init() -> void:
 func _run() -> void:
 	await process_frame
 	var game: Node = root.get_node("/root/Game")
+	game.sfx_enabled = false  # see Game.sfx_enabled
 	var before: int = game.days.size()
 
 	# --- item #15: a trap that looks like clean glass but is coated ---

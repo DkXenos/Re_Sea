@@ -17,6 +17,7 @@ func _init() -> void:
 func _run() -> void:
 	await process_frame
 	var game: Node = root.get_node("/root/Game")
+	game.sfx_enabled = false  # see Game.sfx_enabled
 	var events: Node = root.get_node("/root/Events")
 	game.start_run(12345)
 	events.phase_finished.connect(func() -> void: finished = true)

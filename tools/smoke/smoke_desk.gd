@@ -20,6 +20,7 @@ func _point_for(n: Vector2) -> Vector2:
 func _run() -> void:
 	await process_frame
 	var game: Node = root.get_node("/root/Game")
+	game.sfx_enabled = false  # see Game.sfx_enabled
 	var events: Node = root.get_node("/root/Events")
 	var args := OS.get_cmdline_user_args()
 	var day_number: int = int(args[0]) if args.size() > 0 else 4

@@ -11,6 +11,7 @@ func _init() -> void:
 func _run() -> void:
 	await process_frame
 	var game: Node = root.get_node("/root/Game")
+	game.sfx_enabled = false  # see Game.sfx_enabled
 	var events: Node = root.get_node("/root/Events")
 
 	for bus_name: String in ["Master", "Music", "SFX"]:

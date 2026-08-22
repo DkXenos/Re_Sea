@@ -11,6 +11,7 @@ func _init() -> void:
 func _run() -> void:
 	await process_frame
 	var game: Node = root.get_node("/root/Game")
+	game.sfx_enabled = false  # see Game.sfx_enabled
 	game.start_run(99)
 	game.advance_day()
 	game.advance_day() # day 3, quota 8

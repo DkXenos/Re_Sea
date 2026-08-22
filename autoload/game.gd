@@ -27,6 +27,10 @@ var vfx_intensity: float = 1.0
 # --- debug switches (only ever set by the F1 overlay) ---
 var force_grip: int = 0 ## 1 = always succeed, -1 = always fail, 0 = roll
 
+## Headless harnesses quit mid-frame, and a sound still playing at that moment
+## is reported as a leaked stream. They switch this off; the game never does.
+var sfx_enabled: bool = true
+
 var _sfx_players: Array[AudioStreamPlayer] = []
 var _sfx_cache: Dictionary = {}
 
@@ -260,6 +264,8 @@ func _build_sfx_pool() -> void:
 
 
 func play_sfx(sfx_name: StringName) -> void:
+	if not sfx_enabled:
+		return
 	var stream: AudioStream = _sfx_cache.get(sfx_name, null)
 	if stream == null:
 		var path := SFX_DIR + String(sfx_name) + ".wav"

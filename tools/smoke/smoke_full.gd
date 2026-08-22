@@ -23,6 +23,7 @@ func _run() -> void:
 	bad_mode = "--bad" in OS.get_cmdline_user_args()
 	verbose = "--verbose-days" in OS.get_cmdline_user_args()
 	game = root.get_node("/root/Game")
+	game.sfx_enabled = false  # see Game.sfx_enabled
 	main = load("res://main.tscn").instantiate()
 	root.add_child(main)
 	await process_frame

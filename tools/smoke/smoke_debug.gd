@@ -15,6 +15,7 @@ func _current(main: Node) -> Node:
 func _run() -> void:
 	await process_frame
 	var game: Node = root.get_node("/root/Game")
+	game.sfx_enabled = false  # see Game.sfx_enabled
 	var events: Node = root.get_node("/root/Events")
 	var main: Node = load("res://main.tscn").instantiate()
 	root.add_child(main)

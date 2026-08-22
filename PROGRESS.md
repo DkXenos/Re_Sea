@@ -9,6 +9,7 @@ sorting. Godot 4.7.2, GDScript only, statically typed, 2D only.
 
 ```bash
 godot                                    # play it
+godot --headless --script tools/smoke/smoke_full.gd -- --verbose-days   # per-day numbers
 godot --headless --quit-after 240        # boot check
 ./tools/smoke/run_all.sh                 # every check (~3 min)
 ```
@@ -169,6 +170,10 @@ None outstanding. Fixed during the build, noted in case they resurface:
   keys off `is_multilayer` while the player reveals `true_material`.
 - `pause` had no mouse route, breaking the "every action reachable by mouse"
   rule. There is now a pause button at the top right during a run.
+- The headless checks were intermittently reporting a leaked audio stream (about
+  one run in three) because a harness quits mid-frame while a sound is still
+  playing. `Game.sfx_enabled` now lets the harnesses switch playback off; the
+  game itself never touches it. The suite has since been green on repeated runs.
 
 ## Deliberately not built
 
