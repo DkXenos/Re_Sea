@@ -6,7 +6,6 @@ extends RefCounted
 
 const TABLE: Dictionary = {
 	# --- menu ---
-	"game_title": "CAKAR LAUT",
 	"game_subtitle": "Pilah sampah, selamatkan laut",
 	"menu_play": "Mulai",
 	"menu_settings": "Pengaturan",
@@ -53,27 +52,16 @@ const TABLE: Dictionary = {
 	"claw_hint": "A/D atau panah untuk geser, Spasi untuk turun. Klik tombol di konsol juga bisa.",
 	"claw_drop_button": "TURUN  ({n})",
 	"claw_slipped": "Lepas! Benda jatuh kembali.",
-	"claw_finished": "Jatah cakar habis - kembali ke meja",
-	"claw_to_desk": "Ke Meja Pilah",
-	"claw_inventory": "Terkumpul",
 
 	# --- desk phase ---
-	"desk_title": "MEJA PILAH",
 	"desk_inventory": "Barang terkumpul",
 	"desk_empty": "Semua barang sudah dipilah",
-	"desk_finish": "Selesaikan Hari",
-	"desk_pick_item": "Pilih barang untuk diperiksa",
 	"desk_no_selection": "Pilih barang dulu sebelum membuang",
-	"desk_progress": "Terpilah {a} / {b}",
 	"desk_rulebook_button": "Buku Aturan (R)",
-	"desk_back": "Kembali ke daftar",
-	"inspect_title": "PEMERIKSAAN",
 	"inspect_zoom_hint": "Gulir untuk perbesar, seret untuk geser",
-	"tools_title": "ALAT",
 	"tools_locked": "Alat belum tersedia hari ini",
 	"tools_armed": "{tool} siap - klik pada barang",
 	"evidence_title": "CATATAN BUKTI",
-	"bins_title": "Buang ke",
 	"reveal_success": "Ditemukan sesuatu!",
 	"reveal_nothing": "Bersih di titik ini - tidak ada yang bisa dibaca.",
 	"inspect_found": "Ditemukan: {v}   (waktu shift -{n})",
@@ -107,7 +95,6 @@ const TABLE: Dictionary = {
 
 	# --- rulebook ---
 	"rulebook_title": "BUKU ATURAN",
-	"rulebook_hint": "R untuk buka / tutup",
 	"rulebook_close": "Tutup",
 	"rulebook_empty": "Belum ada aturan khusus hari ini",
 	"rulebook_general": "UMUM",
@@ -141,7 +128,6 @@ const TABLE: Dictionary = {
 	# --- pause ---
 	"pause_title": "JEDA",
 	"pause_resume": "Lanjut",
-	"pause_settings": "Pengaturan",
 	"pause_menu": "Menu Utama",
 }
 

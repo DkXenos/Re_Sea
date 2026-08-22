@@ -227,7 +227,21 @@ files are drawn programmatically by `tools/gen_placeholders.py` and
 | `assets/env/cutscene_02.png` | 960x540 | Cutscene still 2 (placeholder) |
 | `assets/env/cutscene_03.png` | 960x540 | Cutscene still 3 (placeholder) |
 | `assets/env/logo.png` | 640x200 | Title logo |
+| `assets/items/hotspots_banana_peel.png` | 160x160 | Hotspot rings for `banana_peel`. **Generated from `data/items/banana_peel.tres`** by `tools/gen_hotspot_overlays.gd` - never edit by hand, and do not draw it into the item art. |
+| `assets/items/hotspots_fish_bone.png` | 160x160 | Hotspot rings for `fish_bone`. **Generated from `data/items/fish_bone.tres`** by `tools/gen_hotspot_overlays.gd` - never edit by hand, and do not draw it into the item art. |
+| `assets/items/hotspots_pet_bottle.png` | 160x160 | Hotspot rings for `pet_bottle`. **Generated from `data/items/pet_bottle.tres`** by `tools/gen_hotspot_overlays.gd` - never edit by hand, and do not draw it into the item art. |
+| `assets/items/hotspots_alu_can.png` | 160x160 | Hotspot rings for `alu_can`. **Generated from `data/items/alu_can.tres`** by `tools/gen_hotspot_overlays.gd` - never edit by hand, and do not draw it into the item art. |
+| `assets/items/hotspots_styrofoam_tray.png` | 160x160 | Hotspot rings for `styrofoam_tray`. **Generated from `data/items/styrofoam_tray.tres`** by `tools/gen_hotspot_overlays.gd` - never edit by hand, and do not draw it into the item art. |
+| `assets/items/hotspots_car_battery.png` | 160x160 | Hotspot rings for `car_battery`. **Generated from `data/items/car_battery.tres`** by `tools/gen_hotspot_overlays.gd` - never edit by hand, and do not draw it into the item art. |
+| `assets/items/hotspots_oil_jerrycan.png` | 160x160 | Hotspot rings for `oil_jerrycan`. **Generated from `data/items/oil_jerrycan.tres`** by `tools/gen_hotspot_overlays.gd` - never edit by hand, and do not draw it into the item art. |
+| `assets/items/hotspots_paint_bottle.png` | 160x160 | Hotspot rings for `paint_bottle`. **Generated from `data/items/paint_bottle.tres`** by `tools/gen_hotspot_overlays.gd` - never edit by hand, and do not draw it into the item art. |
+| `assets/items/hotspots_juice_carton.png` | 160x160 | Hotspot rings for `juice_carton`. **Generated from `data/items/juice_carton.tres`** by `tools/gen_hotspot_overlays.gd` - never edit by hand, and do not draw it into the item art. |
+| `assets/items/hotspots_eco_tote.png` | 160x160 | Hotspot rings for `eco_tote`. **Generated from `data/items/eco_tote.tres`** by `tools/gen_hotspot_overlays.gd` - never edit by hand, and do not draw it into the item art. |
+| `assets/items/hotspots_paper_cup.png` | 160x160 | Hotspot rings for `paper_cup`. **Generated from `data/items/paper_cup.tres`** by `tools/gen_hotspot_overlays.gd` - never edit by hand, and do not draw it into the item art. |
+| `assets/items/hotspots_spray_can.png` | 160x160 | Hotspot rings for `spray_can`. **Generated from `data/items/spray_can.tres`** by `tools/gen_hotspot_overlays.gd` - never edit by hand, and do not draw it into the item art. |
+| `assets/items/hotspots_glass_jar.png` | 160x160 | Hotspot rings for `glass_jar`. **Generated from `data/items/glass_jar.tres`** by `tools/gen_hotspot_overlays.gd` - never edit by hand, and do not draw it into the item art. |
+| `assets/items/hotspots_fishing_net.png` | 160x160 | Hotspot rings for `fishing_net`. **Generated from `data/items/fishing_net.tres`** by `tools/gen_hotspot_overlays.gd` - never edit by hand, and do not draw it into the item art. |
 
-_85 PNGs, 74 animations across 27 SpriteFrames resources._
+_99 PNGs, 74 animations across 27 SpriteFrames resources._
 _Hotspot overlays are generated separately — see above._
 _Regenerate with_ `python3 tools/gen_placeholders.py`.

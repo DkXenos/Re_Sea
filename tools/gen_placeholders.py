@@ -473,6 +473,17 @@ TABLE_HEADER = """
 """
 
 
+def note_generated_elsewhere():
+    """Files this script does not draw, but which belong in the manifest so the
+    designers see the full picture."""
+    for it in C.ITEM_ART:
+        MANIFEST.append(("items/hotspots_%s.png" % it["id"], "160x160",
+                         "Hotspot rings for `%s`. **Generated from "
+                         "`data/items/%s.tres`** by `tools/gen_hotspot_overlays.gd` - "
+                         "never edit by hand, and do not draw it into the item art."
+                         % (it["id"], it["id"])))
+
+
 def main():
     gen_items()
     gen_claw()
@@ -482,6 +493,7 @@ def main():
     gen_ui()
     gen_env()
     gen_frames()
+    note_generated_elsewhere()
     anims = "\n".join("| `%s` | `%s` | `assets/%s` | %d |" % a for a in ANIMS)
     rows = "\n".join("| `assets/%s` | %s | %s |" % r for r in MANIFEST)
     with open(os.path.join(ASSETS, "ASSETS.md"), "w") as f:
