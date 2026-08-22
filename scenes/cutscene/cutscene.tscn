@@ -1,0 +1,72 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scenes/cutscene/cutscene.gd" id="1_cut"]
+[ext_resource type="Texture2D" path="res://assets/env/water_bg.png" id="2_bg"]
+[ext_resource type="Texture2D" path="res://assets/ui/panel_dark.png" id="3_pd"]
+[ext_resource type="Theme" path="res://assets/ui/ui_theme.tres" id="4_theme"]
+
+[node name="Cutscene" type="Node2D"]
+script = ExtResource("1_cut")
+
+[node name="BgLayer" type="CanvasLayer" parent="."]
+layer = 0
+
+[node name="Bg" type="TextureRect" parent="BgLayer"]
+offset_right = 1280.0
+offset_bottom = 720.0
+mouse_filter = 2
+texture = ExtResource("2_bg")
+expand_mode = 1
+
+[node name="UiLayer" type="CanvasLayer" parent="."]
+layer = 100
+
+[node name="Root" type="Control" parent="UiLayer"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+theme = ExtResource("4_theme")
+
+[node name="Still" type="TextureRect" parent="UiLayer/Root"]
+offset_left = 160.0
+offset_top = 40.0
+offset_right = 1120.0
+offset_bottom = 580.0
+mouse_filter = 2
+expand_mode = 1
+
+[node name="LinePanel" type="NinePatchRect" parent="UiLayer/Root"]
+offset_left = 160.0
+offset_top = 588.0
+offset_right = 1120.0
+offset_bottom = 668.0
+mouse_filter = 2
+texture = ExtResource("3_pd")
+patch_margin_left = 24
+patch_margin_top = 24
+patch_margin_right = 24
+patch_margin_bottom = 24
+
+[node name="Line" type="Label" parent="UiLayer/Root"]
+offset_left = 186.0
+offset_top = 600.0
+offset_right = 1094.0
+offset_bottom = 656.0
+theme_override_font_sizes/font_size = 20
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="AdvanceHint" type="Label" parent="UiLayer/Root"]
+offset_left = 160.0
+offset_top = 676.0
+offset_right = 1120.0
+offset_bottom = 702.0
+theme_override_font_sizes/font_size = 14
+horizontal_alignment = 1
+
+[node name="SkipButton" type="Button" parent="UiLayer/Root"]
+offset_left = 1064.0
+offset_top = 676.0
+offset_right = 1256.0
+offset_bottom = 712.0

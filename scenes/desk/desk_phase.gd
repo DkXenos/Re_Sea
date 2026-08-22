@@ -33,9 +33,22 @@ func _ready() -> void:
 	_rulebook_button.pressed.connect(func() -> void: _rulebook.toggle(not _rulebook.visible))
 	_finish_button.pressed.connect(_finish)
 	Events.toast_requested.connect(_show_toast)
+	Events.debug_command.connect(_on_debug_command)
 	_inventory.refresh()
 	_inventory.select_first()
 	_refresh_header()
+
+
+## Only the debug command that needs the currently inspected item lands here.
+func _on_debug_command(command: StringName, _arg: Variant) -> void:
+	match command:
+		&"reveal_all":
+			if _inspect.entry != null:
+				_inspect.entry.reveal_all()
+				_inspect.show_entry(_inspect.entry)
+		&"fill_inventory":
+			_inventory.refresh()
+			_inventory.select_first()
 
 
 func _unhandled_input(event: InputEvent) -> void:

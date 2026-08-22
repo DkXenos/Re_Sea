@@ -137,6 +137,15 @@ func add_to_inventory(item: ItemData) -> CarriedItem:
 	return entry
 
 
+## Debug only: skip the claw phase and go straight to sorting.
+func fill_inventory(count: int) -> void:
+	var day := current_day()
+	if day == null or day.item_pool.is_empty():
+		return
+	for i in count:
+		add_to_inventory(day.item_pool[rng.randi() % day.item_pool.size()])
+
+
 func unsorted_items() -> Array[CarriedItem]:
 	var out: Array[CarriedItem] = []
 	for e: CarriedItem in inventory:
@@ -283,6 +292,7 @@ func _exit_tree() -> void:
 func _on_debug_command(command: StringName, arg: Variant) -> void:
 	match command:
 		&"refill_charges": refill_charges()
+		&"fill_inventory": fill_inventory(int(arg))
 		&"set_health": set_ocean_health(int(arg))
 		&"force_grip": force_grip = int(arg)
 		&"set_seed":

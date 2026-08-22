@@ -14,7 +14,13 @@ const SCENES: Dictionary = {
 	&"game_over": "res://scenes/game_over/game_over.tscn",
 }
 
+## Pausing only makes sense inside a run; on the menu and in the cutscene Esc
+## already means something else.
+const PAUSABLE_KEYS: Array[StringName] = [&"day_start", &"claw", &"desk", &"report"]
+
 @onready var _holder: Node = $SceneHolder
+@onready var _pause: Control = $PauseLayer/PauseOverlay
+@onready var _debug: Control = $DebugLayer/DebugOverlay
 
 var _current: Node = null
 var _current_key: StringName = &""
@@ -23,7 +29,31 @@ var _current_key: StringName = &""
 func _ready() -> void:
 	Events.scene_change_requested.connect(_on_scene_change_requested)
 	Events.phase_finished.connect(_on_phase_finished)
+	Events.debug_command.connect(_on_debug_command)
 	_on_scene_change_requested(&"main_menu")
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed(&"pause") and _current_key in PAUSABLE_KEYS:
+		_pause.toggle(not _pause.visible)
+		get_viewport().set_input_as_handled()
+	elif event.is_action_pressed(&"debug_overlay") and OS.is_debug_build():
+		if is_instance_valid(_debug):
+			_debug.toggle(not _debug.visible)
+			get_viewport().set_input_as_handled()
+
+
+## Only the commands that need the scene tree land here; the rest are handled
+## by Game, which owns the state they touch.
+func _on_debug_command(command: StringName, _arg: Variant) -> void:
+	if command != &"skip_day":
+		return
+	_pause.toggle(false)
+	if Game.is_last_day():
+		Events.scene_change_requested.emit(&"game_over")
+		return
+	Game.advance_day()
+	_on_scene_change_requested(&"day_start")
 
 
 func _on_phase_finished() -> void:
@@ -43,9 +73,13 @@ func _on_scene_change_requested(scene_key: StringName) -> void:
 
 
 func _swap(path: String) -> void:
+	# A scene change always leaves the tree unpaused, whatever paused it.
+	get_tree().paused = false
+	if is_instance_valid(_pause):
+		_pause.visible = false
 	if is_instance_valid(_current):
-		_current.queue_free()
 		_holder.remove_child(_current)
+		_current.queue_free()
 		_current = null
 	var packed: PackedScene = load(path)
 	_current = packed.instantiate()

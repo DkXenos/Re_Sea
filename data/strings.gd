@@ -24,6 +24,9 @@ const TABLE: Dictionary = {
 	# --- cutscene ---
 	"cutscene_skip": "Lewati (Esc)",
 	"cutscene_advance": "Klik atau Enter untuk lanjut",
+	"cutscene_line_1": "Dulu teluk ini penuh ikan. Sekarang penuh sampah kiriman dari darat.",
+	"cutscene_line_2": "Setiap hari arus membawa kiriman baru. Ada yang jelas, ada yang menyamar.",
+	"cutscene_line_3": "Kamu operator cakar. Angkat, periksa, pilah. Laut menghitung setiap keputusanmu.",
 
 	# --- day start ---
 	"day_label": "HARI {n}",

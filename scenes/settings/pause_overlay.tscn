@@ -1,0 +1,49 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scenes/settings/pause_overlay.gd" id="1_po"]
+[ext_resource type="PackedScene" path="res://scenes/settings/settings_panel.tscn" id="2_panel"]
+[ext_resource type="Texture2D" path="res://assets/ui/panel_dark.png" id="3_pd"]
+[ext_resource type="Theme" path="res://assets/ui/ui_theme.tres" id="4_theme"]
+
+[node name="PauseOverlay" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme = ExtResource("4_theme")
+script = ExtResource("1_po")
+
+[node name="Panel" type="NinePatchRect" parent="."]
+offset_left = 360.0
+offset_top = 80.0
+offset_right = 920.0
+offset_bottom = 640.0
+texture = ExtResource("3_pd")
+patch_margin_left = 24
+patch_margin_top = 24
+patch_margin_right = 24
+patch_margin_bottom = 24
+
+[node name="Title" type="Label" parent="."]
+offset_left = 400.0
+offset_top = 108.0
+offset_right = 880.0
+offset_bottom = 152.0
+theme_override_font_sizes/font_size = 30
+horizontal_alignment = 1
+
+[node name="SettingsPanel" parent="." instance=ExtResource("2_panel")]
+offset_left = 400.0
+offset_top = 180.0
+offset_right = 880.0
+offset_bottom = 490.0
+
+[node name="ResumeButton" type="Button" parent="."]
+offset_left = 400.0
+offset_top = 512.0
+offset_right = 880.0
+offset_bottom = 564.0
+
+[node name="MenuButton" type="Button" parent="."]
+offset_left = 400.0
+offset_top = 574.0
+offset_right = 880.0
+offset_bottom = 620.0
