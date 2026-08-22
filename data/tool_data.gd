@@ -12,3 +12,7 @@ extends Resource
 ## Display order in the rack. Data rather than code so a new tool slots in
 ## wherever its .tres says, with no change here.
 @export var sort_order: int = 0
+## Accent colour for this tool: its hotspot rings, its armed cursor, and the
+## evidence chips it produces. Lives here so nothing renders a tool colour that
+## the data does not know about.
+@export var color: Color = Color.WHITE

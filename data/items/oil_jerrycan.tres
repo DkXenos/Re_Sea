@@ -2,6 +2,7 @@
 
 [ext_resource type="SpriteFrames" path="res://data/frames/item_oil_jerrycan_frames.tres" id="1_rn588"]
 [ext_resource type="Script" path="res://data/item_data.gd" id="2_n380k"]
+[ext_resource type="Texture2D" path="res://assets/items/hotspots_oil_jerrycan.png" id="2_uhuox"]
 [ext_resource type="Texture2D" path="res://assets/items/item_oil_jerrycan.png" id="3_uhuox"]
 
 [resource]
@@ -10,6 +11,7 @@ id = &"oil_jerrycan"
 display_name = "Jeriken Bening"
 texture = ExtResource("3_uhuox")
 frames = ExtResource("1_rn588")
+hotspot_overlay = ExtResource("2_uhuox")
 weight = 2.2
 visible_material = "HDPE bening"
 visible_label = "HDPE 2"

@@ -14,18 +14,33 @@ godot --headless --quit-after 240        # boot check
 ./tools/smoke/run_all.sh                 # every check (~3 min)
 ```
 
-Regenerating content (only needed if you change `tools/content.py`):
+## Source of truth for content — decided in revision 1
+
+**The `.tres` files in `data/` are canonical.** Items, hotspots, rules, tools
+and days are edited in the Godot inspector. There is no longer any generator
+that can overwrite them: `tools/gen_data.gd` and `tools/content.json` were
+deleted, because two sources of truth diverge.
+
+Schema changes arrive as one-off scripts in `tools/migrations/`, kept in the
+repo as a record of what changed and when.
+
+`tools/content.py` survives as **art parameters only** — which shape, which
+colour, which code to draw on a placeholder. It holds no game content and
+becomes obsolete when the designers deliver real art.
+
+Regenerating placeholders:
 
 ```bash
 python3 tools/gen_placeholders.py        # all PNGs + SpriteFrames + ASSETS.md
 python3 tools/gen_sounds.py              # all WAVs
-python3 tools/content.py                 # content.json
-godot --headless --script tools/gen_data.gd -- --force   # rewrites data/*.tres
-```
 
-`gen_data.gd` **refuses to overwrite existing `.tres` without `--force`.** After
-the initial bootstrap the `.tres` files are the source of truth — edit them in
-the Godot inspector, not in Python.
+# Hotspot rings, generated FROM data/items/*.tres so they cannot disagree with
+# the coordinates the game checks. Twice, with an import between: Godot cannot
+# load a PNG it has not imported yet.
+godot --headless --script tools/gen_hotspot_overlays.gd
+godot --headless --import
+godot --headless --script tools/gen_hotspot_overlays.gd
+```
 
 ---
 

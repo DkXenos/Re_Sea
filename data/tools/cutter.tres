@@ -14,3 +14,4 @@ reveals_field = "true_material"
 default_charges = 2
 description = "Menyayat sedikit bagian barang untuk melihat bahan aslinya dan lapisannya."
 sort_order = 3
+color = Color(0.8862745, 0.41568628, 0.36078432, 1)

@@ -13,3 +13,4 @@ icon = ExtResource("2_whw2b")
 reveals_field = "residue_type"
 description = "Mengusap sisa kotoran untuk mengetahui jenisnya."
 sort_order = 1
+color = Color(0.8392157, 0.47058824, 0.78431374, 1)

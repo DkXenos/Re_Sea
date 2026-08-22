@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://d126a4pmphoeq"
-path="res://.godot/imported/fish_small.png-3607bae058217b0d41518ab4d0fc98d9.ctex"
+uid="uid://dxvs7lw7nh8lu"
+path="res://.godot/imported/minimap_claw.png-01b7f57acc2159d3a319154b562148bd.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/fish/fish_small.png"
-dest_files=["res://.godot/imported/fish_small.png-3607bae058217b0d41518ab4d0fc98d9.ctex"]
+source_file="res://assets/ui/minimap_claw.png"
+dest_files=["res://.godot/imported/minimap_claw.png-01b7f57acc2159d3a319154b562148bd.ctex"]
 
 [params]
 

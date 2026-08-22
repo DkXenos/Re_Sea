@@ -1,6 +1,6 @@
 [gd_resource type="SpriteFrames" load_steps=2 format=3]
 
-[ext_resource type="Texture2D" path="res://assets/fish/fish_large.png" id="1"]
+[ext_resource type="Texture2D" path="res://assets/env/bubble.png" id="1"]
 
 [resource]
 animations = [
@@ -10,6 +10,6 @@ animations = [
 "texture": ExtResource("1")
 }],
 "loop": true,
-"name": &"swim",
+"name": &"rise",
 "speed": 6.0
 }]

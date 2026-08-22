@@ -23,8 +23,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ASSETS = os.path.join(ROOT, "assets")
 MANIFEST = []
 
-TOOL_COLORS = {t["id"]: t["color"] for t in C.TOOLS}
-TOOL_LETTER = {"rinse": "R", "swab": "S", "magnifier": "M", "cutter": "C"}
+ANIMS = []  # (SpriteFrames resource, animation, source PNG, target frame count)
 
 
 def font(size):
@@ -40,11 +39,11 @@ def canvas(w, h, bg=(0, 0, 0, 0)):
     return img, ImageDraw.Draw(img)
 
 
-def save(img, rel, desc, animates="no", frames=1):
+def save(img, rel, desc):
     path = os.path.join(ASSETS, rel)
     os.makedirs(os.path.dirname(path), exist_ok=True)
     img.save(path)
-    MANIFEST.append((rel.replace(os.sep, "/"), "%dx%d" % img.size, desc, animates, frames))
+    MANIFEST.append((rel.replace(os.sep, "/"), "%dx%d" % img.size, desc))
 
 
 def centered(d, box, text, fill, size):
@@ -116,34 +115,19 @@ def draw_item_shape(d, shape, col, W, H):
             d.line([(m, y), (W - m, y)], fill=dark, width=3)
 
 
-def draw_hotspot_marker(d, spot, W, H):
-    """Placeholder-only affordance: a thin ring in the tool's colour so hotspots
-    can be found and tested before real art exists. Final art should hide the
-    hotspot inside a natural feature - a seam, a stain, a label corner."""
-    cx, cy = spot["pos"][0] * W, spot["pos"][1] * H
-    r = spot["radius"] * W
-    col = TOOL_COLORS[spot["tool"]] + (235,)
-    for a in range(0, 360, 30):
-        d.arc([cx - r, cy - r, cx + r, cy + r], a, a + 18, fill=col, width=3)
-    centered(d, (cx - 8, cy - 8, cx + 8, cy + 8), TOOL_LETTER[spot["tool"]], col, 14)
-
-
 def gen_items():
+    """Clean item art. Hotspot rings are a separate overlay generated from the
+    .tres by tools/gen_hotspot_overlays.gd - never baked in here."""
     W = H = 160
-    for it in C.ITEMS:
+    for it in C.ITEM_ART:
         img, d = canvas(W, H)
         draw_item_shape(d, it["shape"], it["color"], W, H)
         # small light plate so the code stays legible over any item colour
         d.rounded_rectangle([W / 2 - 26, H - 28, W / 2 + 26, H - 6], radius=6,
                             fill=(245, 245, 245, 235), outline=(40, 40, 40, 255), width=2)
         centered(d, (W / 2 - 26, H - 28, W / 2 + 26, H - 8), it["code"], (20, 20, 20), 14)
-        for spot in it["hotspots"]:
-            draw_hotspot_marker(d, spot, W, H)
-        hidden = [s["reveals"] for s in it["hotspots"]]
         save(img, "items/item_%s.png" % it["id"],
-             "%s - %s. Hotspots: %s" % (it["name"], it["vis_mat"],
-                                        ", ".join(hidden) if hidden else "none"),
-             "yes (wobble in tank)", 4)
+             "Trash item `%s` (%s)" % (it["id"], it["code"]))
 
 
 # ------------------------------------------------------------------- claw/fish
@@ -161,11 +145,10 @@ def gen_claw():
                                     (tip, H - 26), (tip - sgn * 14, H - 26)], shade(col, 0.9))
         if name == "carrying":
             outlined(d, "ellipse", [W / 2 - 20, H - 46, W / 2 + 20, H - 12], (120, 130, 145))
-        save(img, "claw/claw_%s.png" % name, "Claw arm, %s pose" % name,
-             "yes (one SpriteFrames animation per pose)", 6)
+        save(img, "claw/claw_%s.png" % name, "Claw arm, %s pose" % name)
     img, d = canvas(8, 64)
     d.rectangle([2, 0, 5, 63], fill=(150, 158, 172))
-    save(img, "claw/claw_cable.png", "Cable segment, tiled vertically from rail to claw", "no", 1)
+    save(img, "claw/claw_cable.png", "Cable, stretched vertically from rail to claw")
 
 
 def gen_fish():
@@ -174,14 +157,16 @@ def gen_fish():
         outlined(d, "ellipse", [W * .10, H * .18, W * .78, H * .82], col)
         outlined(d, "polygon", [(W * .74, H * .5), (W - 4, H * .12), (W - 4, H * .88)], shade(col, 0.85))
         d.ellipse([W * .20, H * .34, W * .30, H * .48], fill=(30, 30, 40))
-        save(img, "fish/%s.png" % name, "Decoy fish, swims left to right", "yes (swim)", 6)
+        save(img, "fish/%s.png" % name,
+             "Background fish. Not grabbable - atmosphere only")
 
 
 # ----------------------------------------------------------------- bins/tools
 
 def gen_bins():
     W, H = 200, 240
-    faces = {"idle": ("-", 1.0), "accept": ("OK", 1.25), "reject": ("X", 0.75)}
+    faces = {"idle": ("-", 1.0), "accept": ("OK", 1.25), "reject": ("X", 0.75),
+             "highlight": ("!", 1.5)}
     for name, col in C.BINS:
         for state, (glyph, f) in faces.items():
             img, d = canvas(W, H)
@@ -191,12 +176,12 @@ def gen_bins():
             centered(d, (0, 80, W, 160), glyph, shade(c, 0.4), 46)
             suffix = "" if state == "idle" else "_" + state
             save(img, "bins/bin_%s%s.png" % (name, suffix),
-                 "%s bin, %s state" % (name, state), "yes (idle/accept/reject)", 6)
+                 "%s bin, %s state" % (name, state))
 
 
 def gen_tools():
     W = H = 96
-    for t in C.TOOLS:
+    for t in C.TOOL_ART:
         for state in ("idle", "using"):
             img, d = canvas(W, H)
             col = t["color"] if state == "idle" else shade(t["color"], 1.3)
@@ -214,7 +199,7 @@ def gen_tools():
                 outlined(d, "polygon", [(20, 74), (58, 22), (76, 34), (36, 84)], col)
                 d.line([(20, 74), (36, 84)], fill=shade(col, 0.4), width=6)
             save(img, "tools/tool_%s%s.png" % (t["id"], "" if state == "idle" else "_using"),
-                 "%s tool, %s" % (t["name"], state), "yes (idle/using)", 4)
+                 "%s tool, %s" % (t["name"], state))
 
 
 # ------------------------------------------------------------------------ ui
@@ -223,7 +208,7 @@ def gen_ui():
     def panel(name, fill, border, w=96, h=96, r=18, desc=""):
         img, d = canvas(w, h)
         d.rounded_rectangle([2, 2, w - 3, h - 3], radius=r, fill=fill, outline=border, width=3)
-        save(img, "ui/%s.png" % name, desc + " NinePatchRect, 24px margins.", "no", 1)
+        save(img, "ui/%s.png" % name, desc + " NinePatchRect, 24px margins.")
 
     panel("panel_main", (26, 48, 66, 235), (86, 140, 170, 255), desc="Main UI panel.")
     panel("panel_dark", (12, 22, 34, 245), (58, 96, 124, 255), desc="Modal / overlay panel.")
@@ -238,7 +223,7 @@ def gen_ui():
                                ("disabled", (30, 38, 46, 200), (70, 78, 88, 255))):
         img, d = canvas(64, 64)
         d.rounded_rectangle([2, 2, 61, 61], radius=14, fill=fill, outline=border, width=3)
-        save(img, "ui/button_%s.png" % name, "Button %s state. NinePatch, 20px margins." % name, "no", 1)
+        save(img, "ui/button_%s.png" % name, "Button %s state. NinePatch, 20px margins." % name)
 
     for name, col, glyph in (("icon_day", (240, 200, 84), "H"), ("icon_quota", (120, 200, 140), "T"),
                              ("icon_grab", (200, 200, 210), "C"), ("icon_health", (110, 200, 190), "L"),
@@ -248,33 +233,52 @@ def gen_ui():
         img, d = canvas(48, 48)
         outlined(d, "ellipse", [3, 3, 44, 44], col)
         centered(d, (0, 0, 48, 48), glyph, shade(col, 0.35), 24)
-        save(img, "ui/%s.png" % name, "HUD icon (%s)" % glyph, "no", 1)
+        save(img, "ui/%s.png" % name, "HUD icon (%s)" % glyph)
+
+    panel("chip_match", (22, 74, 48, 245), (110, 224, 150, 255), 64, 40, 12,
+          desc="Evidence chip that satisfies an active rule (green).")
+
+    # Minimap: the seabed is wider than the screen, so the player needs to see
+    # where everything is without sweeping the camera.
+    img, d = canvas(960, 28)
+    d.rounded_rectangle([0, 0, 959, 27], radius=8, fill=(14, 30, 44, 235),
+                        outline=(70, 112, 140, 255), width=2)
+    save(img, "ui/minimap_bg.png", "Minimap strip background. Stretched to width.")
+    img, d = canvas(64, 28)
+    d.rectangle([0, 0, 63, 27], fill=(120, 190, 220, 46), outline=(150, 220, 245, 200), width=2)
+    save(img, "ui/minimap_view.png", "Minimap window showing the visible slice. Stretched.")
+    img, d = canvas(10, 10)
+    outlined(d, "ellipse", [0, 0, 9, 9], (236, 200, 96), width=1)
+    save(img, "ui/minimap_item.png", "Minimap dot for one item on the seabed")
+    img, d = canvas(12, 20)
+    outlined(d, "polygon", [(6, 19), (0, 4), (11, 4)], (232, 96, 84), width=1)
+    save(img, "ui/minimap_claw.png", "Minimap marker for the claw")
 
     for name, col in (("meter_bg", (30, 44, 58)), ("meter_fill", (86, 196, 172))):
         img, d = canvas(320, 32)
         d.rounded_rectangle([0, 0, 319, 31], radius=14, fill=col + (255,),
                             outline=shade(col, 1.6) + (255,), width=2)
         save(img, "ui/%s.png" % name, "Ocean health meter %s. Fill is clipped by width." %
-             name.split("_")[1], "no", 1)
+             name.split("_")[1])
 
     for name, col in (("pip_full", (240, 200, 84)), ("pip_empty", (70, 80, 92))):
         img, d = canvas(16, 16)
         outlined(d, "ellipse", [1, 1, 14, 14], col, width=2)
-        save(img, "ui/%s.png" % name, "Tool charge pip (%s)" % name.split("_")[1], "no", 1)
+        save(img, "ui/%s.png" % name, "Budget pip (%s)" % name.split("_")[1])
 
     for name, ang in (("arrow_left", 180), ("arrow_right", 0)):
         img, d = canvas(96, 96)
         outlined(d, "ellipse", [4, 4, 91, 91], (58, 92, 118), width=3)
         pts = [(70, 28), (70, 68), (30, 48)] if ang == 180 else [(26, 28), (26, 68), (66, 48)]
         outlined(d, "polygon", pts, (200, 216, 230))
-        save(img, "ui/%s.png" % name, "Console arrow button (%s)" % name.split("_")[1], "no", 1)
+        save(img, "ui/%s.png" % name, "Console arrow button (%s)" % name.split("_")[1])
 
     img, d = canvas(128, 128)
     outlined(d, "ellipse", [4, 4, 123, 123], (40, 60, 78))
-    save(img, "ui/joystick_base.png", "Console joystick base", "no", 1)
+    save(img, "ui/joystick_base.png", "Console joystick base")
     img, d = canvas(72, 72)
     outlined(d, "ellipse", [2, 2, 69, 69], (198, 82, 72))
-    save(img, "ui/joystick_knob.png", "Console joystick knob, offsets with claw", "no", 1)
+    save(img, "ui/joystick_knob.png", "Console joystick knob, offsets with claw")
 
 
 # ----------------------------------------------------------------------- env
@@ -284,34 +288,34 @@ def gen_env():
     for y in range(720):
         t = y / 719.0
         d.line([(0, y), (1280, y)], fill=(int(8 + 14 * t), int(38 + 30 * t), int(72 + 26 * t), 255))
-    save(img, "env/water_bg.png", "Full-screen water background, layer 0", "no", 1)
+    save(img, "env/water_bg.png", "Full-screen water background, layer 0")
 
     img, d = canvas(1000, 140)
     d.rectangle([0, 30, 999, 139], fill=(74, 68, 52, 255))
     d.rectangle([0, 30, 999, 44], fill=(102, 94, 70, 255))
     for x, r in ((120, 34), (420, 22), (700, 40), (880, 18)):
         outlined(d, "ellipse", [x - r, 30 - r * .7, x + r, 30 + r], (58, 54, 44))
-    save(img, "env/seabed.png", "Seabed floor inside the tank SubViewport, z_index -10", "no", 1)
+    save(img, "env/seabed.png", "Seabed floor inside the tank SubViewport, z_index -10")
 
     img, d = canvas(1040, 460)
     d.rounded_rectangle([0, 0, 1039, 459], radius=26, outline=(58, 74, 92, 255), width=20)
     d.rounded_rectangle([10, 10, 1029, 449], radius=20, outline=(96, 122, 148, 255), width=6)
-    save(img, "env/tank_frame.png", "Machine frame around the tank. Centre is transparent.", "no", 1)
+    save(img, "env/tank_frame.png", "Machine frame around the tank. Centre is transparent.")
 
     img, d = canvas(1000, 420)
     for x0 in (60, 300, 660):
         d.polygon([(x0, 0), (x0 + 90, 0), (x0 + 30, 419), (x0 - 60, 419)], fill=(255, 255, 255, 16))
     d.rectangle([0, 0, 999, 419], fill=(120, 200, 220, 12))
-    save(img, "env/glass_overlay.png", "Glass reflection and tint, layer 20", "no", 1)
+    save(img, "env/glass_overlay.png", "Glass reflection and tint, layer 20")
 
     img, d = canvas(1280, 220)
     d.rectangle([0, 0, 1279, 219], fill=(24, 40, 54, 255))
     d.rectangle([0, 0, 1279, 10], fill=(96, 122, 148, 255))
-    save(img, "env/machine_console.png", "Console backing plate under the tank, layer 30", "no", 1)
+    save(img, "env/machine_console.png", "Console backing plate under the tank, layer 30")
 
     img, d = canvas(24, 24)
     d.ellipse([1, 1, 22, 22], fill=(200, 235, 245, 90), outline=(230, 250, 255, 170), width=2)
-    save(img, "env/bubble.png", "Bubble, count scales with the VFX slider", "no", 1)
+    save(img, "env/bubble.png", "Bubble, count scales with the VFX slider")
 
     for i, (label, col) in enumerate((("LAUT", (18, 58, 92)), ("SAMPAH", (58, 52, 44)),
                                       ("MESIN", (34, 66, 78))), start=1):
@@ -321,13 +325,13 @@ def gen_env():
             d.line([(0, y), (960, y)], fill=shade(col, 0.6 + 0.9 * t) + (255,))
         d.rectangle([0, 380, 959, 539], fill=shade(col, 0.45) + (255,))
         centered(d, (0, 180, 960, 260), label, (235, 240, 245), 64)
-        save(img, "env/cutscene_%02d.png" % i, "Cutscene still %d (placeholder)" % i, "no", 1)
+        save(img, "env/cutscene_%02d.png" % i, "Cutscene still %d (placeholder)" % i)
 
     img, d = canvas(640, 200)
     d.rounded_rectangle([4, 40, 635, 160], radius=20, fill=(16, 44, 68, 255),
                         outline=(110, 190, 210, 255), width=5)
     centered(d, (0, 60, 640, 140), "CAKAR LAUT", (220, 240, 250), 56)
-    save(img, "env/logo.png", "Title logo", "no", 1)
+    save(img, "env/logo.png", "Title logo")
 
 
 
@@ -339,9 +343,9 @@ FRAMES_DIR = os.path.join(ROOT, "data", "frames")
 
 
 def write_frames(name, anims, speed=6.0):
-    """anims: [(anim_name, [texture_rel_path, ...])]"""
+    """anims: [(animation_name, [texture_rel_path, ...], target_frame_count)]"""
     textures = []
-    for _, paths in anims:
+    for _, paths, _ in anims:
         for pth in paths:
             if pth not in textures:
                 textures.append(pth)
@@ -350,11 +354,12 @@ def write_frames(name, anims, speed=6.0):
         lines.append('[ext_resource type="Texture2D" path="res://assets/%s" id="%d"]' % (pth, i + 1))
     lines += ["", "[resource]", "animations = ["]
     blocks = []
-    for anim_name, paths in anims:
+    for anim_name, paths, target in anims:
         fr = ", ".join('{\n"duration": 1.0,\n"texture": ExtResource("%d")\n}'
                        % (textures.index(p) + 1) for p in paths)
         blocks.append('{\n"frames": [%s],\n"loop": true,\n"name": &"%s",\n"speed": %.1f\n}'
                       % (fr, anim_name, speed))
+        ANIMS.append(("data/frames/%s.tres" % name, anim_name, paths[0], target))
     lines.append(", ".join(blocks) + "]")
     os.makedirs(FRAMES_DIR, exist_ok=True)
     with open(os.path.join(FRAMES_DIR, name + ".tres"), "w") as f:
@@ -363,81 +368,113 @@ def write_frames(name, anims, speed=6.0):
 
 def gen_frames():
     n = 0
-    write_frames("claw_frames", [(a, ["claw/claw_%s.png" % a])
-                                 for a in ("open", "closing", "closed", "carrying")], 8.0)
+    write_frames("claw_frames", [
+        ("open", ["claw/claw_open.png"], 4),
+        ("closing", ["claw/claw_closing.png"], 6),
+        ("closed", ["claw/claw_closed.png"], 2),
+        ("carrying", ["claw/claw_carrying.png"], 6)], 8.0)
     n += 1
     for name, _w, _h, _c in C.FISH:
-        write_frames("%s_frames" % name, [("swim", ["fish/%s.png" % name])], 6.0)
+        write_frames("%s_frames" % name, [("swim", ["fish/%s.png" % name], 6)], 6.0)
         n += 1
-    for it in C.ITEMS:
-        write_frames("item_%s_frames" % it["id"],
-                     [("wobble", ["items/item_%s.png" % it["id"]])], 4.0)
+    for it in C.ITEM_ART:
+        base = "items/item_%s.png" % it["id"]
+        # idle on the seabed, wobble when held, sinking while drifting in.
+        write_frames("item_%s_frames" % it["id"], [
+            ("idle", [base], 2),
+            ("wobble", [base], 4),
+            ("sinking", [base], 6)], 4.0)
         n += 1
     for name, _col in C.BINS:
-        write_frames("bin_%s_frames" % name,
-                     [("idle", ["bins/bin_%s.png" % name]),
-                      ("accept", ["bins/bin_%s_accept.png" % name]),
-                      ("reject", ["bins/bin_%s_reject.png" % name])], 8.0)
+        write_frames("bin_%s_frames" % name, [
+            ("idle", ["bins/bin_%s.png" % name], 2),
+            ("accept", ["bins/bin_%s_accept.png" % name], 6),
+            ("reject", ["bins/bin_%s_reject.png" % name], 6),
+            ("highlight", ["bins/bin_%s_highlight.png" % name], 4)], 8.0)
         n += 1
-    for t in C.TOOLS:
-        write_frames("tool_%s_frames" % t["id"],
-                     [("idle", ["tools/tool_%s.png" % t["id"]]),
-                      ("using", ["tools/tool_%s_using.png" % t["id"]])], 8.0)
+    for t in C.TOOL_ART:
+        write_frames("tool_%s_frames" % t["id"], [
+            ("idle", ["tools/tool_%s.png" % t["id"]], 2),
+            ("using", ["tools/tool_%s_using.png" % t["id"]], 4)], 8.0)
         n += 1
+    write_frames("bubble_frames", [("rise", ["env/bubble.png"], 6)], 6.0)
+    n += 1
     print("generated %d SpriteFrames resources in data/frames/" % n)
 
 
 HEADER = """# Asset Manifest
 
 For the designers. **Every visual in the game is one PNG from this list.** The
-code never draws a shape and never uses a `ColorRect` - if you can see it on
+code never draws a shape and never uses a `ColorRect` — if you can see it on
 screen, it came from a file below.
 
 ## How to replace an asset
 
 1. Drop your PNG at **exactly the same path** with **exactly the same pixel
-   size** as the table says. Nothing else needs to change - no code, no scenes.
+   size** as the table says. Nothing else needs to change — no code, no scenes.
 2. Keep the transparent background. Items, claw, fish, bins and tools are cut
    out; only the `env/` backgrounds are opaque.
 3. Keep the art inside the stated canvas. The anchor point is the centre of the
    canvas for everything except `ui/` panels, which stretch from their corners.
 
-## Animation
+## How to animate something
 
-Anything marked **animates** is already an `AnimatedSprite2D` driven by a
-`SpriteFrames` resource in `data/frames/`, currently holding one frame per
-animation. To animate it, add your frames to that existing `SpriteFrames` - do
-not replace the node. The **final frames** column is the frame count we are
+**No animation in this game is written in code.** Anything that moves visually
+is an `AnimatedSprite2D` playing a named animation from a `SpriteFrames`
+resource in `data/frames/`. Code only decides *which* animation plays and
+*when* — never what it looks like.
+
+Every animation already exists with **one placeholder frame**. To animate it:
+
+1. Draw your frames and save them next to the existing file, numbered:
+   `claw_closing_01.png`, `claw_closing_02.png`, …
+2. Open the matching `data/frames/*.tres` in Godot and drop the frames into
+   that animation.
+
+Do not add nodes, rename animations, or replace the `SpriteFrames` — the game
+looks animations up by name. The **target frames** column is what we are
 designing for; fewer works, the animation just plays shorter.
 
-Naming for extra frames: `claw_open_01.png`, `claw_open_02.png`, and so on next
-to the existing file.
+## Hotspots — read this before drawing any item
 
-## Hotspots (items only)
+Items carry 2–3 invisible hotspots — a seam, a label corner, a stained patch —
+and a tool only reveals its property when clicked on the matching one.
 
-Items carry 2-3 invisible hotspots - a seam, a label corner, a stained patch -
-and a tool only reveals its property when clicked on the matching one. The
-placeholder PNGs draw these as **thin dashed rings** with a letter (R rinse,
-S swab, M magnifier, C cutter) so they can be tested.
+Hotspot positions live in `data/items/*.tres`. The rings you see are **not part
+of the item art**: they are a separate overlay, `assets/items/hotspots_<id>.png`,
+generated from that data by `tools/gen_hotspot_overlays.gd`, and the player can
+switch them off.
 
-**In the final art the ring must disappear** and the hotspot must become a real
-feature of the drawing at the same place: draw the stain where the R ring is,
-the printed code where the M ring is, the seam where the C ring is. Hotspot
-positions live in `data/items/*.tres` and can be nudged there if your artwork
-wants them elsewhere.
+**In the final art the hotspot must become a real drawn feature of the item at
+the same coordinates** — draw the stain where the rinse ring is, the printed
+code where the magnifier ring is, the cut seam where the cutter ring is. The
+overlay then survives only as an accessibility aid, not as the way the puzzle is
+solved. Never edit `hotspots_<id>.png` by hand; move the coordinates in the
+`.tres` and re-run the generator.
+
+Ring colours match the tool: rinse blue, swab pink, magnifier yellow, cutter
+red. Those come from `ToolData.color` in `data/tools/*.tres`.
 
 ## No AI generation
 
-No asset in this project - image or audio - may be AI generated. The current
+No asset in this project — image or audio — may be AI generated. The current
 files are drawn programmatically by `tools/gen_placeholders.py` and
 `tools/gen_sounds.py`.
 
 ---
 
-## Manifest
+## Animations
 
-| Path | Size | What it is | Animates | Final frames |
-|------|------|-----------|----------|--------------|
+| SpriteFrames | Animation | Placeholder frame | Target frames |
+|--------------|-----------|-------------------|---------------|
+"""
+
+TABLE_HEADER = """
+
+## Every PNG
+
+| Path | Size | What it is |
+|------|------|-----------|
 """
 
 
@@ -450,10 +487,14 @@ def main():
     gen_ui()
     gen_env()
     gen_frames()
-    rows = "\n".join("| `assets/%s` | %s | %s | %s | %s |" % r for r in MANIFEST)
+    anims = "\n".join("| `%s` | `%s` | `assets/%s` | %d |" % a for a in ANIMS)
+    rows = "\n".join("| `assets/%s` | %s | %s |" % r for r in MANIFEST)
     with open(os.path.join(ASSETS, "ASSETS.md"), "w") as f:
-        f.write(HEADER + rows + "\n\n_%d files. Regenerate placeholders with_ "
-                "`python3 tools/gen_placeholders.py`.\n" % len(MANIFEST))
+        f.write(HEADER + anims + TABLE_HEADER + rows +
+                "\n\n_%d PNGs, %d animations across %d SpriteFrames resources._\n"
+                "_Hotspot overlays are generated separately — see above._\n"
+                "_Regenerate with_ `python3 tools/gen_placeholders.py`.\n"
+                % (len(MANIFEST), len(ANIMS), len(set(a[0] for a in ANIMS))))
     print("generated %d PNGs + ASSETS.md" % len(MANIFEST))
 
 

@@ -13,3 +13,4 @@ icon = ExtResource("2_xv6lh")
 reveals_field = "has_residue"
 default_charges = 4
 description = "Menyiram permukaan untuk melihat apakah masih ada sisa kotoran di baliknya."
+color = Color(0.3764706, 0.69803923, 0.9019608, 1)

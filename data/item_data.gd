@@ -9,8 +9,15 @@ enum Category { ORGANIC, RECYCLABLE, HAZARD, LANDFILL }
 @export var display_name: String
 ## Static texture: inventory cards, inspect view, report rows.
 @export var texture: Texture2D
-## Animated form used inside the tank (wobble). One frame now, more later.
+## Animated form used inside the tank: idle / wobble / sinking. One frame each
+## now, more later.
 @export var frames: SpriteFrames
+## Ring overlay marking this item's hotspots, drawn on top of the item in the
+## inspect panel and toggleable. Generated from `hotspots` below by
+## tools/gen_hotspot_overlays.gd - never hand-drawn, so the two cannot disagree.
+## Final art should integrate the hotspot into the item drawing itself and this
+## overlay becomes an accessibility aid only.
+@export var hotspot_overlay: Texture2D
 @export var weight: float = 1.0 ## affects claw grip chance
 
 # --- Surface info: free, always shown ---

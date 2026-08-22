@@ -14,3 +14,4 @@ reveals_field = "tag_text"
 default_charges = 5
 description = "Membaca kode daur ulang atau label kecil yang tercetak."
 sort_order = 2
+color = Color(0.9411765, 0.78431374, 0.32941177, 1)

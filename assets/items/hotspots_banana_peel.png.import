@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bqqyjwkov47cn"
-path="res://.godot/imported/fish_large.png-67db68baa44151a1280ae6e0ba337f53.ctex"
+uid="uid://ctokw3epcolw5"
+path="res://.godot/imported/hotspots_banana_peel.png-66ad1841793179db0846611ebfc853ac.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/fish/fish_large.png"
-dest_files=["res://.godot/imported/fish_large.png-67db68baa44151a1280ae6e0ba337f53.ctex"]
+source_file="res://assets/items/hotspots_banana_peel.png"
+dest_files=["res://.godot/imported/hotspots_banana_peel.png-66ad1841793179db0846611ebfc853ac.ctex"]
 
 [params]
 

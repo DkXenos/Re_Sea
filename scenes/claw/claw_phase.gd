@@ -7,9 +7,9 @@ extends Node2D
 const ITEM_SCENE := preload("res://scenes/claw/tank_item.tscn")
 const FISH_SCENE := preload("res://scenes/claw/fish.tscn")
 const FISH_FRAMES: Array[String] = [
-	"res://data/frames/fish_small_frames.tres",
-	"res://data/frames/fish_medium_frames.tres",
-	"res://data/frames/fish_large_frames.tres",
+	"res://data/frames/fish_bg_small_frames.tres",
+	"res://data/frames/fish_bg_medium_frames.tres",
+	"res://data/frames/fish_bg_large_frames.tres",
 ]
 const END_DELAY := 1.4
 ## Nearest-layer parallax travel in pixels. Small numbers - enough to read as
@@ -105,13 +105,16 @@ func _spawn_fish() -> void:
 func _rebuild_bubbles(intensity: float) -> void:
 	_clear(_bubbles)
 	_bubble_speeds.clear()
-	var texture: Texture2D = load("res://assets/env/bubble.png")
+	# Bubbles are AnimatedSprite2D like every other animated thing, playing
+	# "rise". Their upward travel is movement; the animation is the designer's.
+	var frames: SpriteFrames = load("res://data/frames/bubble_frames.tres")
 	for i in int(round(14.0 * clampf(intensity, 0.0, 1.0))):
-		var s := Sprite2D.new()
-		s.texture = texture
-		s.position = Vector2(randf_range(160.0, 1120.0), randf_range(50.0, 450.0))
-		s.scale = Vector2.ONE * randf_range(0.5, 1.3)
-		_bubbles.add_child(s)
+		var bubble := AnimatedSprite2D.new()
+		bubble.sprite_frames = frames
+		bubble.play(&"rise")
+		bubble.position = Vector2(randf_range(160.0, 1120.0), randf_range(50.0, 450.0))
+		bubble.scale = Vector2.ONE * randf_range(0.5, 1.3)
+		_bubbles.add_child(bubble)
 		_bubble_speeds.append(randf_range(18.0, 46.0))
 
 
@@ -141,11 +144,11 @@ func _update_parallax() -> void:
 func _update_bubbles(delta: float) -> void:
 	var children := _bubbles.get_children()
 	for i in children.size():
-		var s: Sprite2D = children[i]
-		s.position.y -= _bubble_speeds[i] * delta
-		if s.position.y < 46.0:
-			s.position.y = 452.0
-			s.position.x = randf_range(160.0, 1120.0)
+		var bubble: AnimatedSprite2D = children[i]
+		bubble.position.y -= _bubble_speeds[i] * delta
+		if bubble.position.y < 46.0:
+			bubble.position.y = 452.0
+			bubble.position.x = randf_range(160.0, 1120.0)
 
 
 ## Failure has to be the player's judgement, not a surprise, so the odds are on

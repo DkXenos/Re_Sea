@@ -20,6 +20,14 @@ func _current() -> Node:
 
 func _run() -> void:
 	await process_frame
+	# Headless physics still ticks in real time, so a full five-day run takes
+	# well over a minute at 1x. Scaling time compresses the same simulated run
+	# into far fewer frames; the claw's descent step stays well inside the
+	# grab-area overlap window, so nothing is skipped.
+	# Pass --realtime when the numbers matter (balance checks); the scaled run
+	# is a different but equally valid simulation, since where the claw stops
+	# during a coarser descent step changes which item it contacts.
+	Engine.time_scale = 1.0 if "--realtime" in OS.get_cmdline_user_args() else 6.0
 	bad_mode = "--bad" in OS.get_cmdline_user_args()
 	verbose = "--verbose-days" in OS.get_cmdline_user_args()
 	game = root.get_node("/root/Game")

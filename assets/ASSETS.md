@@ -1,131 +1,235 @@
 # Asset Manifest
 
 For the designers. **Every visual in the game is one PNG from this list.** The
-code never draws a shape and never uses a `ColorRect` - if you can see it on
+code never draws a shape and never uses a `ColorRect` — if you can see it on
 screen, it came from a file below.
 
 ## How to replace an asset
 
 1. Drop your PNG at **exactly the same path** with **exactly the same pixel
-   size** as the table says. Nothing else needs to change - no code, no scenes.
+   size** as the table says. Nothing else needs to change — no code, no scenes.
 2. Keep the transparent background. Items, claw, fish, bins and tools are cut
    out; only the `env/` backgrounds are opaque.
 3. Keep the art inside the stated canvas. The anchor point is the centre of the
    canvas for everything except `ui/` panels, which stretch from their corners.
 
-## Animation
+## How to animate something
 
-Anything marked **animates** is already an `AnimatedSprite2D` driven by a
-`SpriteFrames` resource in `data/frames/`, currently holding one frame per
-animation. To animate it, add your frames to that existing `SpriteFrames` - do
-not replace the node. The **final frames** column is the frame count we are
+**No animation in this game is written in code.** Anything that moves visually
+is an `AnimatedSprite2D` playing a named animation from a `SpriteFrames`
+resource in `data/frames/`. Code only decides *which* animation plays and
+*when* — never what it looks like.
+
+Every animation already exists with **one placeholder frame**. To animate it:
+
+1. Draw your frames and save them next to the existing file, numbered:
+   `claw_closing_01.png`, `claw_closing_02.png`, …
+2. Open the matching `data/frames/*.tres` in Godot and drop the frames into
+   that animation.
+
+Do not add nodes, rename animations, or replace the `SpriteFrames` — the game
+looks animations up by name. The **target frames** column is what we are
 designing for; fewer works, the animation just plays shorter.
 
-Naming for extra frames: `claw_open_01.png`, `claw_open_02.png`, and so on next
-to the existing file.
+## Hotspots — read this before drawing any item
 
-## Hotspots (items only)
+Items carry 2–3 invisible hotspots — a seam, a label corner, a stained patch —
+and a tool only reveals its property when clicked on the matching one.
 
-Items carry 2-3 invisible hotspots - a seam, a label corner, a stained patch -
-and a tool only reveals its property when clicked on the matching one. The
-placeholder PNGs draw these as **thin dashed rings** with a letter (R rinse,
-S swab, M magnifier, C cutter) so they can be tested.
+Hotspot positions live in `data/items/*.tres`. The rings you see are **not part
+of the item art**: they are a separate overlay, `assets/items/hotspots_<id>.png`,
+generated from that data by `tools/gen_hotspot_overlays.gd`, and the player can
+switch them off.
 
-**In the final art the ring must disappear** and the hotspot must become a real
-feature of the drawing at the same place: draw the stain where the R ring is,
-the printed code where the M ring is, the seam where the C ring is. Hotspot
-positions live in `data/items/*.tres` and can be nudged there if your artwork
-wants them elsewhere.
+**In the final art the hotspot must become a real drawn feature of the item at
+the same coordinates** — draw the stain where the rinse ring is, the printed
+code where the magnifier ring is, the cut seam where the cutter ring is. The
+overlay then survives only as an accessibility aid, not as the way the puzzle is
+solved. Never edit `hotspots_<id>.png` by hand; move the coordinates in the
+`.tres` and re-run the generator.
+
+Ring colours match the tool: rinse blue, swab pink, magnifier yellow, cutter
+red. Those come from `ToolData.color` in `data/tools/*.tres`.
 
 ## No AI generation
 
-No asset in this project - image or audio - may be AI generated. The current
+No asset in this project — image or audio — may be AI generated. The current
 files are drawn programmatically by `tools/gen_placeholders.py` and
 `tools/gen_sounds.py`.
 
 ---
 
-## Manifest
+## Animations
 
-| Path | Size | What it is | Animates | Final frames |
-|------|------|-----------|----------|--------------|
-| `assets/items/item_banana_peel.png` | 160x160 | Kulit Pisang - kulit buah. Hotspots: none | yes (wobble in tank) | 4 |
-| `assets/items/item_fish_bone.png` | 160x160 | Tulang Ikan - tulang. Hotspots: none | yes (wobble in tank) | 4 |
-| `assets/items/item_pet_bottle.png` | 160x160 | Botol Air Bening - PET bening. Hotspots: has_residue, tag_text | yes (wobble in tank) | 4 |
-| `assets/items/item_alu_can.png` | 160x160 | Kaleng Minuman - aluminium. Hotspots: has_residue, tag_text | yes (wobble in tank) | 4 |
-| `assets/items/item_styrofoam_tray.png` | 160x160 | Wadah Styrofoam - styrofoam. Hotspots: tag_text | yes (wobble in tank) | 4 |
-| `assets/items/item_car_battery.png` | 160x160 | Aki Bekas - logam dan plastik tebal. Hotspots: tag_text, true_material | yes (wobble in tank) | 4 |
-| `assets/items/item_oil_jerrycan.png` | 160x160 | Jeriken Bening - HDPE bening. Hotspots: has_residue, residue_type, tag_text | yes (wobble in tank) | 4 |
-| `assets/items/item_paint_bottle.png` | 160x160 | Botol Bening Bekas - PET bening. Hotspots: has_residue, residue_type, tag_text | yes (wobble in tank) | 4 |
-| `assets/items/item_juice_carton.png` | 160x160 | Kotak Jus - kertas karton. Hotspots: tag_text, true_material | yes (wobble in tank) | 4 |
-| `assets/items/item_eco_tote.png` | 160x160 | Tas Kain Ramah Lingkungan - kain katun. Hotspots: tag_text, true_material | yes (wobble in tank) | 4 |
-| `assets/items/item_paper_cup.png` | 160x160 | Gelas Kertas - kertas. Hotspots: has_residue, tag_text, true_material | yes (wobble in tank) | 4 |
-| `assets/items/item_spray_can.png` | 160x160 | Kaleng Semprot - kaleng baja. Hotspots: tag_text, true_material | yes (wobble in tank) | 4 |
-| `assets/items/item_glass_jar.png` | 160x160 | Toples Kaca - kaca. Hotspots: has_residue, residue_type, tag_text | yes (wobble in tank) | 4 |
-| `assets/items/item_fishing_net.png` | 160x160 | Jaring Nilon Sobek - nilon. Hotspots: tag_text, true_material | yes (wobble in tank) | 4 |
-| `assets/claw/claw_open.png` | 160x160 | Claw arm, open pose | yes (one SpriteFrames animation per pose) | 6 |
-| `assets/claw/claw_closing.png` | 160x160 | Claw arm, closing pose | yes (one SpriteFrames animation per pose) | 6 |
-| `assets/claw/claw_closed.png` | 160x160 | Claw arm, closed pose | yes (one SpriteFrames animation per pose) | 6 |
-| `assets/claw/claw_carrying.png` | 160x160 | Claw arm, carrying pose | yes (one SpriteFrames animation per pose) | 6 |
-| `assets/claw/claw_cable.png` | 8x64 | Cable segment, tiled vertically from rail to claw | no | 1 |
-| `assets/fish/fish_small.png` | 96x48 | Decoy fish, swims left to right | yes (swim) | 6 |
-| `assets/fish/fish_medium.png` | 128x64 | Decoy fish, swims left to right | yes (swim) | 6 |
-| `assets/fish/fish_large.png` | 176x88 | Decoy fish, swims left to right | yes (swim) | 6 |
-| `assets/bins/bin_organic.png` | 200x240 | organic bin, idle state | yes (idle/accept/reject) | 6 |
-| `assets/bins/bin_organic_accept.png` | 200x240 | organic bin, accept state | yes (idle/accept/reject) | 6 |
-| `assets/bins/bin_organic_reject.png` | 200x240 | organic bin, reject state | yes (idle/accept/reject) | 6 |
-| `assets/bins/bin_recyclable.png` | 200x240 | recyclable bin, idle state | yes (idle/accept/reject) | 6 |
-| `assets/bins/bin_recyclable_accept.png` | 200x240 | recyclable bin, accept state | yes (idle/accept/reject) | 6 |
-| `assets/bins/bin_recyclable_reject.png` | 200x240 | recyclable bin, reject state | yes (idle/accept/reject) | 6 |
-| `assets/bins/bin_hazard.png` | 200x240 | hazard bin, idle state | yes (idle/accept/reject) | 6 |
-| `assets/bins/bin_hazard_accept.png` | 200x240 | hazard bin, accept state | yes (idle/accept/reject) | 6 |
-| `assets/bins/bin_hazard_reject.png` | 200x240 | hazard bin, reject state | yes (idle/accept/reject) | 6 |
-| `assets/bins/bin_landfill.png` | 200x240 | landfill bin, idle state | yes (idle/accept/reject) | 6 |
-| `assets/bins/bin_landfill_accept.png` | 200x240 | landfill bin, accept state | yes (idle/accept/reject) | 6 |
-| `assets/bins/bin_landfill_reject.png` | 200x240 | landfill bin, reject state | yes (idle/accept/reject) | 6 |
-| `assets/tools/tool_rinse.png` | 96x96 | Bilas tool, idle | yes (idle/using) | 4 |
-| `assets/tools/tool_rinse_using.png` | 96x96 | Bilas tool, using | yes (idle/using) | 4 |
-| `assets/tools/tool_swab.png` | 96x96 | Usap Kimia tool, idle | yes (idle/using) | 4 |
-| `assets/tools/tool_swab_using.png` | 96x96 | Usap Kimia tool, using | yes (idle/using) | 4 |
-| `assets/tools/tool_magnifier.png` | 96x96 | Kaca Pembesar tool, idle | yes (idle/using) | 4 |
-| `assets/tools/tool_magnifier_using.png` | 96x96 | Kaca Pembesar tool, using | yes (idle/using) | 4 |
-| `assets/tools/tool_cutter.png` | 96x96 | Pemotong tool, idle | yes (idle/using) | 4 |
-| `assets/tools/tool_cutter_using.png` | 96x96 | Pemotong tool, using | yes (idle/using) | 4 |
-| `assets/ui/panel_main.png` | 96x96 | Main UI panel. NinePatchRect, 24px margins. | no | 1 |
-| `assets/ui/panel_dark.png` | 96x96 | Modal / overlay panel. NinePatchRect, 24px margins. | no | 1 |
-| `assets/ui/panel_slot.png` | 96x96 | Inventory slot background. NinePatchRect, 24px margins. | no | 1 |
-| `assets/ui/chip_surface.png` | 64x40 | Evidence chip, free surface info (grey). NinePatchRect, 24px margins. | no | 1 |
-| `assets/ui/chip_reveal.png` | 64x40 | Evidence chip, tool reveal (gold). NinePatchRect, 24px margins. | no | 1 |
-| `assets/ui/button_normal.png` | 64x64 | Button normal state. NinePatch, 20px margins. | no | 1 |
-| `assets/ui/button_hover.png` | 64x64 | Button hover state. NinePatch, 20px margins. | no | 1 |
-| `assets/ui/button_pressed.png` | 64x64 | Button pressed state. NinePatch, 20px margins. | no | 1 |
-| `assets/ui/button_disabled.png` | 64x64 | Button disabled state. NinePatch, 20px margins. | no | 1 |
-| `assets/ui/icon_day.png` | 48x48 | HUD icon (H) | no | 1 |
-| `assets/ui/icon_quota.png` | 48x48 | HUD icon (T) | no | 1 |
-| `assets/ui/icon_grab.png` | 48x48 | HUD icon (C) | no | 1 |
-| `assets/ui/icon_health.png` | 48x48 | HUD icon (L) | no | 1 |
-| `assets/ui/icon_book.png` | 48x48 | HUD icon (A) | no | 1 |
-| `assets/ui/icon_close.png` | 48x48 | HUD icon (X) | no | 1 |
-| `assets/ui/icon_check.png` | 48x48 | HUD icon (V) | no | 1 |
-| `assets/ui/icon_cross.png` | 48x48 | HUD icon (X) | no | 1 |
-| `assets/ui/icon_pause.png` | 48x48 | HUD icon (II) | no | 1 |
-| `assets/ui/meter_bg.png` | 320x32 | Ocean health meter bg. Fill is clipped by width. | no | 1 |
-| `assets/ui/meter_fill.png` | 320x32 | Ocean health meter fill. Fill is clipped by width. | no | 1 |
-| `assets/ui/pip_full.png` | 16x16 | Tool charge pip (full) | no | 1 |
-| `assets/ui/pip_empty.png` | 16x16 | Tool charge pip (empty) | no | 1 |
-| `assets/ui/arrow_left.png` | 96x96 | Console arrow button (left) | no | 1 |
-| `assets/ui/arrow_right.png` | 96x96 | Console arrow button (right) | no | 1 |
-| `assets/ui/joystick_base.png` | 128x128 | Console joystick base | no | 1 |
-| `assets/ui/joystick_knob.png` | 72x72 | Console joystick knob, offsets with claw | no | 1 |
-| `assets/env/water_bg.png` | 1280x720 | Full-screen water background, layer 0 | no | 1 |
-| `assets/env/seabed.png` | 1000x140 | Seabed floor inside the tank SubViewport, z_index -10 | no | 1 |
-| `assets/env/tank_frame.png` | 1040x460 | Machine frame around the tank. Centre is transparent. | no | 1 |
-| `assets/env/glass_overlay.png` | 1000x420 | Glass reflection and tint, layer 20 | no | 1 |
-| `assets/env/machine_console.png` | 1280x220 | Console backing plate under the tank, layer 30 | no | 1 |
-| `assets/env/bubble.png` | 24x24 | Bubble, count scales with the VFX slider | no | 1 |
-| `assets/env/cutscene_01.png` | 960x540 | Cutscene still 1 (placeholder) | no | 1 |
-| `assets/env/cutscene_02.png` | 960x540 | Cutscene still 2 (placeholder) | no | 1 |
-| `assets/env/cutscene_03.png` | 960x540 | Cutscene still 3 (placeholder) | no | 1 |
-| `assets/env/logo.png` | 640x200 | Title logo | no | 1 |
+| SpriteFrames | Animation | Placeholder frame | Target frames |
+|--------------|-----------|-------------------|---------------|
+| `data/frames/claw_frames.tres` | `open` | `assets/claw/claw_open.png` | 4 |
+| `data/frames/claw_frames.tres` | `closing` | `assets/claw/claw_closing.png` | 6 |
+| `data/frames/claw_frames.tres` | `closed` | `assets/claw/claw_closed.png` | 2 |
+| `data/frames/claw_frames.tres` | `carrying` | `assets/claw/claw_carrying.png` | 6 |
+| `data/frames/fish_bg_small_frames.tres` | `swim` | `assets/fish/fish_bg_small.png` | 6 |
+| `data/frames/fish_bg_medium_frames.tres` | `swim` | `assets/fish/fish_bg_medium.png` | 6 |
+| `data/frames/fish_bg_large_frames.tres` | `swim` | `assets/fish/fish_bg_large.png` | 6 |
+| `data/frames/item_banana_peel_frames.tres` | `idle` | `assets/items/item_banana_peel.png` | 2 |
+| `data/frames/item_banana_peel_frames.tres` | `wobble` | `assets/items/item_banana_peel.png` | 4 |
+| `data/frames/item_banana_peel_frames.tres` | `sinking` | `assets/items/item_banana_peel.png` | 6 |
+| `data/frames/item_fish_bone_frames.tres` | `idle` | `assets/items/item_fish_bone.png` | 2 |
+| `data/frames/item_fish_bone_frames.tres` | `wobble` | `assets/items/item_fish_bone.png` | 4 |
+| `data/frames/item_fish_bone_frames.tres` | `sinking` | `assets/items/item_fish_bone.png` | 6 |
+| `data/frames/item_pet_bottle_frames.tres` | `idle` | `assets/items/item_pet_bottle.png` | 2 |
+| `data/frames/item_pet_bottle_frames.tres` | `wobble` | `assets/items/item_pet_bottle.png` | 4 |
+| `data/frames/item_pet_bottle_frames.tres` | `sinking` | `assets/items/item_pet_bottle.png` | 6 |
+| `data/frames/item_alu_can_frames.tres` | `idle` | `assets/items/item_alu_can.png` | 2 |
+| `data/frames/item_alu_can_frames.tres` | `wobble` | `assets/items/item_alu_can.png` | 4 |
+| `data/frames/item_alu_can_frames.tres` | `sinking` | `assets/items/item_alu_can.png` | 6 |
+| `data/frames/item_styrofoam_tray_frames.tres` | `idle` | `assets/items/item_styrofoam_tray.png` | 2 |
+| `data/frames/item_styrofoam_tray_frames.tres` | `wobble` | `assets/items/item_styrofoam_tray.png` | 4 |
+| `data/frames/item_styrofoam_tray_frames.tres` | `sinking` | `assets/items/item_styrofoam_tray.png` | 6 |
+| `data/frames/item_car_battery_frames.tres` | `idle` | `assets/items/item_car_battery.png` | 2 |
+| `data/frames/item_car_battery_frames.tres` | `wobble` | `assets/items/item_car_battery.png` | 4 |
+| `data/frames/item_car_battery_frames.tres` | `sinking` | `assets/items/item_car_battery.png` | 6 |
+| `data/frames/item_oil_jerrycan_frames.tres` | `idle` | `assets/items/item_oil_jerrycan.png` | 2 |
+| `data/frames/item_oil_jerrycan_frames.tres` | `wobble` | `assets/items/item_oil_jerrycan.png` | 4 |
+| `data/frames/item_oil_jerrycan_frames.tres` | `sinking` | `assets/items/item_oil_jerrycan.png` | 6 |
+| `data/frames/item_paint_bottle_frames.tres` | `idle` | `assets/items/item_paint_bottle.png` | 2 |
+| `data/frames/item_paint_bottle_frames.tres` | `wobble` | `assets/items/item_paint_bottle.png` | 4 |
+| `data/frames/item_paint_bottle_frames.tres` | `sinking` | `assets/items/item_paint_bottle.png` | 6 |
+| `data/frames/item_juice_carton_frames.tres` | `idle` | `assets/items/item_juice_carton.png` | 2 |
+| `data/frames/item_juice_carton_frames.tres` | `wobble` | `assets/items/item_juice_carton.png` | 4 |
+| `data/frames/item_juice_carton_frames.tres` | `sinking` | `assets/items/item_juice_carton.png` | 6 |
+| `data/frames/item_eco_tote_frames.tres` | `idle` | `assets/items/item_eco_tote.png` | 2 |
+| `data/frames/item_eco_tote_frames.tres` | `wobble` | `assets/items/item_eco_tote.png` | 4 |
+| `data/frames/item_eco_tote_frames.tres` | `sinking` | `assets/items/item_eco_tote.png` | 6 |
+| `data/frames/item_paper_cup_frames.tres` | `idle` | `assets/items/item_paper_cup.png` | 2 |
+| `data/frames/item_paper_cup_frames.tres` | `wobble` | `assets/items/item_paper_cup.png` | 4 |
+| `data/frames/item_paper_cup_frames.tres` | `sinking` | `assets/items/item_paper_cup.png` | 6 |
+| `data/frames/item_spray_can_frames.tres` | `idle` | `assets/items/item_spray_can.png` | 2 |
+| `data/frames/item_spray_can_frames.tres` | `wobble` | `assets/items/item_spray_can.png` | 4 |
+| `data/frames/item_spray_can_frames.tres` | `sinking` | `assets/items/item_spray_can.png` | 6 |
+| `data/frames/item_glass_jar_frames.tres` | `idle` | `assets/items/item_glass_jar.png` | 2 |
+| `data/frames/item_glass_jar_frames.tres` | `wobble` | `assets/items/item_glass_jar.png` | 4 |
+| `data/frames/item_glass_jar_frames.tres` | `sinking` | `assets/items/item_glass_jar.png` | 6 |
+| `data/frames/item_fishing_net_frames.tres` | `idle` | `assets/items/item_fishing_net.png` | 2 |
+| `data/frames/item_fishing_net_frames.tres` | `wobble` | `assets/items/item_fishing_net.png` | 4 |
+| `data/frames/item_fishing_net_frames.tres` | `sinking` | `assets/items/item_fishing_net.png` | 6 |
+| `data/frames/bin_organic_frames.tres` | `idle` | `assets/bins/bin_organic.png` | 2 |
+| `data/frames/bin_organic_frames.tres` | `accept` | `assets/bins/bin_organic_accept.png` | 6 |
+| `data/frames/bin_organic_frames.tres` | `reject` | `assets/bins/bin_organic_reject.png` | 6 |
+| `data/frames/bin_organic_frames.tres` | `highlight` | `assets/bins/bin_organic_highlight.png` | 4 |
+| `data/frames/bin_recyclable_frames.tres` | `idle` | `assets/bins/bin_recyclable.png` | 2 |
+| `data/frames/bin_recyclable_frames.tres` | `accept` | `assets/bins/bin_recyclable_accept.png` | 6 |
+| `data/frames/bin_recyclable_frames.tres` | `reject` | `assets/bins/bin_recyclable_reject.png` | 6 |
+| `data/frames/bin_recyclable_frames.tres` | `highlight` | `assets/bins/bin_recyclable_highlight.png` | 4 |
+| `data/frames/bin_hazard_frames.tres` | `idle` | `assets/bins/bin_hazard.png` | 2 |
+| `data/frames/bin_hazard_frames.tres` | `accept` | `assets/bins/bin_hazard_accept.png` | 6 |
+| `data/frames/bin_hazard_frames.tres` | `reject` | `assets/bins/bin_hazard_reject.png` | 6 |
+| `data/frames/bin_hazard_frames.tres` | `highlight` | `assets/bins/bin_hazard_highlight.png` | 4 |
+| `data/frames/bin_landfill_frames.tres` | `idle` | `assets/bins/bin_landfill.png` | 2 |
+| `data/frames/bin_landfill_frames.tres` | `accept` | `assets/bins/bin_landfill_accept.png` | 6 |
+| `data/frames/bin_landfill_frames.tres` | `reject` | `assets/bins/bin_landfill_reject.png` | 6 |
+| `data/frames/bin_landfill_frames.tres` | `highlight` | `assets/bins/bin_landfill_highlight.png` | 4 |
+| `data/frames/tool_rinse_frames.tres` | `idle` | `assets/tools/tool_rinse.png` | 2 |
+| `data/frames/tool_rinse_frames.tres` | `using` | `assets/tools/tool_rinse_using.png` | 4 |
+| `data/frames/tool_swab_frames.tres` | `idle` | `assets/tools/tool_swab.png` | 2 |
+| `data/frames/tool_swab_frames.tres` | `using` | `assets/tools/tool_swab_using.png` | 4 |
+| `data/frames/tool_magnifier_frames.tres` | `idle` | `assets/tools/tool_magnifier.png` | 2 |
+| `data/frames/tool_magnifier_frames.tres` | `using` | `assets/tools/tool_magnifier_using.png` | 4 |
+| `data/frames/tool_cutter_frames.tres` | `idle` | `assets/tools/tool_cutter.png` | 2 |
+| `data/frames/tool_cutter_frames.tres` | `using` | `assets/tools/tool_cutter_using.png` | 4 |
+| `data/frames/bubble_frames.tres` | `rise` | `assets/env/bubble.png` | 6 |
 
-_78 files. Regenerate placeholders with_ `python3 tools/gen_placeholders.py`.
+## Every PNG
+
+| Path | Size | What it is |
+|------|------|-----------|
+| `assets/items/item_banana_peel.png` | 160x160 | Trash item `banana_peel` (ORG) |
+| `assets/items/item_fish_bone.png` | 160x160 | Trash item `fish_bone` (ORG) |
+| `assets/items/item_pet_bottle.png` | 160x160 | Trash item `pet_bottle` (PET) |
+| `assets/items/item_alu_can.png` | 160x160 | Trash item `alu_can` (ALU) |
+| `assets/items/item_styrofoam_tray.png` | 160x160 | Trash item `styrofoam_tray` (PS) |
+| `assets/items/item_car_battery.png` | 160x160 | Trash item `car_battery` (B3) |
+| `assets/items/item_oil_jerrycan.png` | 160x160 | Trash item `oil_jerrycan` (HDP) |
+| `assets/items/item_paint_bottle.png` | 160x160 | Trash item `paint_bottle` (PET) |
+| `assets/items/item_juice_carton.png` | 160x160 | Trash item `juice_carton` (PAP) |
+| `assets/items/item_eco_tote.png` | 160x160 | Trash item `eco_tote` (TXT) |
+| `assets/items/item_paper_cup.png` | 160x160 | Trash item `paper_cup` (PAP) |
+| `assets/items/item_spray_can.png` | 160x160 | Trash item `spray_can` (AER) |
+| `assets/items/item_glass_jar.png` | 160x160 | Trash item `glass_jar` (GL) |
+| `assets/items/item_fishing_net.png` | 160x160 | Trash item `fishing_net` (PA6) |
+| `assets/claw/claw_open.png` | 160x160 | Claw arm, open pose |
+| `assets/claw/claw_closing.png` | 160x160 | Claw arm, closing pose |
+| `assets/claw/claw_closed.png` | 160x160 | Claw arm, closed pose |
+| `assets/claw/claw_carrying.png` | 160x160 | Claw arm, carrying pose |
+| `assets/claw/claw_cable.png` | 8x64 | Cable, stretched vertically from rail to claw |
+| `assets/fish/fish_bg_small.png` | 96x48 | Background fish. Not grabbable - atmosphere only |
+| `assets/fish/fish_bg_medium.png` | 128x64 | Background fish. Not grabbable - atmosphere only |
+| `assets/fish/fish_bg_large.png` | 176x88 | Background fish. Not grabbable - atmosphere only |
+| `assets/bins/bin_organic.png` | 200x240 | organic bin, idle state |
+| `assets/bins/bin_organic_accept.png` | 200x240 | organic bin, accept state |
+| `assets/bins/bin_organic_reject.png` | 200x240 | organic bin, reject state |
+| `assets/bins/bin_organic_highlight.png` | 200x240 | organic bin, highlight state |
+| `assets/bins/bin_recyclable.png` | 200x240 | recyclable bin, idle state |
+| `assets/bins/bin_recyclable_accept.png` | 200x240 | recyclable bin, accept state |
+| `assets/bins/bin_recyclable_reject.png` | 200x240 | recyclable bin, reject state |
+| `assets/bins/bin_recyclable_highlight.png` | 200x240 | recyclable bin, highlight state |
+| `assets/bins/bin_hazard.png` | 200x240 | hazard bin, idle state |
+| `assets/bins/bin_hazard_accept.png` | 200x240 | hazard bin, accept state |
+| `assets/bins/bin_hazard_reject.png` | 200x240 | hazard bin, reject state |
+| `assets/bins/bin_hazard_highlight.png` | 200x240 | hazard bin, highlight state |
+| `assets/bins/bin_landfill.png` | 200x240 | landfill bin, idle state |
+| `assets/bins/bin_landfill_accept.png` | 200x240 | landfill bin, accept state |
+| `assets/bins/bin_landfill_reject.png` | 200x240 | landfill bin, reject state |
+| `assets/bins/bin_landfill_highlight.png` | 200x240 | landfill bin, highlight state |
+| `assets/tools/tool_rinse.png` | 96x96 | Bilas tool, idle |
+| `assets/tools/tool_rinse_using.png` | 96x96 | Bilas tool, using |
+| `assets/tools/tool_swab.png` | 96x96 | Usap Kimia tool, idle |
+| `assets/tools/tool_swab_using.png` | 96x96 | Usap Kimia tool, using |
+| `assets/tools/tool_magnifier.png` | 96x96 | Kaca Pembesar tool, idle |
+| `assets/tools/tool_magnifier_using.png` | 96x96 | Kaca Pembesar tool, using |
+| `assets/tools/tool_cutter.png` | 96x96 | Pemotong tool, idle |
+| `assets/tools/tool_cutter_using.png` | 96x96 | Pemotong tool, using |
+| `assets/ui/panel_main.png` | 96x96 | Main UI panel. NinePatchRect, 24px margins. |
+| `assets/ui/panel_dark.png` | 96x96 | Modal / overlay panel. NinePatchRect, 24px margins. |
+| `assets/ui/panel_slot.png` | 96x96 | Inventory slot background. NinePatchRect, 24px margins. |
+| `assets/ui/chip_surface.png` | 64x40 | Evidence chip, free surface info (grey). NinePatchRect, 24px margins. |
+| `assets/ui/chip_reveal.png` | 64x40 | Evidence chip, tool reveal (gold). NinePatchRect, 24px margins. |
+| `assets/ui/button_normal.png` | 64x64 | Button normal state. NinePatch, 20px margins. |
+| `assets/ui/button_hover.png` | 64x64 | Button hover state. NinePatch, 20px margins. |
+| `assets/ui/button_pressed.png` | 64x64 | Button pressed state. NinePatch, 20px margins. |
+| `assets/ui/button_disabled.png` | 64x64 | Button disabled state. NinePatch, 20px margins. |
+| `assets/ui/icon_day.png` | 48x48 | HUD icon (H) |
+| `assets/ui/icon_quota.png` | 48x48 | HUD icon (T) |
+| `assets/ui/icon_grab.png` | 48x48 | HUD icon (C) |
+| `assets/ui/icon_health.png` | 48x48 | HUD icon (L) |
+| `assets/ui/icon_book.png` | 48x48 | HUD icon (A) |
+| `assets/ui/icon_close.png` | 48x48 | HUD icon (X) |
+| `assets/ui/icon_check.png` | 48x48 | HUD icon (V) |
+| `assets/ui/icon_cross.png` | 48x48 | HUD icon (X) |
+| `assets/ui/icon_pause.png` | 48x48 | HUD icon (II) |
+| `assets/ui/chip_match.png` | 64x40 | Evidence chip that satisfies an active rule (green). NinePatchRect, 24px margins. |
+| `assets/ui/minimap_bg.png` | 960x28 | Minimap strip background. Stretched to width. |
+| `assets/ui/minimap_view.png` | 64x28 | Minimap window showing the visible slice. Stretched. |
+| `assets/ui/minimap_item.png` | 10x10 | Minimap dot for one item on the seabed |
+| `assets/ui/minimap_claw.png` | 12x20 | Minimap marker for the claw |
+| `assets/ui/meter_bg.png` | 320x32 | Ocean health meter bg. Fill is clipped by width. |
+| `assets/ui/meter_fill.png` | 320x32 | Ocean health meter fill. Fill is clipped by width. |
+| `assets/ui/pip_full.png` | 16x16 | Budget pip (full) |
+| `assets/ui/pip_empty.png` | 16x16 | Budget pip (empty) |
+| `assets/ui/arrow_left.png` | 96x96 | Console arrow button (left) |
+| `assets/ui/arrow_right.png` | 96x96 | Console arrow button (right) |
+| `assets/ui/joystick_base.png` | 128x128 | Console joystick base |
+| `assets/ui/joystick_knob.png` | 72x72 | Console joystick knob, offsets with claw |
+| `assets/env/water_bg.png` | 1280x720 | Full-screen water background, layer 0 |
+| `assets/env/seabed.png` | 1000x140 | Seabed floor inside the tank SubViewport, z_index -10 |
+| `assets/env/tank_frame.png` | 1040x460 | Machine frame around the tank. Centre is transparent. |
+| `assets/env/glass_overlay.png` | 1000x420 | Glass reflection and tint, layer 20 |
+| `assets/env/machine_console.png` | 1280x220 | Console backing plate under the tank, layer 30 |
+| `assets/env/bubble.png` | 24x24 | Bubble, count scales with the VFX slider |
+| `assets/env/cutscene_01.png` | 960x540 | Cutscene still 1 (placeholder) |
+| `assets/env/cutscene_02.png` | 960x540 | Cutscene still 2 (placeholder) |
+| `assets/env/cutscene_03.png` | 960x540 | Cutscene still 3 (placeholder) |
+| `assets/env/logo.png` | 640x200 | Title logo |
+
+_87 PNGs, 74 animations across 27 SpriteFrames resources._
+_Hotspot overlays are generated separately — see above._
+_Regenerate with_ `python3 tools/gen_placeholders.py`.
