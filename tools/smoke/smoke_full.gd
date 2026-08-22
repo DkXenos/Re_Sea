@@ -6,6 +6,7 @@ extends SceneTree
 var game: Node
 var main: Node
 var bad_mode := false
+var verbose := false
 
 
 func _init() -> void:
@@ -20,6 +21,7 @@ func _current() -> Node:
 func _run() -> void:
 	await process_frame
 	bad_mode = "--bad" in OS.get_cmdline_user_args()
+	verbose = "--verbose-days" in OS.get_cmdline_user_args()
 	game = root.get_node("/root/Game")
 	main = load("res://main.tscn").instantiate()
 	root.add_child(main)
@@ -50,6 +52,11 @@ func _run() -> void:
 			"DeskPhase":
 				_drive_desk(scene)
 			"DayReport":
+				if verbose:
+					var b: Dictionary = scene._result
+					print("     quota %d, sorted %d, correct %d, wrong %d, fish %d, "
+						% [b["quota"], b["sorted"], b["correct"], b["wrong"], b["fish"]]
+						+ "shortfall -%d, delta %+d" % [b["shortfall"], b["delta"]])
 				scene.get_node("UiLayer/Root/NextButton").pressed.emit()
 			"GameOver":
 				print("reached ending: health=%d title=%s" % [game.ocean_health,

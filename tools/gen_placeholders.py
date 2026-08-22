@@ -243,7 +243,8 @@ def gen_ui():
     for name, col, glyph in (("icon_day", (240, 200, 84), "H"), ("icon_quota", (120, 200, 140), "T"),
                              ("icon_grab", (200, 200, 210), "C"), ("icon_health", (110, 200, 190), "L"),
                              ("icon_book", (220, 200, 160), "A"), ("icon_close", (220, 120, 110), "X"),
-                             ("icon_check", (120, 200, 140), "V"), ("icon_cross", (220, 100, 90), "X")):
+                             ("icon_check", (120, 200, 140), "V"), ("icon_cross", (220, 100, 90), "X"),
+                             ("icon_pause", (200, 210, 225), "II")):
         img, d = canvas(48, 48)
         outlined(d, "ellipse", [3, 3, 44, 44], col)
         centered(d, (0, 0, 48, 48), glyph, shade(col, 0.35), 24)

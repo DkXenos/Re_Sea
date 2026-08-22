@@ -55,6 +55,11 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed(&"rulebook"):
 		_rulebook.toggle(not _rulebook.visible)
 		get_viewport().set_input_as_handled()
+	elif event.is_action_pressed(&"inventory"):
+		# The grid is always on screen here, so this is a shortcut to the next
+		# unsorted item rather than a panel toggle.
+		_inventory.select_first()
+		get_viewport().set_input_as_handled()
 
 
 func _on_item_selected(entry: CarriedItem) -> void:

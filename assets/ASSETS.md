@@ -108,6 +108,7 @@ files are drawn programmatically by `tools/gen_placeholders.py` and
 | `assets/ui/icon_close.png` | 48x48 | HUD icon (X) | no | 1 |
 | `assets/ui/icon_check.png` | 48x48 | HUD icon (V) | no | 1 |
 | `assets/ui/icon_cross.png` | 48x48 | HUD icon (X) | no | 1 |
+| `assets/ui/icon_pause.png` | 48x48 | HUD icon (II) | no | 1 |
 | `assets/ui/meter_bg.png` | 320x32 | Ocean health meter bg. Fill is clipped by width. | no | 1 |
 | `assets/ui/meter_fill.png` | 320x32 | Ocean health meter fill. Fill is clipped by width. | no | 1 |
 | `assets/ui/pip_full.png` | 16x16 | Tool charge pip (full) | no | 1 |
@@ -127,4 +128,4 @@ files are drawn programmatically by `tools/gen_placeholders.py` and
 | `assets/env/cutscene_03.png` | 960x540 | Cutscene still 3 (placeholder) | no | 1 |
 | `assets/env/logo.png` | 640x200 | Title logo | no | 1 |
 
-_77 files. Regenerate placeholders with_ `python3 tools/gen_placeholders.py`.
+_78 files. Regenerate placeholders with_ `python3 tools/gen_placeholders.py`.

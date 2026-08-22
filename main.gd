@@ -21,6 +21,7 @@ const PAUSABLE_KEYS: Array[StringName] = [&"day_start", &"claw", &"desk", &"repo
 @onready var _holder: Node = $SceneHolder
 @onready var _pause: Control = $PauseLayer/PauseOverlay
 @onready var _debug: Control = $DebugLayer/DebugOverlay
+@onready var _pause_button: TextureButton = $PauseLayer/PauseButton
 
 var _current: Node = null
 var _current_key: StringName = &""
@@ -30,6 +31,9 @@ func _ready() -> void:
 	Events.scene_change_requested.connect(_on_scene_change_requested)
 	Events.phase_finished.connect(_on_phase_finished)
 	Events.debug_command.connect(_on_debug_command)
+	# Every action has to be reachable by mouse - the competition build gets
+	# demoed by strangers who will not read a control list.
+	_pause_button.pressed.connect(func() -> void: _pause.toggle(not _pause.visible))
 	_on_scene_change_requested(&"main_menu")
 
 
@@ -69,6 +73,7 @@ func _on_scene_change_requested(scene_key: StringName) -> void:
 		print("[Main] scene not built yet: %s" % path)
 		return
 	_current_key = scene_key
+	_pause_button.visible = scene_key in PAUSABLE_KEYS
 	_swap.call_deferred(path)
 
 
