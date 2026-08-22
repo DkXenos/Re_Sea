@@ -1,7 +1,7 @@
 ## Phase A. A fixed viewpoint facing the machine: the tank renders into a
 ## SubViewport so the glass edge clips it for free, the console and HUD sit on
-## their own CanvasLayers above it, and a few pixels of mouse-driven parallax
-## between those layers is all the depth this needs.
+## their own CanvasLayers above it, and a Camera2D inside the SubViewport
+## follows the claw across a seabed wider than the window.
 extends Node2D
 
 const ITEM_SCENE := preload("res://scenes/claw/tank_item.tscn")
@@ -11,26 +11,41 @@ const FISH_FRAMES: Array[String] = [
 	"res://data/frames/fish_bg_medium_frames.tres",
 	"res://data/frames/fish_bg_large_frames.tres",
 ]
+const MINIMAP_DOT := preload("res://assets/ui/minimap_item.png")
 const END_DELAY := 1.4
-## Nearest-layer parallax travel in pixels. Small numbers - enough to read as
+## The visible slice of the tank, in tank world units.
+const TANK_VIEW := Vector2(1000.0, 400.0)
+## Where items come to rest, and the depths fish drift at.
+const ITEM_REST_Y := Vector2(268.0, 300.0)
+const FISH_DEPTH_Y := Vector2(80.0, 230.0)
+## Nearest-layer mouse parallax in pixels. Small numbers - enough to read as
 ## depth, not enough to distract.
 const PARALLAX := [2.0, 4.0, 6.0]
+## How far the water background slides against the camera. Also small.
+const BG_CAMERA_PARALLAX := 0.04
+
+## Seabed width in tank world units. The brief asked for 2.5x viewport width;
+## the viewport is 1280 but the tank window is only 1000 wide, so this is 2.6x
+## of what the player can actually see and stays under the 3x ceiling - past
+## that, searching becomes sweeping, which is boring. Tuning knob.
+@export var seabed_width: float = 2600.0
+
+## Fish density is an atmosphere knob, not a difficulty knob - they cannot be
+## grabbed and cost nothing. Tune freely.
+@export var fish_count: int = 9
+@export var fish_speed_min: float = 25.0
+@export var fish_speed_max: float = 65.0
 
 @onready var _tank_layer: CanvasLayer = $TankLayer
 @onready var _bg_layer: CanvasLayer = $BgLayer
 @onready var _glass_layer: CanvasLayer = $GlassLayer
-@onready var _world: Node2D = $TankLayer/TankContainer/TankViewport/TankWorld
+@onready var _seabed: Sprite2D = $TankLayer/TankContainer/TankViewport/TankWorld/Seabed
 @onready var _items: Node2D = $TankLayer/TankContainer/TankViewport/TankWorld/Items
 @onready var _fish: Node2D = $TankLayer/TankContainer/TankViewport/TankWorld/FishHolder
 @onready var _claw: Node2D = $TankLayer/TankContainer/TankViewport/TankWorld/Claw
+@onready var _camera: Camera2D = $TankLayer/TankContainer/TankViewport/TankWorld/Camera
 @onready var _bubbles: Node2D = $GlassLayer/Bubbles
 @onready var _knob: TextureRect = $FrameLayer/JoystickKnob
-
-## Fish density is an atmosphere knob, not a difficulty knob - they cannot be
-## grabbed and cost nothing. Tune freely.
-@export var fish_count: int = 7
-@export var fish_speed_min: float = 25.0
-@export var fish_speed_max: float = 65.0
 
 @onready var _day_label: Label = $HudLayer/HudRoot/Hud/DayLabel
 @onready var _quota_label: Label = $HudLayer/HudRoot/Hud/QuotaLabel
@@ -39,12 +54,17 @@ const PARALLAX := [2.0, 4.0, 6.0]
 @onready var _grip_label: Label = $HudLayer/HudRoot/GripLabel
 @onready var _toast: Label = $HudLayer/HudRoot/Toast
 @onready var _hint: Label = $HudLayer/HudRoot/Hint
+@onready var _map: Control = $HudLayer/HudRoot/Minimap
+@onready var _map_view: TextureRect = $HudLayer/HudRoot/Minimap/View
+@onready var _map_dots: Control = $HudLayer/HudRoot/Minimap/Dots
+@onready var _map_claw: TextureRect = $HudLayer/HudRoot/Minimap/ClawMark
 
 var _day: DayData
 var _grabs_left: int = 0
 var _finished: bool = false
 var _knob_home: Vector2
 var _bubble_speeds: Array[float] = []
+var _dots: Array[TextureRect] = []
 
 
 func _ready() -> void:
@@ -54,16 +74,17 @@ func _ready() -> void:
 		return
 	_grabs_left = _day.max_grabs
 	_knob_home = _knob.position
+	_setup_tank()
 	_claw.cycle_finished.connect(_on_cycle_finished)
 	$FrameLayer/ArrowLeft.button_down.connect(func() -> void: _claw.button_axis = -1.0)
 	$FrameLayer/ArrowLeft.button_up.connect(func() -> void: _claw.button_axis = 0.0)
 	$FrameLayer/ArrowRight.button_down.connect(func() -> void: _claw.button_axis = 1.0)
 	$FrameLayer/ArrowRight.button_up.connect(func() -> void: _claw.button_axis = 0.0)
 	$FrameLayer/DropButton.pressed.connect(_claw.start_drop)
+	$FrameLayer/DropButton.text = Strings.t("claw_drop_button")
 	Events.toast_requested.connect(_show_toast)
 	Events.vfx_intensity_changed.connect(_rebuild_bubbles)
 	_hint.text = Strings.t("claw_hint")
-	$FrameLayer/DropButton.text = Strings.t("claw_drop_button")
 	_toast.text = ""
 	_spawn_items()
 	_spawn_fish()
@@ -71,19 +92,40 @@ func _ready() -> void:
 	_refresh_hud()
 
 
+## Everything that depends on how wide the seabed is, in one place.
+func _setup_tank() -> void:
+	# One seabed PNG tiled across the width, rather than a 2600px asset the
+	# designers would have to redraw whenever the width is tuned.
+	_seabed.centered = false
+	_seabed.texture_repeat = CanvasItem.TEXTURE_REPEAT_ENABLED
+	_seabed.region_enabled = true
+	_seabed.region_rect = Rect2(0.0, 0.0, seabed_width, _seabed.texture.get_height())
+	_seabed.position = Vector2(0.0, ITEM_REST_Y.y - 40.0)
+
+	_claw.min_x = 70.0
+	_claw.max_x = seabed_width - 70.0
+	_claw.position.x = seabed_width * 0.5
+
+	_camera.limit_left = 0
+	_camera.limit_right = int(seabed_width)
+	_camera.limit_top = 0
+	_camera.limit_bottom = int(TANK_VIEW.y)
+	_camera.position = Vector2(_claw.position.x, TANK_VIEW.y * 0.5)
+	_camera.reset_smoothing()
+
+
 func _spawn_items() -> void:
 	var count := _day.item_pool.size()
-	var lane := 800.0 / maxf(1.0, float(count))
-	var order := range(count)
+	var usable := seabed_width - 240.0
+	var lane := usable / maxf(1.0, float(count))
 	for i in count:
-		var item: ItemData = _day.item_pool[i]
 		var node: Area2D = ITEM_SCENE.instantiate()
 		_items.add_child(node)
-		node.setup(item)
+		node.setup(_day.item_pool[i])
 		node.add_to_group(&"tank_item")
 		node.position = Vector2(
-			120.0 + lane * order[i] + Game.rng.randf_range(-lane * 0.22, lane * 0.22),
-			Game.rng.randf_range(286.0, 318.0))
+			120.0 + lane * i + Game.rng.randf_range(-lane * 0.22, lane * 0.22),
+			Game.rng.randf_range(ITEM_REST_Y.x, ITEM_REST_Y.y))
 		node.home_y = node.position.y
 
 
@@ -94,11 +136,11 @@ func _spawn_fish() -> void:
 		var frames: SpriteFrames = load(FISH_FRAMES[i % FISH_FRAMES.size()])
 		var depth: float = float(i) / maxf(1.0, float(fish_count - 1))
 		node.setup(frames,
-			Game.rng.randf_range(90.0, 250.0),
+			Game.rng.randf_range(FISH_DEPTH_Y.x, FISH_DEPTH_Y.y),
 			Game.rng.randf_range(fish_speed_min, fish_speed_max),
 			1 if i % 2 == 0 else -1,
 			depth,
-			Vector2(40.0, 960.0))
+			Vector2(40.0, seabed_width - 40.0))
 
 
 ## The one visible thing wired to the VFX slider, so the slider is testable.
@@ -112,16 +154,18 @@ func _rebuild_bubbles(intensity: float) -> void:
 		var bubble := AnimatedSprite2D.new()
 		bubble.sprite_frames = frames
 		bubble.play(&"rise")
-		bubble.position = Vector2(randf_range(160.0, 1120.0), randf_range(50.0, 450.0))
+		bubble.position = Vector2(randf_range(160.0, 1120.0), randf_range(50.0, 430.0))
 		bubble.scale = Vector2.ONE * randf_range(0.5, 1.3)
 		_bubbles.add_child(bubble)
 		_bubble_speeds.append(randf_range(18.0, 46.0))
 
 
 func _process(delta: float) -> void:
+	_camera.position.x = _claw.position.x
 	_update_parallax()
 	_update_bubbles(delta)
 	_update_grip_preview()
+	_update_minimap()
 	_knob.position = _knob_home + Vector2(_claw_progress() * 22.0 - 11.0, 0.0)
 
 
@@ -129,14 +173,17 @@ func _claw_progress() -> float:
 	return inverse_lerp(_claw.min_x, _claw.max_x, _claw.position.x)
 
 
-## Fake parallax: three CanvasLayers offset by a few pixels from the mouse, the
-## nearest moving most. Cheaper and far more predictable than a 3D camera.
+## Three CanvasLayers offset by a few pixels from the mouse, nearest moving
+## most, plus the water sliding against the camera. Cheaper and far more
+## predictable than a 3D camera.
 func _update_parallax() -> void:
 	var vp := get_viewport_rect().size
 	if vp.x <= 0.0:
 		return
 	var m := get_viewport().get_mouse_position() / vp - Vector2(0.5, 0.5)
-	_bg_layer.offset = -m * PARALLAX[0]
+	var camera_slide := (_camera.get_screen_center_position().x - seabed_width * 0.5) \
+		* BG_CAMERA_PARALLAX
+	_bg_layer.offset = -m * PARALLAX[0] - Vector2(camera_slide, 0.0)
 	_tank_layer.offset = -m * PARALLAX[1]
 	_glass_layer.offset = -m * PARALLAX[2]
 
@@ -147,42 +194,60 @@ func _update_bubbles(delta: float) -> void:
 		var bubble: AnimatedSprite2D = children[i]
 		bubble.position.y -= _bubble_speeds[i] * delta
 		if bubble.position.y < 46.0:
-			bubble.position.y = 452.0
+			bubble.position.y = 432.0
 			bubble.position.x = randf_range(160.0, 1120.0)
 
 
 ## Failure has to be the player's judgement, not a surprise, so the odds are on
-## screen before the drop.
+## screen before the drop - and they belong to the exact item the drop will
+## reach, because both come from the same prediction.
 func _update_grip_preview() -> void:
 	if _claw.is_busy():
 		return
-	var best: Node2D = null
-	var best_dx := 70.0
-	for node in _items.get_children():
-		var dx: float = absf(node.position.x - _claw.position.x)
-		if dx < best_dx:
-			best_dx = dx
-			best = node
-	if best == null:
+	var target: Node2D = _claw.predict_target(_items.get_children())
+	_claw.predicted_target = target
+	if target == null:
 		_grip_label.text = Strings.t("claw_grip_none")
 	else:
-		_grip_label.text = "%s  -  %s" % [best.data.display_name,
-			Strings.tf("claw_grip_chance", {"n": int(round(best.grip_chance() * 100.0))})]
+		_grip_label.text = "%s  -  %s" % [target.data.display_name,
+			Strings.tf("claw_grip_chance", {"n": int(round(target.grip_chance() * 100.0))})]
+
+
+## Without this, "where was that heavy thing" becomes tedious rather than tense.
+func _update_minimap() -> void:
+	var width := _map.size.x
+	var scale_x := width / seabed_width
+	_map_view.size.x = TANK_VIEW.x * scale_x
+	_map_view.position.x = (_camera.get_screen_center_position().x - TANK_VIEW.x * 0.5) * scale_x
+	_map_claw.position.x = _claw.position.x * scale_x - _map_claw.size.x * 0.5
+
+	var children := _items.get_children()
+	while _dots.size() < children.size():
+		var dot := TextureRect.new()
+		dot.texture = MINIMAP_DOT
+		dot.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_map_dots.add_child(dot)
+		_dots.append(dot)
+	for i in _dots.size():
+		var visible_dot := i < children.size()
+		_dots[i].visible = visible_dot
+		if visible_dot:
+			var item: Node2D = children[i]
+			_dots[i].position = Vector2(item.position.x * scale_x - 5.0, 9.0)
 
 
 func _on_cycle_finished(result: Dictionary) -> void:
 	_grabs_left -= 1
 	Game.stats["grabs_used"] = int(Game.stats.get("grabs_used", 0)) + 1
 	Events.grabs_changed.emit(_grabs_left)
-	match String(result["kind"]):
-		"item":
-			var item: ItemData = result["item"]
-			Game.add_to_inventory(item)
-			Events.item_grabbed.emit(item)
-			_show_toast(item.display_name)
-			result["node"].queue_free()
-		"miss":
-			_show_toast(Strings.t("claw_slipped"))
+	if String(result["kind"]) == "item":
+		var item: ItemData = result["item"]
+		Game.add_to_inventory(item)
+		Events.item_grabbed.emit(item)
+		_show_toast(item.display_name)
+		result["node"].queue_free()
+	else:
+		_show_toast(Strings.t("claw_slipped"))
 	_refresh_hud()
 	_check_finished()
 

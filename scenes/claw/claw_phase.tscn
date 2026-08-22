@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3]
+[gd_scene load_steps=19 format=3]
 
 [ext_resource type="Script" path="res://scenes/claw/claw_phase.gd" id="1_phase"]
 [ext_resource type="Script" path="res://scenes/claw/claw.gd" id="2_claw"]
@@ -14,6 +14,9 @@
 [ext_resource type="Texture2D" path="res://assets/ui/joystick_base.png" id="12_jb"]
 [ext_resource type="Texture2D" path="res://assets/ui/joystick_knob.png" id="13_jk"]
 [ext_resource type="Theme" path="res://assets/ui/ui_theme.tres" id="14_theme"]
+[ext_resource type="Texture2D" path="res://assets/ui/minimap_bg.png" id="15_mmbg"]
+[ext_resource type="Texture2D" path="res://assets/ui/minimap_view.png" id="16_mmview"]
+[ext_resource type="Texture2D" path="res://assets/ui/minimap_claw.png" id="17_mmclaw"]
 
 [sub_resource type="CircleShape2D" id="Circle_grab"]
 radius = 46.0
@@ -25,10 +28,10 @@ script = ExtResource("1_phase")
 layer = 0
 
 [node name="WaterBg" type="TextureRect" parent="BgLayer"]
-offset_left = -8.0
-offset_top = -8.0
-offset_right = 1288.0
-offset_bottom = 728.0
+offset_left = -140.0
+offset_top = -60.0
+offset_right = 1420.0
+offset_bottom = 780.0
 mouse_filter = 2
 texture = ExtResource("3_water")
 expand_mode = 1
@@ -38,35 +41,39 @@ layer = 10
 
 [node name="TankContainer" type="SubViewportContainer" parent="TankLayer"]
 offset_left = 140.0
-offset_top = 40.0
+offset_top = 34.0
 offset_right = 1140.0
-offset_bottom = 460.0
+offset_bottom = 434.0
 mouse_filter = 2
 
 [node name="TankViewport" type="SubViewport" parent="TankLayer/TankContainer"]
 transparent_bg = true
 handle_input_locally = false
 gui_disable_input = true
-size = Vector2i(1000, 420)
+size = Vector2i(1000, 400)
 render_target_update_mode = 4
 
 [node name="TankWorld" type="Node2D" parent="TankLayer/TankContainer/TankViewport"]
 y_sort_enabled = true
 
+[node name="Camera" type="Camera2D" parent="TankLayer/TankContainer/TankViewport/TankWorld"]
+position_smoothing_enabled = true
+position_smoothing_speed = 6.0
+
 [node name="Seabed" type="Sprite2D" parent="TankLayer/TankContainer/TankViewport/TankWorld"]
 z_index = -10
-position = Vector2(500, 350)
 texture = ExtResource("4_seabed")
-
-[node name="Items" type="Node2D" parent="TankLayer/TankContainer/TankViewport/TankWorld"]
-y_sort_enabled = true
 
 [node name="FishHolder" type="Node2D" parent="TankLayer/TankContainer/TankViewport/TankWorld"]
 z_index = -5
 
+[node name="Items" type="Node2D" parent="TankLayer/TankContainer/TankViewport/TankWorld"]
+y_sort_enabled = true
+
 [node name="Claw" type="Node2D" parent="TankLayer/TankContainer/TankViewport/TankWorld"]
 z_index = 20
 script = ExtResource("2_claw")
+max_depth = 190.0
 
 [node name="Cable" type="Sprite2D" parent="TankLayer/TankContainer/TankViewport/TankWorld/Claw"]
 texture = ExtResource("9_cable")
@@ -89,11 +96,12 @@ layer = 20
 
 [node name="Glass" type="TextureRect" parent="GlassLayer"]
 offset_left = 140.0
-offset_top = 40.0
+offset_top = 34.0
 offset_right = 1140.0
-offset_bottom = 460.0
+offset_bottom = 434.0
 mouse_filter = 2
 texture = ExtResource("5_glass")
+expand_mode = 1
 
 [node name="Bubbles" type="Node2D" parent="GlassLayer"]
 
@@ -102,14 +110,15 @@ layer = 30
 
 [node name="TankFrame" type="TextureRect" parent="FrameLayer"]
 offset_left = 120.0
-offset_top = 20.0
+offset_top = 14.0
 offset_right = 1160.0
-offset_bottom = 480.0
+offset_bottom = 454.0
 mouse_filter = 2
 texture = ExtResource("6_frame")
+expand_mode = 1
 
 [node name="Console" type="TextureRect" parent="FrameLayer"]
-offset_top = 500.0
+offset_top = 470.0
 offset_right = 1280.0
 offset_bottom = 720.0
 mouse_filter = 2
@@ -118,38 +127,38 @@ expand_mode = 1
 
 [node name="ArrowLeft" type="TextureButton" parent="FrameLayer"]
 offset_left = 120.0
-offset_top = 592.0
+offset_top = 584.0
 offset_right = 216.0
-offset_bottom = 688.0
+offset_bottom = 680.0
 texture_normal = ExtResource("10_al")
 
 [node name="ArrowRight" type="TextureButton" parent="FrameLayer"]
 offset_left = 250.0
-offset_top = 592.0
+offset_top = 584.0
 offset_right = 346.0
-offset_bottom = 688.0
+offset_bottom = 680.0
 texture_normal = ExtResource("11_ar")
 
 [node name="DropButton" type="Button" parent="FrameLayer"]
 offset_left = 500.0
-offset_top = 606.0
+offset_top = 596.0
 offset_right = 780.0
-offset_bottom = 678.0
+offset_bottom = 664.0
 theme = ExtResource("14_theme")
 
 [node name="JoystickBase" type="TextureRect" parent="FrameLayer"]
 offset_left = 1040.0
-offset_top = 578.0
+offset_top = 576.0
 offset_right = 1168.0
-offset_bottom = 706.0
+offset_bottom = 704.0
 mouse_filter = 2
 texture = ExtResource("12_jb")
 
 [node name="JoystickKnob" type="TextureRect" parent="FrameLayer"]
 offset_left = 1068.0
-offset_top = 606.0
+offset_top = 604.0
 offset_right = 1140.0
-offset_bottom = 678.0
+offset_bottom = 676.0
 mouse_filter = 2
 texture = ExtResource("13_jk")
 
@@ -164,9 +173,9 @@ theme = ExtResource("14_theme")
 
 [node name="Hud" type="HBoxContainer" parent="HudLayer/HudRoot"]
 offset_left = 40.0
-offset_top = 508.0
+offset_top = 478.0
 offset_right = 1240.0
-offset_bottom = 544.0
+offset_bottom = 512.0
 mouse_filter = 2
 theme_override_constants/separation = 44
 
@@ -179,19 +188,52 @@ theme_override_font_sizes/font_size = 24
 
 [node name="CollectedLabel" type="Label" parent="HudLayer/HudRoot/Hud"]
 
+[node name="Minimap" type="Control" parent="HudLayer/HudRoot"]
+offset_left = 160.0
+offset_top = 518.0
+offset_right = 1120.0
+offset_bottom = 546.0
+mouse_filter = 2
+
+[node name="Bg" type="TextureRect" parent="HudLayer/HudRoot/Minimap"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+texture = ExtResource("15_mmbg")
+expand_mode = 1
+
+[node name="View" type="TextureRect" parent="HudLayer/HudRoot/Minimap"]
+offset_right = 200.0
+offset_bottom = 28.0
+mouse_filter = 2
+texture = ExtResource("16_mmview")
+expand_mode = 1
+
+[node name="Dots" type="Control" parent="HudLayer/HudRoot/Minimap"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+
+[node name="ClawMark" type="TextureRect" parent="HudLayer/HudRoot/Minimap"]
+offset_top = 4.0
+offset_right = 12.0
+offset_bottom = 24.0
+mouse_filter = 2
+texture = ExtResource("17_mmclaw")
+
 [node name="GripLabel" type="Label" parent="HudLayer/HudRoot"]
 offset_left = 320.0
-offset_top = 552.0
+offset_top = 550.0
 offset_right = 960.0
-offset_bottom = 584.0
-theme_override_font_sizes/font_size = 22
+offset_bottom = 580.0
+theme_override_font_sizes/font_size = 21
 horizontal_alignment = 1
 
 [node name="Toast" type="Label" parent="HudLayer/HudRoot"]
 offset_left = 320.0
-offset_top = 412.0
+offset_top = 386.0
 offset_right = 960.0
-offset_bottom = 452.0
+offset_bottom = 426.0
 theme_override_font_sizes/font_size = 26
 horizontal_alignment = 1
 

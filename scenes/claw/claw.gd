@@ -14,6 +14,8 @@ const RISE_SPEED := 200.0
 const CLOSE_TIME := 0.30
 const CABLE_TEXTURE_HEIGHT := 64.0
 const GRAB_OFFSET := 110.0 ## grab point below the claw origin
+const GRAB_RADIUS := 46.0 ## must match GrabArea's CollisionShape2D
+const ITEM_RADIUS := 40.0 ## must match tank_item.tscn's CollisionShape2D
 
 enum State { IDLE, DESCEND, CLOSE, RISE }
 
@@ -33,6 +35,12 @@ var _close_timer: float = 0.0
 var _grip_ok: bool = false
 var _slip_y: float = -1.0
 var _move_sfx_cooldown: float = 0.0
+
+## What this drop is predicted to hit, set by the tank each frame from
+## predict_target(). The grab resolves to this exact node when it is still in
+## reach, so the percentage shown before the drop can never belong to a
+## different item than the one that comes up.
+var predicted_target: Node2D = null
 
 @onready var sprite: AnimatedSprite2D = $Sprite
 @onready var cable: Sprite2D = $Cable
@@ -109,8 +117,37 @@ func _process_rise(delta: float) -> void:
 		_finish_cycle()
 
 
+## The item this drop would hit, found the way the descent will actually find
+## it: the claw stops at the FIRST contact, so the target is whichever item the
+## descending grab circle touches earliest - not the one nearest in x.
+##
+## That difference was a real bug. The preview measured horizontal distance to
+## the claw origin while the grab measured distance to the grab point, so with
+## overlapping items the preview named a neighbour and failure stopped being the
+## player's miscalculation.
+func predict_target(candidates: Array) -> Node2D:
+	var reach := GRAB_RADIUS + ITEM_RADIUS
+	var best: Node2D = null
+	var earliest := INF
+	for node: Node in candidates:
+		if not (node is Node2D) or not ("data" in node):
+			continue
+		var item := node as Node2D
+		var dx: float = absf(item.position.x - position.x)
+		if dx >= reach:
+			continue
+		# Claw height at which its grab circle first touches this item.
+		var contact_y: float = item.position.y - sqrt(reach * reach - dx * dx) - GRAB_OFFSET
+		if contact_y > max_depth:
+			continue
+		if contact_y < earliest:
+			earliest = contact_y
+			best = item
+	return best
+
+
 func _resolve_grab() -> void:
-	var target := _nearest_overlap()
+	var target := _preferred_target()
 	if target == null:
 		Events.sfx_requested.emit(&"grab_fail")
 		return
@@ -167,6 +204,16 @@ func _finish_cycle() -> void:
 	state = State.IDLE
 	sprite.play(&"open")
 	cycle_finished.emit(result)
+
+
+## The predicted item if the descent really did reach it, otherwise whatever is
+## actually in the claw. Honouring the prediction is what makes the preview a
+## promise rather than a hint.
+func _preferred_target() -> Node2D:
+	var overlapping := grab_area.get_overlapping_areas()
+	if predicted_target != null and predicted_target in overlapping:
+		return predicted_target
+	return _nearest_overlap()
 
 
 ## Nearest overlapping area to the grab point, so a crowded seabed still gives
