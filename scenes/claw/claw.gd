@@ -114,14 +114,6 @@ func _resolve_grab() -> void:
 	if target == null:
 		Events.sfx_requested.emit(&"grab_fail")
 		return
-	if target.is_in_group(&"fish"):
-		carried = target
-		_grip_ok = true
-		sprite.play(&"carrying")
-		Events.sfx_requested.emit(&"grab_fail")
-		target.set_process(false)
-		_attach(target)
-		return
 	var chance: float = target.grip_chance()
 	_grip_ok = _roll_grip(chance)
 	carried = target
@@ -167,11 +159,8 @@ func _finish_cycle() -> void:
 	var result := {"kind": "miss", "item": null, "node": null}
 	if carried != null:
 		result["node"] = carried
-		if carried.is_in_group(&"fish"):
-			result["kind"] = "fish"
-		else:
-			result["kind"] = "item"
-			result["item"] = carried.data
+		result["kind"] = "item"
+		result["item"] = carried.data
 	carried = null
 	_slip_y = -1.0
 	_grip_ok = false

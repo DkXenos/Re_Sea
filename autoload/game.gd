@@ -6,6 +6,8 @@ extends Node
 const DAY_DIR := "res://data/days/"
 const SFX_DIR := "res://assets/audio/"
 const SFX_POOL_SIZE := 6
+## Paid once for a day with no mis-sorts that also met quota. Tuning candidate.
+const CLEAN_DAY_BONUS := 5
 
 # --- run ---
 var run_seed: int = 0
@@ -110,7 +112,7 @@ func current_day() -> DayData:
 
 func begin_day() -> void:
 	inventory.clear()
-	stats = {"correct": 0, "wrong": 0, "fish": 0, "sorted": 0, "grabs_used": 0}
+	stats = {"correct": 0, "wrong": 0, "sorted": 0, "grabs_used": 0}
 	tool_charges.clear()
 	var day := current_day()
 	if day != null:
@@ -189,30 +191,38 @@ func refill_charges() -> void:
 
 # ---------------------------------------------------------------- ocean health
 
-## Section 15 of the brief, verbatim. Every term is returned separately so the
-## day report can show the player exactly how the number was reached.
+## Every term is returned separately so the day report can show the player
+## exactly how the number was reached.
+##
+## Revision 1 replaced the original formula: correct sorts now pay 2 instead of
+## 1, a clean day pays a flat bonus, and the fish penalty is gone entirely
+## (fish are background now). A well-played day has to visibly RAISE the meter -
+## the old numbers meant a perfect run still drifted down to 92/100, which
+## contradicted the subject matter. The 4x asymmetry on wrong sorts stays: that
+## part was right.
 func end_day_breakdown() -> Dictionary:
 	var day := current_day()
 	var quota: int = day.quota if day != null else 0
 	var correct: int = int(stats.get("correct", 0))
 	var wrong: int = int(stats.get("wrong", 0))
-	var fish: int = int(stats.get("fish", 0))
 	var sorted_count: int = int(stats.get("sorted", 0))
 	var shortfall: int = maxi(0, quota - sorted_count) * 3
-	var delta: int = (correct * 1) - (wrong * 4) - (fish * 2) - shortfall
+	var quota_met: bool = sorted_count >= quota
+	var clean_bonus: int = CLEAN_DAY_BONUS if wrong == 0 and quota_met else 0
+	var delta: int = (correct * 2) - (wrong * 4) - shortfall + clean_bonus
 	var before: int = ocean_health
 	var after: int = clampi(before + delta, 0, 100)
 	return {
 		"correct": correct,
 		"wrong": wrong,
-		"fish": fish,
 		"sorted": sorted_count,
 		"quota": quota,
 		"shortfall": shortfall,
+		"clean_bonus": clean_bonus,
 		"delta": delta,
 		"health_before": before,
 		"health_after": after,
-		"quota_met": sorted_count >= quota,
+		"quota_met": quota_met,
 	}
 
 

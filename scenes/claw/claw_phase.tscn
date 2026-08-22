@@ -62,6 +62,7 @@ texture = ExtResource("4_seabed")
 y_sort_enabled = true
 
 [node name="FishHolder" type="Node2D" parent="TankLayer/TankContainer/TankViewport/TankWorld"]
+z_index = -5
 
 [node name="Claw" type="Node2D" parent="TankLayer/TankContainer/TankViewport/TankWorld"]
 z_index = 20

@@ -143,12 +143,14 @@ func _add_line(parent: Node, text: String, font_size: int, color: Color) -> void
 # ------------------------------------------------------------------ breakdown
 
 func _build_breakdown() -> void:
-	_add_term(Strings.t("report_correct"), "%d x (+1)" % _result["correct"], _result["correct"])
+	_add_term(Strings.t("report_correct"), "%d x (+2)" % _result["correct"],
+		2 * int(_result["correct"]))
 	_add_term(Strings.t("report_wrong"), "%d x (-4)" % _result["wrong"], -4 * int(_result["wrong"]))
-	_add_term(Strings.t("report_fish"), "%d x (-2)" % _result["fish"], -2 * int(_result["fish"]))
 	_add_term(Strings.t("report_shortfall"),
 		"%d x (-3)" % maxi(0, int(_result["quota"]) - int(_result["sorted"])),
 		-int(_result["shortfall"]))
+	_add_term(Strings.t("report_clean_bonus"),
+		"" if int(_result["clean_bonus"]) > 0 else "-", int(_result["clean_bonus"]))
 	var rule := HSeparator.new()
 	_breakdown.add_child(rule)
 	_add_term(Strings.t("report_total"), "", int(_result["delta"]), 22)

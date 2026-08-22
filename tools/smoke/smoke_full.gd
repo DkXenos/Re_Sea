@@ -55,9 +55,10 @@ func _run() -> void:
 			"DayReport":
 				if verbose:
 					var b: Dictionary = scene._result
-					print("     quota %d, sorted %d, correct %d, wrong %d, fish %d, "
-						% [b["quota"], b["sorted"], b["correct"], b["wrong"], b["fish"]]
-						+ "shortfall -%d, delta %+d" % [b["shortfall"], b["delta"]])
+					print("     quota %d, sorted %d, correct %d, wrong %d, "
+						% [b["quota"], b["sorted"], b["correct"], b["wrong"]]
+						+ "shortfall -%d, clean +%d, delta %+d"
+						% [b["shortfall"], b["clean_bonus"], b["delta"]])
 				scene.get_node("UiLayer/Root/NextButton").pressed.emit()
 			"GameOver":
 				print("reached ending: health=%d title=%s" % [game.ocean_health,

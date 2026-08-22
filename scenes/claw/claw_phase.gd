@@ -11,7 +11,6 @@ const FISH_FRAMES: Array[String] = [
 	"res://data/frames/fish_medium_frames.tres",
 	"res://data/frames/fish_large_frames.tres",
 ]
-const FISH_COUNT := 4
 const END_DELAY := 1.4
 ## Nearest-layer parallax travel in pixels. Small numbers - enough to read as
 ## depth, not enough to distract.
@@ -26,6 +25,12 @@ const PARALLAX := [2.0, 4.0, 6.0]
 @onready var _claw: Node2D = $TankLayer/TankContainer/TankViewport/TankWorld/Claw
 @onready var _bubbles: Node2D = $GlassLayer/Bubbles
 @onready var _knob: TextureRect = $FrameLayer/JoystickKnob
+
+## Fish density is an atmosphere knob, not a difficulty knob - they cannot be
+## grabbed and cost nothing. Tune freely.
+@export var fish_count: int = 7
+@export var fish_speed_min: float = 25.0
+@export var fish_speed_max: float = 65.0
 
 @onready var _day_label: Label = $HudLayer/HudRoot/Hud/DayLabel
 @onready var _quota_label: Label = $HudLayer/HudRoot/Hud/QuotaLabel
@@ -83,16 +88,17 @@ func _spawn_items() -> void:
 
 
 func _spawn_fish() -> void:
-	for i in FISH_COUNT:
-		var node: Area2D = FISH_SCENE.instantiate()
+	for i in fish_count:
+		var node: Node2D = FISH_SCENE.instantiate()
 		_fish.add_child(node)
-		node.add_to_group(&"fish")
 		var frames: SpriteFrames = load(FISH_FRAMES[i % FISH_FRAMES.size()])
-		# Even lanes so fish read as separate obstacles instead of a shoal.
-		node.setup(frames, 100.0 + i * 48.0 + Game.rng.randf_range(-10.0, 10.0),
-			Game.rng.randf_range(40.0, 70.0), 1 if i % 2 == 0 else -1)
-		node.position.x = Game.rng.randf_range(120.0, 880.0)
-		node.z_index = 10
+		var depth: float = float(i) / maxf(1.0, float(fish_count - 1))
+		node.setup(frames,
+			Game.rng.randf_range(90.0, 250.0),
+			Game.rng.randf_range(fish_speed_min, fish_speed_max),
+			1 if i % 2 == 0 else -1,
+			depth,
+			Vector2(40.0, 960.0))
 
 
 ## The one visible thing wired to the VFX slider, so the slider is testable.
@@ -171,11 +177,6 @@ func _on_cycle_finished(result: Dictionary) -> void:
 			Game.add_to_inventory(item)
 			Events.item_grabbed.emit(item)
 			_show_toast(item.display_name)
-			result["node"].queue_free()
-		"fish":
-			Game.stats["fish"] = int(Game.stats.get("fish", 0)) + 1
-			Events.fish_grabbed.emit()
-			_show_toast(Strings.t("claw_caught_fish"))
 			result["node"].queue_free()
 		"miss":
 			_show_toast(Strings.t("claw_slipped"))

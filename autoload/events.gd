@@ -12,7 +12,6 @@ signal phase_finished()
 # --- claw phase ---
 signal grabs_changed(remaining: int)
 signal item_grabbed(item: ItemData)
-signal fish_grabbed()
 signal grip_failed(item: ItemData)
 signal grip_preview_changed(chance: float, item: ItemData)
 

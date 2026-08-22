@@ -35,7 +35,6 @@ func _play_a_messy_day(game: Node) -> void:
 		game.stats["sorted"] = int(game.stats["sorted"]) + 1
 		var key := "correct" if correct else "wrong"
 		game.stats[key] = int(game.stats[key]) + 1
-	game.stats["fish"] = 2
 
 
 func _run() -> void:

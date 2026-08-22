@@ -1,7 +1,12 @@
-## A decoy. Drifts back and forth on a sine path - no AI, no pathfinding, and
-## deliberately no avoidance: the fish is an obstacle the player must read, not
-## an opponent.
-extends Area2D
+## Background atmosphere. Revision 1 removed every interaction: no Area2D, no
+## collision, no grab, no penalty. Punishing the player for something that was
+## never a decision read as unfair and the system bought nothing; as background,
+## fish carry the underwater feel the designers' art will live in.
+##
+## Motion is a sine drift driven by game state, which §1 allows. The fish itself
+## is an AnimatedSprite2D playing "swim" - nothing about how it looks is decided
+## here.
+extends Node2D
 
 var speed: float = 55.0
 var amplitude: float = 22.0
@@ -15,15 +20,23 @@ var _t: float = 0.0
 @onready var sprite: AnimatedSprite2D = $Sprite
 
 
-func setup(frames: SpriteFrames, y: float, spd: float, dir: int) -> void:
+## depth 0 = far (small, slow, dim), 1 = near. Gives the shoal parallax without
+## a second camera.
+func setup(frames: SpriteFrames, y: float, spd: float, dir: int, depth: float,
+		travel: Vector2) -> void:
 	if sprite == null:
 		sprite = $Sprite
 	sprite.sprite_frames = frames
 	sprite.play(&"swim")
+	sprite.scale = Vector2.ONE * lerpf(0.55, 1.15, depth)
+	sprite.modulate.a = lerpf(0.45, 1.0, depth)
 	base_y = y
-	speed = spd
+	speed = spd * lerpf(0.55, 1.2, depth)
 	direction = dir
+	bounds = travel
+	position.x = randf_range(bounds.x, bounds.y)
 	position.y = y
+	amplitude = lerpf(10.0, 28.0, depth)
 	_t = randf() * TAU
 
 

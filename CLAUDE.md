@@ -56,8 +56,9 @@ changes.** If a feature would need a new `if` per item, it is designed wrong.
 | 100 | modal panels: inventory, inspect, rulebook |
 | 200 | pause, settings, debug overlay |
 
-Inside the tank SubViewport, `z_index`: seabed `-10`, items `0`, fish `10`,
-claw and cable `20`.
+Inside the tank SubViewport, `z_index`: seabed `-10`, **fish `-5`**, items `0`,
+claw and cable `20`. Fish are background only (revision 1) and sit behind the
+items, not in front of them.
 
 ## Text
 
