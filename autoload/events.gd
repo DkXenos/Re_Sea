@@ -5,8 +5,9 @@ extends Node
 # --- flow ---
 signal scene_change_requested(scene_key: StringName)
 signal day_started(day: DayData)
-signal claw_phase_finished()
-signal desk_phase_finished()
+## A phase scene emits this when it is done; main.gd asks DayManager what comes
+## next. No scene ever names another scene.
+signal phase_finished()
 
 # --- claw phase ---
 signal grabs_changed(remaining: int)

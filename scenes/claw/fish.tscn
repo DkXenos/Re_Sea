@@ -1,0 +1,16 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scenes/claw/fish.gd" id="1_fish"]
+
+[sub_resource type="CircleShape2D" id="Circle_fish"]
+radius = 34.0
+
+[node name="Fish" type="Area2D"]
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("1_fish")
+
+[node name="Sprite" type="AnimatedSprite2D" parent="."]
+
+[node name="Shape" type="CollisionShape2D" parent="."]
+shape = SubResource("Circle_fish")

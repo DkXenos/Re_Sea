@@ -1,0 +1,202 @@
+[gd_scene load_steps=15 format=3]
+
+[ext_resource type="Script" path="res://scenes/claw/claw_phase.gd" id="1_phase"]
+[ext_resource type="Script" path="res://scenes/claw/claw.gd" id="2_claw"]
+[ext_resource type="Texture2D" path="res://assets/env/water_bg.png" id="3_water"]
+[ext_resource type="Texture2D" path="res://assets/env/seabed.png" id="4_seabed"]
+[ext_resource type="Texture2D" path="res://assets/env/glass_overlay.png" id="5_glass"]
+[ext_resource type="Texture2D" path="res://assets/env/tank_frame.png" id="6_frame"]
+[ext_resource type="Texture2D" path="res://assets/env/machine_console.png" id="7_console"]
+[ext_resource type="SpriteFrames" path="res://data/frames/claw_frames.tres" id="8_clawfr"]
+[ext_resource type="Texture2D" path="res://assets/claw/claw_cable.png" id="9_cable"]
+[ext_resource type="Texture2D" path="res://assets/ui/arrow_left.png" id="10_al"]
+[ext_resource type="Texture2D" path="res://assets/ui/arrow_right.png" id="11_ar"]
+[ext_resource type="Texture2D" path="res://assets/ui/joystick_base.png" id="12_jb"]
+[ext_resource type="Texture2D" path="res://assets/ui/joystick_knob.png" id="13_jk"]
+[ext_resource type="Theme" path="res://assets/ui/ui_theme.tres" id="14_theme"]
+
+[sub_resource type="CircleShape2D" id="Circle_grab"]
+radius = 46.0
+
+[node name="ClawPhase" type="Node2D"]
+script = ExtResource("1_phase")
+
+[node name="BgLayer" type="CanvasLayer" parent="."]
+layer = 0
+
+[node name="WaterBg" type="TextureRect" parent="BgLayer"]
+offset_left = -8.0
+offset_top = -8.0
+offset_right = 1288.0
+offset_bottom = 728.0
+mouse_filter = 2
+texture = ExtResource("3_water")
+expand_mode = 1
+
+[node name="TankLayer" type="CanvasLayer" parent="."]
+layer = 10
+
+[node name="TankContainer" type="SubViewportContainer" parent="TankLayer"]
+offset_left = 140.0
+offset_top = 40.0
+offset_right = 1140.0
+offset_bottom = 460.0
+mouse_filter = 2
+
+[node name="TankViewport" type="SubViewport" parent="TankLayer/TankContainer"]
+transparent_bg = true
+handle_input_locally = false
+gui_disable_input = true
+size = Vector2i(1000, 420)
+render_target_update_mode = 4
+
+[node name="TankWorld" type="Node2D" parent="TankLayer/TankContainer/TankViewport"]
+y_sort_enabled = true
+
+[node name="Seabed" type="Sprite2D" parent="TankLayer/TankContainer/TankViewport/TankWorld"]
+z_index = -10
+position = Vector2(500, 350)
+texture = ExtResource("4_seabed")
+
+[node name="Items" type="Node2D" parent="TankLayer/TankContainer/TankViewport/TankWorld"]
+y_sort_enabled = true
+
+[node name="FishHolder" type="Node2D" parent="TankLayer/TankContainer/TankViewport/TankWorld"]
+
+[node name="Claw" type="Node2D" parent="TankLayer/TankContainer/TankViewport/TankWorld"]
+z_index = 20
+script = ExtResource("2_claw")
+
+[node name="Cable" type="Sprite2D" parent="TankLayer/TankContainer/TankViewport/TankWorld/Claw"]
+texture = ExtResource("9_cable")
+
+[node name="Sprite" type="AnimatedSprite2D" parent="TankLayer/TankContainer/TankViewport/TankWorld/Claw"]
+sprite_frames = ExtResource("8_clawfr")
+animation = &"open"
+offset = Vector2(0, 80)
+
+[node name="GrabArea" type="Area2D" parent="TankLayer/TankContainer/TankViewport/TankWorld/Claw"]
+position = Vector2(0, 110)
+collision_layer = 1
+collision_mask = 2
+
+[node name="Shape" type="CollisionShape2D" parent="TankLayer/TankContainer/TankViewport/TankWorld/Claw/GrabArea"]
+shape = SubResource("Circle_grab")
+
+[node name="GlassLayer" type="CanvasLayer" parent="."]
+layer = 20
+
+[node name="Glass" type="TextureRect" parent="GlassLayer"]
+offset_left = 140.0
+offset_top = 40.0
+offset_right = 1140.0
+offset_bottom = 460.0
+mouse_filter = 2
+texture = ExtResource("5_glass")
+
+[node name="Bubbles" type="Node2D" parent="GlassLayer"]
+
+[node name="FrameLayer" type="CanvasLayer" parent="."]
+layer = 30
+
+[node name="TankFrame" type="TextureRect" parent="FrameLayer"]
+offset_left = 120.0
+offset_top = 20.0
+offset_right = 1160.0
+offset_bottom = 480.0
+mouse_filter = 2
+texture = ExtResource("6_frame")
+
+[node name="Console" type="TextureRect" parent="FrameLayer"]
+offset_top = 500.0
+offset_right = 1280.0
+offset_bottom = 720.0
+mouse_filter = 2
+texture = ExtResource("7_console")
+expand_mode = 1
+
+[node name="ArrowLeft" type="TextureButton" parent="FrameLayer"]
+offset_left = 120.0
+offset_top = 592.0
+offset_right = 216.0
+offset_bottom = 688.0
+texture_normal = ExtResource("10_al")
+
+[node name="ArrowRight" type="TextureButton" parent="FrameLayer"]
+offset_left = 250.0
+offset_top = 592.0
+offset_right = 346.0
+offset_bottom = 688.0
+texture_normal = ExtResource("11_ar")
+
+[node name="DropButton" type="Button" parent="FrameLayer"]
+offset_left = 500.0
+offset_top = 606.0
+offset_right = 780.0
+offset_bottom = 678.0
+theme = ExtResource("14_theme")
+
+[node name="JoystickBase" type="TextureRect" parent="FrameLayer"]
+offset_left = 1040.0
+offset_top = 578.0
+offset_right = 1168.0
+offset_bottom = 706.0
+mouse_filter = 2
+texture = ExtResource("12_jb")
+
+[node name="JoystickKnob" type="TextureRect" parent="FrameLayer"]
+offset_left = 1068.0
+offset_top = 606.0
+offset_right = 1140.0
+offset_bottom = 678.0
+mouse_filter = 2
+texture = ExtResource("13_jk")
+
+[node name="HudLayer" type="CanvasLayer" parent="."]
+layer = 50
+
+[node name="HudRoot" type="Control" parent="HudLayer"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+theme = ExtResource("14_theme")
+
+[node name="Hud" type="HBoxContainer" parent="HudLayer/HudRoot"]
+offset_left = 40.0
+offset_top = 508.0
+offset_right = 1240.0
+offset_bottom = 544.0
+mouse_filter = 2
+theme_override_constants/separation = 44
+
+[node name="DayLabel" type="Label" parent="HudLayer/HudRoot/Hud"]
+theme_override_font_sizes/font_size = 24
+
+[node name="QuotaLabel" type="Label" parent="HudLayer/HudRoot/Hud"]
+
+[node name="GrabsLabel" type="Label" parent="HudLayer/HudRoot/Hud"]
+
+[node name="CollectedLabel" type="Label" parent="HudLayer/HudRoot/Hud"]
+
+[node name="GripLabel" type="Label" parent="HudLayer/HudRoot"]
+offset_left = 320.0
+offset_top = 552.0
+offset_right = 960.0
+offset_bottom = 584.0
+theme_override_font_sizes/font_size = 22
+horizontal_alignment = 1
+
+[node name="Toast" type="Label" parent="HudLayer/HudRoot"]
+offset_left = 320.0
+offset_top = 412.0
+offset_right = 960.0
+offset_bottom = 452.0
+theme_override_font_sizes/font_size = 26
+horizontal_alignment = 1
+
+[node name="Hint" type="Label" parent="HudLayer/HudRoot"]
+offset_left = 380.0
+offset_top = 686.0
+offset_right = 1240.0
+offset_bottom = 712.0
+theme_override_font_sizes/font_size = 15

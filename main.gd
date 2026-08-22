@@ -22,7 +22,12 @@ var _current_key: StringName = &""
 
 func _ready() -> void:
 	Events.scene_change_requested.connect(_on_scene_change_requested)
+	Events.phase_finished.connect(_on_phase_finished)
 	_on_scene_change_requested(&"main_menu")
+
+
+func _on_phase_finished() -> void:
+	_on_scene_change_requested(DayManager.advance_from(_current_key))
 
 
 func _on_scene_change_requested(scene_key: StringName) -> void:
