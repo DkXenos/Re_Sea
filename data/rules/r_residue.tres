@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="RuleData" format=3]
+
+[ext_resource type="Script" path="res://data/rule_data.gd" id="1_f88a7"]
+
+[resource]
+script = ExtResource("1_f88a7")
+id = &"r_residue"
+text = "Barang yang masih ada sisa kotoran tidak bisa didaur ulang. Buang ke RESIDU."
+applies_when = {
+"has_residue": true
+}
+forces_category = 3
+priority = 10

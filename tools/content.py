@@ -174,3 +174,38 @@ FISH = [("fish_small", 96, 48, (244, 162, 97)),
 
 BINS = [("organic", (106, 153, 78)), ("recyclable", (58, 134, 183)),
         ("hazard", (198, 76, 65)), ("landfill", (120, 113, 108))]
+
+
+def as_json():
+    """Dump the content table for tools/gen_data.gd, which builds the actual
+    .tres files. Godot serializes its own resources so the .tres format - typed
+    arrays, resource references, StringName - is always correct."""
+    def item(i):
+        return dict(
+            id=i["id"], display_name=i["name"], weight=i["weight"],
+            visible_material=i["vis_mat"], visible_label=i["vis_label"],
+            has_residue=bool(i.get("residue")), residue_type=i.get("residue", ""),
+            true_material=i.get("true_mat", ""), is_multilayer=i.get("multilayer", False),
+            tag_text=i.get("tag", ""), correct_category=i["cat"], source_batch=i["batch"],
+            hotspots=[dict(pos=list(h["pos"]), radius=h["radius"], tool=h["tool"],
+                           reveals=h["reveals"]) for h in i["hotspots"]],
+        )
+    return dict(
+        items=[item(i) for i in ITEMS],
+        rules=[dict(id=r["id"], text=r["text"], applies_when=r["when"],
+                    forces_category=r["forces"], priority=r["priority"]) for r in RULES],
+        tools=[dict(id=t["id"], display_name=t["name"], reveals_field=t["reveals"],
+                    default_charges=t["charges"], description=t["desc"]) for t in TOOLS],
+        days=[dict(day_number=d["n"], quota=d["quota"], max_grabs=d["grabs"],
+                   tools_enabled=d["tools_enabled"], tool_charges=d["charges"],
+                   active_rules=d["rules"], item_pool=d["items"], intro_text=d["intro"],
+                   modifier="") for d in DAYS],
+    )
+
+
+if __name__ == "__main__":
+    import json, os
+    out = os.path.join(os.path.dirname(os.path.abspath(__file__)), "content.json")
+    with open(out, "w") as f:
+        json.dump(as_json(), f, indent=1, ensure_ascii=False)
+    print("wrote", out)

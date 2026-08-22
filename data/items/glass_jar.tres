@@ -1,0 +1,38 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="SpriteFrames" path="res://data/frames/item_glass_jar_frames.tres" id="1_r5ajd"]
+[ext_resource type="Script" path="res://data/item_data.gd" id="2_hfysg"]
+[ext_resource type="Texture2D" path="res://assets/items/item_glass_jar.png" id="3_c1vmr"]
+
+[resource]
+script = ExtResource("2_hfysg")
+id = &"glass_jar"
+display_name = "Toples Kaca"
+texture = ExtResource("3_c1vmr")
+frames = ExtResource("1_r5ajd")
+weight = 2.0
+visible_material = "kaca"
+has_residue = true
+residue_type = "sisa obat kadaluarsa"
+tag_text = "GL 70 - kaca campur"
+revealed_by_rinse = true
+revealed_by_swab = true
+revealed_by_magnifier = true
+hotspots = Array[Dictionary]([{
+"pos": Vector2(0.5, 0.62),
+"radius": 0.14,
+"reveals": "has_residue",
+"tool": "rinse"
+}, {
+"pos": Vector2(0.66, 0.5),
+"radius": 0.14,
+"reveals": "residue_type",
+"tool": "swab"
+}, {
+"pos": Vector2(0.4, 0.28),
+"radius": 0.14,
+"reveals": "tag_text",
+"tool": "magnifier"
+}])
+correct_category = 1
+source_batch = &"klinik_pesisir"

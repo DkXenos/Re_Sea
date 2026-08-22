@@ -1,0 +1,37 @@
+[gd_resource type="Resource" script_class="DayData" format=3]
+
+[ext_resource type="Script" path="res://data/rule_data.gd" id="1_vrvol"]
+[ext_resource type="Resource" path="res://data/rules/r_baseline.tres" id="2_45bwo"]
+[ext_resource type="Resource" path="res://data/rules/r_residue.tres" id="3_4fpem"]
+[ext_resource type="Resource" path="res://data/rules/r_chem_residue.tres" id="4_sypw1"]
+[ext_resource type="Resource" path="res://data/rules/r_multilayer.tres" id="5_2hp76"]
+[ext_resource type="Script" path="res://data/item_data.gd" id="6_mfa1n"]
+[ext_resource type="Resource" path="res://data/items/banana_peel.tres" id="7_x6s1c"]
+[ext_resource type="Resource" path="res://data/items/fish_bone.tres" id="8_3m8qg"]
+[ext_resource type="Resource" path="res://data/items/pet_bottle.tres" id="9_2ljcg"]
+[ext_resource type="Resource" path="res://data/items/alu_can.tres" id="10_xht3m"]
+[ext_resource type="Resource" path="res://data/items/styrofoam_tray.tres" id="11_n0wqy"]
+[ext_resource type="Resource" path="res://data/items/car_battery.tres" id="12_ov6ou"]
+[ext_resource type="Resource" path="res://data/items/oil_jerrycan.tres" id="13_yqadk"]
+[ext_resource type="Resource" path="res://data/items/paint_bottle.tres" id="14_ypmxn"]
+[ext_resource type="Resource" path="res://data/items/paper_cup.tres" id="15_hfpnv"]
+[ext_resource type="Resource" path="res://data/items/glass_jar.tres" id="16_qu4ep"]
+[ext_resource type="Resource" path="res://data/items/juice_carton.tres" id="17_q5vjj"]
+[ext_resource type="Resource" path="res://data/items/eco_tote.tres" id="18_8ffi4"]
+[ext_resource type="Script" path="res://data/day_data.gd" id="19_o0cp4"]
+
+[resource]
+script = ExtResource("19_o0cp4")
+day_number = 4
+active_rules = Array[ExtResource("1_vrvol")]([ExtResource("2_45bwo"), ExtResource("3_4fpem"), ExtResource("4_sypw1"), ExtResource("5_2hp76")])
+item_pool = Array[ExtResource("6_mfa1n")]([ExtResource("7_x6s1c"), ExtResource("8_3m8qg"), ExtResource("9_2ljcg"), ExtResource("10_xht3m"), ExtResource("11_n0wqy"), ExtResource("12_ov6ou"), ExtResource("13_yqadk"), ExtResource("14_ypmxn"), ExtResource("15_hfpnv"), ExtResource("16_qu4ep"), ExtResource("17_q5vjj"), ExtResource("18_8ffi4")])
+quota = 10
+max_grabs = 14
+tools_enabled = true
+tool_charges = {
+&"cutter": 2,
+&"magnifier": 4,
+&"rinse": 4,
+&"swab": 3
+}
+intro_text = "Pemotong tersedia, hanya dua kali pakai. Yang terlihat seperti kertas belum tentu kertas."

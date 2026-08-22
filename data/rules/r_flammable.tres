@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="RuleData" format=3]
+
+[ext_resource type="Script" path="res://data/rule_data.gd" id="1_ctqyg"]
+
+[resource]
+script = ExtResource("1_ctqyg")
+id = &"r_flammable"
+text = "Barang dengan label MUDAH TERBAKAR selalu masuk B3, walaupun terlihat kosong."
+applies_when = {
+"tag_text": ["MUDAH TERBAKAR - jangan ditusuk"]
+}
+forces_category = 2
+priority = 50

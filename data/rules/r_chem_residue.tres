@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="RuleData" format=3]
+
+[ext_resource type="Script" path="res://data/rule_data.gd" id="1_aglgl"]
+
+[resource]
+script = ExtResource("1_aglgl")
+id = &"r_chem_residue"
+text = "Sisa oli, cat pelarut atau obat kadaluarsa membuat wadahnya menjadi limbah B3. Aturan ini mengalahkan aturan sisa kotoran."
+applies_when = {
+"residue_type": ["oli mesin", "cat berbasis pelarut", "sisa obat kadaluarsa"]
+}
+forces_category = 2
+priority = 40

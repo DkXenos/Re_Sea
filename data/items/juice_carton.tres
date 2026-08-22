@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="SpriteFrames" path="res://data/frames/item_juice_carton_frames.tres" id="1_idqda"]
+[ext_resource type="Script" path="res://data/item_data.gd" id="2_38vcj"]
+[ext_resource type="Texture2D" path="res://assets/items/item_juice_carton.png" id="3_n21di"]
+
+[resource]
+script = ExtResource("2_38vcj")
+id = &"juice_carton"
+display_name = "Kotak Jus"
+texture = ExtResource("3_n21di")
+frames = ExtResource("1_idqda")
+weight = 0.8
+visible_material = "kertas karton"
+visible_label = "DAUR ULANG"
+true_material = "kertas, aluminium dan PE"
+is_multilayer = true
+tag_text = "PAP 84 - karton berlapis"
+revealed_by_magnifier = true
+revealed_by_cutter = true
+hotspots = Array[Dictionary]([{
+"pos": Vector2(0.55, 0.3),
+"radius": 0.14,
+"reveals": "tag_text",
+"tool": "magnifier"
+}, {
+"pos": Vector2(0.28, 0.62),
+"radius": 0.14,
+"reveals": "true_material",
+"tool": "cutter"
+}])
+correct_category = 1
+source_batch = &"pabrik_minuman"

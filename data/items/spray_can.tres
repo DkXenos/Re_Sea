@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="SpriteFrames" path="res://data/frames/item_spray_can_frames.tres" id="1_d07k1"]
+[ext_resource type="Script" path="res://data/item_data.gd" id="2_sul0u"]
+[ext_resource type="Texture2D" path="res://assets/items/item_spray_can.png" id="3_la4a3"]
+
+[resource]
+script = ExtResource("2_sul0u")
+id = &"spray_can"
+display_name = "Kaleng Semprot"
+texture = ExtResource("3_la4a3")
+frames = ExtResource("1_d07k1")
+weight = 1.4
+visible_material = "kaleng baja"
+visible_label = "KOSONG?"
+true_material = "baja dengan sisa gas propelan"
+tag_text = "MUDAH TERBAKAR - jangan ditusuk"
+revealed_by_magnifier = true
+revealed_by_cutter = true
+hotspots = Array[Dictionary]([{
+"pos": Vector2(0.52, 0.72),
+"radius": 0.14,
+"reveals": "tag_text",
+"tool": "magnifier"
+}, {
+"pos": Vector2(0.3, 0.4),
+"radius": 0.14,
+"reveals": "true_material",
+"tool": "cutter"
+}])
+correct_category = 1
+source_batch = &"pabrik_cat"

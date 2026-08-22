@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ToolData" format=3]
+
+[ext_resource type="SpriteFrames" path="res://data/frames/tool_swab_frames.tres" id="1_50dfa"]
+[ext_resource type="Texture2D" path="res://assets/tools/tool_swab.png" id="2_whw2b"]
+[ext_resource type="Script" path="res://data/tool_data.gd" id="3_ephen"]
+
+[resource]
+script = ExtResource("3_ephen")
+id = &"swab"
+display_name = "Usap Kimia"
+frames = ExtResource("1_50dfa")
+icon = ExtResource("2_whw2b")
+reveals_field = "residue_type"
+description = "Mengusap sisa kotoran untuk mengetahui jenisnya."

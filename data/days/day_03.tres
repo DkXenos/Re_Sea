@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="DayData" format=3]
+
+[ext_resource type="Script" path="res://data/rule_data.gd" id="1_olrn3"]
+[ext_resource type="Resource" path="res://data/rules/r_baseline.tres" id="2_t2wtq"]
+[ext_resource type="Resource" path="res://data/rules/r_residue.tres" id="3_gd2i6"]
+[ext_resource type="Resource" path="res://data/rules/r_chem_residue.tres" id="4_7tspe"]
+[ext_resource type="Script" path="res://data/item_data.gd" id="5_c3q0c"]
+[ext_resource type="Resource" path="res://data/items/banana_peel.tres" id="6_ia86x"]
+[ext_resource type="Resource" path="res://data/items/fish_bone.tres" id="7_xoql0"]
+[ext_resource type="Resource" path="res://data/items/pet_bottle.tres" id="8_lqufv"]
+[ext_resource type="Resource" path="res://data/items/alu_can.tres" id="9_rgt6f"]
+[ext_resource type="Resource" path="res://data/items/styrofoam_tray.tres" id="10_7eti1"]
+[ext_resource type="Resource" path="res://data/items/car_battery.tres" id="11_kr8m6"]
+[ext_resource type="Resource" path="res://data/items/oil_jerrycan.tres" id="12_orvbu"]
+[ext_resource type="Resource" path="res://data/items/paint_bottle.tres" id="13_ef3kf"]
+[ext_resource type="Resource" path="res://data/items/paper_cup.tres" id="14_6v1vf"]
+[ext_resource type="Resource" path="res://data/items/glass_jar.tres" id="15_a5fes"]
+[ext_resource type="Script" path="res://data/day_data.gd" id="16_84sts"]
+
+[resource]
+script = ExtResource("16_84sts")
+day_number = 3
+active_rules = Array[ExtResource("1_olrn3")]([ExtResource("2_t2wtq"), ExtResource("3_gd2i6"), ExtResource("4_7tspe")])
+item_pool = Array[ExtResource("5_c3q0c")]([ExtResource("6_ia86x"), ExtResource("7_xoql0"), ExtResource("8_lqufv"), ExtResource("9_rgt6f"), ExtResource("10_7eti1"), ExtResource("11_kr8m6"), ExtResource("12_orvbu"), ExtResource("13_ef3kf"), ExtResource("14_6v1vf"), ExtResource("15_a5fes")])
+quota = 8
+max_grabs = 12
+tools_enabled = true
+tool_charges = {
+&"magnifier": 4,
+&"rinse": 3,
+&"swab": 2
+}
+intro_text = "Usap kimia tersedia. Tidak semua sisa kotoran sama bahayanya."

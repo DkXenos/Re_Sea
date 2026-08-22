@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="RuleData" format=3]
+
+[ext_resource type="Script" path="res://data/rule_data.gd" id="1_dmnmj"]
+
+[resource]
+script = ExtResource("1_dmnmj")
+id = &"r_baseline"
+text = "Pilah dari bahannya: bahan alami masuk ORGANIK; plastik, logam, kaca dan kertas yang bersih masuk DAUR ULANG; bahan kimia masuk B3; sisanya masuk RESIDU."

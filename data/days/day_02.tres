@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="DayData" format=3]
+
+[ext_resource type="Script" path="res://data/rule_data.gd" id="1_p0xa3"]
+[ext_resource type="Resource" path="res://data/rules/r_baseline.tres" id="2_m3wj7"]
+[ext_resource type="Resource" path="res://data/rules/r_residue.tres" id="3_1ipuw"]
+[ext_resource type="Script" path="res://data/item_data.gd" id="4_100ek"]
+[ext_resource type="Resource" path="res://data/items/banana_peel.tres" id="5_80l45"]
+[ext_resource type="Resource" path="res://data/items/fish_bone.tres" id="6_bnhly"]
+[ext_resource type="Resource" path="res://data/items/pet_bottle.tres" id="7_e51uk"]
+[ext_resource type="Resource" path="res://data/items/alu_can.tres" id="8_he6va"]
+[ext_resource type="Resource" path="res://data/items/styrofoam_tray.tres" id="9_30eif"]
+[ext_resource type="Resource" path="res://data/items/car_battery.tres" id="10_m3vtm"]
+[ext_resource type="Resource" path="res://data/items/oil_jerrycan.tres" id="11_br5qx"]
+[ext_resource type="Resource" path="res://data/items/paint_bottle.tres" id="12_46dms"]
+[ext_resource type="Script" path="res://data/day_data.gd" id="13_fj25p"]
+
+[resource]
+script = ExtResource("13_fj25p")
+day_number = 2
+active_rules = Array[ExtResource("1_p0xa3")]([ExtResource("2_m3wj7"), ExtResource("3_1ipuw")])
+item_pool = Array[ExtResource("4_100ek")]([ExtResource("5_80l45"), ExtResource("6_bnhly"), ExtResource("7_e51uk"), ExtResource("8_he6va"), ExtResource("9_30eif"), ExtResource("10_m3vtm"), ExtResource("11_br5qx"), ExtResource("12_46dms")])
+quota = 6
+max_grabs = 10
+tools_enabled = true
+tool_charges = {
+&"magnifier": 3,
+&"rinse": 3
+}
+intro_text = "Alat periksa datang. Bilas untuk melihat sisa kotoran, kaca pembesar untuk membaca kode."

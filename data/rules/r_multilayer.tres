@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="RuleData" format=3]
+
+[ext_resource type="Script" path="res://data/rule_data.gd" id="1_13lgy"]
+
+[resource]
+script = ExtResource("1_13lgy")
+id = &"r_multilayer"
+text = "Kemasan berlapis (kertas, plastik dan aluminium yang menyatu) tidak bisa dipisah. Buang ke RESIDU."
+applies_when = {
+"is_multilayer": true
+}
+forces_category = 3
+priority = 30

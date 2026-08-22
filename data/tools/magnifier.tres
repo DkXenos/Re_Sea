@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ToolData" format=3]
+
+[ext_resource type="SpriteFrames" path="res://data/frames/tool_magnifier_frames.tres" id="1_irk3m"]
+[ext_resource type="Texture2D" path="res://assets/tools/tool_magnifier.png" id="2_n1chp"]
+[ext_resource type="Script" path="res://data/tool_data.gd" id="3_mlm52"]
+
+[resource]
+script = ExtResource("3_mlm52")
+id = &"magnifier"
+display_name = "Kaca Pembesar"
+frames = ExtResource("1_irk3m")
+icon = ExtResource("2_n1chp")
+reveals_field = "tag_text"
+default_charges = 5
+description = "Membaca kode daur ulang atau label kecil yang tercetak."

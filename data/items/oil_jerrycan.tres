@@ -1,0 +1,40 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="SpriteFrames" path="res://data/frames/item_oil_jerrycan_frames.tres" id="1_rn588"]
+[ext_resource type="Script" path="res://data/item_data.gd" id="2_n380k"]
+[ext_resource type="Texture2D" path="res://assets/items/item_oil_jerrycan.png" id="3_uhuox"]
+
+[resource]
+script = ExtResource("2_n380k")
+id = &"oil_jerrycan"
+display_name = "Jeriken Bening"
+texture = ExtResource("3_uhuox")
+frames = ExtResource("1_rn588")
+weight = 2.2
+visible_material = "HDPE bening"
+visible_label = "HDPE 2"
+has_residue = true
+residue_type = "oli mesin"
+true_material = "HDPE"
+tag_text = "HDPE 2"
+revealed_by_rinse = true
+revealed_by_swab = true
+revealed_by_magnifier = true
+hotspots = Array[Dictionary]([{
+"pos": Vector2(0.38, 0.7),
+"radius": 0.14,
+"reveals": "has_residue",
+"tool": "rinse"
+}, {
+"pos": Vector2(0.62, 0.6),
+"radius": 0.14,
+"reveals": "residue_type",
+"tool": "swab"
+}, {
+"pos": Vector2(0.5, 0.24),
+"radius": 0.14,
+"reveals": "tag_text",
+"tool": "magnifier"
+}])
+correct_category = 1
+source_batch = &"bengkel_pesisir"

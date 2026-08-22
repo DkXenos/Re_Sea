@@ -12,15 +12,37 @@ extends Resource
 @export var forces_category: ItemData.Category
 @export var priority: int = 0 ## higher wins on conflict
 
+## An empty applies_when means this rule is rulebook text only and never
+## overrides anything - that is how the day 1 baseline rule states the default
+## without special-casing it in code.
 func matches(item: ItemData) -> bool:
+	if applies_when.is_empty():
+		return false
 	for key: String in applies_when:
 		var expected: Variant = applies_when[key]
 		var actual: Variant = item.get(key)
 		if actual == null:
 			return false
 		if expected is Array:
-			if not (actual in expected):
+			if not _contains(expected, actual):
 				return false
-		elif actual != expected:
+		elif not _same(actual, expected):
 			return false
 	return true
+
+
+## Numbers may arrive as int or float depending on how the .tres was authored,
+## so compare them numerically rather than by exact type.
+static func _same(a: Variant, b: Variant) -> bool:
+	var a_num := typeof(a) == TYPE_INT or typeof(a) == TYPE_FLOAT
+	var b_num := typeof(b) == TYPE_INT or typeof(b) == TYPE_FLOAT
+	if a_num and b_num:
+		return is_equal_approx(float(a), float(b))
+	return a == b
+
+
+static func _contains(list: Array, value: Variant) -> bool:
+	for entry: Variant in list:
+		if _same(entry, value):
+			return true
+	return false

@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="SpriteFrames" path="res://data/frames/item_car_battery_frames.tres" id="1_8acy3"]
+[ext_resource type="Script" path="res://data/item_data.gd" id="2_qojco"]
+[ext_resource type="Texture2D" path="res://assets/items/item_car_battery.png" id="3_jok44"]
+
+[resource]
+script = ExtResource("2_qojco")
+id = &"car_battery"
+display_name = "Aki Bekas"
+texture = ExtResource("3_jok44")
+frames = ExtResource("1_8acy3")
+weight = 4.2
+visible_material = "logam dan plastik tebal"
+visible_label = "AWAS ASAM"
+true_material = "timbal dan asam sulfat"
+tag_text = "Pb - AWAS ASAM"
+revealed_by_magnifier = true
+revealed_by_cutter = true
+hotspots = Array[Dictionary]([{
+"pos": Vector2(0.7, 0.25),
+"radius": 0.14,
+"reveals": "tag_text",
+"tool": "magnifier"
+}, {
+"pos": Vector2(0.3, 0.55),
+"radius": 0.14,
+"reveals": "true_material",
+"tool": "cutter"
+}])
+correct_category = 2
+source_batch = &"bengkel_pesisir"
