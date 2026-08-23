@@ -298,7 +298,9 @@ func _update_grip_preview() -> void:
 	if target == null:
 		_grip_label.text = Strings.t("claw_grip_none")
 	else:
-		_grip_label.text = "%s  -  %s" % [target.data.display_name,
+		# Nothing in the tank has been identified yet, so the readout describes
+		# what the claw can see rather than naming it (revision 2 §3).
+		_grip_label.text = "%s  -  %s" % [target.data.surface_label(),
 			Strings.tf("claw_grip_chance", {"n": int(round(target.grip_chance() * 100.0))})]
 
 
@@ -336,7 +338,7 @@ func _on_cycle_finished(result: Dictionary) -> void:
 		var item: ItemData = result["item"]
 		Game.add_to_inventory(item)
 		Events.item_grabbed.emit(item)
-		_show_toast(item.display_name)
+		_show_toast(item.surface_label())
 		result["node"].queue_free()
 	else:
 		_show_toast(Strings.t("claw_slipped"))

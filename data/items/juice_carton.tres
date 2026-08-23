@@ -13,6 +13,7 @@ texture = ExtResource("3_n21di")
 frames = ExtResource("1_idqda")
 hotspot_overlay = ExtResource("2_n21di")
 weight = 0.8
+surface_properties = Array[String](["kaku", "bagian dalam licin", "berbentuk kotak"])
 visible_material = "kertas karton"
 visible_label = "DAUR ULANG"
 true_material = "kertas, aluminium dan PE"

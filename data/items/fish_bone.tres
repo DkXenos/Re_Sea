@@ -13,5 +13,6 @@ texture = ExtResource("3_jntl8")
 frames = ExtResource("1_8idme")
 hotspot_overlay = ExtResource("2_jntl8")
 weight = 0.3
+surface_properties = Array[String](["keras", "ringan", "berpori"])
 visible_material = "tulang"
 source_batch = &"kapal_nelayan"

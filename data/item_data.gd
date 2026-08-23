@@ -20,6 +20,12 @@ enum Category { ORGANIC, RECYCLABLE, HAZARD, LANDFILL }
 @export var hotspot_overlay: Texture2D
 @export var weight: float = 1.0 ## affects claw grip chance
 
+## What the item LOOKS and FEELS like, before any tool is used (revision 2 §3).
+## Shown in place of the name, so the phase reads as identification rather than
+## label-matching: "tembus pandang - lentur - mengapung", not "Botol Plastik".
+## Free information, like visible_material - these cost nothing to observe.
+@export var surface_properties: Array[String] = []
+
 # --- Surface info: free, always shown ---
 @export var visible_material: String ## what it LOOKS like
 @export var visible_label: String ## printed text, may be absent or misleading
@@ -44,6 +50,15 @@ enum Category { ORGANIC, RECYCLABLE, HAZARD, LANDFILL }
 
 @export var correct_category: Category
 @export var source_batch: StringName ## for the later "trace the polluter" arc
+
+## The property line shown while the item is still unidentified. Falls back to
+## what it looks like, so an item whose .tres has no properties yet still reads
+## as an observation rather than as a blank.
+func surface_label() -> String:
+	if surface_properties.is_empty():
+		return visible_material
+	return "  ·  ".join(surface_properties)
+
 
 ## True if this tool can ever learn anything here (used only for reporting,
 ## never to block a click).

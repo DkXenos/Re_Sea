@@ -13,6 +13,7 @@ texture = ExtResource("3_uhuox")
 frames = ExtResource("1_rn588")
 hotspot_overlay = ExtResource("2_uhuox")
 weight = 2.2
+surface_properties = Array[String](["buram", "kaku", "permukaan licin"])
 visible_material = "HDPE bening"
 visible_label = "HDPE 2"
 has_residue = true

@@ -13,6 +13,7 @@ texture = ExtResource("3_kyn8h")
 frames = ExtResource("1_7153q")
 hotspot_overlay = ExtResource("2_kyn8h")
 weight = 2.6
+surface_properties = Array[String](["berjaring", "lentur", "basah"])
 visible_material = "nilon"
 true_material = "nilon dengan serat baja"
 is_multilayer = true

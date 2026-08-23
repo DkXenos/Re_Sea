@@ -13,6 +13,7 @@ texture = ExtResource("3_c1vmr")
 frames = ExtResource("1_r5ajd")
 hotspot_overlay = ExtResource("2_c1vmr")
 weight = 2.0
+surface_properties = Array[String](["tembus pandang", "berat", "licin"])
 visible_material = "kaca"
 has_residue = true
 residue_type = "sisa obat kadaluarsa"

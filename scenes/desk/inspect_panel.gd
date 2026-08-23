@@ -345,7 +345,11 @@ func _rebuild_log() -> void:
 		return
 	var lit: Dictionary = _evidence_state()["lit"]
 	var item := entry.data
-	# Surface info is free and always shown.
+	# Surface info is free and always shown. The property line comes first
+	# because, until a tool has been spent, it is the whole of what is known
+	# about this item (revision 2 §3).
+	_add_chip("surface_properties", Strings.tf("chip_properties",
+		{"v": item.surface_label()}), false, lit)
 	_add_chip("visible_material", Strings.tf("chip_material", {"v": item.visible_material}),
 		false, lit)
 	_add_chip("visible_label", Strings.tf("chip_label",

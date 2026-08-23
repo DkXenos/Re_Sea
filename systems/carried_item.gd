@@ -13,6 +13,19 @@ var broken_rule: RuleData = null
 func _init(item_data: ItemData) -> void:
 	data = item_data
 
+## The item names itself once the player has learned something about it with a
+## tool, or once they have committed it to a bin (revision 2 §3). Until then the
+## panel shows observed properties instead - the name is a conclusion, and
+## handing it over for free is what made the phase feel like label-matching.
+func name_known() -> bool:
+	return sorted_to != -1 or not revealed.is_empty()
+
+
+## The name if it has been earned, the observed properties if it has not.
+func label() -> String:
+	return data.display_name if name_known() else data.surface_label()
+
+
 func is_revealed(field: String) -> bool:
 	return revealed.get(field, false)
 

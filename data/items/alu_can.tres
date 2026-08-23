@@ -13,6 +13,7 @@ texture = ExtResource("3_egsb5")
 frames = ExtResource("1_7m1l3")
 hotspot_overlay = ExtResource("2_egsb5")
 weight = 0.5
+surface_properties = Array[String](["logam tipis", "penyok", "ringan"])
 visible_material = "aluminium"
 visible_label = "SODA"
 has_residue = true

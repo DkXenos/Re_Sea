@@ -13,6 +13,7 @@ texture = ExtResource("3_7bdvg")
 frames = ExtResource("1_qcdo1")
 hotspot_overlay = ExtResource("2_7bdvg")
 weight = 0.4
+surface_properties = Array[String](["sangat ringan", "berbusa", "mengapung"])
 visible_material = "styrofoam"
 tag_text = "PS 6 - tidak didaur ulang"
 revealed_by_magnifier = true

@@ -13,6 +13,7 @@ texture = ExtResource("3_w6kso")
 frames = ExtResource("1_aesu6")
 hotspot_overlay = ExtResource("2_w6kso")
 weight = 0.9
+surface_properties = Array[String](["lentur", "berserat", "ada jahitan"])
 visible_material = "kain katun"
 visible_label = "RAMAH LINGKUNGAN"
 true_material = "katun berlapis PVC"

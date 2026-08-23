@@ -13,6 +13,7 @@ texture = ExtResource("3_j8u54")
 frames = ExtResource("1_0j8tn")
 hotspot_overlay = ExtResource("2_j8u54")
 weight = 0.5
+surface_properties = Array[String](["kaku", "permukaan licin", "ringan"])
 visible_material = "kertas"
 visible_label = "KERTAS"
 has_residue = true

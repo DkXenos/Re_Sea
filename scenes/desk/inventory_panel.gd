@@ -45,11 +45,17 @@ func _make_card(entry: CarriedItem) -> Control:
 	icon.size = Vector2(64, 64)
 	card.add_child(icon)
 
+	# Revision 2 §3: an item names itself only once the player has earned the
+	# name. Until then the card lists what can be observed, so choosing what to
+	# inspect is a judgement about properties rather than a look-up by label.
+	var known := entry.name_known()
 	var label := Label.new()
-	label.text = entry.data.display_name
+	label.text = entry.label()
 	label.position = Vector2(78, 8)
 	label.size = Vector2(116, 60)
-	label.add_theme_font_size_override("font_size", 14)
+	label.add_theme_font_size_override("font_size", 14 if known else 12)
+	if not known:
+		label.add_theme_color_override("font_color", Color(0.78, 0.84, 0.9))
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER

@@ -13,6 +13,7 @@ texture = ExtResource("3_la4a3")
 frames = ExtResource("1_d07k1")
 hotspot_overlay = ExtResource("2_la4a3")
 weight = 1.4
+surface_properties = Array[String](["logam", "terasa padat", "ada nozel"])
 visible_material = "kaleng baja"
 visible_label = "KOSONG?"
 true_material = "baja dengan sisa gas propelan"

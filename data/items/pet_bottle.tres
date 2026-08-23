@@ -13,6 +13,7 @@ texture = ExtResource("3_n6txb")
 frames = ExtResource("1_0vpyq")
 hotspot_overlay = ExtResource("2_n6txb")
 weight = 0.6
+surface_properties = Array[String](["tembus pandang", "lentur", "mengapung"])
 visible_material = "PET bening"
 visible_label = "AIR MINERAL"
 tag_text = "PET 1 - bening bersih"
