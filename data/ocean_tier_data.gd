@@ -8,9 +8,19 @@ class_name OceanTierData
 extends Resource
 
 @export var tier: int = 0
+## Shown in the shift HUD as "Laut: Buruk". Since revision 3 this is the ONLY
+## part of a tier the game renders - see the art note below.
+@export var display_name: String = ""
 ## Inclusive health range this tier covers. Tuning knob.
 @export var min_health: int = 0
 @export var max_health: int = 25
+
+# --- DEFERRED, NOT CANCELLED (revision 3 §2.3) ---
+# Nothing below is read by the game right now. Four sets of tier art is polish
+# on a system whose value is unproven, so the visual treatment waits until the
+# owner confirms that a rising meter feels rewarding. The fields stay here, and
+# stay filled, because they are the brief for the designers: four water tints,
+# four seabeds, two corals, one debris piece, and the counts each tier wants.
 
 ## Multiplied onto the water background and the seabed.
 @export var water_tint: Color = Color.WHITE

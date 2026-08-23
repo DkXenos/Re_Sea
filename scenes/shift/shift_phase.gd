@@ -17,6 +17,8 @@ const END_DELAY := 1.4
 @onready var _quota_label: Label = $BarLayer/Root/QuotaLabel
 @onready var _budget_label: Label = $BarLayer/Root/BudgetLabel
 @onready var _status: Label = $BarLayer/Root/Status
+@onready var _ocean_label: Label = $BarLayer/Root/OceanLabel
+@onready var _upgrade_label: Label = $BarLayer/Root/UpgradeLabel
 @onready var _switch_button: Button = $BarLayer/Root/SwitchButton
 @onready var _end_button: Button = $BarLayer/Root/EndButton
 
@@ -68,6 +70,23 @@ func _refresh_bar() -> void:
 		Game.budget_left, Game.budget_max]
 	# The tab button says where it goes, how much work is waiting there, and
 	# which key does it - strangers demoing this will not read a control list.
+	# Revision 3 §2.3: the ocean's state is a text label, not four sets of art.
+	# Revision 3 §4: the active upgrade and what it changed are on screen while
+	# playing, so its influence is legible in the shift rather than in a menu.
+	var tier := Game.current_tier()
+	_ocean_label.text = Strings.tf("ocean_label",
+		{"v": tier.display_name if tier != null else "?", "n": Game.ocean_health})
+	# The costs come from Game either way, so the label can never disagree with
+	# what the shift actually charges.
+	var costs := {"drop": Game.cost_of(&"drop"), "tool": Game.cost_of(&"tool"),
+		"sort": Game.cost_of(&"sort")}
+	var up := Game.upgrade()
+	if up == null:
+		_upgrade_label.text = Strings.tf("upgrade_none", costs)
+	else:
+		costs["v"] = up.display_name
+		_upgrade_label.text = Strings.tf("upgrade_active", costs)
+
 	var unsorted := Game.unsorted_items().size()
 	if _view == View.CLAW:
 		_switch_button.text = "%s (%d)  ·  TAB" % [Strings.t("shift_to_desk"), unsorted]

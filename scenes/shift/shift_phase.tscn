@@ -26,7 +26,7 @@ theme = ExtResource("5_theme")
 offset_left = -8.0
 offset_top = -12.0
 offset_right = 1288.0
-offset_bottom = 46.0
+offset_bottom = 74.0
 mouse_filter = 2
 texture = ExtResource("4_pd")
 patch_margin_left = 24
@@ -61,6 +61,20 @@ offset_top = 12.0
 offset_right = 752.0
 offset_bottom = 36.0
 theme_override_font_sizes/font_size = 13
+
+[node name="OceanLabel" type="Label" parent="BarLayer/Root"]
+offset_left = 20.0
+offset_top = 48.0
+offset_right = 420.0
+offset_bottom = 70.0
+theme_override_font_sizes/font_size = 14
+
+[node name="UpgradeLabel" type="Label" parent="BarLayer/Root"]
+offset_left = 430.0
+offset_top = 48.0
+offset_right = 1204.0
+offset_bottom = 70.0
+theme_override_font_sizes/font_size = 14
 
 [node name="SwitchButton" type="Button" parent="BarLayer/Root"]
 offset_left = 758.0

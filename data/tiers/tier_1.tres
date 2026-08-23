@@ -8,6 +8,7 @@
 [resource]
 script = ExtResource("1_script")
 tier = 1
+display_name = "Sedang"
 min_health = 26
 max_health = 50
 water_tint = Color(0.78, 0.86, 0.86, 1)

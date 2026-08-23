@@ -33,7 +33,12 @@ var run_seed: int = 0
 var rng := RandomNumberGenerator.new()
 var days: Array[DayData] = []
 var day_index: int = 0
-var ocean_health: int = 100
+## The run opens with the ocean already damaged. At 100 it started in the top
+## tier and a competent player never left it, so nothing the meter drives was
+## ever visible in normal play - which is what revision 3 exists to fix.
+## Tuning candidate.
+const STARTING_HEALTH := 35
+var ocean_health: int = STARTING_HEALTH
 
 # --- ocean recovery tiers (revision 2 §1) ---
 var tiers: Array[OceanTierData] = []
@@ -170,7 +175,7 @@ func start_run(seed_value: int = 0) -> void:
 	run_seed = seed_value if seed_value != 0 else int(Time.get_unix_time_from_system() * 1000.0) % 100000000
 	rng.seed = run_seed
 	day_index = 0
-	ocean_health = 100
+	ocean_health = STARTING_HEALTH
 	force_grip = 0
 	correct_by_category = {}
 	unlocked_blueprints = []

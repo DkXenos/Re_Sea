@@ -29,18 +29,18 @@ const BG_CAMERA_PARALLAX := 0.04
 ## that, searching becomes sweeping, which is boring. Tuning knob.
 @export var seabed_width: float = 2600.0
 
-## How fast the background fish drift. HOW MANY of them there are is not a knob
-## here any more: it comes from the ocean tier (revision 2 §1), because the
-## point of the tier is that a recovering ocean visibly has more life in it.
+## Fish density is an atmosphere knob, not a difficulty one - fish cannot be
+## grabbed and cost nothing. It came from the ocean tier in revision 2; revision
+## 3 deferred all tier ART, so it is a plain export again. When the designers
+## build the four tiers, this goes back to OceanTierData.fish_count.
+@export var fish_count: int = 9
 @export var fish_speed_min: float = 25.0
 @export var fish_speed_max: float = 65.0
 
 @onready var _tank_layer: CanvasLayer = $TankLayer
 @onready var _bg_layer: CanvasLayer = $BgLayer
 @onready var _glass_layer: CanvasLayer = $GlassLayer
-@onready var _water_bg: TextureRect = $BgLayer/WaterBg
 @onready var _seabed: Sprite2D = $TankLayer/TankContainer/TankViewport/TankWorld/Seabed
-@onready var _decor: Node2D = $TankLayer/TankContainer/TankViewport/TankWorld/Decor
 @onready var _items: Node2D = $TankLayer/TankContainer/TankViewport/TankWorld/Items
 @onready var _fish: Node2D = $TankLayer/TankContainer/TankViewport/TankWorld/FishHolder
 @onready var _claw: Node2D = $TankLayer/TankContainer/TankViewport/TankWorld/Claw
@@ -57,7 +57,6 @@ const BG_CAMERA_PARALLAX := 0.04
 @onready var _map_claw: TextureRect = $HudLayer/HudRoot/Minimap/ClawMark
 
 var _day: DayData
-var _tier: OceanTierData
 var _active: bool = true
 ## Items that have not drifted in yet.
 var _pending: Array[ItemData] = []
@@ -73,7 +72,6 @@ func _ready() -> void:
 		push_warning("Claw phase started with no day loaded")
 		return
 	_knob_home = _knob.position
-	_tier = Game.current_tier()
 	_setup_tank()
 	_claw.cycle_finished.connect(_on_cycle_finished)
 	_claw.drop_started.connect(_on_drop_started)
@@ -91,13 +89,11 @@ func _ready() -> void:
 	_toast.text = ""
 	_spawn_items()
 	_spawn_fish()
-	_spawn_decor()
 	_rebuild_bubbles(Game.vfx_intensity)
 
 
 ## Everything that depends on how wide the seabed is, in one place.
 func _setup_tank() -> void:
-	_apply_tier()
 	# One seabed PNG tiled across the width, rather than a 2600px asset the
 	# designers would have to redraw whenever the width is tuned.
 	_seabed.centered = false
@@ -118,44 +114,14 @@ func _setup_tank() -> void:
 	_camera.reset_smoothing()
 
 
-## The ocean tier is presentation and nothing else: a tint, a backdrop, and how
-## much life and rubbish is lying about. It is read once, here, when the shift
-## loads - Game only moves it at the day report, so the seabed never changes
-## under the player mid-shift.
-func _apply_tier() -> void:
-	if _tier == null:
-		return
-	_water_bg.modulate = _tier.water_tint
-	_seabed.modulate = _tier.water_tint
-	if _tier.seabed != null:
-		_seabed.texture = _tier.seabed
-
-
-## Coral and debris are AnimatedSprite2D like everything else that will ever
-## move: they play "idle" and nothing in code touches their transform.
-func _spawn_decor() -> void:
-	if _tier == null:
-		return
-	_scatter_decor(_tier.coral_frames, _tier.coral_count, Vector2(0.85, 1.15), 6.0)
-	_scatter_decor(_tier.debris_frames, _tier.debris_count, Vector2(0.7, 1.0), 22.0)
-
-
-func _scatter_decor(frames: SpriteFrames, count: int, scale_range: Vector2,
-		y_offset: float) -> void:
-	if frames == null:
-		return
-	var lane := (seabed_width - 200.0) / maxf(1.0, float(count))
-	for i in count:
-		var node := AnimatedSprite2D.new()
-		node.sprite_frames = frames
-		node.play(&"idle")
-		node.position = Vector2(
-			100.0 + lane * i + Game.rng.randf_range(0.0, lane * 0.6),
-			ITEM_REST_Y.y + y_offset)
-		node.scale = Vector2.ONE * Game.rng.randf_range(scale_range.x, scale_range.y)
-		node.modulate = _tier.water_tint
-		_decor.add_child(node)
-
+## The ocean tier drives one text label in the shift bar and nothing else.
+##
+## Revision 2 swapped the seabed, tinted the water and scattered coral per tier.
+## Revision 3 DEFERRED all of that: four sets of tier art is polish on a reward
+## loop whose value is still unproven, and the label proves the loop just as
+## well. The tier data is still filled in and still computed - see
+## data/ocean_tier_data.gd for what the designers eventually draw, and the
+## dormant Decor node below the seabed for where it hangs.
 
 ## The seabed opens partly stocked and fills up over the shift. Starting empty
 ## would mean waiting, and waiting is dead time; starting full would mean there
@@ -215,7 +181,6 @@ func _update_spawning(delta: float) -> void:
 
 
 func _spawn_fish() -> void:
-	var fish_count: int = _tier.fish_count if _tier != null else 0
 	for i in fish_count:
 		var node: Node2D = FISH_SCENE.instantiate()
 		_fish.add_child(node)
