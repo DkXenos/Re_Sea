@@ -134,6 +134,17 @@ const TABLE: Dictionary = {
 	"upgrade_take": "Ambil ini",
 	"upgrade_chosen": "Peningkatan dipilih: {v}",
 
+	# --- calibration puzzle (EXPERIMENTAL, revision 2 §5) ---
+	# Delete this block together with scenes/puzzle/. The step text and the
+	# failure lines live in that folder, so removing it removes the feature.
+	"puzzle_title": "URUTKAN LANGKAH MESIN",
+	"puzzle_hint": "Seret langkah ke urutan yang benar, lalu jalankan. Salah urutan tidak menghukum - coba lagi sebanyak yang kamu mau.",
+	"puzzle_run": "Jalankan",
+	"puzzle_skip": "Lewati",
+	"puzzle_continue": "Lanjut",
+	"puzzle_success": "Mesin berjalan benar. Kesehatan laut +{n}.",
+	"puzzle_wrong": "Urutannya belum tepat.",
+
 	# --- endings ---
 	"over_title": "LAUT MATI",
 	"over_body": "Kesehatan laut habis. Sampah menang kali ini.",

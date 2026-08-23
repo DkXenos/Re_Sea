@@ -85,7 +85,7 @@ the placeholder art and **no game content**.
 | 20 | glass overlay: reflection, bubbles, tint |
 | 30 | machine frame and console |
 | 50 | HUD, and the shift bar shared by both views |
-| 100 | modal panels: the rulebook |
+| 100 | modal panels: the rulebook, and the experimental calibration puzzle |
 | 200 | pause, settings, debug overlay |
 
 The desk's inventory and inspect panels are **view content, not modals**, so

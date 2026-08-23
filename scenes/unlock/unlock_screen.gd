@@ -7,6 +7,9 @@
 extends Node2D
 
 const CARD_BG := preload("res://assets/ui/panel_slot.png")
+## EXPERIMENTAL - revision 2 §5. Delete this line, the marked block in
+## _finish(), and scenes/puzzle/, and the feature is gone.
+const CALIBRATION_PUZZLE := preload("res://scenes/puzzle/calibration_puzzle.tscn")
 
 @onready var _title: Label = $UiLayer/Root/TitleLabel
 @onready var _name: Label = $UiLayer/Root/NameLabel
@@ -18,6 +21,7 @@ const CARD_BG := preload("res://assets/ui/panel_slot.png")
 @onready var _next: Button = $UiLayer/Root/NextButton
 
 var blueprint: BlueprintData = null
+var _puzzle_shown: bool = false
 
 
 func _ready() -> void:
@@ -122,4 +126,14 @@ func _unhandled_input(event: InputEvent) -> void:
 func _finish() -> void:
 	if _next.disabled:
 		return
+	# --- revision 2 §5 (EXPERIMENTAL), the only call site ---
+	if Game.feature_calibration_puzzle and blueprint != null and not _puzzle_shown:
+		_puzzle_shown = true
+		var puzzle: CanvasLayer = CALIBRATION_PUZZLE.instantiate()
+		if puzzle.setup(blueprint.id):
+			puzzle.finished.connect(_finish)
+			add_child(puzzle)
+			return
+		puzzle.free()
+	# --- end §5 ---
 	Events.phase_finished.emit()

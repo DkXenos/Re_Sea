@@ -82,6 +82,10 @@ var force_grip: int = 0 ## 1 = always succeed, -1 = always fail, 0 = roll
 ## is reported as a leaked stream. They switch this off; the game never does.
 var sfx_enabled: bool = true
 
+## EXPERIMENTAL - revision 2 §5, and the only flag it has. With this false the
+## game plays exactly as it would if scenes/puzzle/ did not exist.
+var feature_calibration_puzzle: bool = true
+
 var _sfx_players: Array[AudioStreamPlayer] = []
 var _sfx_cache: Dictionary = {}
 
