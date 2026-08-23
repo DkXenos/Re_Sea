@@ -1,0 +1,127 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scenes/after_day/after_day.gd" id="1_after"]
+[ext_resource type="Texture2D" path="res://assets/env/water_bg.png" id="2_bg"]
+[ext_resource type="Texture2D" path="res://assets/ui/panel_dark.png" id="3_pdark"]
+[ext_resource type="Theme" path="res://assets/ui/ui_theme.tres" id="4_theme"]
+
+[node name="AfterDay" type="Node2D"]
+script = ExtResource("1_after")
+
+[node name="BgLayer" type="CanvasLayer" parent="."]
+layer = 0
+
+[node name="Bg" type="TextureRect" parent="BgLayer"]
+offset_right = 1280.0
+offset_bottom = 720.0
+mouse_filter = 2
+texture = ExtResource("2_bg")
+expand_mode = 1
+
+[node name="UiLayer" type="CanvasLayer" parent="."]
+layer = 50
+
+[node name="Root" type="Control" parent="UiLayer"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+theme = ExtResource("4_theme")
+
+[node name="TitleLabel" type="Label" parent="UiLayer/Root"]
+offset_left = 24.0
+offset_top = 14.0
+offset_right = 700.0
+offset_bottom = 52.0
+theme_override_font_sizes/font_size = 24
+
+[node name="Tabs" type="HBoxContainer" parent="UiLayer/Root"]
+offset_left = 24.0
+offset_top = 60.0
+offset_right = 1000.0
+offset_bottom = 104.0
+theme_override_constants/separation = 10
+
+[node name="ResultTab" type="Button" parent="UiLayer/Root/Tabs"]
+custom_minimum_size = Vector2(240, 44)
+theme_override_font_sizes/font_size = 16
+
+[node name="TechTab" type="Button" parent="UiLayer/Root/Tabs"]
+custom_minimum_size = Vector2(240, 44)
+theme_override_font_sizes/font_size = 16
+
+[node name="GearTab" type="Button" parent="UiLayer/Root/Tabs"]
+custom_minimum_size = Vector2(240, 44)
+theme_override_font_sizes/font_size = 16
+
+[node name="PageBg" type="NinePatchRect" parent="UiLayer/Root"]
+offset_left = 20.0
+offset_top = 112.0
+offset_right = 1260.0
+offset_bottom = 634.0
+mouse_filter = 2
+texture = ExtResource("3_pdark")
+patch_margin_left = 24
+patch_margin_top = 24
+patch_margin_right = 24
+patch_margin_bottom = 24
+
+[node name="ResultPage" type="Control" parent="UiLayer/Root"]
+offset_left = 20.0
+offset_top = 112.0
+offset_right = 1260.0
+offset_bottom = 634.0
+mouse_filter = 2
+
+[node name="Table" type="Node2D" parent="UiLayer/Root/ResultPage"]
+position = Vector2(40, 26)
+
+[node name="Summary" type="Label" parent="UiLayer/Root/ResultPage"]
+offset_left = 36.0
+offset_top = 400.0
+offset_right = 636.0
+offset_bottom = 496.0
+theme_override_font_sizes/font_size = 16
+
+[node name="MistakesScroll" type="ScrollContainer" parent="UiLayer/Root/ResultPage"]
+offset_left = 660.0
+offset_top = 300.0
+offset_right = 1206.0
+offset_bottom = 500.0
+
+[node name="Mistakes" type="VBoxContainer" parent="UiLayer/Root/ResultPage/MistakesScroll"]
+custom_minimum_size = Vector2(536, 0)
+theme_override_constants/separation = 6
+
+[node name="TechPage" type="Control" parent="UiLayer/Root"]
+offset_left = 20.0
+offset_top = 112.0
+offset_right = 1260.0
+offset_bottom = 634.0
+mouse_filter = 2
+
+[node name="Rows" type="VBoxContainer" parent="UiLayer/Root/TechPage"]
+offset_left = 30.0
+offset_top = 26.0
+offset_right = 966.0
+offset_bottom = 490.0
+theme_override_constants/separation = 12
+
+[node name="GearPage" type="Control" parent="UiLayer/Root"]
+offset_left = 20.0
+offset_top = 112.0
+offset_right = 1260.0
+offset_bottom = 634.0
+mouse_filter = 2
+
+[node name="Rows" type="VBoxContainer" parent="UiLayer/Root/GearPage"]
+offset_left = 30.0
+offset_top = 26.0
+offset_right = 966.0
+offset_bottom = 490.0
+theme_override_constants/separation = 10
+
+[node name="NextButton" type="Button" parent="UiLayer/Root"]
+offset_left = 990.0
+offset_top = 648.0
+offset_right = 1260.0
+offset_bottom = 702.0

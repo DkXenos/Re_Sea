@@ -17,9 +17,7 @@ func _run() -> void:
 	game.start_run(31337)
 
 	assert(game.upgrades.size() >= 2, "expected at least two upgrades as data")
-	assert(game.upgrade() == null, "a run must start with no upgrade")
-	assert(not game.upgrade_choice_pending(),
-		"the choice must not be offered before a blueprint is finished")
+	assert(game.upgrade() == null, "a run must start with no upgrade fitted")
 
 	# Every upgrade has to give something AND take something. An upgrade that
 	# only makes things easier makes the last day flatter than the first.
@@ -31,20 +29,16 @@ func _run() -> void:
 		assert(cheaper and pays, "%s is not a trade-off" % up.id)
 		print("  %-16s benefit + cost, both present" % up.id)
 
-	# The choice appears once the first blueprint lands, and closes for good.
-	game.pending_unlocks.append(game.blueprints[0])
-	game.claim_unlock()
-	assert(game.upgrade_choice_pending(), "the choice must open with the first blueprint")
-	game.choose_upgrade(&"cakar_ringan")
-	assert(not game.upgrade_choice_pending(), "the choice must close once taken")
+	game.equip_upgrade(&"cakar_ringan")
 	assert(game.cost_of(&"drop") == 4, "cakar_ringan should drop for 4")
 	assert(is_equal_approx(game.grip_delta(), -0.15), "cakar_ringan should cost 15pp of grip")
 	assert(not game.coarse_readings(), "cakar_ringan must not affect tool readings")
 	print("  cakar_ringan: drop %d (base %d), grip %+.2f"
 		% [game.cost_of(&"drop"), game.base_cost(&"drop"), game.grip_delta()])
 
-	game.start_run(31337)
-	game.choose_upgrade(&"pemindai_kasar")
+	# Revision 3: swapping is free and reversible, not a once-per-run choice.
+	game.equip_upgrade(&"pemindai_kasar")
+	assert(game.equipped_upgrade == &"pemindai_kasar", "an upgrade must be swappable")
 	assert(game.cost_of(&"tool") == 2, "pemindai_kasar should probe for 2")
 	assert(game.base_cost(&"tool") == 4, "the full reading still costs the base 4")
 	assert(game.coarse_readings(), "pemindai_kasar must make readings coarse")
@@ -61,7 +55,7 @@ func _run() -> void:
 	# No currency anywhere: taking an upgrade never touches the shift budget.
 	var before: int = game.budget_left
 	game.start_run(31337)
-	game.choose_upgrade(&"cakar_ringan")
+	game.equip_upgrade(&"cakar_ringan")
 	assert(game.budget_left == game.budget_max,
 		"choosing an upgrade must not spend shift budget")
 	print("  no currency: budget untouched by the choice (%d/%d)"

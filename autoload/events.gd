@@ -28,6 +28,8 @@ signal vfx_intensity_changed(value: float)
 signal hotspots_visible_changed(value: bool)
 ## Blueprint material counts moved, or one was unlocked (revision 2 §2).
 signal blueprints_changed()
+## The fitted upgrade changed. Swappable between days since revision 3.
+signal upgrade_equipped(upgrade_id: StringName)
 signal toast_requested(text: String)
 
 # --- debug (F1 overlay) ---

@@ -84,8 +84,8 @@ func _check_blueprints() -> void:
 			"a perfect day must raise the meter (day %d)" % (day + 1))
 		if game.visual_tier > before_tier:
 			tier_rises += 1
-		while game.has_pending_unlock():
-			var bp: BlueprintData = game.claim_unlock()
+		for bp: BlueprintData in game.claimable_blueprints():
+			game.claim_blueprint(bp.id)
 			unlocked += 1
 			print("  day %d: unlocked %s (+%d) | health %d tier %d"
 				% [day + 1, bp.display_name, bp.health_gain, game.ocean_health,
@@ -101,10 +101,10 @@ func _check_blueprints() -> void:
 func _check_clamp() -> void:
 	game.start_run(7)
 	game.set_ocean_health(98)
-	for bp: BlueprintData in game.blueprints:
-		game.pending_unlocks.append(bp)
-	while game.has_pending_unlock():
-		game.claim_unlock()
+	for c in 4:
+		game.correct_by_category[c] = 99
+	for bp: BlueprintData in game.claimable_blueprints():
+		game.claim_blueprint(bp.id)
 	assert(game.ocean_health == 100, "health must clamp at 100, got %d" % game.ocean_health)
 	print("  three blueprint bonuses from 98 clamp at 100")
 

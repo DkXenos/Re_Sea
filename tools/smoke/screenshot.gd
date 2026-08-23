@@ -12,6 +12,7 @@ const SCENES := {
 	"cutscene": "res://scenes/cutscene/cutscene.tscn",
 	"day_start": "res://scenes/day_start/day_start.tscn",
 	"report": "res://scenes/report/day_report.tscn",
+	"after_day": "res://scenes/after_day/after_day.tscn",
 	"game_over": "res://scenes/game_over/game_over.tscn",
 }
 
@@ -52,8 +53,12 @@ func _run() -> void:
 	if key == "desk" or (key == "shift" and args.size() > 3 and args[3] in ["desk", "evidence"]):
 		for item in game.current_day().item_pool:
 			game.add_to_inventory(item)
-	if key == "report":
+	if key == "report" or key == "after_day":
 		_play_a_messy_day(game)
+	if key == "after_day":
+		# The after-day screen reads what the report worked out, so stand in
+		# for the report having run.
+		game.commit_day_result(game.end_day_breakdown())
 	var scene: Node = load(SCENES[key]).instantiate()
 	root.add_child(scene)
 	for i in 20:
@@ -77,6 +82,12 @@ func _run() -> void:
 		scene._toggle_view()
 		for i in 3:
 			await process_frame
+	if key == "after_day" and args.size() > 3:
+		var tabs := {"result": 0, "tech": 1, "gear": 2}
+		if tabs.has(args[3]):
+			scene._show_tab(int(tabs[args[3]]))
+			for i in 3:
+				await process_frame
 	if args.size() > 3 and args[3] == "rulebook":
 		scene.get_node("UiLayer/Root/RulebookPanel").toggle(true)
 		for i in 5:

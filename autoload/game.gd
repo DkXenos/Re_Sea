@@ -55,22 +55,24 @@ var blueprints: Array[BlueprintData] = []
 ## a sort was right until then, and a counter ticking up would leak the verdict.
 var correct_by_category: Dictionary = {}
 var unlocked_blueprints: Array[StringName] = []
-## Completed but not yet shown. The unlock screen drains this one at a time.
-var pending_unlocks: Array[BlueprintData] = []
 ## Set by a blueprint that pushes the art forward. -1 for none.
 var forced_tier: int = -1
 
 # --- upgrades (revision 2 §4) ---
 var upgrades: Array[UpgradeData] = []
-## The one upgrade taken this run. The others stay locked for the rest of it -
-## that single choice is the whole system. Not persisted: settings survive a
-## restart, run progress does not.
-var chosen_upgrade: StringName = &""
+## The upgrade currently fitted. Revision 3 made this swappable at the end of
+## every day rather than a once-per-run choice: the owner has to be able to try
+## all four inside one session. Locking it back down is a balancing decision for
+## later. Not persisted - settings survive a restart, run progress does not.
+var equipped_upgrade: StringName = &""
 
 # --- current day ---
 var inventory: Array[CarriedItem] = []
 var tools: Array[ToolData] = []
 var stats: Dictionary = {}
+## What the day report worked out, kept so the after-day screen can show the
+## same numbers without recomputing them against an already-committed meter.
+var last_breakdown: Dictionary = {}
 var budget_max: int = 0
 var budget_left: int = 0
 
@@ -179,9 +181,9 @@ func start_run(seed_value: int = 0) -> void:
 	force_grip = 0
 	correct_by_category = {}
 	unlocked_blueprints = []
-	pending_unlocks = []
 	forced_tier = -1
-	chosen_upgrade = &""
+	equipped_upgrade = &""
+	last_breakdown = {}
 	visual_tier = tier_for(ocean_health)
 	Events.ocean_health_changed.emit(ocean_health)
 	begin_day()
@@ -339,6 +341,7 @@ func end_day_breakdown() -> Dictionary:
 
 
 func commit_day_result(breakdown: Dictionary) -> void:
+	last_breakdown = breakdown
 	ocean_health = int(breakdown["health_after"])
 	Events.ocean_health_changed.emit(ocean_health)
 	_credit_blueprint_materials()
@@ -347,8 +350,9 @@ func commit_day_result(breakdown: Dictionary) -> void:
 
 # -------------------------------------------------------------- blueprints
 
-## Today's correct sorts join the run-wide totals, and anything that finishes as
-## a result queues its unlock screen. Called once, from the day report.
+## Today's correct sorts join the run-wide totals. Called once, from the day
+## report. Nothing is unlocked here: since revision 3 the player claims a
+## finished blueprint themselves, from the Teknologi tab.
 func _credit_blueprint_materials() -> void:
 	for entry: CarriedItem in inventory:
 		if entry.sorted_to == -1 or not entry.was_correct:
@@ -356,31 +360,36 @@ func _credit_blueprint_materials() -> void:
 		var category: int = entry.expected_category
 		correct_by_category[category] = int(correct_by_category.get(category, 0)) + 1
 	Events.blueprints_changed.emit()
+
+
+## Finished, and the player has not taken it yet.
+func blueprint_claimable(bp: BlueprintData) -> bool:
+	return not blueprint_unlocked(bp.id) and bp.is_complete(correct_by_category)
+
+
+func claimable_blueprints() -> Array[BlueprintData]:
+	var out: Array[BlueprintData] = []
 	for bp: BlueprintData in blueprints:
-		if bp.id in unlocked_blueprints or bp in pending_unlocks:
+		if blueprint_claimable(bp):
+			out.append(bp)
+	return out
+
+
+## The player pressing Klaim. The health gain lands here rather than inside the
+## day report's formula, so the report's arithmetic stays traceable term by
+## term.
+func claim_blueprint(blueprint_id: StringName) -> BlueprintData:
+	for bp: BlueprintData in blueprints:
+		if bp.id != blueprint_id or not blueprint_claimable(bp):
 			continue
-		if bp.is_complete(correct_by_category):
-			pending_unlocks.append(bp)
-
-
-func has_pending_unlock() -> bool:
-	return not pending_unlocks.is_empty()
-
-
-## Takes the next completed blueprint and applies it. The health gain lands
-## here rather than in the day report's formula, so the report's arithmetic
-## stays traceable term by term.
-func claim_unlock() -> BlueprintData:
-	if pending_unlocks.is_empty():
-		return null
-	var bp: BlueprintData = pending_unlocks.pop_front()
-	unlocked_blueprints.append(bp.id)
-	if bp.forces_tier >= 0:
-		forced_tier = maxi(forced_tier, bp.forces_tier)
-	set_ocean_health(ocean_health + bp.health_gain)
-	refresh_visual_tier()
-	Events.blueprints_changed.emit()
-	return bp
+		unlocked_blueprints.append(bp.id)
+		if bp.forces_tier >= 0:
+			forced_tier = maxi(forced_tier, bp.forces_tier)
+		set_ocean_health(ocean_health + bp.health_gain)
+		refresh_visual_tier()
+		Events.blueprints_changed.emit()
+		return bp
+	return null
 
 
 func blueprint_unlocked(blueprint_id: StringName) -> bool:
@@ -391,18 +400,22 @@ func blueprint_unlocked(blueprint_id: StringName) -> bool:
 
 func upgrade() -> UpgradeData:
 	for up: UpgradeData in upgrades:
-		if up.id == chosen_upgrade:
+		if up.id == equipped_upgrade:
 			return up
 	return null
 
 
-## The choice is offered once, on the unlock screen, after the first blueprint.
-func upgrade_choice_pending() -> bool:
-	return chosen_upgrade == &"" and not unlocked_blueprints.is_empty()
+## Availability is data, not a table here: an upgrade opens once the player has
+## claimed that many blueprints, so a fifth one slots in with a .tres.
+func upgrade_unlocked(up: UpgradeData) -> bool:
+	return unlocked_blueprints.size() >= up.unlock_after_blueprints
 
 
-func choose_upgrade(upgrade_id: StringName) -> void:
-	chosen_upgrade = upgrade_id
+## Fitting an upgrade, or taking it off again by passing the one already on.
+## Never costs anything: there is no currency in this game.
+func equip_upgrade(upgrade_id: StringName) -> void:
+	equipped_upgrade = &"" if upgrade_id == equipped_upgrade else upgrade_id
+	Events.upgrade_equipped.emit(equipped_upgrade)
 	Events.budget_changed.emit(budget_left, budget_max)
 
 

@@ -23,4 +23,11 @@ extends Resource
 ## needs a second use at the normal cost.
 @export var coarse_readings: bool = false
 
+## How many blueprints must be claimed before this is available. 0 means it is
+## on the table from day 1 - two of the four are, deliberately, so the system is
+## testable immediately.
+@export var unlock_after_blueprints: int = 0
+## Shown on a locked upgrade so the player knows what opens it.
+@export var unlock_text: String = ""
+
 @export var sort_order: int = 0

@@ -10,13 +10,13 @@ const SCENES: Dictionary = {
 	&"day_start": "res://scenes/day_start/day_start.tscn",
 	&"shift": "res://scenes/shift/shift_phase.tscn",
 	&"report": "res://scenes/report/day_report.tscn",
-	&"unlock": "res://scenes/unlock/unlock_screen.tscn",
+	&"after_day": "res://scenes/after_day/after_day.tscn",
 	&"game_over": "res://scenes/game_over/game_over.tscn",
 }
 
 ## Pausing only makes sense inside a run; on the menu and in the cutscene Esc
 ## already means something else.
-const PAUSABLE_KEYS: Array[StringName] = [&"day_start", &"shift", &"report", &"unlock"]
+const PAUSABLE_KEYS: Array[StringName] = [&"day_start", &"shift", &"report", &"after_day"]
 
 @onready var _holder: Node = $SceneHolder
 @onready var _pause: Control = $PauseLayer/PauseOverlay

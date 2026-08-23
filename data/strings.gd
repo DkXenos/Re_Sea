@@ -65,7 +65,6 @@ const TABLE: Dictionary = {
 	"tools_locked": "Alat belum tersedia hari ini",
 	"tools_armed": "{tool} siap - klik pada barang",
 	"evidence_title": "CATATAN BUKTI",
-	"reveal_success": "Ditemukan sesuatu!",
 	"reveal_nothing": "Bersih di titik ini - tidak ada yang bisa dibaca.",
 	"inspect_found": "Ditemukan: {v}   (waktu shift -{n})",
 	"inspect_coarse": "Ada sesuatu di titik ini, tapi belum terbaca. Pakai alat sekali lagi untuk membacanya. (waktu shift -{n})",
@@ -122,20 +121,28 @@ const TABLE: Dictionary = {
 	"report_next": "Hari Berikutnya",
 	"report_perfect": "Tidak ada kesalahan. Kerja bagus.",
 
+	# --- after-day screen (revision 3) ---
+	"after_title": "HARI {n} SELESAI",
+	"after_tab_result": "Hasil Hari Ini",
+	"after_tab_tech": "Teknologi",
+	"after_tab_gear": "Peralatan",
+	"after_next_day": "Mulai Hari Berikutnya",
+	"after_last_day": "Selesaikan Shift Terakhir",
+	"after_sorted": "Pilah benar {ok}  ·  salah {bad}  ·  belum dipilah {left}",
+	"after_budget": "Waktu shift terpakai {spent} dari {max}, sisa {left}",
+	"after_health": "Kesehatan laut {before} -> {after}   (Laut: {tier})",
+
 	# --- blueprints (revision 2) ---
 	"blueprint_requires": "Butuh: {v}",
 	"blueprint_done": "SELESAI",
-	"blueprint_unlocked_title": "TEKNOLOGI BARU SELESAI DIBANGUN",
-	"blueprint_health_gain": "Kesehatan laut +{n}",
-	"blueprint_continue": "Lanjut",
+	"blueprint_claim": "Klaim  (+{n})",
 
 	# --- upgrades (revision 2) ---
-	"upgrade_choose_title": "PILIH SATU PENINGKATAN",
-	"upgrade_choose_hint": "Hanya satu yang bisa dipakai. Yang lain terkunci sampai permainan ini selesai.",
+	"upgrade_equip": "Pakai",
+	"upgrade_equipped": "Terpasang",
+	"upgrade_locked": "Terkunci",
 	"upgrade_benefit": "+ {v}",
 	"upgrade_cost": "- {v}",
-	"upgrade_take": "Ambil ini",
-	"upgrade_chosen": "Peningkatan dipilih: {v}",
 
 	# --- calibration puzzle (EXPERIMENTAL, revision 2 §5) ---
 	# Delete this block together with scenes/puzzle/. The step text and the

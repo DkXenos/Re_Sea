@@ -10,6 +10,8 @@ var verbose := false
 ## 0 means "let the game pick one". A fixed seed makes two runs comparable,
 ## which is how the calibration puzzle is proved to be optional (revision 2 §6).
 var fixed_seed := 0
+## "" leaves the claw unmodified; "first" fits whatever is available.
+var upgrade_choice := "first"
 
 
 func _init() -> void:
@@ -41,6 +43,8 @@ func _run() -> void:
 	game.sfx_enabled = false  # see Game.sfx_enabled
 	if "--no-puzzle" in args:
 		game.feature_calibration_puzzle = false
+	if "--no-upgrade" in args:
+		upgrade_choice = ""
 	main = load("res://main.tscn").instantiate()
 	root.add_child(main)
 	await process_frame
@@ -77,18 +81,11 @@ func _run() -> void:
 						+ "shortfall -%d, clean +%d, delta %+d"
 						% [b["shortfall"], b["clean_bonus"], b["delta"]])
 				scene.get_node("UiLayer/Root/NextButton").pressed.emit()
-			"UnlockScreen":
-				# Revision 2 §4: the first blueprint also offers the one upgrade
-				# choice of the run, and the Continue button stays disabled until
-				# the player has made it.
-				var choice: Control = scene.get_node("UiLayer/Root/UpgradeChoice")
-				if choice.visible and game.chosen_upgrade == &"":
-					_take_first_upgrade(scene)
-				# Revision 2 §2: a blueprint that completed at the report gets
-				# its own screen before the next day starts.
-				print("     unlocked %s | health=%d tier=%d" % [scene.blueprint.display_name
-					if scene.blueprint != null else "?", game.ocean_health, game.visual_tier])
-				scene.get_node("UiLayer/Root/NextButton").pressed.emit()
+			"AfterDay":
+				# Revision 3 §3: this screen is entered every day, so the
+				# harness works it the way a player would - claim anything
+				# finished, keep an upgrade fitted, then move on.
+				_drive_after_day(scene)
 			"GameOver":
 				print("reached ending: health=%d title=%s" % [game.ocean_health,
 					scene.get_node("UiLayer/Root/TitleLabel").text])
@@ -103,14 +100,29 @@ func _run() -> void:
 	quit()
 
 
-## Takes the leftmost upgrade card. Which one matters less than that the choice
-## is made at all: the Continue button is disabled until it is.
-func _take_first_upgrade(scene: Node) -> void:
-	for card: Control in scene.get_node("UiLayer/Root/UpgradeChoice/Cards").get_children():
-		for child: Node in card.get_children():
-			if child is Button:
+## Claims every finished blueprint and keeps the first available upgrade
+## fitted, then continues. Driving the real buttons rather than calling Game
+## directly is the point: revision 2's tier check passed while never firing in
+## a real run, because it set state by hand (rev 3 §6).
+func _drive_after_day(scene: Node) -> void:
+	# A claimed blueprint may open the calibration puzzle over this screen.
+	# Skipping it is what a player who does not want it would do.
+	for child: Node in scene.get_children():
+		if child is CanvasLayer and child.has_method("_close"):
+			child._close()
+			return
+	for row: Control in scene.get_node("UiLayer/Root/TechPage/Rows").get_children():
+		for child: Node in row.get_children():
+			if child is Button and not (child as Button).disabled:
 				(child as Button).pressed.emit()
 				return
+	if game.equipped_upgrade == &"" and upgrade_choice != "":
+		for row: Control in scene.get_node("UiLayer/Root/GearPage/Rows").get_children():
+			for child: Node in row.get_children():
+				if child is Button and not (child as Button).disabled:
+					(child as Button).pressed.emit()
+					return
+	scene.get_node("UiLayer/Root/NextButton").pressed.emit()
 
 
 ## Works the shift the way a player would: stay at the tank while there is
