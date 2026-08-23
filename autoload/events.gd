@@ -26,6 +26,8 @@ signal ocean_health_changed(value: int)
 signal sfx_requested(sfx_name: StringName)
 signal vfx_intensity_changed(value: float)
 signal hotspots_visible_changed(value: bool)
+## Blueprint material counts moved, or one was unlocked (revision 2 §2).
+signal blueprints_changed()
 signal toast_requested(text: String)
 
 # --- debug (F1 overlay) ---

@@ -5,6 +5,7 @@
 [ext_resource type="Script" path="res://scenes/desk/inspect_panel.gd" id="3_insp"]
 [ext_resource type="Script" path="res://scenes/desk/bin_row.gd" id="4_bins"]
 [ext_resource type="Script" path="res://scenes/desk/rulebook_panel.gd" id="5_rule"]
+[ext_resource type="Script" path="res://scenes/desk/blueprint_panel.gd" id="9_bp"]
 [ext_resource type="Texture2D" path="res://assets/env/water_bg.png" id="6_bg"]
 [ext_resource type="Texture2D" path="res://assets/ui/panel_dark.png" id="7_pdark"]
 [ext_resource type="Theme" path="res://assets/ui/ui_theme.tres" id="8_theme"]
@@ -36,6 +37,19 @@ offset_left = 1022.0
 offset_top = 52.0
 offset_right = 1264.0
 offset_bottom = 88.0
+
+[node name="BlueprintPanel" type="Control" parent="UiLayer/Root"]
+offset_left = 260.0
+offset_top = 52.0
+offset_right = 1010.0
+offset_bottom = 90.0
+mouse_filter = 2
+script = ExtResource("9_bp")
+
+[node name="Rows" type="HBoxContainer" parent="UiLayer/Root/BlueprintPanel"]
+offset_right = 750.0
+offset_bottom = 38.0
+theme_override_constants/separation = 8
 
 [node name="InventoryBg" type="NinePatchRect" parent="UiLayer/Root"]
 offset_left = 16.0

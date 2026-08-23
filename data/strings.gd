@@ -117,6 +117,13 @@ const TABLE: Dictionary = {
 	"report_next": "Hari Berikutnya",
 	"report_perfect": "Tidak ada kesalahan. Kerja bagus.",
 
+	# --- blueprints (revision 2) ---
+	"blueprint_requires": "Butuh: {v}",
+	"blueprint_done": "SELESAI",
+	"blueprint_unlocked_title": "TEKNOLOGI BARU SELESAI DIBANGUN",
+	"blueprint_health_gain": "Kesehatan laut +{n}",
+	"blueprint_continue": "Lanjut",
+
 	# --- endings ---
 	"over_title": "LAUT MATI",
 	"over_body": "Kesehatan laut habis. Sampah menang kali ini.",

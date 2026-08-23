@@ -66,6 +66,12 @@ func _run() -> void:
 						+ "shortfall -%d, clean +%d, delta %+d"
 						% [b["shortfall"], b["clean_bonus"], b["delta"]])
 				scene.get_node("UiLayer/Root/NextButton").pressed.emit()
+			"UnlockScreen":
+				# Revision 2 §2: a blueprint that completed at the report gets
+				# its own screen before the next day starts.
+				print("     unlocked %s | health=%d tier=%d" % [scene.blueprint.display_name
+					if scene.blueprint != null else "?", game.ocean_health, game.visual_tier])
+				scene.get_node("UiLayer/Root/NextButton").pressed.emit()
 			"GameOver":
 				print("reached ending: health=%d title=%s" % [game.ocean_health,
 					scene.get_node("UiLayer/Root/TitleLabel").text])

@@ -5,6 +5,7 @@ extends Node
 
 const DAY_DIR := "res://data/days/"
 const TIER_DIR := "res://data/tiers/"
+const BLUEPRINT_DIR := "res://data/blueprints/"
 const SFX_DIR := "res://assets/audio/"
 const SFX_POOL_SIZE := 6
 ## Paid once for a day with no mis-sorts that also met quota. Tuning candidate.
@@ -41,6 +42,18 @@ var tiers: Array[OceanTierData] = []
 ## one that flickers.
 var visual_tier: int = 3
 
+# --- technology blueprints (revision 2 §2) ---
+var blueprints: Array[BlueprintData] = []
+## ItemData.Category -> correctly sorted items of it, across the WHOLE run.
+## Credited at the day report, never mid-shift: the player is not told whether
+## a sort was right until then, and a counter ticking up would leak the verdict.
+var correct_by_category: Dictionary = {}
+var unlocked_blueprints: Array[StringName] = []
+## Completed but not yet shown. The unlock screen drains this one at a time.
+var pending_unlocks: Array[BlueprintData] = []
+## Set by a blueprint that pushes the art forward. -1 for none.
+var forced_tier: int = -1
+
 # --- current day ---
 var inventory: Array[CarriedItem] = []
 var tools: Array[ToolData] = []
@@ -76,6 +89,7 @@ func _ready() -> void:
 	_load_days()
 	_load_tools()
 	_load_tiers()
+	_load_blueprints()
 	Events.sfx_requested.connect(play_sfx)
 	Events.debug_command.connect(_on_debug_command)
 
@@ -98,6 +112,12 @@ func _load_tiers() -> void:
 	tiers.assign(_load_dir(TIER_DIR))
 	tiers.sort_custom(func(a: OceanTierData, b: OceanTierData) -> bool:
 		return a.min_health < b.min_health)
+
+
+func _load_blueprints() -> void:
+	blueprints.assign(_load_dir(BLUEPRINT_DIR))
+	blueprints.sort_custom(func(a: BlueprintData, b: BlueprintData) -> bool:
+		return a.sort_order < b.sort_order)
 
 
 ## Shared by every content directory: sorted, .remap-aware, silent if missing.
@@ -133,6 +153,10 @@ func start_run(seed_value: int = 0) -> void:
 	day_index = 0
 	ocean_health = 100
 	force_grip = 0
+	correct_by_category = {}
+	unlocked_blueprints = []
+	pending_unlocks = []
+	forced_tier = -1
 	visual_tier = tier_for(ocean_health)
 	Events.ocean_health_changed.emit(ocean_health)
 	begin_day()
@@ -273,7 +297,50 @@ func end_day_breakdown() -> Dictionary:
 func commit_day_result(breakdown: Dictionary) -> void:
 	ocean_health = int(breakdown["health_after"])
 	Events.ocean_health_changed.emit(ocean_health)
+	_credit_blueprint_materials()
 	refresh_visual_tier()
+
+
+# -------------------------------------------------------------- blueprints
+
+## Today's correct sorts join the run-wide totals, and anything that finishes as
+## a result queues its unlock screen. Called once, from the day report.
+func _credit_blueprint_materials() -> void:
+	for entry: CarriedItem in inventory:
+		if entry.sorted_to == -1 or not entry.was_correct:
+			continue
+		var category: int = entry.expected_category
+		correct_by_category[category] = int(correct_by_category.get(category, 0)) + 1
+	Events.blueprints_changed.emit()
+	for bp: BlueprintData in blueprints:
+		if bp.id in unlocked_blueprints or bp in pending_unlocks:
+			continue
+		if bp.is_complete(correct_by_category):
+			pending_unlocks.append(bp)
+
+
+func has_pending_unlock() -> bool:
+	return not pending_unlocks.is_empty()
+
+
+## Takes the next completed blueprint and applies it. The health gain lands
+## here rather than in the day report's formula, so the report's arithmetic
+## stays traceable term by term.
+func claim_unlock() -> BlueprintData:
+	if pending_unlocks.is_empty():
+		return null
+	var bp: BlueprintData = pending_unlocks.pop_front()
+	unlocked_blueprints.append(bp.id)
+	if bp.forces_tier >= 0:
+		forced_tier = maxi(forced_tier, bp.forces_tier)
+	set_ocean_health(ocean_health + bp.health_gain)
+	refresh_visual_tier()
+	Events.blueprints_changed.emit()
+	return bp
+
+
+func blueprint_unlocked(blueprint_id: StringName) -> bool:
+	return blueprint_id in unlocked_blueprints
 
 
 # ------------------------------------------------------------- ocean tiers
@@ -301,9 +368,16 @@ func current_tier() -> OceanTierData:
 
 ## Called only at the day report and at the start of a run. Returns the tier the
 ## art moved to, or -1 if nothing changed, so the report can say one quiet line.
+## A blueprint can push the art forward, but only "if health allows": the
+## forced tier is ignored while the ocean has fallen below the tier under it,
+## because showing a healed reef over a dying ocean would be a lie.
 func refresh_visual_tier() -> int:
 	var was := visual_tier
 	visual_tier = tier_for(ocean_health)
+	if forced_tier >= 0 and visual_tier < forced_tier:
+		var below := tier_data(forced_tier - 1)
+		if below == null or ocean_health >= below.min_health:
+			visual_tier = forced_tier
 	return visual_tier if visual_tier != was else -1
 
 
