@@ -18,8 +18,6 @@ visible_material = "logam dan plastik tebal"
 visible_label = "AWAS ASAM"
 true_material = "timbal dan asam sulfat"
 tag_text = "Pb - AWAS ASAM"
-revealed_by_magnifier = true
-revealed_by_cutter = true
 hotspots = Array[Dictionary]([{
 "pos": Vector2(0.7, 0.25),
 "radius": 0.14,

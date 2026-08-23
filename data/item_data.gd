@@ -37,11 +37,9 @@ enum Category { ORGANIC, RECYCLABLE, HAZARD, LANDFILL }
 @export var is_multilayer: bool = false
 @export var tag_text: String = "" ## care label / recycling code
 
-# Which tool reveals which field
-@export var revealed_by_rinse: bool = false
-@export var revealed_by_swab: bool = false
-@export var revealed_by_magnifier: bool = false
-@export var revealed_by_cutter: bool = false
+# Which tool reveals which field is NOT a set of booleans here: it is the
+# "tool" key on each hotspot below. One source of truth, and a fifth tool needs
+# no field and no code (rev 3 §1.6).
 
 ## Normalized hotspots on the texture. Using a tool anywhere else spends the
 ## charge and reveals nothing - that risk is the point of the whole design.
@@ -60,14 +58,12 @@ func surface_label() -> String:
 	return "  ·  ".join(surface_properties)
 
 
-## True if this tool can ever learn anything here (used only for reporting,
-## never to block a click).
+## True if this tool has anywhere to look on this item. Read from the hotspots
+## rather than from a per-tool field, so adding a tool is still zero code.
 func tool_can_reveal(tool_id: StringName) -> bool:
-	match tool_id:
-		&"rinse": return revealed_by_rinse
-		&"swab": return revealed_by_swab
-		&"magnifier": return revealed_by_magnifier
-		&"cutter": return revealed_by_cutter
+	for spot: Dictionary in hotspots:
+		if StringName(spot["tool"]) == tool_id:
+			return true
 	return false
 
 func get_field_text(field: String) -> String:

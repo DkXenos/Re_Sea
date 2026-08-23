@@ -30,7 +30,6 @@ func _run() -> void:
 	item.visible_label = "UJI"
 	item.true_material = "kaca berlapis plastik"
 	item.is_multilayer = true
-	item.revealed_by_cutter = true
 	item.correct_category = ItemData.Category.RECYCLABLE
 	item.source_batch = &"uji_coba"
 	var spots: Array[Dictionary] = [{

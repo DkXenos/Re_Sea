@@ -21,9 +21,6 @@ residue_type = "kopi"
 true_material = "kertas berlapis PE"
 is_multilayer = true
 tag_text = "PAP 22 - lapisan PE"
-revealed_by_rinse = true
-revealed_by_magnifier = true
-revealed_by_cutter = true
 hotspots = Array[Dictionary]([{
 "pos": Vector2(0.5, 0.7),
 "radius": 0.14,

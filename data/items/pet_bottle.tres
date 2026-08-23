@@ -17,8 +17,6 @@ surface_properties = Array[String](["tembus pandang", "lentur", "mengapung"])
 visible_material = "PET bening"
 visible_label = "AIR MINERAL"
 tag_text = "PET 1 - bening bersih"
-revealed_by_rinse = true
-revealed_by_magnifier = true
 hotspots = Array[Dictionary]([{
 "pos": Vector2(0.32, 0.68),
 "radius": 0.14,

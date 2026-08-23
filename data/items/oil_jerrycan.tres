@@ -20,9 +20,6 @@ has_residue = true
 residue_type = "oli mesin"
 true_material = "HDPE"
 tag_text = "HDPE 2"
-revealed_by_rinse = true
-revealed_by_swab = true
-revealed_by_magnifier = true
 hotspots = Array[Dictionary]([{
 "pos": Vector2(0.38, 0.7),
 "radius": 0.14,

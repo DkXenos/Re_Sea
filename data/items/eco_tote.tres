@@ -19,8 +19,6 @@ visible_label = "RAMAH LINGKUNGAN"
 true_material = "katun berlapis PVC"
 is_multilayer = true
 tag_text = "60% katun / 40% PVC"
-revealed_by_magnifier = true
-revealed_by_cutter = true
 hotspots = Array[Dictionary]([{
 "pos": Vector2(0.62, 0.68),
 "radius": 0.14,

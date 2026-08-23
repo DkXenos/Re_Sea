@@ -16,7 +16,6 @@ weight = 0.4
 surface_properties = Array[String](["sangat ringan", "berbusa", "mengapung"])
 visible_material = "styrofoam"
 tag_text = "PS 6 - tidak didaur ulang"
-revealed_by_magnifier = true
 hotspots = Array[Dictionary]([{
 "pos": Vector2(0.55, 0.6),
 "radius": 0.14,

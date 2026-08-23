@@ -5,6 +5,8 @@ extends Control
 signal item_selected(entry: CarriedItem)
 
 const SLOT_BG := preload("res://assets/ui/panel_slot.png")
+## Selection is a different PNG, not a tint on the plain one (rev 3 §1.4).
+const SLOT_BG_SELECTED := preload("res://assets/ui/panel_slot_selected.png")
 
 @onready var _grid: GridContainer = $Scroll/Grid
 @onready var _title: Label = $Title
@@ -72,7 +74,7 @@ func _make_card(entry: CarriedItem) -> Control:
 	card.add_child(button)
 
 	if entry == _selected:
-		bg.modulate = Color(1.4, 1.4, 1.1)
+		bg.texture = SLOT_BG_SELECTED
 	return card
 
 

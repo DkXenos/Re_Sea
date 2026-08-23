@@ -19,8 +19,6 @@ visible_label = "SODA"
 has_residue = true
 residue_type = "sisa minuman manis"
 tag_text = "ALU - kaleng minuman"
-revealed_by_rinse = true
-revealed_by_magnifier = true
 hotspots = Array[Dictionary]([{
 "pos": Vector2(0.5, 0.72),
 "radius": 0.14,

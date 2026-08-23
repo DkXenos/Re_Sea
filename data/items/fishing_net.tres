@@ -18,8 +18,6 @@ visible_material = "nilon"
 true_material = "nilon dengan serat baja"
 is_multilayer = true
 tag_text = "PA 6 - inti berserat"
-revealed_by_magnifier = true
-revealed_by_cutter = true
 hotspots = Array[Dictionary]([{
 "pos": Vector2(0.6, 0.35),
 "radius": 0.14,

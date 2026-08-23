@@ -18,9 +18,6 @@ visible_material = "kaca"
 has_residue = true
 residue_type = "sisa obat kadaluarsa"
 tag_text = "GL 70 - kaca campur"
-revealed_by_rinse = true
-revealed_by_swab = true
-revealed_by_magnifier = true
 hotspots = Array[Dictionary]([{
 "pos": Vector2(0.5, 0.62),
 "radius": 0.14,

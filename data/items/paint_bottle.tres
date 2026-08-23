@@ -19,9 +19,6 @@ visible_label = "PET 1"
 has_residue = true
 residue_type = "cat berbasis pelarut"
 tag_text = "PET 1"
-revealed_by_rinse = true
-revealed_by_swab = true
-revealed_by_magnifier = true
 hotspots = Array[Dictionary]([{
 "pos": Vector2(0.45, 0.72),
 "radius": 0.14,

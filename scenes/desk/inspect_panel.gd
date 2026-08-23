@@ -23,10 +23,12 @@ signal reveal_happened(field: String, hit: bool)
 ## The bin the revealed evidence currently points at, or -1 for none.
 signal bin_hint_changed(category: int)
 
+## The one place in the game a sprite is not shown at scale 1. Named here, in
+## one file, and quoted in ASSETS.md so a designer knows an item is read at
+## 160 x 1.8 = 288 px in this panel (rev 3 §1.5).
 const BASE_SCALE := 1.8
 const MIN_ZOOM := 1.0
 const MAX_ZOOM := 3.0
-const ITEM_SIZE := 160.0
 const CHIP_SURFACE := preload("res://assets/ui/chip_surface.png")
 const CHIP_REVEAL := preload("res://assets/ui/chip_reveal.png")
 const CHIP_MATCH := preload("res://assets/ui/chip_match.png")
@@ -134,9 +136,14 @@ func _refresh_rack() -> void:
 			button.tooltip_text = Strings.t("budget_too_low")
 		else:
 			button.tooltip_text = Strings.tf("tools_cost_label", {"n": Game.cost_of(&"tool")})
+		# A locked tool is a different drawing, never a dimmed one - code must
+		# not express state by tinting designer art (rev 3 §1.4). The labels
+		# beside it are UI text and may fade.
 		var sprite: AnimatedSprite2D = parts["sprite"]
-		sprite.play(&"using" if _armed == tool_id else &"idle")
-		sprite.modulate.a = 1.0 if usable else 0.35
+		if not usable:
+			sprite.play(&"locked")
+		else:
+			sprite.play(&"using" if _armed == tool_id else &"idle")
 		parts["label"].modulate.a = 1.0 if unlocked else 0.35
 		parts["cost"].modulate.a = 1.0 if usable else 0.35
 
@@ -204,9 +211,17 @@ func _question_for(target: CarriedItem) -> String:
 	return Strings.tf("inspect_question", {"mat": target.data.visible_material})
 
 
+## Never assumes how big an item PNG is: a designer may deliver 256 or 512 and
+## the panel has to keep working (rev 3 §1.5).
+func _item_span() -> float:
+	if _item_sprite.texture == null:
+		return 0.0
+	return float(_item_sprite.texture.get_width())
+
+
 func _apply_transform() -> void:
 	var view_size := Vector2(_view.size)
-	var span := ITEM_SIZE * BASE_SCALE * _zoom
+	var span := _item_span() * BASE_SCALE * _zoom
 	var slack := maxf(0.0, (span - view_size.x) * 0.5)
 	_pan = _pan.clamp(Vector2(-slack, -slack), Vector2(slack, slack))
 	_item_root.position = view_size * 0.5 + _pan
@@ -242,7 +257,9 @@ func _on_surface_input(event: InputEvent) -> void:
 ## which is the space hotspots are authored in. Zooming therefore never moves a
 ## hotspot relative to the artwork.
 func _to_normalized(point: Vector2) -> Vector2:
-	var span := ITEM_SIZE * BASE_SCALE * _zoom
+	var span := _item_span() * BASE_SCALE * _zoom
+	if span <= 0.0:
+		return Vector2(-1.0, -1.0)
 	var origin := Vector2(_view.size) * 0.5 + _pan
 	return (point - origin) / span + Vector2(0.5, 0.5)
 

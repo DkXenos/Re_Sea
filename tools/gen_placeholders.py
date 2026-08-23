@@ -182,9 +182,15 @@ def gen_bins():
 def gen_tools():
     W = H = 96
     for t in C.TOOL_ART:
-        for state in ("idle", "using"):
+        for state in ("idle", "using", "locked"):
             img, d = canvas(W, H)
-            col = t["color"] if state == "idle" else shade(t["color"], 1.3)
+            col = t["color"]
+            if state == "using":
+                col = shade(t["color"], 1.3)
+            elif state == "locked":
+                # A locked tool is its own drawing, not a dimmed one. Code must
+                # never express state by tinting designer art (rev 3 §1.4).
+                col = (96, 100, 108)
             if t["id"] == "rinse":
                 outlined(d, "rounded_rectangle", [26, 16, 62, 58], col, radius=8)
                 for i in range(3):
@@ -198,7 +204,7 @@ def gen_tools():
             else:
                 outlined(d, "polygon", [(20, 74), (58, 22), (76, 34), (36, 84)], col)
                 d.line([(20, 74), (36, 84)], fill=shade(col, 0.4), width=6)
-            save(img, "tools/tool_%s%s.png" % (t["id"], "" if state == "idle" else "_using"),
+            save(img, "tools/tool_%s%s.png" % (t["id"], "" if state == "idle" else "_" + state),
                  "%s tool, %s" % (t["name"], state))
 
 
@@ -213,6 +219,8 @@ def gen_ui():
     panel("panel_main", (26, 48, 66, 235), (86, 140, 170, 255), desc="Main UI panel.")
     panel("panel_dark", (12, 22, 34, 245), (58, 96, 124, 255), desc="Modal / overlay panel.")
     panel("panel_slot", (20, 38, 54, 220), (70, 112, 140, 255), desc="Inventory slot background.")
+    panel("panel_slot_selected", (34, 68, 92, 235), (150, 210, 240, 255),
+          desc="Inventory slot, selected. A different PNG rather than a tint.")
     panel("chip_surface", (54, 62, 72, 240), (120, 130, 142, 255), 64, 40, 12,
           desc="Evidence chip, free surface info (grey).")
     panel("chip_reveal", (78, 62, 20, 240), (240, 200, 84, 255), 64, 40, 12,
@@ -428,7 +436,8 @@ def gen_frames():
     for t in C.TOOL_ART:
         write_frames("tool_%s_frames" % t["id"], [
             ("idle", ["tools/tool_%s.png" % t["id"]], 2),
-            ("using", ["tools/tool_%s_using.png" % t["id"]], 4)], 8.0)
+            ("using", ["tools/tool_%s_using.png" % t["id"]], 4),
+            ("locked", ["tools/tool_%s_locked.png" % t["id"]], 1)], 8.0)
         n += 1
     write_frames("bubble_frames", [("rise", ["env/bubble.png"], 6)], 6.0)
     n += 1
@@ -445,7 +454,10 @@ For the designers. **Every visual in the game is one PNG from this list.** The
 code never draws a shape and never uses a `ColorRect` — if you can see it on
 screen, it came from a file below.
 
-## How to replace an asset
+## The replacement rule
+
+**Same path, same pixel size, flat art, no baked lighting.** That is the whole
+contract. Everything below expands on it.
 
 1. Drop your PNG at **exactly the same path** with **exactly the same pixel
    size** as the table says. Nothing else needs to change — no code, no scenes.
@@ -453,6 +465,22 @@ screen, it came from a file below.
    out; only the `env/` backgrounds are opaque.
 3. Keep the art inside the stated canvas. The anchor point is the centre of the
    canvas for everything except `ui/` panels, which stretch from their corners.
+4. **Do not bake lighting, shadows or glow into the art.** Lighting and shaders
+   are a later pass by the owner, applied per `CanvasLayer` and to the tank's
+   `SubViewport` as a whole. Art that already has a light direction painted in
+   will fight it.
+5. **One PNG is one whole thing.** The game shows one texture per node — a
+   bottle is one file, not a body plus a cap plus a label. The only thing ever
+   layered on top of an item is the hotspot ring overlay, which is a debug aid
+   (see below).
+6. **State is a different drawing, never a tint.** A locked tool, a highlighted
+   bin, a selected slot — each is its own PNG or its own named animation. The
+   code never recolours your art to mean something, because that breaks the
+   moment your palette differs from the placeholder's.
+7. Every sprite is displayed at **scale 1** at its authored size. The one
+   exception is the item in the inspect panel, which is enlarged by
+   `InspectPanel.BASE_SCALE` (currently **1.8**) — so a 160×160 item is read at
+   288×288 there. Draw items with that in mind.
 
 ## How to animate something
 
@@ -510,9 +538,20 @@ TABLE_HEADER = """
 
 ## Every PNG
 
-| Path | Size | What it is |
-|------|------|-----------|
+`Animated` names the `SpriteFrames` animations this PNG is the placeholder
+frame for, with the frame count the final version should have. `static` means
+the file is displayed as-is and never animates.
+
+| Path | Size | Animated | What it is |
+|------|------|----------|-----------|
 """
+
+
+def animation_note(rel_path):
+    """Which animations, and at how many frames, this PNG stands in for."""
+    parts = ["`%s` %d fr" % (anim, target)
+             for _res, anim, src, target in ANIMS if src == rel_path]
+    return ", ".join(parts) if parts else "static"
 
 
 def note_generated_elsewhere():
@@ -538,7 +577,8 @@ def main():
     gen_frames()
     note_generated_elsewhere()
     anims = "\n".join("| `%s` | `%s` | `assets/%s` | %d |" % a for a in ANIMS)
-    rows = "\n".join("| `assets/%s` | %s | %s |" % r for r in MANIFEST)
+    rows = "\n".join("| `assets/%s` | %s | %s | %s |"
+                     % (r[0], r[1], animation_note(r[0]), r[2]) for r in MANIFEST)
     with open(os.path.join(ASSETS, "ASSETS.md"), "w") as f:
         f.write(HEADER + anims + TABLE_HEADER + rows +
                 "\n\n_%d PNGs, %d animations across %d SpriteFrames resources._\n"

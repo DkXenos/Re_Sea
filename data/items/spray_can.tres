@@ -18,8 +18,6 @@ visible_material = "kaleng baja"
 visible_label = "KOSONG?"
 true_material = "baja dengan sisa gas propelan"
 tag_text = "MUDAH TERBAKAR - jangan ditusuk"
-revealed_by_magnifier = true
-revealed_by_cutter = true
 hotspots = Array[Dictionary]([{
 "pos": Vector2(0.52, 0.72),
 "radius": 0.14,

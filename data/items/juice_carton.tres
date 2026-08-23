@@ -19,8 +19,6 @@ visible_label = "DAUR ULANG"
 true_material = "kertas, aluminium dan PE"
 is_multilayer = true
 tag_text = "PAP 84 - karton berlapis"
-revealed_by_magnifier = true
-revealed_by_cutter = true
 hotspots = Array[Dictionary]([{
 "pos": Vector2(0.55, 0.3),
 "radius": 0.14,

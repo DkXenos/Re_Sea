@@ -20,16 +20,16 @@ var _t: float = 0.0
 @onready var sprite: AnimatedSprite2D = $Sprite
 
 
-## depth 0 = far (small, slow, dim), 1 = near. Gives the shoal parallax without
-## a second camera.
+## depth 0 = far, 1 = near. Depth picks WHICH fish swims here - the three sizes
+## are three different PNGs - and how fast and how far it drifts. It never
+## scales or tints the sprite: that would be code deciding what the designers'
+## art looks like (rev 3 §1.4, §1.5).
 func setup(frames: SpriteFrames, y: float, spd: float, dir: int, depth: float,
 		travel: Vector2) -> void:
 	if sprite == null:
 		sprite = $Sprite
 	sprite.sprite_frames = frames
 	sprite.play(&"swim")
-	sprite.scale = Vector2.ONE * lerpf(0.55, 1.15, depth)
-	sprite.modulate.a = lerpf(0.45, 1.0, depth)
 	base_y = y
 	speed = spd * lerpf(0.55, 1.2, depth)
 	direction = dir
