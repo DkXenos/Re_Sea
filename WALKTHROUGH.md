@@ -5,7 +5,7 @@ demonstrates, and why it is built that way. Written for the owner, who is going
 to refactor all of this during production.
 
 Read in order — each section assumes the ones above it. Sections marked
-**(rev 1)** changed in the first revision, **(rev 2)** in the second.
+**(rev 1)**, **(rev 2)** or **(rev 3)** changed in that revision.
 
 ---
 
@@ -245,25 +245,25 @@ down to 92/100 — a game about healing the ocean where the ocean never heals.
 `end_day_breakdown()` computes and commits nothing; the report displays it and
 calls `commit_day_result()`.
 
-## 19a. Ocean recovery tiers — `data/ocean_tier_data.gd`, `claw_phase.gd` **(rev 2, new)**
+## 19a. Ocean recovery tiers — `data/ocean_tier_data.gd` **(rev 2, art deferred in rev 3)**
 
-**Godot concept:** nothing new — a `Resource` per tier, `modulate` on the
-background layers, and a texture swap.
+Four tiers driven by `Game.ocean_health`, moving **only at the day report**
+(`refresh_visual_tier`, called from `commit_day_result`) so the world never
+shifts under the player mid-shift.
 
-Four tiers driven by `Game.ocean_health`. A tier is a water tint, a seabed
-backdrop, and a count of fish, coral and debris sprites. That is all it is: it
-never touches the health formula, the budget or the rules.
+Revision 2 rendered a tier as a water tint, a seabed swap and a scatter of
+coral and debris. **Revision 3 deferred all of it** and replaced it with one
+label in the shift bar: `Laut: Buruk / Sedang / Baik / Pulih`. Four sets of
+tier art is polish on a reward loop whose value was unproven, and — the actual
+reason — the loop had never once fired in real play, because the run started at
+100 health, which is already the top tier.
 
-`Game.visual_tier` follows health **only at the day report** (`refresh_visual_tier`,
-called from `commit_day_result`). The claw view reads it once, in `_ready`. The
-seabed must not shift under the player mid-shift — stability reads as a world
-that changes when the day turns over, and a flickering one reads as a bug.
+The data is still authored and still the designers' brief: thresholds, tints,
+seabeds and counts sit in `data/tiers/*.tres` and nothing reads them but
+`display_name`. Re-enabling is `_apply_tier()` plus `_spawn_decor()` in
+`claw_phase.gd` and the empty `Decor` node that is still in the scene.
 
-Thresholds, tints, counts and the one quiet transition line are all in
-`data/tiers/*.tres`, so a fifth tier is a `.tres` and no code change. Coral and
-debris are `AnimatedSprite2D` playing `idle`, like everything else that moves.
-
-## 19b. Blueprints — `data/blueprint_data.gd`, `scenes/unlock/` **(rev 2, new)**
+## 19b. Blueprints — `data/blueprint_data.gd`, `scenes/after_day/` **(rev 2, rev 3)**
 
 A progress counter and an unlock screen. There is no combining, no
 experimenting, no failure state and no recipe discovery — that was considered
@@ -275,27 +275,55 @@ was right, so a counter ticking up on a correct bin would give the verdict away
 a full screen early. `_credit_blueprint_materials()` runs once, from
 `commit_day_result`, and queues any completed blueprint for its own screen.
 
-The health gain lands on the unlock screen rather than inside the report's
-formula, so the report's arithmetic stays traceable term by term.
-`BlueprintData.required` is a `Dictionary` of category → count, so a fourth
-blueprint is one `.tres`.
+The health gain lands on the claim rather than inside the report's formula, so
+the report's arithmetic stays traceable term by term. `BlueprintData.required`
+is a `Dictionary` of category → count, so a fourth blueprint is one `.tres`.
 
-## 19c. Upgrades — `data/upgrade_data.gd`, `scenes/unlock/` **(rev 2, new)**
+Revision 3 made claiming the **player's** action, in the Teknologi tab, rather
+than something that happened to them on a screen that only appeared when a
+blueprint finished.
 
-Unlocked by the first blueprint, never bought — there is no currency system
-anywhere, and adding one would put a second resource in competition with the
-shift budget.
+## 19c. Upgrades — `data/upgrade_data.gd`, `scenes/after_day/` **(rev 2, rev 3)**
 
-Both upgrades are trade-offs by construction: `UpgradeData` carries a benefit
-**and** a cost, and `smoke_upgrades.gd` refuses to let one ship with only the
-benefit filled in. `Game.cost_of()` consults the chosen upgrade, `base_cost()`
-does not — which is exactly the seam the coarse scanner needs, since its second,
-full reading is charged at the base price.
+Four of them, never bought — there is no currency system anywhere, and adding
+one would put a second resource in competition with the shift budget. Two are
+available on day 1 and two open on claimed blueprints, and revision 3 made them
+**swappable between days** rather than a once-per-run choice: the owner has to
+be able to try all four in one session.
 
-## 19d. Calibration puzzle — `scenes/puzzle/` **(rev 2, EXPERIMENTAL)**
+Trade-offs are enforced by construction. `UpgradeData.is_trade_off()` lives on
+the resource, so it is the resource that knows which way each field cuts, and
+`smoke_upgrades.gd` refuses to let one ship with only a benefit.
+
+`Game.cost_of()` consults the fitted upgrade, `base_cost()` does not — exactly
+the seam the coarse scanner needs, since its second, full reading is charged at
+the base price. `smoke_upgrade_play.gd` proves the effects by playing two real
+shifts on one seed and comparing what they spent and grabbed.
+
+## 19d. The after-day screen — `scenes/after_day/` **(rev 3, new, the main change)**
+
+Entered after every report. Three tabs, plain buttons swapping `visible`.
+
+The reason it exists: revision 2 put the blueprints, the upgrade choice and the
+puzzle behind a screen that only appeared when a blueprint happened to complete,
+which was day 4 of 5. The systems all worked and the owner saw none of them.
+A screen that is always entered is worth more than a screen that is prettier.
+
+Two details worth knowing:
+
+- The day's haul is drawn as `Sprite2D` nodes with the item art itself, with a
+  check or cross PNG on top. Not a text list, and not a tint — right and wrong
+  is a separate overlay sprite, per §1.4.
+- The mistake rows come from `systems/mistake_view.gd`, shared with the day
+  report. Two screens that both explain a mis-sort must not be able to disagree
+  about what the player missed, and the only way to guarantee that is for there
+  to be one of them.
+
+## 19e. Calibration puzzle — `scenes/puzzle/` **(rev 2, EXPERIMENTAL, rev 3 moved)**
 
 **This may be cut.** Everything about it is in `scenes/puzzle/`, reached from
-one call site in `unlock_screen.gd` and gated by `Game.feature_calibration_puzzle`.
+one call site in `after_day.gd` — where revision 3 moved it, next to the
+blueprint it belongs to — and gated by `Game.feature_calibration_puzzle`.
 Delete the folder, the flag, the marked block in the unlock screen and the
 marked block in `strings.gd`, and the game is unchanged — `run_all.sh` proves
 that by playing a whole run twice on one seed, once each way.
@@ -338,7 +366,7 @@ Every button emits a command; `Game` handles the ones about state, `main.gd` the
 one that changes scene, the desk the one that needs the inspected item. That is
 why there is not a single `if debug` inside a phase scene.
 
-## 23. Asset pipeline — `tools/gen_placeholders.py`, `assets/ASSETS.md` **(rev 1)**
+## 23. Asset pipeline — `tools/gen_placeholders.py`, `assets/ASSETS.md` **(rev 1, rev 3)**
 
 **Godot concept:** `SpriteFrames` authored up front, and `.import` files as the
 seam between source art and the engine.
@@ -353,13 +381,21 @@ than Python, because it reads `data/items/*.tres` — the rings are drawn *from 
 same coordinates the game checks against*, so they can never disagree. It must be
 run twice with an import between: Godot cannot load a PNG it has not imported.
 
-## 24. Verification — `tools/smoke/` **(rev 1)**
+## 24. Verification — `tools/smoke/` **(rev 1, rev 3)**
 
 **Godot concept:** `extends SceneTree` scripts run with `--script`, driving real
 scenes with `await process_frame` / `await physics_frame`.
 
-`run_all.sh` runs four static rule checks, two boot checks, fourteen
-simulations and one two-run comparison. Two caveats worth knowing:
+`run_all.sh` runs nine static rule checks, two boot checks, sixteen simulations
+and one two-run comparison.
+
+Nine of those are greps, and they are the cheapest insurance in the project:
+they hold the asset seam open. No `_draw`, no `draw_*`, no `Polygon2D` or
+`Line2D` or `ColorRect`, no `ShaderMaterial` or light node, no `StyleBoxFlat`,
+no texture built at runtime, no `modulate` expressing state on a game object, no
+sprite scaled by anything but a named constant quoted in `ASSETS.md`, and no
+`if item.id == "..."` anywhere. All of it is a grep because all of it is the
+kind of thing that creeps back in one convenient line at a time. Two caveats worth knowing:
 
 - A script passed to `--script` is compiled **before** the autoloads register, so
   these fetch `Game` and `Events` with `root.get_node("/root/Game")`. Scripts
@@ -368,7 +404,16 @@ simulations and one two-run comparison. Two caveats worth knowing:
   so a broken check hangs instead of failing. `run_all.sh` enforces a per-check
   time limit and treats an overrun as a failure.
 
-`smoke_ocean.gd` proves the revision 2 promises: a run of correct sorting
+**Revision 3's rule: a progression check must run through play.** Revision 2's
+tier check passed for a whole revision while the tier never once moved in a real
+run, because the check set health by hand. `smoke_full.gd` now asserts the shape
+of the run — two tier rises, two blueprints claimed, the first by day 2 — from
+the real scenes driven by the real buttons, and `smoke_upgrade_play.gd` proves
+the upgrades by playing two shifts on one seed. That change immediately found a
+bug three revisions old: items could spawn outside the claw's reach, and a day
+could end with fifteen drops and nothing collected.
+
+`smoke_ocean.gd` proves the arithmetic: a run of correct sorting
 reaches at least one blueprint and at least one tier rise, a perfect day never
 loses ground, and blueprint bonuses cannot push the meter past 100.
 `smoke_upgrades.gd` refuses an upgrade that is a pure improvement.

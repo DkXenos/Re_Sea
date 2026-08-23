@@ -27,10 +27,17 @@ contract. Everything below expands on it.
    bin, a selected slot — each is its own PNG or its own named animation. The
    code never recolours your art to mean something, because that breaks the
    moment your palette differs from the placeholder's.
-7. Every sprite is displayed at **scale 1** at its authored size. The one
-   exception is the item in the inspect panel, which is enlarged by
-   `InspectPanel.BASE_SCALE` (currently **1.8**) — so a 160×160 item is read at
-   288×288 there. Draw items with that in mind.
+7. Every sprite is displayed at **scale 1** at its authored size, with exactly
+   three exceptions. Each is one named constant in one file, and this is the
+   list — if you need to know the size your art is actually read at, it is here.
+
+   | What | Authored | Displayed | Constant |
+   |------|----------|-----------|----------|
+   | Item in the inspect panel | 160×160 | 288×288 | `InspectPanel.BASE_SCALE` = 1.8 |
+   | Tool icon in the rack | 96×96 | 60×60 | `InspectPanel.TOOL_ICON_SCALE` = 0.62 |
+   | Bin on the desk | 200×240 | 144×173 | `BinRow.BIN_DISPLAY_SCALE` = 0.72 |
+
+   Everywhere else, the pixel size in the table below is the size on screen.
 
 ## How to animate something
 

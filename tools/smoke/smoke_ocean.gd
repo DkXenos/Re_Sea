@@ -1,7 +1,11 @@
-## Revision 2 §6. The three things this revision promised the player:
-##   1. a full run reaches at least one blueprint and at least one tier rise
-##   2. a perfect day still visibly raises the meter, blueprint bonuses included
-##   3. health can never exceed 100, whatever a blueprint pays
+## The tier and blueprint ARITHMETIC: thresholds cover every health value, a
+## perfect day never loses ground, and no bonus can push the meter past 100.
+##
+## What this deliberately no longer does is claim anything about how a real run
+## goes. Revision 2 asserted that here by setting health and stats by hand, and
+## that check passed for a whole revision while the tier never once moved in
+## actual play. Progression - two tier rises, two blueprints, the first by day
+## 2 - is now asserted in smoke_full, from a run that was played (rev 3 §6).
 ##   godot --headless --script tools/smoke/smoke_ocean.gd
 extends SceneTree
 
@@ -54,8 +58,9 @@ func _check_tiers() -> void:
 		"a recovered ocean must hold less debris than a dead one")
 
 
-## The tier only moves at the report, and a run that sorts well crosses at
-## least one boundary upward.
+## Day-shaped arithmetic only: a perfect day must never cost health, and a
+## finished blueprint must become claimable. Whether a REAL run gets there is
+## smoke_full's job.
 func _check_blueprints() -> void:
 	game.start_run(4242)
 	game.set_ocean_health(30)
@@ -92,9 +97,10 @@ func _check_blueprints() -> void:
 				game.visual_tier])
 		if not game.is_last_day():
 			game.advance_day()
-	print("  run reached %d blueprint(s) and %d tier increase(s)" % [unlocked, tier_rises])
-	assert(unlocked >= 1, "a full run of correct sorting must reach a blueprint")
-	assert(tier_rises >= 1, "a full run of correct sorting must raise the ocean tier")
+	print("  arithmetic: %d blueprint(s) became claimable, %d tier increase(s)"
+		% [unlocked, tier_rises])
+	assert(unlocked >= 1, "correct sorting must make a blueprint claimable")
+	assert(tier_rises >= 1, "correct sorting must raise the ocean tier")
 
 
 ## A blueprint bonus can never push the meter past full.

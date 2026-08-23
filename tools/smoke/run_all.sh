@@ -57,11 +57,32 @@ static_check "no tweens in game-object scripts" \
 static_check "no tweened transforms or frames anywhere" \
   "$(grep -rnE 'tween_property\([^,]+, *"(position|rotation|scale|frame)' \
       --include='*.gd' scenes/ autoload/ systems/ 2>/dev/null)"
-# Every visual is a PNG.
-static_check "no ColorRect / draw_* / 3D nodes" \
-  "$(grep -rnE 'ColorRect|draw_rect|draw_circle|draw_line|draw_texture|Node3D|Sprite3D|Camera3D' \
-      --include='*.gd' --include='*.tscn' --include='*.tres' \
-      scenes/ autoload/ systems/ data/ main.gd main.tscn 2>/dev/null)"
+# Every visual is a PNG on disk, nothing is drawn or built at runtime, and
+# nothing here decides what the designers' art looks like (revision 3 §1).
+ASSET_SRC="scenes/ autoload/ systems/ data/ main.gd main.tscn"
+static_check "no drawn visuals, no 3D" \
+  "$(grep -rnE '_draw\(|draw_rect|draw_circle|draw_line|draw_polygon|draw_texture|ColorRect|Polygon2D|Line2D|Node3D|Sprite3D|Camera3D' \
+      --include='*.gd' --include='*.tscn' --include='*.tres' $ASSET_SRC 2>/dev/null)"
+static_check "no shaders, lighting or runtime textures" \
+  "$(grep -rnE 'ShaderMaterial|CanvasModulate|PointLight2D|LightOccluder2D|normal_map|GradientTexture|NoiseTexture' \
+      --include='*.gd' --include='*.tscn' --include='*.tres' $ASSET_SRC 2>/dev/null)"
+static_check "panels are NinePatchRect over a PNG, never StyleBoxFlat" \
+  "$(grep -rnE 'StyleBoxFlat' --include='*.gd' --include='*.tscn' --include='*.tres' \
+      $ASSET_SRC assets/ 2>/dev/null)"
+# State is a named animation or its own PNG - never a tint on designer art.
+static_check "no modulate expressing state on a game object" \
+  "$(grep -nE '\.modulate' scenes/claw/claw.gd scenes/claw/tank_item.gd \
+      scenes/claw/fish.gd scenes/desk/bin_row.gd 2>/dev/null
+     grep -rnE '\b(sprite|_sprite|_item_sprite|_hotspot_sprite|mark|bubble)\.modulate' \
+      --include='*.gd' scenes/ 2>/dev/null)"
+# Scaling a sprite in code is code deciding a display size, so each one that
+# genuinely has to exist is a named constant quoted in ASSETS.md.
+static_check "sprites are scaled only by a named display constant" \
+  "$(grep -rnE '\.scale *= *' --include='*.gd' scenes/ autoload/ systems/ 2>/dev/null \
+      | grep -vE 'BASE_SCALE|TOOL_ICON_SCALE|BIN_DISPLAY_SCALE')"
+# Anything that differs between items lives in that item's .tres.
+static_check "no per-asset special cases in code" \
+  "$(grep -rnE '\.id *== *&?"' --include='*.gd' $ASSET_SRC 2>/dev/null)"
 static_check "exactly two autoloads" \
   "$(awk '/^\[autoload\]/{f=1;next} /^\[/{f=0} f&&/=/{n++} END{if(n!=2) print "found " n}' project.godot)"
 
@@ -70,7 +91,7 @@ check "boots (2 frames)"   godot --headless --quit-after 2
 check "boots (240 frames)" godot --headless --quit-after 240
 
 echo "Systems:"
-for t in claw desk shift inspect report ocean upgrades puzzle settings debug extensibility full; do
+for t in claw desk shift inspect report ocean upgrades upgrade_play puzzle settings debug extensibility full; do
   check "smoke_$t" godot --headless --script "tools/smoke/smoke_$t.gd"
 done
 check "smoke_claw --fail" godot --headless --script tools/smoke/smoke_claw.gd -- --fail

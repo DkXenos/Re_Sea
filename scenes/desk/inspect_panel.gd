@@ -33,6 +33,9 @@ const CHIP_SURFACE := preload("res://assets/ui/chip_surface.png")
 const CHIP_REVEAL := preload("res://assets/ui/chip_reveal.png")
 const CHIP_MATCH := preload("res://assets/ui/chip_match.png")
 const TOOL_ROW_HEIGHT := 64
+## Tools are authored at 96x96 and shown at 60x60 in the rack. Named here and
+## quoted in ASSETS.md for the same reason BASE_SCALE is (rev 3 §1.5).
+const TOOL_ICON_SCALE := 0.62
 
 @onready var _view: SubViewport = $ViewportBox/ItemViewport
 @onready var _item_root: Node2D = $ViewportBox/ItemViewport/ItemRoot
@@ -90,7 +93,7 @@ func _make_tool_entry(tool_data: ToolData) -> Control:
 	var sprite := AnimatedSprite2D.new()
 	sprite.sprite_frames = tool_data.frames
 	sprite.play(&"idle")
-	sprite.scale = Vector2(0.62, 0.62)
+	sprite.scale = Vector2.ONE * TOOL_ICON_SCALE
 	sprite.position = Vector2(30, 32)
 	row.add_child(sprite)
 

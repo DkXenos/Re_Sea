@@ -6,6 +6,11 @@
 ## "reject" plays when the click could not be honoured at all.
 extends Control
 
+## Bins are authored at 200x240 and shown at 144x173 so four fit across the
+## desk. One named constant in one file, quoted in ASSETS.md, per rev 3 §1.5 -
+## a designer needs to know the size their art is actually read at.
+const BIN_DISPLAY_SCALE := 0.72
+
 signal bin_chosen(category: int)
 
 const CATEGORY_ASSETS: Array[String] = ["organic", "recyclable", "hazard", "landfill"]
@@ -23,7 +28,7 @@ func _ready() -> void:
 		var sprite := AnimatedSprite2D.new()
 		sprite.sprite_frames = load("res://data/frames/bin_%s_frames.tres" % CATEGORY_ASSETS[i])
 		sprite.play(&"idle")
-		sprite.scale = Vector2(0.72, 0.72)
+		sprite.scale = Vector2.ONE * BIN_DISPLAY_SCALE
 		sprite.position = Vector2(centre, 96)
 		add_child(sprite)
 		_sprites.append(sprite)

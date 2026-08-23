@@ -138,12 +138,28 @@ func _spawn_items() -> void:
 	var lane := usable / maxf(1.0, float(seeded))
 	for i in seeded:
 		var node := _make_item(pool[i])
+		# Clamped to what the claw can actually reach. Without this the jitter
+		# on lane 0 could put an item at negative x, where no drop could ever
+		# touch it - and since it still counted as work waiting in the tank, a
+		# player aiming at it burned the whole shift on drops that grabbed
+		# nothing. Found by a run driven through real play (rev 3 §6).
 		node.position = Vector2(
-			120.0 + lane * i + Game.rng.randf_range(-lane * 0.25, lane * 0.25),
+			clampf(120.0 + lane * i + Game.rng.randf_range(-lane * 0.25, lane * 0.25),
+				_reach_min(), _reach_max()),
 			Game.rng.randf_range(ITEM_REST_Y.x, ITEM_REST_Y.y))
 		node.home_y = node.position.y
 	_pending.assign(pool.slice(seeded))
 	_reset_spawn_timer()
+
+
+## The span an item may rest in: anywhere the claw can be placed. Derived from
+## the claw's own limits so the two can never drift apart.
+func _reach_min() -> float:
+	return _claw.min_x
+
+
+func _reach_max() -> float:
+	return _claw.max_x
 
 
 func _make_item(data: ItemData) -> Area2D:
@@ -175,7 +191,7 @@ func _update_spawning(delta: float) -> void:
 	if _spawn_timer > 0.0 and _items.get_child_count() >= _day.min_available_items:
 		return
 	var node := _make_item(_pending.pop_front())
-	node.drift_in(Game.rng.randf_range(140.0, seabed_width - 140.0),
+	node.drift_in(Game.rng.randf_range(_reach_min(), _reach_max()),
 		Game.rng.randf_range(ITEM_REST_Y.x, ITEM_REST_Y.y))
 	_reset_spawn_timer()
 
@@ -200,13 +216,14 @@ func _rebuild_bubbles(intensity: float) -> void:
 	_bubble_speeds.clear()
 	# Bubbles are AnimatedSprite2D like every other animated thing, playing
 	# "rise". Their upward travel is movement; the animation is the designer's.
+	# They are all one size: randomly scaling a sprite is code deciding what the
+	# art looks like, so size variation is the designers' to draw (rev 3 §1.5).
 	var frames: SpriteFrames = load("res://data/frames/bubble_frames.tres")
 	for i in int(round(14.0 * clampf(intensity, 0.0, 1.0))):
 		var bubble := AnimatedSprite2D.new()
 		bubble.sprite_frames = frames
 		bubble.play(&"rise")
 		bubble.position = Vector2(randf_range(160.0, 1120.0), randf_range(80.0, 428.0))
-		bubble.scale = Vector2.ONE * randf_range(0.5, 1.3)
 		_bubbles.add_child(bubble)
 		_bubble_speeds.append(randf_range(18.0, 46.0))
 

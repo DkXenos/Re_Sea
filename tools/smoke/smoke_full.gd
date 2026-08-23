@@ -51,10 +51,23 @@ func _run() -> void:
 	await process_frame
 
 	var seen: Array[String] = []
+	# Revision 3 §6: the shape of the run is asserted from a run that was
+	# actually played, never from state set by hand.
+	var tier := int(game.visual_tier)
+	var tier_rises := 0
+	var claimed := 0
+	var first_claim_day := 0
 	var guard := 0
 	while guard < 40000:
 		guard += 1
 		await physics_frame
+		if int(game.visual_tier) > tier:
+			tier_rises += 1
+		tier = int(game.visual_tier)
+		if game.unlocked_blueprints.size() > claimed:
+			claimed = game.unlocked_blueprints.size()
+			if first_claim_day == 0:
+				first_claim_day = game.day_index + 1
 		var scene: Node = _current()
 		if scene == null:
 			continue
@@ -91,9 +104,21 @@ func _run() -> void:
 					scene.get_node("UiLayer/Root/TitleLabel").text])
 				break
 	print("frames=%d  scenes visited=%d" % [guard, seen.size()])
+	print("tier rises=%d  blueprints claimed=%d  first claim on day %d"
+		% [tier_rises, claimed, first_claim_day])
 	assert(String(_current().name) == "GameOver", "run did not reach an ending")
 	if bad_mode:
 		assert(game.ocean_health == 0, "sorting everything wrong should bottom out the ocean")
+	else:
+		# What revision 3 promised the owner: every meta system reachable, and
+		# the reward loop visible, inside a normal run.
+		assert(tier_rises >= 2,
+			"a well-played run must cross at least two tier thresholds, crossed %d" % tier_rises)
+		assert(claimed >= 2,
+			"a well-played run must claim at least two blueprints, claimed %d" % claimed)
+		assert(first_claim_day > 0 and first_claim_day <= 2,
+			"the first blueprint must be claimable by the end of day 2, claimed on day %d"
+			% first_claim_day)
 	game.stop_all_sfx()
 	for i in 10:
 		await process_frame
