@@ -431,6 +431,19 @@ func coarse_readings() -> bool:
 	return up != null and up.coarse_readings
 
 
+## Multiplies the claw's travel speed along the rail.
+func move_speed_multiplier() -> float:
+	var up := upgrade()
+	return up.move_speed_multiplier if up != null else 1.0
+
+
+## Seconds the rail is out of action after a cycle. Zero for every upgrade that
+## did not trade movement away.
+func post_drop_lockout() -> float:
+	var up := upgrade()
+	return up.post_drop_lockout if up != null else 0.0
+
+
 # ------------------------------------------------------------- ocean tiers
 
 ## Which tier a health value falls in. Data decides the thresholds; if they ever

@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="UpgradeData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://data/upgrade_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"rel_cepat"
+display_name = "Rel Cepat"
+benefit_text = "Cakar bergeser 60% lebih cepat di sepanjang rel."
+cost_text = "Setelah setiap turun, rel butuh 2 detik untuk siap lagi sebelum bisa digeser."
+drop_cost = -1
+tool_cost = -1
+grip_delta = 0.0
+coarse_readings = false
+move_speed_multiplier = 1.6
+post_drop_lockout = 2.0
+unlock_after_blueprints = 1
+unlock_text = "Terbuka setelah satu teknologi selesai dibangun."
+sort_order = 2

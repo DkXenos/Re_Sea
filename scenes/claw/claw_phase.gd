@@ -260,7 +260,11 @@ func _update_grip_preview() -> void:
 		return
 	var target: Node2D = _claw.predict_target(_items.get_children())
 	_claw.predicted_target = target
-	if target == null:
+	# A rail that will not move has to say so, or it reads as a broken control
+	# rather than as the cost the player chose (rev 3 §4).
+	if _claw.is_rail_locked():
+		_grip_label.text = Strings.t("claw_rail_locked")
+	elif target == null:
 		_grip_label.text = Strings.t("claw_grip_none")
 	else:
 		# Nothing in the tank has been identified yet, so the readout describes

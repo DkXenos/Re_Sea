@@ -51,6 +51,7 @@ const TABLE: Dictionary = {
 	"upgrade_active": "Alat aktif: {v}  -  turun {drop} · alat {tool} · pilah {sort}",
 	"upgrade_none": "Tanpa peningkatan  -  turun {drop} · alat {tool} · pilah {sort}",
 	"claw_grip_chance": "Peluang cengkeram: {n}%",
+	"claw_rail_locked": "Rel sedang siap ulang - sebentar lagi bisa digeser",
 	"claw_grip_none": "Arahkan cakar ke sebuah benda",
 	"claw_hint": "A/D atau panah untuk geser, Spasi untuk turun. Klik tombol di konsol juga bisa.",
 	"claw_drop_button": "TURUN  ({n})",

@@ -42,6 +42,10 @@ var _close_timer: float = 0.0
 var _grip_ok: bool = false
 var _slip_y: float = -1.0
 var _move_sfx_cooldown: float = 0.0
+## Seconds left before the rail will move again. Only ever non-zero when the
+## fitted upgrade traded rail responsiveness for speed (rev 3 §4); the claw
+## itself does not know which upgrade that is.
+var _rail_lockout: float = 0.0
 
 ## What this drop is predicted to hit, set by the tank each frame from
 ## predict_target(). The grab resolves to this exact node when it is still in
@@ -64,6 +68,12 @@ func is_busy() -> bool:
 	return state != State.IDLE
 
 
+## The rail is re-engaging: the player can still drop, still think, still read.
+## Nothing is being spent while this runs.
+func is_rail_locked() -> bool:
+	return _rail_lockout > 0.0
+
+
 func _physics_process(delta: float) -> void:
 	match state:
 		State.IDLE: _process_idle(delta)
@@ -76,9 +86,12 @@ func _physics_process(delta: float) -> void:
 func _process_idle(delta: float) -> void:
 	if not input_enabled:
 		return
+	_rail_lockout = maxf(0.0, _rail_lockout - delta)
 	var axis := clampf(Input.get_axis(&"claw_left", &"claw_right") + button_axis, -1.0, 1.0)
-	if not is_zero_approx(axis):
-		position.x = clampf(position.x + axis * H_SPEED * delta, min_x, max_x)
+	if not is_zero_approx(axis) and not is_rail_locked():
+		position.x = clampf(
+			position.x + axis * H_SPEED * Game.move_speed_multiplier() * delta,
+			min_x, max_x)
 		_move_sfx_cooldown -= delta
 		if _move_sfx_cooldown <= 0.0:
 			_move_sfx_cooldown = 0.22
@@ -124,6 +137,7 @@ func _process_rise(delta: float) -> void:
 		_slip()
 	if position.y <= rail_y:
 		position.y = rail_y
+		_rail_lockout = Game.post_drop_lockout()
 		_finish_cycle()
 
 

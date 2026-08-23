@@ -16,7 +16,7 @@ func _run() -> void:
 	game.sfx_enabled = false  # see Game.sfx_enabled
 	game.start_run(31337)
 
-	assert(game.upgrades.size() >= 2, "expected at least two upgrades as data")
+	assert(game.upgrades.size() >= 4, "expected four upgrades as data")
 	assert(game.upgrade() == null, "a run must start with no upgrade fitted")
 
 	# Every upgrade has to give something AND take something. An upgrade that
@@ -24,10 +24,25 @@ func _run() -> void:
 	for up: UpgradeData in game.upgrades:
 		assert(up.benefit_text != "", "%s has no stated benefit" % up.id)
 		assert(up.cost_text != "", "%s has no stated cost" % up.id)
-		var cheaper: bool = up.drop_cost >= 0 or up.tool_cost >= 0
-		var pays: bool = up.grip_delta < 0.0 or up.coarse_readings
-		assert(cheaper and pays, "%s is not a trade-off" % up.id)
-		print("  %-16s benefit + cost, both present" % up.id)
+		assert(up.is_trade_off(game.base_cost(&"drop"), game.base_cost(&"tool")),
+			"%s is not a trade-off" % up.id)
+		print("  %-18s benefit + cost, both present%s" % [up.id,
+			"" if up.unlock_after_blueprints == 0 else
+			"  (opens after %d blueprint(s))" % up.unlock_after_blueprints])
+
+	# Two must be on the table from day one, or the system is not testable
+	# until the run is nearly over - which is what revision 3 exists to fix.
+	var day_one: int = 0
+	for up: UpgradeData in game.upgrades:
+		if up.unlock_after_blueprints == 0:
+			day_one += 1
+		assert(up.unlock_after_blueprints == 0 or up.unlock_text != "",
+			"%s is locked but never says what opens it" % up.id)
+	assert(day_one >= 2, "at least two upgrades must be available on day 1, found %d" % day_one)
+	assert(game.upgrade_unlocked(game.upgrades[0]), "a day-1 upgrade must start unlocked")
+	for up: UpgradeData in game.upgrades:
+		if up.unlock_after_blueprints > 0:
+			assert(not game.upgrade_unlocked(up), "%s must start locked" % up.id)
 
 	game.equip_upgrade(&"cakar_ringan")
 	assert(game.cost_of(&"drop") == 4, "cakar_ringan should drop for 4")
