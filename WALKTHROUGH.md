@@ -5,7 +5,7 @@ demonstrates, and why it is built that way. Written for the owner, who is going
 to refactor all of this during production.
 
 Read in order — each section assumes the ones above it. Sections marked
-**(rev 1)** changed in the first revision.
+**(rev 1)** changed in the first revision, **(rev 2)** in the second.
 
 ---
 
@@ -245,6 +245,69 @@ down to 92/100 — a game about healing the ocean where the ocean never heals.
 `end_day_breakdown()` computes and commits nothing; the report displays it and
 calls `commit_day_result()`.
 
+## 19a. Ocean recovery tiers — `data/ocean_tier_data.gd`, `claw_phase.gd` **(rev 2, new)**
+
+**Godot concept:** nothing new — a `Resource` per tier, `modulate` on the
+background layers, and a texture swap.
+
+Four tiers driven by `Game.ocean_health`. A tier is a water tint, a seabed
+backdrop, and a count of fish, coral and debris sprites. That is all it is: it
+never touches the health formula, the budget or the rules.
+
+`Game.visual_tier` follows health **only at the day report** (`refresh_visual_tier`,
+called from `commit_day_result`). The claw view reads it once, in `_ready`. The
+seabed must not shift under the player mid-shift — stability reads as a world
+that changes when the day turns over, and a flickering one reads as a bug.
+
+Thresholds, tints, counts and the one quiet transition line are all in
+`data/tiers/*.tres`, so a fifth tier is a `.tres` and no code change. Coral and
+debris are `AnimatedSprite2D` playing `idle`, like everything else that moves.
+
+## 19b. Blueprints — `data/blueprint_data.gd`, `scenes/unlock/` **(rev 2, new)**
+
+A progress counter and an unlock screen. There is no combining, no
+experimenting, no failure state and no recipe discovery — that was considered
+and cut as out of scope.
+
+The one non-obvious decision: **counts are credited at the day report, never
+when the player hits the bin.** The desk deliberately never says whether a sort
+was right, so a counter ticking up on a correct bin would give the verdict away
+a full screen early. `_credit_blueprint_materials()` runs once, from
+`commit_day_result`, and queues any completed blueprint for its own screen.
+
+The health gain lands on the unlock screen rather than inside the report's
+formula, so the report's arithmetic stays traceable term by term.
+`BlueprintData.required` is a `Dictionary` of category → count, so a fourth
+blueprint is one `.tres`.
+
+## 19c. Upgrades — `data/upgrade_data.gd`, `scenes/unlock/` **(rev 2, new)**
+
+Unlocked by the first blueprint, never bought — there is no currency system
+anywhere, and adding one would put a second resource in competition with the
+shift budget.
+
+Both upgrades are trade-offs by construction: `UpgradeData` carries a benefit
+**and** a cost, and `smoke_upgrades.gd` refuses to let one ship with only the
+benefit filled in. `Game.cost_of()` consults the chosen upgrade, `base_cost()`
+does not — which is exactly the seam the coarse scanner needs, since its second,
+full reading is charged at the base price.
+
+## 19d. Calibration puzzle — `scenes/puzzle/` **(rev 2, EXPERIMENTAL)**
+
+**This may be cut.** Everything about it is in `scenes/puzzle/`, reached from
+one call site in `unlock_screen.gd` and gated by `Game.feature_calibration_puzzle`.
+Delete the folder, the flag, the marked block in the unlock screen and the
+marked block in `strings.gd`, and the game is unchanged — `run_all.sh` proves
+that by playing a whole run twice on one seed, once each way.
+
+**Godot concept:** `_get_drag_data` / `_can_drop_data` / `_drop_data`, the
+built-in drag and drop, so no drag maths is written by hand.
+
+The failure lines carry the whole educational value, so each one says what
+actually goes wrong rather than "wrong order". They are picked by the first
+violated ordering pair, which is roughly the order the machine would hit the
+problem in.
+
 ## 20. Settings — `scenes/settings/settings_panel.gd`, `systems/save_settings.gd`
 
 **Godot concept:** `AudioServer` bus indices, `linear_to_db()`, and `ConfigFile`
@@ -295,8 +358,8 @@ run twice with an import between: Godot cannot load a PNG it has not imported.
 **Godot concept:** `extends SceneTree` scripts run with `--script`, driving real
 scenes with `await process_frame` / `await physics_frame`.
 
-`run_all.sh` runs four static rule checks, two boot checks and eleven
-simulations. Two caveats worth knowing:
+`run_all.sh` runs four static rule checks, two boot checks, fourteen
+simulations and one two-run comparison. Two caveats worth knowing:
 
 - A script passed to `--script` is compiled **before** the autoloads register, so
   these fetch `Game` and `Events` with `root.get_node("/root/Game")`. Scripts
@@ -304,6 +367,13 @@ simulations. Two caveats worth knowing:
 - A failed GDScript `assert` aborts the coroutine without ever reaching `quit()`,
   so a broken check hangs instead of failing. `run_all.sh` enforces a per-check
   time limit and treats an overrun as a failure.
+
+`smoke_ocean.gd` proves the revision 2 promises: a run of correct sorting
+reaches at least one blueprint and at least one tier rise, a perfect day never
+loses ground, and blueprint bonuses cannot push the meter past 100.
+`smoke_upgrades.gd` refuses an upgrade that is a pure improvement.
+`smoke_puzzle.gd` checks the order logic and that failing is free; the feature
+flag is proved by a whole run each way on one seed.
 
 `smoke_shift.gd` holds the two invariants the shift model must never break:
 budget spent equals the sum of the actions taken, and the tank never starves

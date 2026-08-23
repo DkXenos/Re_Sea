@@ -70,12 +70,28 @@ check "boots (2 frames)"   godot --headless --quit-after 2
 check "boots (240 frames)" godot --headless --quit-after 240
 
 echo "Systems:"
-for t in claw desk shift inspect report settings debug extensibility full; do
+for t in claw desk shift inspect report ocean upgrades puzzle settings debug extensibility full; do
   check "smoke_$t" godot --headless --script "tools/smoke/smoke_$t.gd"
 done
 check "smoke_claw --fail" godot --headless --script tools/smoke/smoke_claw.gd -- --fail
 check "smoke_full --bad"  godot --headless --script tools/smoke/smoke_full.gd -- --bad
 check "smoke_shift day 1"  godot --headless --script tools/smoke/smoke_shift.gd -- 1
+
+# Revision 2 §6: the experimental calibration puzzle must be genuinely
+# optional. One seed, one whole game each way, and the ocean has to end in the
+# same place - the flag is the only difference.
+echo "Feature flag:"
+ending() {
+  run_limited godot --headless --script tools/smoke/smoke_full.gd -- --seed "$1" "${@:2}" \
+    2>&1 | grep -o 'reached ending: health=[0-9]*'
+}
+with=$(ending 20260823)
+without=$(ending 20260823 --no-puzzle)
+if [ -n "$with" ] && [ "$with" = "$without" ]; then
+  printf '  PASS  full run identical with the puzzle off (%s)\n' "$with"
+else
+  printf '  FAIL  puzzle flag changes the run: on=[%s] off=[%s]\n' "$with" "$without"; fail=1
+fi
 
 if [ "$fail" -eq 0 ]; then echo "All checks passed."; else echo "FAILURES above."; fi
 exit $fail

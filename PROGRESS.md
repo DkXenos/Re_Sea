@@ -3,9 +3,9 @@
 Playable prototype of **Cakar Laut** — underwater claw machine plus waste
 sorting. Godot 4.7.2, GDScript only, statically typed, 2D only.
 
-**Revision 1 is applied.** It changed the shape of the game, not just the
-polish: see *What revision 1 superseded* at the bottom for which parts of the
-original brief no longer describe this build.
+**Revisions 1 and 2 are applied.** Revision 1 changed the shape of the game;
+revision 2 gave it a reason to play. See *What the revisions superseded* at the
+bottom for which parts of the earlier briefs no longer describe this build.
 
 ---
 
@@ -67,8 +67,19 @@ The original seven phases are complete. Revision 1 then changed:
 | 9 | One source of truth for content, decision recorded above | done |
 | 10 | Smoke suite updated, two new invariant checks added | done |
 
-**Definition of Done — verified, not assumed.** `run_all.sh` runs 17 checks:
-4 static rules, 2 boot checks, and 11 simulations.
+Revision 2 then added the "why":
+
+| § | Change | State |
+|---|--------|-------|
+| 1 | Four ocean recovery tiers, changing only at the day report | done |
+| 2 | Three technology blueprints, progress always visible on the desk | done |
+| 3 | Property-first identification: the name is earned, not given | done |
+| 4 | Two upgrades, one taken per run, both trade-offs | done |
+| 5 | Calibration puzzle, isolated behind a flag — **experimental, may be cut** | done |
+| 6 | Smoke suite updated: three new checks and a two-run flag comparison | done |
+
+**Definition of Done — verified, not assumed.** `run_all.sh` runs 21 checks:
+4 static rules, 2 boot checks, 14 simulations and one two-run comparison.
 
 - Zero code-driven animation on game objects — static-checked every run
 - `assets/ASSETS.md` lists every PNG **and** every animation with its target
@@ -87,6 +98,15 @@ The original seven phases are complete. Revision 1 then changed:
 - Adding an item, rule or day needs only a `.tres` — `smoke_extensibility`
   creates all three, drives both views with them, and deletes them
 - Exactly two autoloads; no `ColorRect`, `draw_*` or 3D nodes anywhere
+- Four ocean tiers, every health value in exactly one of them, each visibly
+  different, and the tier only moving at the report — `smoke_ocean` asserts it
+- A run of correct sorting reaches a blueprint **and** a tier rise; a perfect
+  day never loses ground; blueprint bonuses cannot pass 100 — `smoke_ocean`
+- Neither upgrade can ship with only its benefit filled in, and choosing one
+  never touches the shift budget — `smoke_upgrades` asserts both
+- The calibration puzzle explains *why* an order is wrong, failing is free, and
+  with the flag off a whole run on one seed ends identically — `smoke_puzzle`
+  plus the two-run comparison in `run_all.sh`
 
 ---
 
@@ -108,7 +128,13 @@ Everything below is a starting point from the revision brief, not a tuned value.
 | Spawn pacing | seed 40%, every 3.0–6.5 s, floor 4 items | `data/days/*.tres` |
 | Fish density | 7–9, drift 25–65 px/s | `@export` on `claw_phase` |
 | Claw speeds | 220 / 160 / 200 px/s | `scenes/claw/claw.gd` |
-| Grip curve | `clamp(1 - weight*0.15, 0.25, 0.95)` | `scenes/claw/tank_item.gd` |
+| Grip curve | `clamp(1 - weight*0.15 + upgrade, 0.05, 0.95)` | `scenes/claw/tank_item.gd` |
+| Tier thresholds | 0–25 / 26–50 / 51–75 / 76–100 | `data/tiers/*.tres` |
+| Per-tier fish / coral / debris | 0,5,9 · 2,4,6 · 6,4,3 · 10,7,0 | `data/tiers/*.tres` |
+| Blueprint requirements | 12R · 8H+4O · 10R+6O+4H | `data/blueprints/*.tres` |
+| Blueprint health gains | +8 / +10 / +12 | `data/blueprints/*.tres` |
+| Upgrade trade-off values | drop 4 / −15pp grip · tool 2 / coarse | `data/upgrades/*.tres` |
+| Calibration puzzle bonus | +2 | `scenes/puzzle/calibration_puzzle.gd` |
 
 **Open question the brief asked me to raise:** should unspent budget pay a small
 bonus? Ending a shift early with quota met should be a viable strategic choice,
@@ -117,13 +143,96 @@ Shift*. A bonus of roughly `unspent / 10` would make it a real decision without
 competing with the clean-day bonus. **Not implemented** — §8 gave an exact
 formula and I did not want to quietly add a term to it.
 
+### Two blueprints are mathematically unreachable — decide the counts
+
+Measured, not guessed. If the player collected **every** item on **every** day
+and sorted all of them correctly, the whole five-day run yields:
+
+| Category | Ceiling for a flawless run |
+|----------|---------------------------|
+| ORGANIC | 10 |
+| RECYCLABLE | **7** |
+| HAZARD | 15 |
+| LANDFILL | 18 |
+
+Against the counts the brief specified:
+
+| Blueprint | Needs | Reachable in five days |
+|-----------|-------|------------------------|
+| Penyaring Mikroplastik | 12 RECYCLABLE | **no** — the run only holds 7 |
+| Penetral Limbah B3 | 8 HAZARD + 4 ORGANIC | yes |
+| Pemulih Terumbu | 10 RECYCLABLE + 6 ORGANIC + 4 HAZARD | **no** |
+
+I have shipped the counts as specified, because they are what the brief asked
+for and the requirement was that a run reach *at least one* blueprint, which it
+does. But two of the three are currently goals the player cannot finish, and a
+visible counter that can never fill is worse than no counter.
+
+**Proposal, yours to accept or reject:** scale the requirements to the supply —
+Penyaring Mikroplastik **5 RECYCLABLE**, Penetral Limbah B3 unchanged, Pemulih
+Terumbu **6 RECYCLABLE + 6 ORGANIC + 8 HAZARD**. That makes all three
+reachable and the third one only by playing nearly perfectly. The alternative
+is to add more recyclables to the day pools, which changes the difficulty
+curve rather than the goal — your call which lever to pull.
+
+### Cakar Ringan is currently a strict win — §4 said to flag this
+
+Also measured. Average grip across the fifty item slots in the run is 0.814.
+
+| Claw | Cost per drop | Grip | Budget per successful grab |
+|------|---------------|------|----------------------------|
+| Plain | 6 | 0.814 | **7.37** |
+| Cakar Ringan | 4 | 0.664 | **6.02** |
+
+So −15 percentage points does not pay for the two budget it saves: the upgrade
+is cheaper *and* better in expectation, which is exactly the pure improvement
+§4 forbids. Break-even is a grip of 0.543, i.e. a penalty of about **−27pp**.
+
+I have shipped −15 because that is the number in the brief's table, and flagged
+it here as §4 instructed rather than quietly re-tuning a specified value.
+**Proposal: −30pp**, which makes it a genuine trade-off — a cheaper claw that
+you take when you are hunting light items and regret on the heavy ones.
+Pemindai Kasar needs no such fix: a full reading through it costs 2 + 4 = 6
+against a plain 4, so it is only worth taking if you often probe and walk away.
+
+### Does the calibration puzzle earn its place? — my honest read
+
+**What it cost:** about 300 lines across `scenes/puzzle/`, two scenes, seven
+strings, one flag, one call site and one smoke check. Isolation was cheap
+because it touches nothing — no health formula, no budget, no counters.
+
+**What it adds:** the failure lines. *"Air dibuang sebelum disaring. Residunya
+ikut keluar."* is the only place in the game that explains a process rather
+than a category, and in a judged Q&A that is worth having.
+
+**What it does not add:** any decision. Four items reorder in seconds, failure
+costs nothing, and there is a skip button. It is a reading exercise wearing a
+puzzle's clothes, and it interrupts the one moment — a blueprint completing —
+that the rest of the revision built up to.
+
+**My recommendation: cut the interaction, keep the words.** Show the ordered
+sequence and its explanation as a panel on the unlock screen and you keep all
+of the educational value and lose none of the pacing. If you would rather keep
+it playable, keep it — it is genuinely free to leave in, and `run_all.sh`
+proves the game is identical with the flag off. That check is there so this
+stays your decision rather than mine.
+
 ### Still yours to supply
 
+- **Real art for the ocean tiers first.** `seabed_tier_0..3.png`,
+  `coral_healthy.png`, `coral_dead.png`, `debris_overlay.png`. This is the
+  single best-looking part of the game and the cheapest place for a designer to
+  make a difference — four seabeds and two corals carry the whole "the ocean is
+  recovering" idea.
 - **Real art.** Drop PNGs at the paths and sizes in `assets/ASSETS.md`. Read the
   hotspot section there first: the rings are a separate overlay now, and final
   art must draw the hotspot into the item itself at the authored coordinates.
 - **Real audio.** Replace `assets/audio/*.wav`, same filenames.
 - **Cutscene script.** Three placeholder lines in `data/strings.gd`.
+- **Flavour text review.** Three blueprint lines and two upgrade descriptions
+  in `data/blueprints/*.tres` and `data/upgrades/*.tres`. They are deliberately
+  plain and claim nothing technical about chemistry, since the team has no
+  chemist and has to defend every line.
 - **Export templates** (GUI-only step) if you want a build.
 
 ---
@@ -177,6 +286,20 @@ heals the ocean. Sorting everything wrong still bottoms the meter out on day 4.
   can test the real difficulty. Final art must integrate them.
 - **Fish count and speed are `@export` on the tank, not `DayData`.** Density is
   an atmosphere knob, not a difficulty one, so it is deliberately not per-day.
+- **The ocean tier's transition line lives in the `.tres`, not `strings.gd`.**
+  Same reasoning as rule text: it is content, one line per tier, and a fifth
+  tier must not need a code or table change to say something.
+- **The calibration puzzle keeps its own step and failure text.** §5 required
+  that deleting `scenes/puzzle/` remove the feature completely, which a
+  `strings.gd` dependency would break. Only its UI chrome is in `strings.gd`,
+  in a block marked for deletion with it.
+- **The puzzle has a skip button, which the brief did not ask for.** An
+  experimental feature must never be able to block a run in a demo. It is one
+  button and it goes with the folder.
+- **"Forces tier 3 art if health allows" reads as: not below the tier under
+  it.** Pemulih Terumbu pushes the art to tier 3, but the push is withdrawn if
+  the ocean falls under 51. Painting a healed reef over a dying ocean would be
+  a lie, and that is the most defensible reading of "if health allows".
 - **The claw view still owns the tank's spawning.** If the tank ever needs to
   keep running while unloaded, that logic moves to `Game`.
 
@@ -207,9 +330,27 @@ does not), screen transitions, particles, juice passes, audio mixing.
 
 ---
 
-## What revision 1 superseded
+## What the revisions superseded
 
-These parts of the original brief no longer describe this build:
+These parts of the earlier briefs no longer describe this build.
+
+**Revision 2 over revision 1:**
+
+| Was | Now |
+|-----|-----|
+| Fish count and speed are both `@export` on the tank | Count comes from the ocean tier; only speed is an `@export` (rev 2 §1) |
+| The seabed is one fixed backdrop | Four tier backdrops, swapped at the day report (rev 2 §1) |
+| `main_menu → cutscene → day_start → shift → report` | `… → report → [unlock] → …`, one unlock screen per completed blueprint (rev 2 §2) |
+| The inventory card and the claw readout name the item | They describe it until the name has been earned (rev 2 §3) |
+| `Game.cost_of()` is the action cost | `base_cost()` is the action cost; `cost_of()` applies the run's upgrade (rev 2 §4) |
+| Layer 100 is the rulebook | The rulebook and the experimental calibration puzzle (rev 2 §5) |
+
+Nothing revision 1 built was removed. The shift model, the budget, the rule
+resolver, the health formula and the inspect panel are all untouched — the
+health formula in particular, since blueprint and puzzle bonuses are applied
+outside it precisely so the report's arithmetic stays traceable.
+
+**Revision 1 over the original brief:**
 
 | Original | Now |
 |----------|-----|

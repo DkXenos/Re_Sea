@@ -7,6 +7,9 @@ var game: Node
 var main: Node
 var bad_mode := false
 var verbose := false
+## 0 means "let the game pick one". A fixed seed makes two runs comparable,
+## which is how the calibration puzzle is proved to be optional (revision 2 §6).
+var fixed_seed := 0
 
 
 func _init() -> void:
@@ -30,8 +33,14 @@ func _run() -> void:
 	Engine.time_scale = 1.0 if "--realtime" in OS.get_cmdline_user_args() else 6.0
 	bad_mode = "--bad" in OS.get_cmdline_user_args()
 	verbose = "--verbose-days" in OS.get_cmdline_user_args()
+	var args := OS.get_cmdline_user_args()
+	var seed_at := args.find("--seed")
+	if seed_at >= 0 and seed_at + 1 < args.size():
+		fixed_seed = int(args[seed_at + 1])
 	game = root.get_node("/root/Game")
 	game.sfx_enabled = false  # see Game.sfx_enabled
+	if "--no-puzzle" in args:
+		game.feature_calibration_puzzle = false
 	main = load("res://main.tscn").instantiate()
 	root.add_child(main)
 	await process_frame
@@ -52,6 +61,8 @@ func _run() -> void:
 		match String(kind):
 			"MainMenu":
 				scene.get_node("UiLayer/Root/Buttons/PlayButton").pressed.emit()
+				if fixed_seed != 0:
+					game.start_run(fixed_seed)
 			"Cutscene":
 				scene._finish()
 			"DayStart":
