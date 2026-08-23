@@ -137,6 +137,9 @@ files are drawn programmatically by `tools/gen_placeholders.py` and
 | `data/frames/tool_cutter_frames.tres` | `idle` | `assets/tools/tool_cutter.png` | 2 |
 | `data/frames/tool_cutter_frames.tres` | `using` | `assets/tools/tool_cutter_using.png` | 4 |
 | `data/frames/bubble_frames.tres` | `rise` | `assets/env/bubble.png` | 6 |
+| `data/frames/coral_healthy_frames.tres` | `idle` | `assets/env/coral_healthy.png` | 6 |
+| `data/frames/coral_dead_frames.tres` | `idle` | `assets/env/coral_dead.png` | 6 |
+| `data/frames/debris_overlay_frames.tres` | `idle` | `assets/env/debris_overlay.png` | 6 |
 
 ## Every PNG
 
@@ -227,6 +230,13 @@ files are drawn programmatically by `tools/gen_placeholders.py` and
 | `assets/env/cutscene_02.png` | 960x540 | Cutscene still 2 (placeholder) |
 | `assets/env/cutscene_03.png` | 960x540 | Cutscene still 3 (placeholder) |
 | `assets/env/logo.png` | 640x200 | Title logo |
+| `assets/env/seabed_tier_0.png` | 1000x140 | Seabed backdrop for ocean tier 0. Tiled across the seabed width. |
+| `assets/env/seabed_tier_1.png` | 1000x140 | Seabed backdrop for ocean tier 1. Tiled across the seabed width. |
+| `assets/env/seabed_tier_2.png` | 1000x140 | Seabed backdrop for ocean tier 2. Tiled across the seabed width. |
+| `assets/env/seabed_tier_3.png` | 1000x140 | Seabed backdrop for ocean tier 3. Tiled across the seabed width. |
+| `assets/env/coral_healthy.png` | 120x140 | Coral overlay, in colour. Sways in place; count is per ocean tier. |
+| `assets/env/coral_dead.png` | 120x140 | Coral overlay, bleached. Sways in place; count is per ocean tier. |
+| `assets/env/debris_overlay.png` | 96x96 | Debris clutter on the seabed. Count falls as the ocean recovers. |
 | `assets/items/hotspots_banana_peel.png` | 160x160 | Hotspot rings for `banana_peel`. **Generated from `data/items/banana_peel.tres`** by `tools/gen_hotspot_overlays.gd` - never edit by hand, and do not draw it into the item art. |
 | `assets/items/hotspots_fish_bone.png` | 160x160 | Hotspot rings for `fish_bone`. **Generated from `data/items/fish_bone.tres`** by `tools/gen_hotspot_overlays.gd` - never edit by hand, and do not draw it into the item art. |
 | `assets/items/hotspots_pet_bottle.png` | 160x160 | Hotspot rings for `pet_bottle`. **Generated from `data/items/pet_bottle.tres`** by `tools/gen_hotspot_overlays.gd` - never edit by hand, and do not draw it into the item art. |
@@ -242,6 +252,6 @@ files are drawn programmatically by `tools/gen_placeholders.py` and
 | `assets/items/hotspots_glass_jar.png` | 160x160 | Hotspot rings for `glass_jar`. **Generated from `data/items/glass_jar.tres`** by `tools/gen_hotspot_overlays.gd` - never edit by hand, and do not draw it into the item art. |
 | `assets/items/hotspots_fishing_net.png` | 160x160 | Hotspot rings for `fishing_net`. **Generated from `data/items/fishing_net.tres`** by `tools/gen_hotspot_overlays.gd` - never edit by hand, and do not draw it into the item art. |
 
-_99 PNGs, 74 animations across 27 SpriteFrames resources._
+_106 PNGs, 77 animations across 30 SpriteFrames resources._
 _Hotspot overlays are generated separately — see above._
 _Regenerate with_ `python3 tools/gen_placeholders.py`.

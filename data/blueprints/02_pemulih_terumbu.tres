@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="BlueprintData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://data/blueprint_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"pemulih_terumbu"
+display_name = "Pemulih Terumbu"
+flavour_text = "Rangka tempat karang muda bisa menempel dan tumbuh kembali."
+required = { 1: 10, 0: 6, 2: 4 }
+health_gain = 12
+forces_tier = 3
+sort_order = 2

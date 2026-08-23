@@ -330,6 +330,44 @@ def gen_env():
 
 
 
+# --------------------------------------------------------------- ocean tiers
+# Revision 2 §1. The seabed backdrop, the coral and the debris are swapped by
+# tier, so the recovering ocean is something the player can see rather than a
+# number on a report. Counts and thresholds live in data/tiers/*.tres.
+
+def gen_tiers():
+    """Four seabed backdrops, murky to bright, plus coral and debris overlays."""
+    for tier, (floor_col, top_col, rocks) in enumerate(C.TIER_SEABED):
+        img, d = canvas(1000, 140)
+        d.rectangle([0, 30, 999, 139], fill=floor_col + (255,))
+        d.rectangle([0, 30, 999, 44], fill=top_col + (255,))
+        for x, r in rocks:
+            outlined(d, "ellipse", [x - r, 30 - r * .7, x + r, 30 + r], shade(floor_col, 0.8))
+        save(img, "env/seabed_tier_%d.png" % tier,
+             "Seabed backdrop for ocean tier %d. Tiled across the seabed width." % tier)
+
+    for name, col, dead in (("coral_healthy", (232, 118, 132), False),
+                            ("coral_dead", (128, 124, 118), True)):
+        img, d = canvas(120, 140)
+        branches = [(60, 138, 60, 44), (60, 96, 26, 40), (60, 96, 94, 40),
+                    (60, 70, 38, 18), (60, 70, 84, 20)]
+        for x0, y0, x1, y1 in branches:
+            d.line([(x0, y0), (x1, y1)], fill=shade(col, 0.7), width=11)
+        for x0, y0, x1, y1 in branches:
+            r = 9 if dead else 13
+            outlined(d, "ellipse", [x1 - r, y1 - r, x1 + r, y1 + r], col, width=2)
+        save(img, "env/%s.png" % name,
+             "Coral overlay, %s. Sways in place; count is per ocean tier."
+             % ("bleached" if dead else "in colour"))
+
+    img, d = canvas(96, 96)
+    for x0, y0, w, h in ((8, 62, 40, 22), (44, 70, 34, 16), (20, 44, 26, 20)):
+        outlined(d, "rounded_rectangle", [x0, y0, x0 + w, y0 + h], (78, 74, 66), radius=5)
+    d.line([(10, 40), (58, 30)], fill=(64, 60, 54), width=5)
+    save(img, "env/debris_overlay.png",
+         "Debris clutter on the seabed. Count falls as the ocean recovers.")
+
+
 # ------------------------------------------------------------- SpriteFrames
 # Everything that will ever animate is already an AnimatedSprite2D backed by one
 # of these, currently one frame per animation. Designers add frames here rather
@@ -394,6 +432,10 @@ def gen_frames():
         n += 1
     write_frames("bubble_frames", [("rise", ["env/bubble.png"], 6)], 6.0)
     n += 1
+    # Ocean-tier overlays. They sway; nothing in code moves them (revision 1 §1).
+    for name in ("coral_healthy", "coral_dead", "debris_overlay"):
+        write_frames("%s_frames" % name, [("idle", ["env/%s.png" % name], 6)], 3.0)
+        n += 1
     print("generated %d SpriteFrames resources in data/frames/" % n)
 
 
@@ -492,6 +534,7 @@ def main():
     gen_tools()
     gen_ui()
     gen_env()
+    gen_tiers()
     gen_frames()
     note_generated_elsewhere()
     anims = "\n".join("| `%s` | `%s` | `assets/%s` | %d |" % a for a in ANIMS)

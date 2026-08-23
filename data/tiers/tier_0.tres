@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="OceanTierData" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://data/ocean_tier_data.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/env/seabed_tier_0.png" id="2_seabed"]
+[ext_resource type="SpriteFrames" path="res://data/frames/coral_dead_frames.tres" id="3_coral"]
+[ext_resource type="SpriteFrames" path="res://data/frames/debris_overlay_frames.tres" id="4_debris"]
+
+[resource]
+script = ExtResource("1_script")
+tier = 0
+min_health = 0
+max_health = 25
+water_tint = Color(0.62, 0.70, 0.62, 1)
+seabed = ExtResource("2_seabed")
+fish_count = 0
+coral_count = 5
+coral_frames = ExtResource("3_coral")
+debris_count = 9
+debris_frames = ExtResource("4_debris")
+transition_text = "Airnya keruh. Hampir tidak ada yang hidup di sini."

@@ -22,6 +22,7 @@ const METER_WIDTH := 320.0
 @onready var _breakdown: VBoxContainer = $UiLayer/Root/Breakdown
 @onready var _health_label: Label = $UiLayer/Root/HealthLabel
 @onready var _meter_clip: Control = $UiLayer/Root/MeterClip
+@onready var _tier_line: Label = $UiLayer/Root/TierLine
 @onready var _next: Button = $UiLayer/Root/NextButton
 
 var _result: Dictionary
@@ -41,8 +42,26 @@ func _ready() -> void:
 	_animate_meter()
 	Events.sfx_requested.emit(&"day_end")
 	# Committing here, after the numbers are on screen, keeps the report the
-	# single place the ocean meter can change.
+	# single place the ocean meter can change - and, since revision 2, the
+	# single place the ocean's ART can change.
+	var tier_before := Game.visual_tier
 	Game.commit_day_result(_result)
+	_show_tier_line(tier_before)
+
+
+## One quiet sentence when the ocean crosses a tier boundary, and nothing at
+## all when it does not. The restraint is deliberate: the meter moving a little
+## every day is the reward, and a fanfare would cheapen it.
+func _show_tier_line(tier_before: int) -> void:
+	_tier_line.text = ""
+	if Game.visual_tier == tier_before:
+		return
+	var tier := Game.current_tier()
+	if tier == null:
+		return
+	_tier_line.text = tier.transition_text
+	_tier_line.add_theme_color_override("font_color",
+		Color(0.62, 0.9, 0.86) if Game.visual_tier > tier_before else Color(0.9, 0.74, 0.62))
 
 
 func _unhandled_input(event: InputEvent) -> void:

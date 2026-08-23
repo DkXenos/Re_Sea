@@ -45,3 +45,14 @@ FISH = [("fish_bg_small", 96, 48, (244, 162, 97)),
 
 BINS = [("organic", (106, 153, 78)), ("recyclable", (58, 134, 183)),
         ("hazard", (198, 76, 65)), ("landfill", (120, 113, 108))]
+
+# Ocean-tier seabed backdrops (revision 2 §1): floor colour, ridge colour and
+# where the rocks sit. Tier 0 is murky and cluttered, tier 3 is bright and open.
+# The tier *thresholds and counts* are game content and live in data/tiers/.
+TIER_SEABED = [
+    ((66, 60, 44), (88, 80, 58), [(120, 34), (300, 30), (420, 22), (560, 36),
+                                  (700, 40), (880, 18)]),
+    ((74, 70, 52), (100, 94, 68), [(120, 34), (420, 22), (700, 40), (880, 18)]),
+    ((88, 92, 66), (118, 124, 86), [(160, 28), (520, 24), (820, 30)]),
+    ((104, 118, 84), (140, 158, 108), [(200, 22), (760, 26)]),
+]

@@ -4,6 +4,7 @@
 extends Node
 
 const DAY_DIR := "res://data/days/"
+const TIER_DIR := "res://data/tiers/"
 const SFX_DIR := "res://assets/audio/"
 const SFX_POOL_SIZE := 6
 ## Paid once for a day with no mis-sorts that also met quota. Tuning candidate.
@@ -31,6 +32,14 @@ var rng := RandomNumberGenerator.new()
 var days: Array[DayData] = []
 var day_index: int = 0
 var ocean_health: int = 100
+
+# --- ocean recovery tiers (revision 2 §1) ---
+var tiers: Array[OceanTierData] = []
+## The tier the ART is currently showing. It follows ocean_health, but only at
+## the day report: the seabed must not shift under the player mid-shift, and
+## stability reads as a world that changes when the day turns over rather than
+## one that flickers.
+var visual_tier: int = 3
 
 # --- current day ---
 var inventory: Array[CarriedItem] = []
@@ -66,6 +75,7 @@ func _ready() -> void:
 			apply_setting(key, float(settings[key]), false)
 	_load_days()
 	_load_tools()
+	_load_tiers()
 	Events.sfx_requested.connect(play_sfx)
 	Events.debug_command.connect(_on_debug_command)
 
@@ -73,38 +83,39 @@ func _ready() -> void:
 # ---------------------------------------------------------------- content load
 
 func _load_days() -> void:
-	days.clear()
-	var dir := DirAccess.open(DAY_DIR)
-	if dir == null:
-		push_warning("No day data directory yet: %s" % DAY_DIR)
-		return
-	var names := dir.get_files()
-	names.sort()
-	for file_name: String in names:
-		var clean := file_name.trim_suffix(".remap")
-		if not clean.ends_with(".tres"):
-			continue
-		var day: DayData = load(DAY_DIR + clean)
-		if day != null:
-			days.append(day)
+	days.assign(_load_dir(DAY_DIR))
+	if days.is_empty():
+		push_warning("No day data found in %s" % DAY_DIR)
 	days.sort_custom(func(a: DayData, b: DayData) -> bool: return a.day_number < b.day_number)
 
 
 func _load_tools() -> void:
-	tools.clear()
-	var dir := DirAccess.open("res://data/tools/")
+	tools.assign(_load_dir("res://data/tools/"))
+	tools.sort_custom(func(a: ToolData, b: ToolData) -> bool: return a.sort_order < b.sort_order)
+
+
+func _load_tiers() -> void:
+	tiers.assign(_load_dir(TIER_DIR))
+	tiers.sort_custom(func(a: OceanTierData, b: OceanTierData) -> bool:
+		return a.min_health < b.min_health)
+
+
+## Shared by every content directory: sorted, .remap-aware, silent if missing.
+func _load_dir(dir_path: String) -> Array:
+	var out: Array = []
+	var dir := DirAccess.open(dir_path)
 	if dir == null:
-		return
+		return out
 	var names := dir.get_files()
 	names.sort()
 	for file_name: String in names:
 		var clean := file_name.trim_suffix(".remap")
 		if not clean.ends_with(".tres"):
 			continue
-		var tool_data: ToolData = load("res://data/tools/" + clean)
-		if tool_data != null:
-			tools.append(tool_data)
-	tools.sort_custom(func(a: ToolData, b: ToolData) -> bool: return a.sort_order < b.sort_order)
+		var res: Resource = load(dir_path + clean)
+		if res != null:
+			out.append(res)
+	return out
 
 
 func get_tool(tool_id: StringName) -> ToolData:
@@ -122,6 +133,7 @@ func start_run(seed_value: int = 0) -> void:
 	day_index = 0
 	ocean_health = 100
 	force_grip = 0
+	visual_tier = tier_for(ocean_health)
 	Events.ocean_health_changed.emit(ocean_health)
 	begin_day()
 
@@ -261,6 +273,38 @@ func end_day_breakdown() -> Dictionary:
 func commit_day_result(breakdown: Dictionary) -> void:
 	ocean_health = int(breakdown["health_after"])
 	Events.ocean_health_changed.emit(ocean_health)
+	refresh_visual_tier()
+
+
+# ------------------------------------------------------------- ocean tiers
+
+## Which tier a health value falls in. Data decides the thresholds; if they ever
+## leave a gap, the nearest tier below wins rather than nothing at all.
+func tier_for(health: int) -> int:
+	var best: int = 0
+	for t: OceanTierData in tiers:
+		if health >= t.min_health:
+			best = maxi(best, t.tier)
+	return best
+
+
+func tier_data(tier: int) -> OceanTierData:
+	for t: OceanTierData in tiers:
+		if t.tier == tier:
+			return t
+	return null
+
+
+func current_tier() -> OceanTierData:
+	return tier_data(visual_tier)
+
+
+## Called only at the day report and at the start of a run. Returns the tier the
+## art moved to, or -1 if nothing changed, so the report can say one quiet line.
+func refresh_visual_tier() -> int:
+	var was := visual_tier
+	visual_tier = tier_for(ocean_health)
+	return visual_tier if visual_tier != was else -1
 
 
 func set_ocean_health(value: int) -> void:
