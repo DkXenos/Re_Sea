@@ -5,6 +5,9 @@ extends RefCounted
 
 var data: ItemData
 var revealed: Dictionary = {} ## field name -> true
+## Fields the coarse scanner has found but not yet read (revision 2 §4). Only
+## ever filled when that upgrade is taken.
+var probed: Dictionary = {}
 var sorted_to: int = -1
 var was_correct: bool = false
 var expected_category: int = -1
@@ -24,6 +27,14 @@ func name_known() -> bool:
 ## The name if it has been earned, the observed properties if it has not.
 func label() -> String:
 	return data.display_name if name_known() else data.surface_label()
+
+
+func is_probed(field: String) -> bool:
+	return probed.get(field, false)
+
+
+func probe(field: String) -> void:
+	probed[field] = true
 
 
 func is_revealed(field: String) -> bool:

@@ -65,6 +65,7 @@ const TABLE: Dictionary = {
 	"reveal_success": "Ditemukan sesuatu!",
 	"reveal_nothing": "Bersih di titik ini - tidak ada yang bisa dibaca.",
 	"inspect_found": "Ditemukan: {v}   (waktu shift -{n})",
+	"inspect_coarse": "Ada sesuatu di titik ini, tapi belum terbaca. Pakai alat sekali lagi untuk membacanya. (waktu shift -{n})",
 	"inspect_nothing": "Bersih di titik ini. Tidak ada temuan, waktu shift tetap terpakai -{n}.",
 	"inspect_rules_title": "ATURAN AKTIF HARI INI",
 	"inspect_question": "Terlihat seperti {mat}. Percaya?",
@@ -124,6 +125,14 @@ const TABLE: Dictionary = {
 	"blueprint_unlocked_title": "TEKNOLOGI BARU SELESAI DIBANGUN",
 	"blueprint_health_gain": "Kesehatan laut +{n}",
 	"blueprint_continue": "Lanjut",
+
+	# --- upgrades (revision 2) ---
+	"upgrade_choose_title": "PILIH SATU PENINGKATAN",
+	"upgrade_choose_hint": "Hanya satu yang bisa dipakai. Yang lain terkunci sampai permainan ini selesai.",
+	"upgrade_benefit": "+ {v}",
+	"upgrade_cost": "- {v}",
+	"upgrade_take": "Ambil ini",
+	"upgrade_chosen": "Peningkatan dipilih: {v}",
 
 	# --- endings ---
 	"over_title": "LAUT MATI",

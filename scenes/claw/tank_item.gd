@@ -58,8 +58,11 @@ func drift_in(target_x: float, rest_y: float) -> void:
 	sprite.play(&"sinking")
 
 
+## The weight curve, plus whatever the run's upgrade traded away. A lighter claw
+## is cheaper to drop and worse at holding on (revision 2 §4); the number the
+## player sees before the drop already includes that.
 func grip_chance() -> float:
-	return clampf(1.0 - data.weight * 0.15, 0.25, 0.95)
+	return clampf(1.0 - data.weight * 0.15 + Game.grip_delta(), 0.05, 0.95)
 
 
 ## Carried by the claw: reparented so it simply follows. No joint, no physics.

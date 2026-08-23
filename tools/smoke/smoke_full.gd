@@ -67,6 +67,12 @@ func _run() -> void:
 						% [b["shortfall"], b["clean_bonus"], b["delta"]])
 				scene.get_node("UiLayer/Root/NextButton").pressed.emit()
 			"UnlockScreen":
+				# Revision 2 §4: the first blueprint also offers the one upgrade
+				# choice of the run, and the Continue button stays disabled until
+				# the player has made it.
+				var choice: Control = scene.get_node("UiLayer/Root/UpgradeChoice")
+				if choice.visible and game.chosen_upgrade == &"":
+					_take_first_upgrade(scene)
 				# Revision 2 §2: a blueprint that completed at the report gets
 				# its own screen before the next day starts.
 				print("     unlocked %s | health=%d tier=%d" % [scene.blueprint.display_name
@@ -84,6 +90,16 @@ func _run() -> void:
 	for i in 10:
 		await process_frame
 	quit()
+
+
+## Takes the leftmost upgrade card. Which one matters less than that the choice
+## is made at all: the Continue button is disabled until it is.
+func _take_first_upgrade(scene: Node) -> void:
+	for card: Control in scene.get_node("UiLayer/Root/UpgradeChoice/Cards").get_children():
+		for child: Node in card.get_children():
+			if child is Button:
+				(child as Button).pressed.emit()
+				return
 
 
 ## Works the shift the way a player would: stay at the tank while there is

@@ -254,13 +254,26 @@ func _use_tool_at(point: Vector2) -> void:
 	if not Game.tool_unlocked(tool_id):
 		Events.toast_requested.emit(Strings.t("tools_locked"))
 		return
-	if not Game.spend(&"tool"):
+	var field := _hotspot_field(_to_normalized(point), tool_id)
+	# The coarse scanner (revision 2 §4) probes cheaply and reads properly only
+	# on a second use, which is charged at the normal price. Working out which
+	# of the two this click is costs nothing - paying for it always does.
+	var second_reading: bool = Game.coarse_readings() and field != "" \
+		and entry.is_probed(field)
+	var cost: int = Game.base_cost(&"tool") if second_reading else Game.cost_of(&"tool")
+	if not Game.spend_amount(cost):
 		Events.toast_requested.emit(Strings.t("budget_too_low"))
 		return
 	Game.stats["tool_uses"] = int(Game.stats.get("tool_uses", 0)) + 1
 	Events.sfx_requested.emit(&"tool_use")
-	var cost := Game.cost_of(&"tool")
-	var field := _hotspot_field(_to_normalized(point), tool_id)
+	if Game.coarse_readings() and field != "" and not second_reading:
+		# Found something, cannot say what. Cheap, and deliberately unfinished.
+		entry.probe(field)
+		Events.sfx_requested.emit(&"reveal_success")
+		_set_feedback(Strings.tf("inspect_coarse", {"n": cost}), Color(0.86, 0.88, 0.6))
+		reveal_happened.emit(field, false)
+		_refresh_rack()
+		return
 	if field.is_empty():
 		# Missed. The charge is gone anyway - that is the risk, and it must
 		# never be prevented. But spending for nothing has to *read* as an

@@ -6,6 +6,7 @@ extends Node
 const DAY_DIR := "res://data/days/"
 const TIER_DIR := "res://data/tiers/"
 const BLUEPRINT_DIR := "res://data/blueprints/"
+const UPGRADE_DIR := "res://data/upgrades/"
 const SFX_DIR := "res://assets/audio/"
 const SFX_POOL_SIZE := 6
 ## Paid once for a day with no mis-sorts that also met quota. Tuning candidate.
@@ -54,6 +55,13 @@ var pending_unlocks: Array[BlueprintData] = []
 ## Set by a blueprint that pushes the art forward. -1 for none.
 var forced_tier: int = -1
 
+# --- upgrades (revision 2 §4) ---
+var upgrades: Array[UpgradeData] = []
+## The one upgrade taken this run. The others stay locked for the rest of it -
+## that single choice is the whole system. Not persisted: settings survive a
+## restart, run progress does not.
+var chosen_upgrade: StringName = &""
+
 # --- current day ---
 var inventory: Array[CarriedItem] = []
 var tools: Array[ToolData] = []
@@ -90,6 +98,7 @@ func _ready() -> void:
 	_load_tools()
 	_load_tiers()
 	_load_blueprints()
+	_load_upgrades()
 	Events.sfx_requested.connect(play_sfx)
 	Events.debug_command.connect(_on_debug_command)
 
@@ -117,6 +126,12 @@ func _load_tiers() -> void:
 func _load_blueprints() -> void:
 	blueprints.assign(_load_dir(BLUEPRINT_DIR))
 	blueprints.sort_custom(func(a: BlueprintData, b: BlueprintData) -> bool:
+		return a.sort_order < b.sort_order)
+
+
+func _load_upgrades() -> void:
+	upgrades.assign(_load_dir(UPGRADE_DIR))
+	upgrades.sort_custom(func(a: UpgradeData, b: UpgradeData) -> bool:
 		return a.sort_order < b.sort_order)
 
 
@@ -157,6 +172,7 @@ func start_run(seed_value: int = 0) -> void:
 	unlocked_blueprints = []
 	pending_unlocks = []
 	forced_tier = -1
+	chosen_upgrade = &""
 	visual_tier = tier_for(ocean_health)
 	Events.ocean_health_changed.emit(ocean_health)
 	begin_day()
@@ -219,8 +235,22 @@ func unsorted_items() -> Array[CarriedItem]:
 
 # ---------------------------------------------------------------- shift budget
 
-func cost_of(action: StringName) -> int:
+## What an action costs before any upgrade touches it.
+func base_cost(action: StringName) -> int:
 	return int(ACTION_COST.get(action, 0))
+
+
+func cost_of(action: StringName) -> int:
+	var up := upgrade()
+	if up != null:
+		match action:
+			&"drop":
+				if up.drop_cost >= 0:
+					return up.drop_cost
+			&"tool":
+				if up.tool_cost >= 0:
+					return up.tool_cost
+	return base_cost(action)
 
 
 func can_afford(action: StringName) -> bool:
@@ -229,7 +259,12 @@ func can_afford(action: StringName) -> bool:
 
 ## Always spends, including when a tool click reveals nothing. That is the risk.
 func spend(action: StringName) -> bool:
-	var cost := cost_of(action)
+	return spend_amount(cost_of(action))
+
+
+## Same, for the one case where the price is not the standard one: the coarse
+## scanner's second, full reading is charged at the base tool cost.
+func spend_amount(cost: int) -> bool:
 	if budget_left < cost:
 		return false
 	budget_left -= cost
@@ -341,6 +376,37 @@ func claim_unlock() -> BlueprintData:
 
 func blueprint_unlocked(blueprint_id: StringName) -> bool:
 	return blueprint_id in unlocked_blueprints
+
+
+# ---------------------------------------------------------------- upgrades
+
+func upgrade() -> UpgradeData:
+	for up: UpgradeData in upgrades:
+		if up.id == chosen_upgrade:
+			return up
+	return null
+
+
+## The choice is offered once, on the unlock screen, after the first blueprint.
+func upgrade_choice_pending() -> bool:
+	return chosen_upgrade == &"" and not unlocked_blueprints.is_empty()
+
+
+func choose_upgrade(upgrade_id: StringName) -> void:
+	chosen_upgrade = upgrade_id
+	Events.budget_changed.emit(budget_left, budget_max)
+
+
+## Added to every item's grip chance. Zero unless an upgrade traded grip away.
+func grip_delta() -> float:
+	var up := upgrade()
+	return up.grip_delta if up != null else 0.0
+
+
+## True while tools report only THAT something is there, not what it is.
+func coarse_readings() -> bool:
+	var up := upgrade()
+	return up != null and up.coarse_readings
 
 
 # ------------------------------------------------------------- ocean tiers

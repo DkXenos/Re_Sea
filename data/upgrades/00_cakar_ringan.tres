@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="UpgradeData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://data/upgrade_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"cakar_ringan"
+display_name = "Cakar Ringan"
+benefit_text = "Menurunkan cakar hanya butuh 4 waktu shift, bukan 6."
+cost_text = "Cengkeramannya lebih lemah: peluang berhasil turun 15 poin."
+drop_cost = 4
+tool_cost = -1
+grip_delta = -0.15
+coarse_readings = false
+sort_order = 0
