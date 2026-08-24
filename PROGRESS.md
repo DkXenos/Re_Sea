@@ -256,6 +256,23 @@ it playable, keep it — it is genuinely free to leave in, and `run_all.sh`
 proves the game is identical with the flag off. That check is there so this
 stays your decision rather than mine.
 
+### How to reach the upgrades — this was not obvious in the playtest
+
+Upgrades are not bought and there is no shop. Finish a day, and the **after-day
+screen** appears after the report. It has three tabs:
+
+- **Hasil Hari Ini** — the day's haul.
+- **Teknologi** — the three blueprints. When one has its materials, its
+  **Klaim** button lights up. Claiming applies its health bonus (and, if the
+  calibration puzzle is still switched on, opens it).
+- **Peralatan** — the upgrades. Press **Pakai** on any unlocked one. Two are
+  available from day 1; Rel Cepat opens after the first claimed blueprint and
+  Cengkeraman Kuat after the second. Pressing Pakai on the fitted one takes it
+  off again, and the choice can be changed every night.
+
+The fitted upgrade and the costs it changes are shown in the shift bar while
+playing, so its effect is legible without opening a menu.
+
 ### Still yours to supply
 
 - **Real art for the ocean tiers first.** `seabed_tier_0..3.png`,
@@ -320,6 +337,11 @@ heals the ocean. Sorting everything wrong still bottoms the meter out on day 4.
   deliberate — §7.2 asked for exactly this — but it does mean a player who
   inspects thoroughly is told the answer. The cost of inspecting is what keeps
   that honest.
+- **Item placeholders no longer carry a material code.** They used to be
+  stamped `PET`, `ORG`, `B3` and so on, which made them easy to tell apart in a
+  screenshot and quietly answered the question the inspect phase exists to ask.
+  Placeholders are now shape and colour only. Fourteen distinct shapes is enough
+  to tell them apart, and it is a stamp no designer was going to reproduce.
 - **Placeholder hotspot rings are visible by default.** They now live in a
   separate overlay and can be switched off in settings or with F1, so the owner
   can test the real difficulty. Final art must integrate them.
@@ -351,7 +373,34 @@ heals the ocean. Sorting everything wrong still bottoms the meter out on day 4.
 
 ## Known bugs
 
-None outstanding. Fixed during revision 3:
+None outstanding. Fixed after the revision 3 playtest:
+
+- **Dragging a step in the calibration puzzle did nothing and printed an error.**
+  `step_row.gd` walked up a fixed number of parents to find the puzzle, and the
+  script sits on the `CanvasLayer`, one level further up than the count assumed.
+  Every drop landed on a bare `Control`. The puzzle is now handed to each row
+  explicitly. `smoke_puzzle` had set `_order` directly, so it passed while the
+  only way a player can reorder was broken — it now drives `_drop_data`.
+- **The desk sat underneath the shift bar.** Revision 3 grew the bar from 46 to
+  74 pixels for the ocean and upgrade labels and nothing below it moved, so the
+  inventory title, the blueprint strip and the rulebook button were all partly
+  covered.
+- **Three blueprint progress bars were 320x32 instead of 88x5**, painting over
+  the rulebook button and cutting its label in half. `TextureRect` clamps `size`
+  against its texture at the moment you assign it, and `expand_mode` was being
+  set on the line after. Order matters; `_meter()` now holds it in one place.
+- **A NinePatch drew its corners on top of each other** in the 38px blueprint
+  rows, because the patch margins were 24 top and bottom. They are 14 now.
+- **Inventory card text was cut mid-word.** A `Label` sized by hand kept one
+  line and overflowed; the card is an `HBoxContainer` now, so autowrap works.
+
+`smoke_layout.gd` was written for this class of bug and asserts geometry: that
+nothing on the desk hides under the shift bar or runs off screen, that the
+blueprint strip stays inside its panel and clear of the rulebook button, that
+every control stays in the box it was given, and that the inspect panel always
+identifies the item somehow.
+
+Fixed during revision 3:
 
 - **Items could spawn where the claw could never reach them.** The jitter on the
   first lane of `_spawn_items` could place an item at negative x, outside the

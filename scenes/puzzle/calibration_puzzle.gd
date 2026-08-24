@@ -120,7 +120,7 @@ func _rebuild() -> void:
 	for position in _order.size():
 		var row: Control = STEP_ROW.instantiate()
 		_rows.add_child(row)
-		row.setup(_order[position], _steps[_order[position]])
+		row.setup(_order[position], _steps[_order[position]], self)
 		row.set_position_number(position + 1)
 
 

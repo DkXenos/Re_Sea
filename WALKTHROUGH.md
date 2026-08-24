@@ -420,6 +420,16 @@ loses ground, and blueprint bonuses cannot push the meter past 100.
 `smoke_puzzle.gd` checks the order logic and that failing is free; the feature
 flag is proved by a whole run each way on one seed.
 
+`smoke_layout.gd` asserts geometry, which a headless run cannot: it came out of
+a playtest that found three versions of one bug on a single screen — a desk
+still positioned under a shift bar that had grown taller, a NinePatch whose
+margins were bigger than its box, and three progress bars left at their PNG's
+full size because `TextureRect.size` was assigned before `expand_mode`.
+Everything still *worked*; it just could not be read. Godot has two traps here
+worth remembering: a `TextureRect` clamps `size` against its texture at the
+moment you assign it, and a `Label` sized by hand will not autowrap — put it in
+a container.
+
 `smoke_shift.gd` holds the two invariants the shift model must never break:
 budget spent equals the sum of the actions taken, and the tank never starves
 while the pool still has items. `smoke_inspect.gd` asserts each of the five

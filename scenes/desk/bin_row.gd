@@ -29,13 +29,13 @@ func _ready() -> void:
 		sprite.sprite_frames = load("res://data/frames/bin_%s_frames.tres" % CATEGORY_ASSETS[i])
 		sprite.play(&"idle")
 		sprite.scale = Vector2.ONE * BIN_DISPLAY_SCALE
-		sprite.position = Vector2(centre, 96)
+		sprite.position = Vector2(centre, 90)
 		add_child(sprite)
 		_sprites.append(sprite)
 
 		var label := Label.new()
 		label.text = Strings.t(CATEGORY_KEYS[i])
-		label.position = Vector2(centre - slot * 0.5, 186)
+		label.position = Vector2(centre - slot * 0.5, 178)
 		label.size = Vector2(slot, 26)
 		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		label.add_theme_font_size_override("font_size", 18)
@@ -44,7 +44,7 @@ func _ready() -> void:
 		var button := Button.new()
 		button.flat = true
 		button.position = Vector2(centre - slot * 0.5 + 8, 8)
-		button.size = Vector2(slot - 16, 200)
+		button.size = Vector2(slot - 16, 192)
 		button.pressed.connect(bin_chosen.emit.bind(i))
 		add_child(button)
 

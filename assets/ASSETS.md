@@ -179,20 +179,20 @@ the file is displayed as-is and never animates.
 
 | Path | Size | Animated | What it is |
 |------|------|----------|-----------|
-| `assets/items/item_banana_peel.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `banana_peel` (ORG) |
-| `assets/items/item_fish_bone.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `fish_bone` (ORG) |
-| `assets/items/item_pet_bottle.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `pet_bottle` (PET) |
-| `assets/items/item_alu_can.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `alu_can` (ALU) |
-| `assets/items/item_styrofoam_tray.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `styrofoam_tray` (PS) |
-| `assets/items/item_car_battery.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `car_battery` (B3) |
-| `assets/items/item_oil_jerrycan.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `oil_jerrycan` (HDP) |
-| `assets/items/item_paint_bottle.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `paint_bottle` (PET) |
-| `assets/items/item_juice_carton.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `juice_carton` (PAP) |
-| `assets/items/item_eco_tote.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `eco_tote` (TXT) |
-| `assets/items/item_paper_cup.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `paper_cup` (PAP) |
-| `assets/items/item_spray_can.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `spray_can` (AER) |
-| `assets/items/item_glass_jar.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `glass_jar` (GL) |
-| `assets/items/item_fishing_net.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `fishing_net` (PA6) |
+| `assets/items/item_banana_peel.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `banana_peel` |
+| `assets/items/item_fish_bone.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `fish_bone` |
+| `assets/items/item_pet_bottle.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `pet_bottle` |
+| `assets/items/item_alu_can.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `alu_can` |
+| `assets/items/item_styrofoam_tray.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `styrofoam_tray` |
+| `assets/items/item_car_battery.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `car_battery` |
+| `assets/items/item_oil_jerrycan.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `oil_jerrycan` |
+| `assets/items/item_paint_bottle.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `paint_bottle` |
+| `assets/items/item_juice_carton.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `juice_carton` |
+| `assets/items/item_eco_tote.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `eco_tote` |
+| `assets/items/item_paper_cup.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `paper_cup` |
+| `assets/items/item_spray_can.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `spray_can` |
+| `assets/items/item_glass_jar.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `glass_jar` |
+| `assets/items/item_fishing_net.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `fishing_net` |
 | `assets/claw/claw_open.png` | 160x160 | `open` 4 fr | Claw arm, open pose |
 | `assets/claw/claw_closing.png` | 160x160 | `closing` 6 fr | Claw arm, closing pose |
 | `assets/claw/claw_closed.png` | 160x160 | `closed` 2 fr | Claw arm, closed pose |

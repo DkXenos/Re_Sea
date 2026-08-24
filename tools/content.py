@@ -12,21 +12,24 @@ rings can never disagree with the coordinates the game checks against.
 """
 
 # id -> how to draw its placeholder. Ids must match data/items/<id>.tres.
+# Shape and colour only: nothing is written on an item any more. A code stamped
+# on the art told the player the material for free, which is the one thing the
+# inspect phase is supposed to make them work for.
 ITEM_ART = [
-    dict(id="banana_peel", shape="peel", color=(232, 197, 71), code="ORG"),
-    dict(id="fish_bone", shape="bone", color=(237, 230, 214), code="ORG"),
-    dict(id="pet_bottle", shape="bottle", color=(127, 212, 232), code="PET"),
-    dict(id="alu_can", shape="can", color=(201, 205, 212), code="ALU"),
-    dict(id="styrofoam_tray", shape="tray", color=(242, 242, 242), code="PS"),
-    dict(id="car_battery", shape="box", color=(74, 85, 104), code="B3"),
-    dict(id="oil_jerrycan", shape="jerrycan", color=(143, 212, 143), code="HDP"),
-    dict(id="paint_bottle", shape="bottle", color=(183, 201, 232), code="PET"),
-    dict(id="juice_carton", shape="carton", color=(224, 122, 95), code="PAP"),
-    dict(id="eco_tote", shape="tote", color=(163, 177, 138), code="TXT"),
-    dict(id="paper_cup", shape="cup", color=(244, 225, 193), code="PAP"),
-    dict(id="spray_can", shape="spray", color=(176, 183, 195), code="AER"),
-    dict(id="glass_jar", shape="jar", color=(111, 168, 160), code="GL"),
-    dict(id="fishing_net", shape="net", color=(62, 124, 177), code="PA6"),
+    dict(id="banana_peel", shape="peel", color=(232, 197, 71)),
+    dict(id="fish_bone", shape="bone", color=(237, 230, 214)),
+    dict(id="pet_bottle", shape="bottle", color=(127, 212, 232)),
+    dict(id="alu_can", shape="can", color=(201, 205, 212)),
+    dict(id="styrofoam_tray", shape="tray", color=(242, 242, 242)),
+    dict(id="car_battery", shape="box", color=(74, 85, 104)),
+    dict(id="oil_jerrycan", shape="jerrycan", color=(143, 212, 143)),
+    dict(id="paint_bottle", shape="bottle", color=(183, 201, 232)),
+    dict(id="juice_carton", shape="carton", color=(224, 122, 95)),
+    dict(id="eco_tote", shape="tote", color=(163, 177, 138)),
+    dict(id="paper_cup", shape="cup", color=(244, 225, 193)),
+    dict(id="spray_can", shape="spray", color=(176, 183, 195)),
+    dict(id="glass_jar", shape="jar", color=(111, 168, 160)),
+    dict(id="fishing_net", shape="net", color=(62, 124, 177)),
 ]
 
 # Icon colours only. ToolData.color in data/tools/*.tres is authoritative for

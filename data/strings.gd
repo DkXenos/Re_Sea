@@ -77,7 +77,6 @@ const TABLE: Dictionary = {
 	"tools_cost_label": "biaya {n}",
 
 	# --- evidence chips ---
-	"chip_properties": "CIRI: {v}",
 	"chip_material": "TAMPAK: {v}",
 	"chip_label": "TULISAN: {v}",
 	"chip_weight": "BERAT: {v} kg",

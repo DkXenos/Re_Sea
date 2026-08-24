@@ -116,18 +116,20 @@ def draw_item_shape(d, shape, col, W, H):
 
 
 def gen_items():
-    """Clean item art. Hotspot rings are a separate overlay generated from the
-    .tres by tools/gen_hotspot_overlays.gd - never baked in here."""
+    """Clean item art: one flat shape, one colour, nothing written on it.
+
+    Earlier placeholders stamped a material code ("PET", "ORG") on every item.
+    That was removed: the whole inspect phase is about judging what an item is
+    from what you can observe, and a label reading PET answers the question for
+    free - and does it in art the designers were never going to reproduce.
+
+    Hotspot rings are a separate overlay generated from the .tres by
+    tools/gen_hotspot_overlays.gd - never baked in here."""
     W = H = 160
     for it in C.ITEM_ART:
         img, d = canvas(W, H)
         draw_item_shape(d, it["shape"], it["color"], W, H)
-        # small light plate so the code stays legible over any item colour
-        d.rounded_rectangle([W / 2 - 26, H - 28, W / 2 + 26, H - 6], radius=6,
-                            fill=(245, 245, 245, 235), outline=(40, 40, 40, 255), width=2)
-        centered(d, (W / 2 - 26, H - 28, W / 2 + 26, H - 8), it["code"], (20, 20, 20), 14)
-        save(img, "items/item_%s.png" % it["id"],
-             "Trash item `%s` (%s)" % (it["id"], it["code"]))
+        save(img, "items/item_%s.png" % it["id"], "Trash item `%s`" % it["id"])
 
 
 # ------------------------------------------------------------------- claw/fish

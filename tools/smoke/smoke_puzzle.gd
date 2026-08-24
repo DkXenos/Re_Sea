@@ -56,6 +56,16 @@ func _check_sequence(blueprint_id: StringName) -> void:
 	assert(not puzzle._is_correct(puzzle._order),
 		"the puzzle must never open already solved")
 
+	# Reorder through the real drag path. Setting _order directly is what let a
+	# broken _drop_data ship: the check passed while dragging a row did nothing
+	# at all in the running game.
+	var rows: Array = puzzle._rows.get_children()
+	var before: Array[int] = puzzle._order.duplicate()
+	rows[0]._drop_data(Vector2.ZERO, rows[1])
+	assert(puzzle._order[0] == before[1] and puzzle._order[1] == before[0],
+		"dropping one row on another must swap them")
+	print("  %s drag reorder works: %s -> %s" % [blueprint_id, before, puzzle._order])
+
 	# Away from the ceiling, so a +2 bonus is actually visible.
 	game.set_ocean_health(50)
 	# Wrong order: a readable line that is not the generic fallback, no health

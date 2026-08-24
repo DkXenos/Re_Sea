@@ -42,6 +42,11 @@ const TOOL_ICON_SCALE := 0.62
 @onready var _item_sprite: Sprite2D = $ViewportBox/ItemViewport/ItemRoot/Sprite
 @onready var _hotspot_sprite: Sprite2D = $ViewportBox/ItemViewport/ItemRoot/Hotspots
 @onready var _surface: Control = $Surface
+## What the player is looking at: the observed properties until the name has
+## been earned, the name once it has (rev 2 §3). Without this the desk showed
+## nothing at all that identified an item, which read as a missing label rather
+## than as a deliberate withholding.
+@onready var _name: Label = $NameLabel
 @onready var _question: Label = $Question
 @onready var _zoom_hint: Label = $ZoomHint
 @onready var _rack: VBoxContainer = $ToolRack
@@ -65,6 +70,7 @@ func _ready() -> void:
 	_evidence_title.text = Strings.t("evidence_title")
 	_rules_title.text = Strings.t("inspect_rules_title")
 	_question.text = Strings.t("inspect_pick_first")
+	_name.text = ""
 	_feedback.text = ""
 	_surface.gui_input.connect(_on_surface_input)
 	Events.budget_changed.connect(func(_r: int, _m: int) -> void: _refresh_rack())
@@ -181,6 +187,7 @@ func show_entry(new_entry: CarriedItem) -> void:
 	_item_sprite.texture = entry.data.texture if entry != null else null
 	_hotspot_sprite.texture = entry.data.hotspot_overlay if entry != null else null
 	_question.text = _question_for(entry)
+	_set_identity(entry)
 	_apply_transform()
 	_rebuild_log()
 	_rebuild_rules()
@@ -192,10 +199,22 @@ func clear() -> void:
 	_item_sprite.texture = null
 	_hotspot_sprite.texture = null
 	_question.text = Strings.t("inspect_pick_first")
+	_name.text = ""
 	_feedback.text = ""
 	_rebuild_log()
 	_rebuild_rules()
 	bin_hint_changed.emit(-1)
+
+
+## An unidentified item is named by what can be seen; a known one by its name.
+## The two are coloured differently so the moment it flips is unmissable.
+func _set_identity(target: CarriedItem) -> void:
+	if target == null:
+		_name.text = ""
+		return
+	_name.text = target.label()
+	_name.add_theme_color_override("font_color",
+		Color(1, 1, 1) if target.name_known() else Color(0.78, 0.86, 0.94))
 
 
 func _set_hotspots_visible(value: bool) -> void:
@@ -309,6 +328,7 @@ func _use_tool_at(point: Vector2) -> void:
 			{"v": entry.data.get_field_text(field), "n": cost}), Color(0.6, 0.92, 0.72))
 		Events.tool_used.emit(tool_id, field)
 		reveal_happened.emit(field, true)
+		_set_identity(entry)
 		_rebuild_log()
 		_rebuild_rules()
 	_refresh_rack()
@@ -378,11 +398,8 @@ func _rebuild_log() -> void:
 		return
 	var lit: Dictionary = _evidence_state()["lit"]
 	var item := entry.data
-	# Surface info is free and always shown. The property line comes first
-	# because, until a tool has been spent, it is the whole of what is known
-	# about this item (revision 2 §3).
-	_add_chip("surface_properties", Strings.tf("chip_properties",
-		{"v": item.surface_label()}), false, lit)
+	# Surface info is free and always shown. The observed properties are not
+	# repeated here: they are the panel's heading until the name is earned.
 	_add_chip("visible_material", Strings.tf("chip_material", {"v": item.visible_material}),
 		false, lit)
 	_add_chip("visible_label", Strings.tf("chip_label",
