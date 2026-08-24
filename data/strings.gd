@@ -99,6 +99,8 @@ const TABLE: Dictionary = {
 
 	# --- rulebook ---
 	"rulebook_title": "BUKU ATURAN",
+	"rulebook_codes": "ARTI KODE DAUR ULANG",
+	"rulebook_codes_note": "Kode ini dicetak atau dicap pada barangnya. Kode memberi tahu bahannya - bukan apakah barangnya bersih.",
 	"rulebook_close": "Tutup",
 	"rulebook_empty": "Belum ada aturan khusus hari ini",
 	"rulebook_general": "UMUM",
@@ -168,6 +170,27 @@ const TABLE: Dictionary = {
 	"pause_resume": "Lanjut",
 	"pause_menu": "Menu Utama",
 }
+
+## The resin and material codes printed on real packaging, in plain Indonesian.
+##
+## A player who has never sorted waste has no reason to know what PET means, and
+## the game shows the code on the item, on its label and in the magnifier
+## reading. Explaining it is one page in a book that is already free to open.
+##
+## This is a fixed reference table, not per-item content, so it lives here with
+## the rest of the text rather than becoming fourteen more .tres files.
+const CODES: Array = [
+	["PET 1", "plastik bening untuk botol minuman. Bisa didaur ulang kalau bersih."],
+	["HDPE 2", "plastik tebal untuk jerigen dan botol sabun. Bisa didaur ulang kalau bersih."],
+	["PVC 3", "plastik lentur tahan air. Sulit didaur ulang."],
+	["PE", "lapisan plastik tipis, sering dilapiskan ke kertas."],
+	["PS 6", "styrofoam. Hampir tidak pernah diterima daur ulang."],
+	["PA 6", "nilon, dipakai untuk tali dan jaring."],
+	["PAP", "kertas dan karton. Kalau berlapis plastik atau aluminium, tidak bisa dipisah."],
+	["ALU", "aluminium. Bernilai tinggi dan bisa didaur ulang berulang kali."],
+	["GL", "kaca. Bisa didaur ulang, tapi kaca campur sering ditolak."],
+	["Pb", "timbal. Logam berat beracun - selalu B3."],
+]
 
 static func t(key: String) -> String:
 	if TABLE.has(key):
