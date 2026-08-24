@@ -15,5 +15,5 @@ coarse_readings = false
 move_speed_multiplier = 1.6
 post_drop_lockout = 2.0
 unlock_after_blueprints = 1
-unlock_text = "Terbuka setelah satu teknologi selesai dibangun."
+unlock_text = "Terbuka setelah Drone Pembersih selesai dibangun."
 sort_order = 2

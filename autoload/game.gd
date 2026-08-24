@@ -52,12 +52,21 @@ var tiers: Array[OceanTierData] = []
 ## one that flickers.
 var visual_tier: int = 3
 
-# --- technology blueprints (revision 2 §2) ---
+# --- technology blueprints (revision 2 §2, reworked in revision 4 §3) ---
 var blueprints: Array[BlueprintData] = []
-## ItemData.Category -> correctly sorted items of it, across the WHOLE run.
+## ItemData.Category -> materials in hand and SPENDABLE. A correct sort adds
+## one; a wrong sort adds nothing; crafting a component subtracts. It persists
+## across the days of a run and never goes negative - a craft that cannot be
+## paid for is refused before anything is taken.
+##
+## Revision 3's flat per-category totals are gone rather than kept alongside:
+## the whole point of revision 4 is that progress is spent, not accumulated.
+##
 ## Credited at the day report, never mid-shift: the player is not told whether
 ## a sort was right until then, and a counter ticking up would leak the verdict.
-var correct_by_category: Dictionary = {}
+var materials: Dictionary = {}
+## ComponentData.id -> true. Per run, reset with the run.
+var crafted: Dictionary = {}
 var unlocked_blueprints: Array[StringName] = []
 ## Set by a blueprint that pushes the art forward. -1 for none.
 var forced_tier: int = -1
@@ -186,7 +195,8 @@ func start_run(seed_value: int = 0) -> void:
 	day_index = 0
 	ocean_health = STARTING_HEALTH
 	force_grip = 0
-	correct_by_category = {}
+	materials = {}
+	crafted = {}
 	unlocked_blueprints = []
 	forced_tier = -1
 	equipped_upgrade = &""
@@ -417,43 +427,77 @@ func commit_day_result(breakdown: Dictionary) -> void:
 	last_breakdown = breakdown
 	ocean_health = int(breakdown["health_after"])
 	Events.ocean_health_changed.emit(ocean_health)
-	_credit_blueprint_materials()
+	_credit_materials()
 	refresh_visual_tier()
 
 
 # -------------------------------------------------------------- blueprints
 
-## Today's correct sorts join the run-wide totals. Called once, from the day
-## report. Nothing is unlocked here: since revision 3 the player claims a
-## finished blueprint themselves, from the Teknologi tab.
-func _credit_blueprint_materials() -> void:
+## Today's correct sorts join the run's material pool. Called once, from the day
+## report. Nothing is built here: the player crafts and assembles themselves,
+## from the Teknologi tab.
+func _credit_materials() -> void:
 	for entry: CarriedItem in inventory:
 		if entry.sorted_to == -1 or not entry.was_correct:
 			continue
 		var category: int = entry.expected_category
-		correct_by_category[category] = int(correct_by_category.get(category, 0)) + 1
+		materials[category] = int(materials.get(category, 0)) + 1
 	Events.blueprints_changed.emit()
 
 
-## Finished, and the player has not taken it yet.
-func blueprint_claimable(bp: BlueprintData) -> bool:
-	return not blueprint_unlocked(bp.id) and bp.is_complete(correct_by_category)
+func material_count(category: int) -> int:
+	return int(materials.get(category, 0))
 
 
-func claimable_blueprints() -> Array[BlueprintData]:
+## What a component is short of, category -> how many. Empty means it can be
+## crafted. The UI shows this rather than a bare disabled button.
+func craft_shortfall(component: ComponentData) -> Dictionary:
+	return component.shortfall(materials)
+
+
+func component_crafted(component: ComponentData) -> bool:
+	return bool(crafted.get(component.id, false))
+
+
+func can_craft(component: ComponentData) -> bool:
+	return not component_crafted(component) and component.affordable(materials)
+
+
+## Rakit. Spends the materials and marks the part done.
+##
+## The pool can never go negative: affordability is checked against the whole
+## requirement before a single category is debited, so a component that is short
+## on its second material does not silently eat the first.
+func craft_component(component: ComponentData) -> bool:
+	if not can_craft(component):
+		return false
+	for category: int in component.requirements:
+		materials[category] = int(materials.get(category, 0)) - int(component.requirements[category])
+	crafted[component.id] = true
+	Events.component_crafted.emit(component)
+	Events.blueprints_changed.emit()
+	return true
+
+
+## Every part crafted, and the blueprint not yet assembled: the CRAFT button.
+func blueprint_ready(bp: BlueprintData) -> bool:
+	return not blueprint_unlocked(bp.id) and bp.is_complete(crafted)
+
+
+func ready_blueprints() -> Array[BlueprintData]:
 	var out: Array[BlueprintData] = []
 	for bp: BlueprintData in blueprints:
-		if blueprint_claimable(bp):
+		if blueprint_ready(bp):
 			out.append(bp)
 	return out
 
 
-## The player pressing Klaim. The health gain lands here rather than inside the
+## The player pressing CRAFT. The health gain lands here rather than inside the
 ## day report's formula, so the report's arithmetic stays traceable term by
 ## term.
-func claim_blueprint(blueprint_id: StringName) -> BlueprintData:
+func build_blueprint(blueprint_id: StringName) -> BlueprintData:
 	for bp: BlueprintData in blueprints:
-		if bp.id != blueprint_id or not blueprint_claimable(bp):
+		if bp.id != blueprint_id or not blueprint_ready(bp):
 			continue
 		unlocked_blueprints.append(bp.id)
 		if bp.forces_tier >= 0:
@@ -469,6 +513,15 @@ func blueprint_unlocked(blueprint_id: StringName) -> bool:
 	return blueprint_id in unlocked_blueprints
 
 
+## Which blueprint a component belongs to, or null. Only the popup needs this,
+## and it reads it from the data rather than being told.
+func blueprint_of(component: ComponentData) -> BlueprintData:
+	for bp: BlueprintData in blueprints:
+		if component in bp.components:
+			return bp
+	return null
+
+
 # ---------------------------------------------------------------- upgrades
 
 func upgrade() -> UpgradeData:
@@ -478,9 +531,15 @@ func upgrade() -> UpgradeData:
 	return null
 
 
-## Availability is data, not a table here: an upgrade opens once the player has
-## claimed that many blueprints, so a fifth one slots in with a .tres.
+## Availability is data, not a table here. An upgrade a blueprint names is
+## opened by THAT blueprint being built; anything no blueprint claims falls back
+## to "how many technologies are finished", which is how the two day-one
+## upgrades stay available from the start. A fourth blueprint and its tool are
+## both .tres files and neither needs a line here.
 func upgrade_unlocked(up: UpgradeData) -> bool:
+	for bp: BlueprintData in blueprints:
+		if bp.unlocks_upgrade == up.id:
+			return blueprint_unlocked(bp.id)
 	return unlocked_blueprints.size() >= up.unlock_after_blueprints
 
 

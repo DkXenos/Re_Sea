@@ -15,5 +15,5 @@ coarse_readings = false
 move_speed_multiplier = 1.0
 post_drop_lockout = 0.0
 unlock_after_blueprints = 2
-unlock_text = "Terbuka setelah dua teknologi selesai dibangun."
+unlock_text = "Terbuka setelah Penyaring Mikroplastik selesai dibangun."
 sort_order = 3

@@ -37,10 +37,20 @@ enum Tab { RESULT, TECH, GEAR }
 @onready var _table: Node2D = $UiLayer/Root/ResultPage/Table
 @onready var _result_summary: Label = $UiLayer/Root/ResultPage/Summary
 @onready var _mistakes: VBoxContainer = $UiLayer/Root/ResultPage/MistakesScroll/Mistakes
-@onready var _tech_rows: VBoxContainer = $UiLayer/Root/TechPage/Rows
 @onready var _gear_rows: VBoxContainer = $UiLayer/Root/GearPage/Rows
 
+# --- Teknologi (revision 4 §3) ---
+@onready var _tech: Control = $UiLayer/Root/TechPage
+@onready var _diagram: Control = $UiLayer/Root/TechPage/Diagram
+@onready var _craft_button: Button = $UiLayer/Root/TechPage/CraftButton
+@onready var _popup_layer: CanvasLayer = $PopupLayer
+@onready var _popup: Control = $PopupLayer/Popup/Panel
+
 var _tab: Tab = Tab.RESULT
+## Which blueprint the selector is showing. There is no grid and no tabs inside
+## tabs - one sheet at a time, paged with the two arrows.
+var _sheet: int = 0
+var _popup_component: ComponentData = null
 
 
 func _ready() -> void:
@@ -53,6 +63,14 @@ func _ready() -> void:
 	for i in _tab_buttons.size():
 		_tab_buttons[i].text = Strings.t(labels[i])
 		_tab_buttons[i].pressed.connect(_show_tab.bind(i as Tab))
+	_tech.get_node("PrevButton").text = Strings.t("tech_prev")
+	_tech.get_node("NextButton").text = Strings.t("tech_next")
+	_tech.get_node("PrevButton").pressed.connect(_page_sheet.bind(-1))
+	_tech.get_node("NextButton").pressed.connect(_page_sheet.bind(1))
+	_craft_button.pressed.connect(_on_craft_blueprint)
+	_popup.get_node("CloseButton").text = Strings.t("tech_close")
+	_popup.get_node("CloseButton").pressed.connect(_close_popup)
+	_popup.get_node("CraftPartButton").pressed.connect(_on_craft_part)
 	_build_result()
 	_build_tech()
 	_build_gear()
@@ -147,59 +165,210 @@ func _make_table_item(entry: CarriedItem, origin: Vector2, size: Vector2) -> Nod
 
 # ------------------------------------------------------------ tab 2: Teknologi
 
-## Progress and a Klaim button. Nothing else: no combining, no experimenting, no
-## recipe discovery, no material inventory. §3 was explicit that this is not a
-## crafting tab and it is not one.
+## A blueprint is a diagram of parts, each crafted on its own by spending
+## sorted materials, and one CRAFT button that assembles them (revision 4 §3).
+##
+## This is a FIXED-recipe system. Every requirement is authored in a .tres and
+## on screen before the player commits: there is no free-form combining, no
+## recipe to discover and no failure state. A craft the pool cannot pay for is
+## refused with the shortfall named, never attempted and lost.
 func _build_tech() -> void:
-	_clear(_tech_rows)
-	for bp: BlueprintData in Game.blueprints:
-		_tech_rows.add_child(_make_tech_row(bp))
+	var bp := _current_blueprint()
+	var pageable: bool = Game.blueprints.size() > 1
+	_tech.get_node("PrevButton").disabled = not pageable
+	_tech.get_node("NextButton").disabled = not pageable
+	_tech.get_node("BlueprintName").text = bp.display_name if bp != null else ""
+	_tech.get_node("Flavour").text = bp.flavour_text if bp != null else ""
+	_tech.get_node("PoolLabel").text = _pool_text()
+	_tech.get_node("Unlocks").text = _unlocks_text(bp)
+	_tech.get_node("PartsLabel").text = "" if bp == null else Strings.tf("tech_parts",
+		{"have": bp.crafted_count(Game.crafted), "need": bp.components.size()})
+	_build_diagram(bp)
+	_refresh_craft_button(bp)
 
 
-func _make_tech_row(bp: BlueprintData) -> Control:
-	var done := Game.blueprint_unlocked(bp.id)
-	var claimable := Game.blueprint_claimable(bp)
-	var progress: Dictionary = bp.progress(Game.correct_by_category)
-
-	var row := _panel_row(96)
-	var lines := VBoxContainer.new()
-	lines.position = Vector2(16, 10)
-	lines.size = Vector2(700, 76)
-	lines.add_theme_constant_override("separation", 1)
-	row.add_child(lines)
-
-	MistakeView.add_line(lines, "%s   %d / %d" % [bp.display_name,
-		int(progress["need"]) if done else int(progress["have"]), int(progress["need"])],
-		18, Color(1, 1, 1))
-	MistakeView.add_line(lines, _requirement_text(bp), 13, Color(0.78, 0.84, 0.9))
-	MistakeView.add_line(lines, bp.flavour_text, 13, Color(0.68, 0.74, 0.82))
-
-	var button := Button.new()
-	button.position = Vector2(736, 26)
-	button.size = Vector2(180, 44)
-	if done:
-		button.text = Strings.t("blueprint_done")
-		button.disabled = true
-	else:
-		button.text = Strings.tf("blueprint_claim", {"n": bp.health_gain})
-		button.disabled = not claimable
-		button.pressed.connect(_on_claim.bind(bp))
-	row.add_child(button)
-	return row
+func _current_blueprint() -> BlueprintData:
+	if Game.blueprints.is_empty():
+		return null
+	return Game.blueprints[posmod(_sheet, Game.blueprints.size())]
 
 
-## Progress counts are per category, so the requirement reads the same way.
-func _requirement_text(bp: BlueprintData) -> String:
+func _page_sheet(step: int) -> void:
+	if Game.blueprints.is_empty():
+		return
+	_sheet = posmod(_sheet + step, Game.blueprints.size())
+	Events.sfx_requested.emit(&"ui_click")
+	_build_tech()
+
+
+## The pool, always on screen. It is what the player spends, so it is never
+## more than one glance away from the button that spends it.
+func _pool_text() -> String:
 	var parts: Array[String] = []
-	for category: int in bp.required:
-		parts.append("%d / %d %s" % [
-			mini(int(bp.required[category]), int(Game.correct_by_category.get(category, 0))),
-			int(bp.required[category]), Strings.category_name(category)])
+	for category in ItemData.Category.values():
+		var held: int = Game.material_count(category)
+		if held > 0:
+			parts.append("%d %s" % [held, Strings.category_name(category)])
+	if parts.is_empty():
+		return Strings.t("tech_pool_empty")
+	return Strings.tf("tech_pool", {"v": "   ·   ".join(parts)})
+
+
+func _unlocks_text(bp: BlueprintData) -> String:
+	if bp == null or bp.unlocks_upgrade == &"":
+		return ""
+	for up: UpgradeData in Game.upgrades:
+		if up.id == bp.unlocks_upgrade:
+			return Strings.tf("tech_unlocks", {"v": up.display_name})
+	return ""
+
+
+## The sheet with its parts on top of it.
+##
+## Everything is laid out from the rect the background is ACTUALLY drawn at,
+## and every part is placed from its normalized 0-1 coordinate, so a designer
+## delivering a sheet at a different resolution keeps the parts aligned without
+## touching a number here. Part sizes scale with the sheet for the same reason.
+func _build_diagram(bp: BlueprintData) -> void:
+	_clear(_diagram)
+	if bp == null or bp.background == null:
+		return
+	var sheet := bp.background.get_size()
+	var box := _diagram.size
+	var scale_factor: float = minf(box.x / sheet.x, box.y / sheet.y)
+	var drawn := sheet * scale_factor
+	var origin := (box - drawn) * 0.5
+
+	var background := TextureRect.new()
+	background.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	background.stretch_mode = TextureRect.STRETCH_SCALE
+	background.custom_minimum_size = Vector2.ZERO
+	background.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	background.texture = bp.background
+	background.position = origin
+	background.size = drawn
+	_diagram.add_child(background)
+
+	for component: ComponentData in bp.components:
+		_diagram.add_child(_make_component(component, origin, drawn, scale_factor))
+
+
+## Crafted or not is two different PNGs, chosen here. Nothing is ever
+## greyscaled, tinted or shaded in code - §3 is explicit about it.
+func _make_component(component: ComponentData, origin: Vector2, drawn: Vector2,
+		scale_factor: float) -> Control:
+	var done := Game.component_crafted(component)
+	var texture: Texture2D = component.done_texture if done else component.locked_texture
+	var display: Vector2 = texture.get_size() * scale_factor if texture != null \
+		else Vector2(96, 96)
+
+	var holder := Control.new()
+	holder.position = origin + component.diagram_position * drawn - display * 0.5
+	holder.size = display
+
+	var art := TextureRect.new()
+	art.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	art.stretch_mode = TextureRect.STRETCH_SCALE
+	art.custom_minimum_size = Vector2.ZERO
+	art.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	art.texture = texture
+	art.position = Vector2.ZERO
+	art.size = display
+	holder.add_child(art)
+
+	# Invisible hit area over the art, the same way an inventory card works.
+	var button := Button.new()
+	button.flat = true
+	button.set_anchors_preset(Control.PRESET_FULL_RECT)
+	button.tooltip_text = "%s\n%s" % [component.display_name,
+		_requirement_text(component)]
+	button.pressed.connect(_open_popup.bind(component))
+	holder.add_child(button)
+	return holder
+
+
+## One large button, and it does not become pressable until every part is on
+## the diagram.
+func _refresh_craft_button(bp: BlueprintData) -> void:
+	if bp == null:
+		_craft_button.text = ""
+		_craft_button.disabled = true
+		return
+	if Game.blueprint_unlocked(bp.id):
+		_craft_button.text = Strings.t("tech_craft_done")
+		_craft_button.disabled = true
+	elif Game.blueprint_ready(bp):
+		_craft_button.text = Strings.tf("tech_craft",
+			{"v": bp.display_name, "n": bp.health_gain})
+		_craft_button.disabled = false
+	else:
+		_craft_button.text = Strings.t("tech_craft_locked")
+		_craft_button.disabled = true
+
+
+## "6 organik, 2 residu" - the fixed recipe, exactly as authored.
+func _requirement_text(component: ComponentData) -> String:
+	var parts: Array[String] = []
+	for category: int in component.requirements:
+		parts.append("%d %s" % [int(component.requirements[category]),
+			Strings.category_name(category)])
 	return Strings.tf("blueprint_requires", {"v": ", ".join(parts)})
 
 
-func _on_claim(bp: BlueprintData) -> void:
-	if Game.claim_blueprint(bp.id) == null:
+# ------------------------------------------------------- the component popup
+
+## Name, requirement, what the player actually holds, and Rakit. The pool is
+## repeated here beside the requirement so the decision never needs a second
+## screen, and the button says what is short rather than only being dead.
+func _open_popup(component: ComponentData) -> void:
+	_popup_component = component
+	var done := Game.component_crafted(component)
+	var shortfall := Game.craft_shortfall(component)
+
+	_popup.get_node("Icon").texture = component.done_texture if done \
+		else component.locked_texture
+	_popup.get_node("TitleLabel").text = component.display_name
+	_popup.get_node("StatusLabel").text = Strings.t("tech_part_done") if done \
+		else Strings.t("tech_part_todo")
+
+	var lines: VBoxContainer = _popup.get_node("Lines")
+	_clear(lines)
+	for category: int in component.requirements:
+		var need: int = int(component.requirements[category])
+		var held: int = Game.material_count(category)
+		MistakeView.add_line(lines, "%s   (%s)" % [
+			Strings.tf("tech_needs", {"n": need, "v": Strings.category_name(category)}),
+			Strings.tf("tech_have", {"n": held})],
+			15, Color(0.86, 0.9, 0.94) if held >= need else Color(0.95, 0.72, 0.6))
+	for category: int in shortfall:
+		MistakeView.add_line(lines, Strings.tf("tech_short",
+			{"n": int(shortfall[category]), "v": Strings.category_name(category)}),
+			14, Color(0.95, 0.72, 0.6))
+
+	var button: Button = _popup.get_node("CraftPartButton")
+	button.text = Strings.t("tech_rakit_done") if done else Strings.t("tech_rakit")
+	button.disabled = done or not shortfall.is_empty()
+	_popup_layer.visible = true
+	Events.sfx_requested.emit(&"ui_click")
+
+
+func _on_craft_part() -> void:
+	if _popup_component == null or not Game.craft_component(_popup_component):
+		return
+	Events.sfx_requested.emit(&"bin_accept")
+	_build_tech()
+	_open_popup(_popup_component)
+
+
+func _close_popup() -> void:
+	_popup_layer.visible = false
+	_popup_component = null
+	Events.sfx_requested.emit(&"ui_click")
+
+
+func _on_craft_blueprint() -> void:
+	var bp := _current_blueprint()
+	if bp == null or Game.build_blueprint(bp.id) == null:
 		return
 	Events.sfx_requested.emit(&"bin_accept")
 	_build_tech()

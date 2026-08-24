@@ -59,3 +59,28 @@ TIER_SEABED = [
     ((88, 92, 66), (118, 124, 86), [(160, 28), (520, 24), (820, 30)]),
     ((104, 118, 84), (140, 158, 108), [(200, 22), (760, 26)]),
 ]
+
+
+# Blueprint diagram art (revision 4 §3). Shape and colour only - what each
+# component COSTS is game content and lives in data/components/*.tres.
+#
+# The sheet colour is per blueprint so three schematics are told apart at a
+# glance; the components are drawn in colour for `done` and in the greyscale of
+# that same colour for `locked`, as two separate PNGs.
+BLUEPRINT_SHEETS = [
+    dict(id="cleaner_drone", color=(26, 62, 104)),
+    dict(id="penyaring_mikroplastik", color=(22, 66, 88)),
+    dict(id="penetral_b3", color=(48, 46, 92)),
+]
+
+COMPONENT_ART = [
+    dict(id="drone_body", shape="hull", color=(126, 196, 232)),
+    dict(id="bio_core", shape="core", color=(140, 214, 150)),
+    dict(id="intake_fin", shape="fin", color=(232, 190, 108)),
+    dict(id="filter_mesh", shape="mesh", color=(128, 206, 214)),
+    dict(id="pump_housing", shape="pump", color=(214, 154, 120)),
+    dict(id="collection_tank", shape="tank", color=(154, 186, 232)),
+    dict(id="sealed_chamber", shape="chamber", color=(196, 132, 124)),
+    dict(id="neutralizer_cell", shape="cell", color=(178, 156, 224)),
+    dict(id="safety_valve", shape="valve", color=(226, 206, 120)),
+]

@@ -139,10 +139,26 @@ const TABLE: Dictionary = {
 	"after_budget": "Waktu shift terpakai {spent} dari {max}, sisa {left}",
 	"after_health": "Kesehatan laut {before} -> {after}   (Laut: {tier})",
 
-	# --- blueprints (revision 2) ---
+	# --- blueprints (revision 2, reworked in revision 4) ---
 	"blueprint_requires": "Butuh: {v}",
 	"blueprint_done": "SELESAI",
-	"blueprint_claim": "Klaim  (+{n})",
+	"tech_prev": "\u2039",
+	"tech_next": "\u203a",
+	"tech_pool": "Bahan tersimpan:  {v}",
+	"tech_pool_empty": "Bahan tersimpan:  belum ada",
+	"tech_parts": "Bagian terpasang {have} / {need}",
+	"tech_craft": "RAKIT {v}   (+{n} kesehatan laut)",
+	"tech_craft_locked": "Selesaikan semua bagian dulu",
+	"tech_craft_done": "SUDAH DIBANGUN",
+	"tech_unlocks": "Selesai membangun ini membuka alat: {v}",
+	"tech_part_todo": "Belum dirakit",
+	"tech_part_done": "Sudah terpasang",
+	"tech_needs": "Butuh {n} {v}",
+	"tech_have": "punya {n}",
+	"tech_short": "Kurang {n} {v}",
+	"tech_rakit": "Rakit",
+	"tech_rakit_done": "Terpasang",
+	"tech_close": "Tutup",
 
 	# --- upgrades (revision 2) ---
 	"upgrade_equip": "Pakai",

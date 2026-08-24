@@ -1,12 +1,20 @@
-## The compact "what am I working toward" strip on the desk (revision 2 §2).
+## The compact "what am I working toward" strip on the desk (revision 2 §2,
+## following revision 4 §3).
 ##
-## One row per blueprint: name, a 7 / 12 counter and a bar. Nothing here is
-## clickable and nothing here is a crafting system - the player never combines
-## anything, they just sort correctly and watch this fill.
+## One row per blueprint: name, a parts counter and a bar. Nothing here is
+## clickable - crafting happens in the Teknologi tab, and this is only a
+## reminder of what the day's sorting is feeding.
 ##
-## The counts are run-wide and only move at the day report. That is deliberate:
-## the desk never tells the player whether a sort was right, and a counter that
-## ticked up the moment they hit the correct bin would give the answer away.
+## Revision 4 replaced the flat "7 / 12 correctly sorted" counter this used to
+## show. Correct sorts now go into a spendable pool, so a per-category total
+## would be a number that goes DOWN when the player crafts, which reads as
+## losing progress. What is actually monotonic is parts assembled, so that is
+## what the bar tracks.
+##
+## The counts only move at the day report and in the tab after it. That is
+## deliberate: the desk never tells the player whether a sort was right, and a
+## counter that ticked up the moment they hit the correct bin would give the
+## answer away.
 extends Control
 
 const ROW_BG := preload("res://assets/ui/panel_slot.png")
@@ -33,9 +41,8 @@ func rebuild() -> void:
 
 func _make_row(bp: BlueprintData) -> Control:
 	var done: bool = Game.blueprint_unlocked(bp.id)
-	var progress: Dictionary = bp.progress(Game.correct_by_category)
-	var have: int = int(progress["need"]) if done else int(progress["have"])
-	var need: int = int(progress["need"])
+	var need: int = bp.components.size()
+	var have: int = need if done else bp.crafted_count(Game.crafted)
 
 	var row := Control.new()
 	row.custom_minimum_size = Vector2(ROW_WIDTH, 34)
@@ -103,10 +110,13 @@ func _meter(texture: Texture2D, at: Vector2, box: Vector2) -> TextureRect:
 	return rect
 
 
+## The whole sheet's cost, so the tooltip still answers "what is this for?"
+## without the strip having to know how the parts are split up.
 func _requirement_text(bp: BlueprintData) -> String:
 	var parts: Array[String] = []
-	for category: int in bp.required:
-		parts.append("%d %s" % [int(bp.required[category]), Strings.category_name(category)])
+	var required := bp.total_requirements()
+	for category: int in required:
+		parts.append("%d %s" % [int(required[category]), Strings.category_name(category)])
 	return Strings.tf("blueprint_requires", {"v": ", ".join(parts)})
 
 

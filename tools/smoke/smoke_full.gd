@@ -57,6 +57,7 @@ func _run() -> void:
 	var tier_rises := 0
 	var claimed := 0
 	var first_claim_day := 0
+	var seen_after: Dictionary = {}
 	var guard := 0
 	while guard < 40000:
 		guard += 1
@@ -68,6 +69,9 @@ func _run() -> void:
 			claimed = game.unlocked_blueprints.size()
 			if first_claim_day == 0:
 				first_claim_day = game.day_index + 1
+			if verbose:
+				print("     built %s on day %d, pool now %s"
+					% [game.unlocked_blueprints[-1], game.day_index + 1, _pool_line()])
 		var scene: Node = _current()
 		if scene == null:
 			continue
@@ -96,8 +100,12 @@ func _run() -> void:
 				scene.get_node("UiLayer/Root/NextButton").pressed.emit()
 			"AfterDay":
 				# Revision 3 §3: this screen is entered every day, so the
-				# harness works it the way a player would - claim anything
-				# finished, keep an upgrade fitted, then move on.
+				# harness works it the way a player would - craft anything the
+				# pool can pay for, keep an upgrade fitted, then move on.
+				if verbose and not seen_after.has(game.day_index):
+					seen_after[game.day_index] = true
+					print("     pool after day %d: %s" % [game.day_index + 1,
+						_pool_line()])
 				_drive_after_day(scene)
 			"GameOver":
 				print("reached ending: health=%d title=%s" % [game.ocean_health,
@@ -116,8 +124,10 @@ func _run() -> void:
 			"a well-played run must cross at least two tier thresholds, crossed %d" % tier_rises)
 		assert(claimed >= 2,
 			"a well-played run must claim at least two blueprints, claimed %d" % claimed)
-		assert(first_claim_day > 0 and first_claim_day <= 2,
-			"the first blueprint must be claimable by the end of day 2, claimed on day %d"
+		# Revision 4 §3: a well-played run crafts all three parts of one
+		# blueprint and presses CRAFT by the end of day 3.
+		assert(first_claim_day > 0 and first_claim_day <= 3,
+			"the first blueprint must be built by the end of day 3, built on day %d"
 			% first_claim_day)
 	game.stop_all_sfx()
 	for i in 10:
@@ -125,7 +135,16 @@ func _run() -> void:
 	quit()
 
 
-## Claims every finished blueprint and keeps the first available upgrade
+## The spendable material pool, for the tuning report.
+func _pool_line() -> String:
+	var parts: Array[String] = []
+	for category in ItemData.Category.values():
+		parts.append("%s %d" % [Strings.category_name(category),
+			game.material_count(category)])
+	return "  ".join(parts)
+
+
+## Crafts every finished blueprint and keeps the first available upgrade
 ## fitted, then continues. Driving the real buttons rather than calling Game
 ## directly is the point: revision 2's tier check passed while never firing in
 ## a real run, because it set state by hand (rev 3 §6).
@@ -136,11 +155,12 @@ func _drive_after_day(scene: Node) -> void:
 		if child is CanvasLayer and child.has_method("_close"):
 			child._close()
 			return
-	for row: Control in scene.get_node("UiLayer/Root/TechPage/Rows").get_children():
-		for child: Node in row.get_children():
-			if child is Button and not (child as Button).disabled:
-				(child as Button).pressed.emit()
-				return
+	# Revision 4 §3: work the Teknologi tab the way a player would - page
+	# through the sheets, craft every part the pool can pay for, and press CRAFT
+	# on any sheet whose parts are all done. Driving the real buttons is the
+	# point; setting Game.crafted by hand would prove nothing about the tab.
+	if _drive_tech(scene):
+		return
 	if game.equipped_upgrade == &"" and upgrade_choice != "":
 		for row: Control in scene.get_node("UiLayer/Root/GearPage/Rows").get_children():
 			for child: Node in row.get_children():
@@ -148,6 +168,31 @@ func _drive_after_day(scene: Node) -> void:
 					(child as Button).pressed.emit()
 					return
 	scene.get_node("UiLayer/Root/NextButton").pressed.emit()
+
+
+## One action per call, so every craft goes through the popup that owns it and
+## the diagram is rebuilt in between. Returns true while there was something to
+## do, which keeps the screen open until the tab is worked out.
+func _drive_tech(scene: Node) -> bool:
+	var page: Control = scene.get_node("UiLayer/Root/TechPage")
+	var popup: Control = scene.get_node("PopupLayer/Popup/Panel")
+	if scene.get_node("PopupLayer").visible:
+		var rakit: Button = popup.get_node("CraftPartButton")
+		if not rakit.disabled:
+			rakit.pressed.emit()
+		popup.get_node("CloseButton").pressed.emit()
+		return true
+	for sheet in game.blueprints.size():
+		var bp: BlueprintData = scene._current_blueprint()
+		if not page.get_node("CraftButton").disabled:
+			page.get_node("CraftButton").pressed.emit()
+			return true
+		for component: ComponentData in bp.components:
+			if game.can_craft(component):
+				scene._open_popup(component)
+				return true
+		page.get_node("NextButton").pressed.emit()
+	return false
 
 
 ## Works the shift the way a player would: stay at the tank while there is

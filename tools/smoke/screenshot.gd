@@ -89,7 +89,7 @@ func _run() -> void:
 			for i in 3:
 				await process_frame
 	if args.size() > 3 and args[3] == "rulebook":
-		scene.get_node("UiLayer/Root/RulebookPanel").toggle(true)
+		scene.get_node("RulebookLayer/RulebookPanel").toggle(true)
 		for i in 5:
 			await process_frame
 	await process_frame

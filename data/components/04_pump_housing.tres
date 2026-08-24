@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ComponentData" format=3]
+
+[ext_resource type="Script" path="res://data/component_data.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/ui/comp_pump_housing_locked.png" id="2_locked"]
+[ext_resource type="Texture2D" path="res://assets/ui/comp_pump_housing_done.png" id="3_done"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"pump_housing"
+display_name = "Rumah Pompa"
+locked_texture = ExtResource("2_locked")
+done_texture = ExtResource("3_done")
+diagram_position = Vector2(0.58, 0.42)
+requirements = { 1: 3, 3: 1 }

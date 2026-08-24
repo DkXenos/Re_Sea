@@ -89,10 +89,16 @@ func _check_blueprints() -> void:
 			"a perfect day must raise the meter (day %d)" % (day + 1))
 		if game.visual_tier > before_tier:
 			tier_rises += 1
-		for bp: BlueprintData in game.claimable_blueprints():
-			game.claim_blueprint(bp.id)
+		# Revision 4 §3: a blueprint is finished part by part out of the
+		# spendable pool, then assembled. Crafting whatever the pool can pay
+		# for is what a player working the tab would do.
+		for bp: BlueprintData in game.blueprints:
+			for component: ComponentData in bp.components:
+				game.craft_component(component)
+		for bp: BlueprintData in game.ready_blueprints():
+			game.build_blueprint(bp.id)
 			unlocked += 1
-			print("  day %d: unlocked %s (+%d) | health %d tier %d"
+			print("  day %d: built %s (+%d) | health %d tier %d"
 				% [day + 1, bp.display_name, bp.health_gain, game.ocean_health,
 				game.visual_tier])
 		if not game.is_last_day():
@@ -108,11 +114,18 @@ func _check_clamp() -> void:
 	game.start_run(7)
 	game.set_ocean_health(98)
 	for c in 4:
-		game.correct_by_category[c] = 99
-	for bp: BlueprintData in game.claimable_blueprints():
-		game.claim_blueprint(bp.id)
+		game.materials[c] = 99
+	for bp: BlueprintData in game.blueprints:
+		for component: ComponentData in bp.components:
+			assert(game.craft_component(component), "a fully stocked pool refused a craft")
+	var built: int = 0
+	for bp: BlueprintData in game.ready_blueprints():
+		game.build_blueprint(bp.id)
+		built += 1
+	assert(built == game.blueprints.size(), "only %d of %d blueprints assembled"
+		% [built, game.blueprints.size()])
 	assert(game.ocean_health == 100, "health must clamp at 100, got %d" % game.ocean_health)
-	print("  three blueprint bonuses from 98 clamp at 100")
+	print("  %d blueprint bonuses from 98 clamp at 100" % built)
 
 
 ## "Forces tier 3 art if health allows": it does not paint a healed reef over a

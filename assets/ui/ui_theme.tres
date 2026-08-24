@@ -1,10 +1,10 @@
-[gd_resource type="Theme" format=3]
+[gd_resource type="Theme" format=3 uid="uid://bpxj4j7ei2hhx"]
 
-[ext_resource type="Texture2D" path="res://assets/ui/button_disabled.png" id="1_2t3ff"]
-[ext_resource type="Texture2D" path="res://assets/ui/button_hover.png" id="2_x27uq"]
-[ext_resource type="Texture2D" path="res://assets/ui/button_normal.png" id="3_k4cr1"]
-[ext_resource type="Texture2D" path="res://assets/ui/button_pressed.png" id="4_g2k3a"]
-[ext_resource type="Texture2D" path="res://assets/ui/panel_main.png" id="5_jjarc"]
+[ext_resource type="Texture2D" uid="uid://fgvc5abm307f" path="res://assets/ui/button_disabled.png" id="1_2t3ff"]
+[ext_resource type="Texture2D" uid="uid://dobeoe8g630ni" path="res://assets/ui/button_hover.png" id="2_x27uq"]
+[ext_resource type="Texture2D" uid="uid://c0ss82ew10ogj" path="res://assets/ui/button_normal.png" id="3_k4cr1"]
+[ext_resource type="Texture2D" uid="uid://d1ldocyt870qu" path="res://assets/ui/button_pressed.png" id="4_g2k3a"]
+[ext_resource type="Texture2D" uid="uid://stv631a2ieo7" path="res://assets/ui/panel_main.png" id="5_jjarc"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_e1g2j"]
 content_margin_left = 14.0

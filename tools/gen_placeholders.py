@@ -163,6 +163,93 @@ def gen_boxes():
 
 
 
+# ------------------------------------------------------------- blueprint sheets
+
+def greyscale(c):
+    """The locked component is drawn in the greyscale of its own colour.
+
+    It is a SEPARATE PNG, not the colour one with a filter over it at runtime -
+    revision 4 §3 is explicit that locked and done are two drawings. Doing the
+    conversion here, once, at draw time, is what keeps them the same shape."""
+    v = int(round(0.299 * c[0] + 0.587 * c[1] + 0.114 * c[2]))
+    return (v, v, v)
+
+
+def draw_component_shape(d, shape, col, W, H):
+    m = 14
+    dark = shade(col, 0.55)
+    if shape == "hull":
+        outlined(d, "rounded_rectangle", [m + 16, H * .34, W - m - 16, H * .66], col, radius=12)
+        for y in (H * .30, H * .70):
+            outlined(d, "rectangle", [m, y - 7, W - m, y + 7], shade(col, 0.75))
+    elif shape == "core":
+        outlined(d, "ellipse", [m + 4, m + 4, W - m - 4, H - m - 4], col)
+        outlined(d, "ellipse", [W * .34, H * .34, W * .66, H * .66], shade(col, 0.6))
+    elif shape == "fin":
+        outlined(d, "polygon", [(m, H - m), (W * .5, m), (W - m, H - m)], col)
+        d.line([(W * .5, m + 18), (W * .5, H - m - 6)], fill=dark, width=4)
+    elif shape == "mesh":
+        outlined(d, "rectangle", [m, m, W - m, H - m], col)
+        for i in range(1, 4):
+            at = m + (W - 2 * m) * i / 4.0
+            d.line([(at, m), (at, H - m)], fill=dark, width=3)
+            d.line([(m, at), (W - m, at)], fill=dark, width=3)
+    elif shape == "pump":
+        outlined(d, "ellipse", [m, H * .22, W * .68, H * .90], col)
+        outlined(d, "rectangle", [W * .52, H * .30, W - m, H * .54], shade(col, 0.75))
+    elif shape == "tank":
+        outlined(d, "rounded_rectangle", [W * .26, m + 12, W * .74, H - m], col, radius=14)
+        outlined(d, "rectangle", [W * .40, m, W * .60, m + 16], shade(col, 0.75))
+        d.line([(W * .30, H * .62), (W * .70, H * .62)], fill=dark, width=4)
+    elif shape == "chamber":
+        outlined(d, "rectangle", [m, m, W - m, H - m], col, width=8)
+        outlined(d, "rectangle", [W * .34, H * .34, W * .66, H * .66], shade(col, 0.6))
+    elif shape == "cell":
+        outlined(d, "rounded_rectangle", [m + 8, m, W - m - 8, H - m], col, radius=10)
+        for y in (H * .34, H * .52, H * .70):
+            d.line([(W * .30, y), (W * .70, y)], fill=dark, width=4)
+    elif shape == "valve":
+        outlined(d, "ellipse", [W * .22, H * .22, W * .78, H * .78], col)
+        d.line([(W * .5, m), (W * .5, H - m)], fill=dark, width=6)
+        d.line([(m, H * .5), (W - m, H * .5)], fill=dark, width=6)
+    else:
+        outlined(d, "rectangle", [m, m, W - m, H - m], col)
+
+
+def gen_blueprints():
+    """The three schematic sheets and the nine components on them.
+
+    Flat: a field, a thin grid and a border, no gradient and no baked shadow.
+    Nothing is written on a sheet - the component NAMES come from the .tres and
+    are drawn as labels by the tab, so a designer redrawing a sheet never has to
+    reproduce Indonesian text in the art."""
+    for sheet in C.BLUEPRINT_SHEETS:
+        W, H = 960, 540
+        img, d = canvas(W, H, sheet["color"] + (255,))
+        grid = shade(sheet["color"], 1.5) + (255,)
+        for x in range(0, W, 48):
+            d.line([(x, 0), (x, H)], fill=grid, width=1)
+        for y in range(0, H, 48):
+            d.line([(0, y), (W, y)], fill=grid, width=1)
+        border = shade(sheet["color"], 2.4) + (255,)
+        d.rectangle([2, 2, W - 3, H - 3], outline=border, width=4)
+        d.rectangle([22, 22, W - 23, H - 23], outline=border, width=2)
+        save(img, "ui/blueprint_bg_%s.png" % sheet["id"],
+             "Blueprint schematic sheet for `%s`. Components are positioned on "
+             "top of it from normalized coordinates in the .tres." % sheet["id"])
+
+    for comp in C.COMPONENT_ART:
+        W = H = 128
+        for state, col in (("done", comp["color"]),
+                           ("locked", greyscale(comp["color"]))):
+            img, d = canvas(W, H)
+            draw_component_shape(d, comp["shape"], col, W, H)
+            save(img, "ui/comp_%s_%s.png" % (comp["id"], state),
+                 "Blueprint component `%s`, %s. A separate drawing, never the "
+                 "other one tinted." % (comp["id"], state))
+
+
+
 # ------------------------------------------------------------------- claw/fish
 
 def gen_claw():
@@ -366,7 +453,7 @@ def gen_env():
     img, d = canvas(640, 200)
     d.rounded_rectangle([4, 40, 635, 160], radius=20, fill=(16, 44, 68, 255),
                         outline=(110, 190, 210, 255), width=5)
-    centered(d, (0, 60, 640, 140), "CAKAR LAUT", (220, 240, 250), 56)
+    centered(d, (0, 60, 640, 140), "game laut idk", (220, 240, 250), 56)
     save(img, "env/logo.png", "Title logo")
 
 
@@ -630,6 +717,7 @@ def _groups():
     return {
         "items": [gen_items],
         "boxes": [gen_boxes, frames_box],
+        "blueprints": [gen_blueprints],
         "claw": [gen_claw],
         "fish": [gen_fish],
         "bins": [gen_bins],
@@ -672,6 +760,7 @@ def main():
     gen_env()
     gen_tiers()
     gen_boxes()
+    gen_blueprints()
     gen_frames()
     note_generated_elsewhere()
     anims = "\n".join("| `%s` | `%s` | `assets/%s` | %d |" % a for a in ANIMS)

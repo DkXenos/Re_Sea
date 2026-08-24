@@ -28,8 +28,10 @@ signal ocean_health_changed(value: int)
 signal sfx_requested(sfx_name: StringName)
 signal vfx_intensity_changed(value: float)
 signal hotspots_visible_changed(value: bool)
-## Blueprint material counts moved, or one was unlocked (revision 2 §2).
+## The material pool moved, a component was crafted, or a blueprint was built.
 signal blueprints_changed()
+## One component of a blueprint was crafted (revision 4 §3).
+signal component_crafted(component: ComponentData)
 ## The fitted upgrade changed. Swappable between days since revision 3.
 signal upgrade_equipped(upgrade_id: StringName)
 signal toast_requested(text: String)
