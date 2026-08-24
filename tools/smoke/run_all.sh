@@ -79,7 +79,7 @@ static_check "no modulate expressing state on a game object" \
 # genuinely has to exist is a named constant quoted in ASSETS.md.
 static_check "sprites are scaled only by a named display constant" \
   "$(grep -rnE '\.scale *= *' --include='*.gd' scenes/ autoload/ systems/ 2>/dev/null \
-      | grep -vE 'BASE_SCALE|TOOL_ICON_SCALE|BIN_DISPLAY_SCALE')"
+      | grep -vE 'BASE_SCALE|TOOL_ICON_SCALE|BIN_DISPLAY_SCALE|BOX_CARD_SCALE')"
 # Anything that differs between items lives in that item's .tres.
 static_check "no per-asset special cases in code" \
   "$(grep -rnE '\.id *== *&?"' --include='*.gd' $ASSET_SRC 2>/dev/null)"
@@ -91,7 +91,7 @@ check "boots (2 frames)"   godot --headless --quit-after 2
 check "boots (240 frames)" godot --headless --quit-after 240
 
 echo "Systems:"
-for t in claw desk shift inspect layout report ocean upgrades upgrade_play puzzle settings debug extensibility full; do
+for t in claw desk shift inspect layout report ocean box upgrades upgrade_play puzzle settings debug extensibility full; do
   check "smoke_$t" godot --headless --script "tools/smoke/smoke_$t.gd"
 done
 check "smoke_claw --fail" godot --headless --script tools/smoke/smoke_claw.gd -- --fail

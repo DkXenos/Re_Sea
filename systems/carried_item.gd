@@ -9,12 +9,22 @@ var revealed: Dictionary = {} ## field name -> true
 ## ever filled when that upgrade is taken.
 var probed: Dictionary = {}
 var sorted_to: int = -1
+## Containers only (revision 4 §2). The seed its contents are drawn from, fixed
+## when the box was grabbed, and whether it has been opened yet.
+var container_seed: int = 0
+var opened: bool = false
 var was_correct: bool = false
 var expected_category: int = -1
 var broken_rule: RuleData = null
 
 func _init(item_data: ItemData) -> void:
 	data = item_data
+
+
+## A sealed box: one button, never a bin. Everything that offers sorting, tools
+## or inspection asks this rather than looking at the item's id.
+func is_container() -> bool:
+	return data != null and data.is_container
 
 ## The item names itself once the player has learned something about it with a
 ## tool, or once they have committed it to a bin (revision 2 §3). Until then the

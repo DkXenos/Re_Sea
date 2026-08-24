@@ -72,8 +72,13 @@ func _unhandled_input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 
 
+## Null means the inventory holds nothing a bin would take - either everything
+## is sorted, or the only things left are sealed boxes waiting to be opened.
 func _on_item_selected(entry: CarriedItem) -> void:
-	_inspect.show_entry(entry)
+	if entry == null:
+		_inspect.clear()
+	else:
+		_inspect.show_entry(entry)
 
 
 func _on_bin_chosen(category: int) -> void:

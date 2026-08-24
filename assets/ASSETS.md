@@ -36,6 +36,7 @@ contract. Everything below expands on it.
    | Item in the inspect panel | 160×160 | 288×288 | `InspectPanel.BASE_SCALE` = 1.8 |
    | Tool icon in the rack | 96×96 | 60×60 | `InspectPanel.TOOL_ICON_SCALE` = 0.62 |
    | Bin on the desk | 200×240 | 144×173 | `BinRow.BIN_DISPLAY_SCALE` = 0.72 |
+   | Box on its inventory card | 160×160 | 64×64 | `InventoryPanel.BOX_CARD_SCALE` = 0.4 |
 
    Everywhere else, the pixel size in the table below is the size on screen.
 
@@ -167,6 +168,11 @@ files are drawn programmatically by `tools/gen_placeholders.py` and
 | `data/frames/tool_cutter_frames.tres` | `using` | `assets/tools/tool_cutter_using.png` | 4 |
 | `data/frames/tool_cutter_frames.tres` | `locked` | `assets/tools/tool_cutter_locked.png` | 1 |
 | `data/frames/bubble_frames.tres` | `rise` | `assets/env/bubble.png` | 6 |
+| `data/frames/box.tres` | `closed` | `assets/items/box_closed.png` | 2 |
+| `data/frames/box.tres` | `opened` | `assets/items/box_opened.png` | 2 |
+| `data/frames/box.tres` | `idle` | `assets/items/box_closed.png` | 2 |
+| `data/frames/box.tres` | `wobble` | `assets/items/box_closed.png` | 4 |
+| `data/frames/box.tres` | `sinking` | `assets/items/box_closed.png` | 6 |
 | `data/frames/coral_healthy_frames.tres` | `idle` | `assets/env/coral_healthy.png` | 6 |
 | `data/frames/coral_dead_frames.tres` | `idle` | `assets/env/coral_dead.png` | 6 |
 | `data/frames/debris_overlay_frames.tres` | `idle` | `assets/env/debris_overlay.png` | 6 |
@@ -276,6 +282,8 @@ the file is displayed as-is and never animates.
 | `assets/env/coral_healthy.png` | 120x140 | `idle` 6 fr | Coral overlay, in colour. Sways in place; count is per ocean tier. |
 | `assets/env/coral_dead.png` | 120x140 | `idle` 6 fr | Coral overlay, bleached. Sways in place; count is per ocean tier. |
 | `assets/env/debris_overlay.png` | 96x96 | `idle` 6 fr | Debris clutter on the seabed. Count falls as the ocean recovers. |
+| `assets/items/box_closed.png` | 160x160 | `closed` 2 fr, `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Mystery box, sealed. State `closed`. |
+| `assets/items/box_opened.png` | 160x160 | `opened` 2 fr | Mystery box, lid open. State `opened`. |
 | `assets/items/hotspots_banana_peel.png` | 160x160 | static | Hotspot rings for `banana_peel`. **Generated from `data/items/banana_peel.tres`** by `tools/gen_hotspot_overlays.gd` - never edit by hand, and do not draw it into the item art. |
 | `assets/items/hotspots_fish_bone.png` | 160x160 | static | Hotspot rings for `fish_bone`. **Generated from `data/items/fish_bone.tres`** by `tools/gen_hotspot_overlays.gd` - never edit by hand, and do not draw it into the item art. |
 | `assets/items/hotspots_pet_bottle.png` | 160x160 | static | Hotspot rings for `pet_bottle`. **Generated from `data/items/pet_bottle.tres`** by `tools/gen_hotspot_overlays.gd` - never edit by hand, and do not draw it into the item art. |
@@ -291,6 +299,6 @@ the file is displayed as-is and never animates.
 | `assets/items/hotspots_glass_jar.png` | 160x160 | static | Hotspot rings for `glass_jar`. **Generated from `data/items/glass_jar.tres`** by `tools/gen_hotspot_overlays.gd` - never edit by hand, and do not draw it into the item art. |
 | `assets/items/hotspots_fishing_net.png` | 160x160 | static | Hotspot rings for `fishing_net`. **Generated from `data/items/fishing_net.tres`** by `tools/gen_hotspot_overlays.gd` - never edit by hand, and do not draw it into the item art. |
 
-_111 PNGs, 81 animations across 30 SpriteFrames resources._
+_113 PNGs, 86 animations across 31 SpriteFrames resources._
 _Hotspot overlays are generated separately — see above._
 _Regenerate with_ `python3 tools/gen_placeholders.py`.

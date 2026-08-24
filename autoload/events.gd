@@ -19,6 +19,8 @@ signal grip_preview_changed(chance: float, item: ItemData)
 signal tool_armed(tool_id: StringName)
 signal tool_used(tool_id: StringName, revealed_field: String)
 signal item_sorted(entry: CarriedItem, chosen: int, correct: bool)
+## A sealed box was opened and became its contents (revision 4 §2).
+signal container_opened(box: CarriedItem, contents: Array)
 signal rulebook_toggled(open: bool)
 
 # --- global feedback ---

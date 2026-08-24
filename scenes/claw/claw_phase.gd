@@ -127,7 +127,10 @@ func _setup_tank() -> void:
 ## would mean waiting, and waiting is dead time; starting full would mean there
 ## is no reason to keep watching the tank.
 func _spawn_items() -> void:
-	var pool := _day.item_pool.duplicate()
+	# The day's items plus its sealed boxes (revision 4 §2). A box drifts in,
+	# rests and is grabbed exactly like anything else - the tank does not know
+	# the difference and must not have to.
+	var pool := _day.spawn_pool()
 	_shuffle(pool)
 	# The fraction is the intent, but the availability floor wins: on a small
 	# pool a 40% seed would open below min_available_items and the player would

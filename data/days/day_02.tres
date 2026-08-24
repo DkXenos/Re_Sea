@@ -12,6 +12,7 @@
 [ext_resource type="Resource" path="res://data/items/car_battery.tres" id="10_m3vtm"]
 [ext_resource type="Resource" path="res://data/items/oil_jerrycan.tres" id="11_br5qx"]
 [ext_resource type="Resource" path="res://data/items/paint_bottle.tres" id="12_46dms"]
+[ext_resource type="Resource" path="res://data/items/mystery_box.tres" id="90_box"]
 [ext_resource type="Script" path="res://data/day_data.gd" id="13_fj25p"]
 
 [resource]
@@ -19,6 +20,8 @@ script = ExtResource("13_fj25p")
 day_number = 2
 active_rules = Array[ExtResource("1_p0xa3")]([ExtResource("2_m3wj7"), ExtResource("3_1ipuw")])
 item_pool = Array[ExtResource("4_100ek")]([ExtResource("5_80l45"), ExtResource("6_bnhly"), ExtResource("7_e51uk"), ExtResource("8_he6va"), ExtResource("9_30eif"), ExtResource("10_m3vtm"), ExtResource("11_br5qx"), ExtResource("12_46dms")])
+box_item = ExtResource("90_box")
+box_spawn_count = 1
 quota = 6
 budget = 110
 available_tools = Array[StringName]([&"rinse", &"magnifier"])

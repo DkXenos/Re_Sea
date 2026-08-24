@@ -158,6 +158,8 @@ func _drive_after_day(scene: Node) -> void:
 func _drive_shift(shift: Node) -> void:
 	var claw_view: Node = shift.get_node("ClawView")
 	var desk_view: Node = shift.get_node("DeskView")
+	# unsorted_items() already counts a sealed box as work waiting, so the
+	# driver crosses to the desk to open one without needing to be told.
 	var unsorted: Array = game.unsorted_items()
 	var worth_grabbing: bool = game.can_afford(&"drop") and claw_view.has_work()
 	var on_claw: bool = shift._view == 0
@@ -189,6 +191,16 @@ func _drive_claw(scene: Node) -> void:
 func _drive_desk(scene: Node) -> void:
 	var inspect: Control = scene.get_node("UiLayer/Root/InspectPanel")
 	var bins: Control = scene.get_node("UiLayer/Root/BinRow")
+	# Revision 4 §2: a sealed box is not sortable, so the first thing a player
+	# does at the desk is open the ones they hauled up. Opening costs nothing,
+	# so there is never a reason to leave one shut.
+	var inventory: Control = scene.get_node("UiLayer/Root/InventoryPanel")
+	for card: Node in inventory.get_node("Scroll/Grid").get_children():
+		for child: Node in card.get_children():
+			if child is Button and (child as Button).text == Strings.t("box_open") \
+					and not (child as Button).disabled:
+				(child as Button).pressed.emit()
+				return
 	var entry = inspect.entry
 	if entry == null or not game.can_afford(&"sort"):
 		return

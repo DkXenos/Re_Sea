@@ -91,6 +91,11 @@ const TABLE: Dictionary = {
 	"field_no_tag": "tidak ada kode",
 	"field_multilayer_suffix": " (berlapis)",
 
+	# --- mystery box (revision 4) ---
+	"box_open": "Buka",
+	"box_sealed": "Kotak tersegel - belum tahu isinya",
+	"box_opened_toast": "Kotak dibuka: {n} barang masuk ke daftar",
+
 	# --- bins ---
 	"bin_organic": "ORGANIK",
 	"bin_recyclable": "DAUR ULANG",

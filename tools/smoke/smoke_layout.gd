@@ -80,6 +80,10 @@ func _check_contained(parent: Control, label: String) -> void:
 func _check_desk() -> void:
 	for item: ItemData in game.current_day().item_pool:
 		game.add_to_inventory(item)
+	# A box card is laid out by hand rather than by a container, so it is
+	# exactly the kind of thing this check exists for (revision 4 §2).
+	if game.current_day().box_item != null:
+		game.add_to_inventory(game.current_day().box_item)
 	var desk: Node = load("res://scenes/desk/desk_phase.tscn").instantiate()
 	root.add_child(desk)
 	for i in 20:

@@ -12,6 +12,10 @@ const SFX_POOL_SIZE := 6
 ## Paid once for a day with no mis-sorts that also met quota. Tuning candidate.
 const CLEAN_DAY_BONUS := 5
 
+## Spacing between the per-box content streams (revision 4 §2). Any large odd
+## number does; this one is prime so consecutive boxes cannot share a stream.
+const CONTAINER_STREAM := 104729
+
 ## What each action spends from the shift budget.
 ##
 ## Time is spent by ACTIONS, never by the clock - there is no real-time
@@ -68,6 +72,9 @@ var equipped_upgrade: StringName = &""
 
 # --- current day ---
 var inventory: Array[CarriedItem] = []
+## How many boxes have been grabbed today. Only ever used to space their
+## content streams apart - see add_to_inventory().
+var containers_grabbed: int = 0
 var tools: Array[ToolData] = []
 var stats: Dictionary = {}
 ## What the day report worked out, kept so the after-day screen can show the
@@ -197,6 +204,7 @@ func current_day() -> DayData:
 
 func begin_day() -> void:
 	inventory.clear()
+	containers_grabbed = 0
 	stats = {"correct": 0, "wrong": 0, "sorted": 0, "drops": 0, "tool_uses": 0, "spent": 0}
 	var day := current_day()
 	budget_max = day.budget if day != null else 0
@@ -223,8 +231,49 @@ func advance_day() -> void:
 
 func add_to_inventory(item: ItemData) -> CarriedItem:
 	var entry := CarriedItem.new(item)
+	if entry.is_container():
+		# A stream of its own, fixed at the moment the box was grabbed and
+		# derived from the run seed, the day and how many boxes came before it.
+		# Drawing from Game.rng instead would make the contents depend on how
+		# long the player watched the tank, because the spawn timers share that
+		# stream - so the same seed would stop reproducing the same boxes.
+		entry.container_seed = run_seed + day_index * 7919 \
+			+ CONTAINER_STREAM * (containers_grabbed + 1)
+		containers_grabbed += 1
 	inventory.append(entry)
 	return entry
+
+
+## Opens a sealed box: it leaves the inventory and its contents take its place
+## as ordinary grabbed items, which from here on are indistinguishable from
+## anything the claw lifted directly.
+##
+## Costs nothing. The price of a box is the sorting time of what comes out of
+## it - whether that is the right price is a tuning question for the owner, not
+## one to invent an answer to (revision 4 §2).
+func open_container(entry: CarriedItem) -> Array[CarriedItem]:
+	var out: Array[CarriedItem] = []
+	var day := current_day()
+	if day == null or entry == null or not entry.is_container() or entry.opened:
+		return out
+	var pool := day.content_pool()
+	if pool.is_empty():
+		push_warning("Day %d has a box but nothing for it to contain" % day.day_number)
+		return out
+	var stream := RandomNumberGenerator.new()
+	stream.seed = entry.container_seed
+	var count := day.contents_count(stream)
+	var at := inventory.find(entry)
+	entry.opened = true
+	inventory.erase(entry)
+	for i in count:
+		# Contents may repeat within a box, and the pool has already had every
+		# container filtered out of it, so a box can never hold another box.
+		var made := CarriedItem.new(pool[stream.randi() % pool.size()])
+		inventory.insert(clampi(at + i, 0, inventory.size()), made)
+		out.append(made)
+	Events.container_opened.emit(entry, out)
+	return out
 
 
 ## Debug only: skip the claw phase and go straight to sorting.
@@ -240,6 +289,26 @@ func unsorted_items() -> Array[CarriedItem]:
 	var out: Array[CarriedItem] = []
 	for e: CarriedItem in inventory:
 		if e.sorted_to == -1:
+			out.append(e)
+	return out
+
+
+## The unsorted things a bin will actually take. A sealed box is work waiting -
+## it counts as unsorted - but it can never be dropped into a bin, so anything
+## choosing what to inspect or asking whether sorting is still possible asks
+## this instead.
+func sortable_items() -> Array[CarriedItem]:
+	var out: Array[CarriedItem] = []
+	for e: CarriedItem in unsorted_items():
+		if not e.is_container():
+			out.append(e)
+	return out
+
+
+func sealed_containers() -> Array[CarriedItem]:
+	var out: Array[CarriedItem] = []
+	for e: CarriedItem in unsorted_items():
+		if e.is_container():
 			out.append(e)
 	return out
 
@@ -290,7 +359,11 @@ func spend_amount(cost: int) -> bool:
 func can_still_act() -> bool:
 	if can_afford(&"drop"):
 		return true
-	return not unsorted_items().is_empty() and can_afford(&"sort")
+	# Opening a box is free, so a sealed box is always something left to do -
+	# but only if what comes out of it could then be sorted.
+	if not sealed_containers().is_empty() and can_afford(&"sort"):
+		return true
+	return not sortable_items().is_empty() and can_afford(&"sort")
 
 
 func tool_unlocked(tool_id: StringName) -> bool:

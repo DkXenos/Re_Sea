@@ -132,6 +132,37 @@ def gen_items():
         save(img, "items/item_%s.png" % it["id"], "Trash item `%s`" % it["id"])
 
 
+# ----------------------------------------------------------------- mystery box
+
+def gen_boxes():
+    """The sealed box (revision 4 §2). Two states, two PNGs - never a tint.
+
+    Flat crate, thin outline, no gradient and no baked shadow, drawn exactly
+    like the items so it reads as one more thing on the seabed. `closed` is what
+    drifts in and what the inventory card shows; the card swaps to `opened` when
+    the player presses Buka."""
+    W = H = 160
+    col = (176, 134, 86)
+    dark = shade(col, 0.55)
+
+    img, d = canvas(W, H)
+    outlined(d, "rounded_rectangle", [22, 44, W - 22, H - 20], col, radius=10)
+    outlined(d, "rectangle", [16, 32, W - 16, 54], shade(col, 0.8))
+    for y in (86, 112):
+        d.line([(26, y), (W - 26, y)], fill=dark, width=3)
+    d.line([(W // 2, 56), (W // 2, H - 22)], fill=dark, width=3)
+    save(img, "items/box_closed.png", "Mystery box, sealed. State `closed`.")
+
+    img, d = canvas(W, H)
+    outlined(d, "rounded_rectangle", [22, 56, W - 22, H - 20], col, radius=10)
+    outlined(d, "rectangle", [32, 58, W - 32, 88], shade(col, 0.35))
+    outlined(d, "polygon", [(14, 44), (W - 44, 16), (W - 14, 30), (44, 58)],
+             shade(col, 0.8))
+    d.line([(W // 2, 90), (W // 2, H - 22)], fill=dark, width=3)
+    save(img, "items/box_opened.png", "Mystery box, lid open. State `opened`.")
+
+
+
 # ------------------------------------------------------------------- claw/fish
 
 def gen_claw():
@@ -409,6 +440,22 @@ def write_frames(name, anims, speed=6.0):
         f.write("\n".join(lines) + "\n")
 
 
+def frames_box():
+    """The box answers to the tank's three named states as well as its own two.
+
+    tank_item.gd plays `idle`, `wobble` and `sinking` on everything it holds; a
+    box that did not have them would need the tank to learn what a box is, which
+    is exactly the per-asset special case the data model forbids. All three show
+    the sealed crate - `opened` is only ever reached from the inventory card.
+    """
+    write_frames("box", [
+        ("closed", ["items/box_closed.png"], 2),
+        ("opened", ["items/box_opened.png"], 2),
+        ("idle", ["items/box_closed.png"], 2),
+        ("wobble", ["items/box_closed.png"], 4),
+        ("sinking", ["items/box_closed.png"], 6)], 4.0)
+
+
 def gen_frames():
     n = 0
     write_frames("claw_frames", [
@@ -442,6 +489,8 @@ def gen_frames():
             ("locked", ["tools/tool_%s_locked.png" % t["id"]], 1)], 8.0)
         n += 1
     write_frames("bubble_frames", [("rise", ["env/bubble.png"], 6)], 6.0)
+    n += 1
+    frames_box()
     n += 1
     # Ocean-tier overlays. They sway; nothing in code moves them (revision 1 §1).
     for name in ("coral_healthy", "coral_dead", "debris_overlay"):
@@ -488,6 +537,7 @@ contract. Everything below expands on it.
    | Item in the inspect panel | 160×160 | 288×288 | `InspectPanel.BASE_SCALE` = 1.8 |
    | Tool icon in the rack | 96×96 | 60×60 | `InspectPanel.TOOL_ICON_SCALE` = 0.62 |
    | Bin on the desk | 200×240 | 144×173 | `BinRow.BIN_DISPLAY_SCALE` = 0.72 |
+   | Box on its inventory card | 160×160 | 64×64 | `InventoryPanel.BOX_CARD_SCALE` = 0.4 |
 
    Everywhere else, the pixel size in the table below is the size on screen.
 
@@ -574,7 +624,45 @@ def note_generated_elsewhere():
                          % (it["id"], it["id"])))
 
 
+## Groups a --only run can ask for, so adding one asset never means redrawing
+## every PNG in the project. A group may also own SpriteFrames.
+def _groups():
+    return {
+        "items": [gen_items],
+        "boxes": [gen_boxes, frames_box],
+        "claw": [gen_claw],
+        "fish": [gen_fish],
+        "bins": [gen_bins],
+        "tools": [gen_tools],
+        "ui": [gen_ui],
+        "env": [gen_env],
+        "tiers": [gen_tiers],
+    }
+
+
+def generate_only(names):
+    """Draws just the named groups and leaves ASSETS.md alone.
+
+    A full run rewrites every PNG and the whole manifest. That is right when the
+    art rules change and wrong when one asset is added, so the new rows go into
+    ASSETS.md by hand and a later full run reproduces them in place."""
+    groups = _groups()
+    for name in names:
+        if name not in groups:
+            raise SystemExit("unknown group %r; have: %s"
+                             % (name, ", ".join(sorted(groups))))
+        for fn in groups[name]:
+            fn()
+    for rel, size, desc in MANIFEST:
+        print("  assets/%s  %s  %s" % (rel, size, desc))
+    print("generated %d PNGs for: %s (ASSETS.md not rewritten)"
+          % (len(MANIFEST), ", ".join(names)))
+
+
 def main():
+    if len(sys.argv) > 2 and sys.argv[1] == "--only":
+        generate_only(sys.argv[2].split(","))
+        return
     gen_items()
     gen_claw()
     gen_fish()
@@ -583,6 +671,7 @@ def main():
     gen_ui()
     gen_env()
     gen_tiers()
+    gen_boxes()
     gen_frames()
     note_generated_elsewhere()
     anims = "\n".join("| `%s` | `%s` | `assets/%s` | %d |" % a for a in ANIMS)

@@ -20,6 +20,15 @@ enum Category { ORGANIC, RECYCLABLE, HAZARD, LANDFILL }
 @export var hotspot_overlay: Texture2D
 @export var weight: float = 1.0 ## affects claw grip chance
 
+## A sealed box rather than a piece of trash (revision 4 §2). It drifts in, is
+## grabbed and costs a drop exactly like anything else, but it is never sorted:
+## the desk offers it one button, Buka, and it becomes 2-3 ordinary items.
+##
+## This is a property of the resource, not a special case in code - a second
+## kind of container is one more .tres, and DayData.content_pool() filters
+## containers out of what a box may hold, so no box can ever contain a box.
+@export var is_container: bool = false
+
 ## What the item LOOKS and FEELS like, before any tool is used (revision 2 §3).
 ## Shown in place of the name, so the phase reads as identification rather than
 ## label-matching: "tembus pandang - lentur - mengapung", not "Botol Plastik".

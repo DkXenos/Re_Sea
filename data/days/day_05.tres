@@ -22,6 +22,7 @@
 [ext_resource type="Resource" path="res://data/items/spray_can.tres" id="20_uw8fa"]
 [ext_resource type="Resource" path="res://data/items/glass_jar.tres" id="21_cxlrb"]
 [ext_resource type="Resource" path="res://data/items/fishing_net.tres" id="22_srjg0"]
+[ext_resource type="Resource" path="res://data/items/mystery_box.tres" id="90_box"]
 [ext_resource type="Script" path="res://data/day_data.gd" id="23_27d48"]
 
 [resource]
@@ -29,6 +30,8 @@ script = ExtResource("23_27d48")
 day_number = 5
 active_rules = Array[ExtResource("1_iock1")]([ExtResource("2_2mgca"), ExtResource("3_7iw8q"), ExtResource("4_rt1rh"), ExtResource("5_ncpma"), ExtResource("6_be1lu"), ExtResource("7_ucesi")])
 item_pool = Array[ExtResource("8_tqqxb")]([ExtResource("9_8qpwf"), ExtResource("10_axbku"), ExtResource("11_r621r"), ExtResource("12_wksii"), ExtResource("13_oboq6"), ExtResource("14_4j7ba"), ExtResource("15_vlya8"), ExtResource("16_tnx5v"), ExtResource("17_jaaxc"), ExtResource("18_f3gij"), ExtResource("19_05fvb"), ExtResource("20_uw8fa"), ExtResource("21_cxlrb"), ExtResource("22_srjg0")])
+box_item = ExtResource("90_box")
+box_spawn_count = 2
 quota = 12
 budget = 160
 available_tools = Array[StringName]([&"rinse", &"magnifier", &"swab", &"cutter"])
