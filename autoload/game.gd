@@ -513,15 +513,6 @@ func blueprint_unlocked(blueprint_id: StringName) -> bool:
 	return blueprint_id in unlocked_blueprints
 
 
-## Which blueprint a component belongs to, or null. Only the popup needs this,
-## and it reads it from the data rather than being told.
-func blueprint_of(component: ComponentData) -> BlueprintData:
-	for bp: BlueprintData in blueprints:
-		if component in bp.components:
-			return bp
-	return null
-
-
 # ---------------------------------------------------------------- upgrades
 
 func upgrade() -> UpgradeData:

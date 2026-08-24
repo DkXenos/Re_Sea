@@ -13,7 +13,7 @@ extends Node2D
 
 ## EXPERIMENTAL - revision 3 §5 moved the calibration puzzle's entry point here,
 ## next to the blueprint it belongs to. Delete this line, the marked block in
-## _on_claim(), and scenes/puzzle/, and the feature is gone.
+## _on_craft_blueprint(), and scenes/puzzle/, and the feature is gone.
 const CALIBRATION_PUZZLE := preload("res://scenes/puzzle/calibration_puzzle.tscn")
 
 const SLOT_BG := preload("res://assets/ui/panel_slot.png")
@@ -37,7 +37,7 @@ enum Tab { RESULT, TECH, GEAR }
 @onready var _table: Node2D = $UiLayer/Root/ResultPage/Table
 @onready var _result_summary: Label = $UiLayer/Root/ResultPage/Summary
 @onready var _mistakes: VBoxContainer = $UiLayer/Root/ResultPage/MistakesScroll/Mistakes
-@onready var _gear_rows: VBoxContainer = $UiLayer/Root/GearPage/Rows
+@onready var _gear_rows: VBoxContainer = $UiLayer/Root/GearPage/Scroll/Rows
 
 # --- Teknologi (revision 4 §3) ---
 @onready var _tech: Control = $UiLayer/Root/TechPage
@@ -78,13 +78,21 @@ func _ready() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed(&"advance"):
+	if not event.is_action_pressed(&"advance"):
+		return
+	# With a component popup open, Enter belongs to the popup. Without this it
+	# would fall through and start the next day out from under it.
+	if _popup_layer.visible:
+		_close_popup()
+	else:
 		_finish()
-		get_viewport().set_input_as_handled()
+	get_viewport().set_input_as_handled()
 
 
 func _show_tab(tab: Tab) -> void:
 	_tab = tab
+	if _popup_layer.visible:
+		_close_popup()
 	for i in _pages.size():
 		_pages[i].visible = i == int(tab)
 		_tab_buttons[i].disabled = i == int(tab)
@@ -259,11 +267,15 @@ func _make_component(component: ComponentData, origin: Vector2, drawn: Vector2,
 		scale_factor: float) -> Control:
 	var done := Game.component_crafted(component)
 	var texture: Texture2D = component.done_texture if done else component.locked_texture
-	var display: Vector2 = texture.get_size() * scale_factor if texture != null \
-		else Vector2(96, 96)
+	# Rounded to whole pixels. The fitted scale is rarely exact, and a part whose
+	# art was a millionth of a pixel wider than the box holding it counted as
+	# escaping its box in the layout check - correctly, if pointlessly.
+	var display: Vector2 = (texture.get_size() * scale_factor).round() \
+		if texture != null else Vector2(96, 96)
 
 	var holder := Control.new()
-	holder.position = origin + component.diagram_position * drawn - display * 0.5
+	holder.position = (origin + component.diagram_position * drawn
+		- display * 0.5).round()
 	holder.size = display
 
 	var art := TextureRect.new()

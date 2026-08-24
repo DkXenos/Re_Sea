@@ -91,7 +91,7 @@ check "boots (2 frames)"   godot --headless --quit-after 2
 check "boots (240 frames)" godot --headless --quit-after 240
 
 echo "Systems:"
-for t in claw desk shift inspect layout report ocean box upgrades upgrade_play puzzle settings debug extensibility full; do
+for t in claw desk shift inspect layout report ocean box tech upgrades upgrade_play puzzle settings debug extensibility full; do
   check "smoke_$t" godot --headless --script "tools/smoke/smoke_$t.gd"
 done
 check "smoke_claw --fail" godot --headless --script tools/smoke/smoke_claw.gd -- --fail

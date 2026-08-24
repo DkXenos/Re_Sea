@@ -11,4 +11,4 @@ display_name = "Tangki Penampung"
 locked_texture = ExtResource("2_locked")
 done_texture = ExtResource("3_done")
 diagram_position = Vector2(0.38, 0.74)
-requirements = { 0: 2, 1: 2 }
+requirements = { 0: 2, 1: 1 }

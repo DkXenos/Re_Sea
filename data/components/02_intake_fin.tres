@@ -11,4 +11,4 @@ display_name = "Sirip Penyedot"
 locked_texture = ExtResource("2_locked")
 done_texture = ExtResource("3_done")
 diagram_position = Vector2(0.44, 0.72)
-requirements = { 0: 1, 1: 2 }
+requirements = { 0: 1, 1: 1 }

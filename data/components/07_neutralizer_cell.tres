@@ -11,4 +11,4 @@ display_name = "Sel Penetral"
 locked_texture = ExtResource("2_locked")
 done_texture = ExtResource("3_done")
 diagram_position = Vector2(0.66, 0.34)
-requirements = { 0: 3, 3: 2 }
+requirements = { 0: 2, 2: 3 }

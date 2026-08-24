@@ -236,7 +236,7 @@ the file is displayed as-is and never animates.
 | `assets/tools/tool_cutter_using.png` | 96x96 | `using` 4 fr | Pemotong tool, using |
 | `assets/tools/tool_cutter_locked.png` | 96x96 | `locked` 1 fr | Pemotong tool, locked |
 | `assets/ui/panel_main.png` | 96x96 | static | Main UI panel. NinePatchRect, 24px margins. |
-| `assets/ui/panel_dark.png` | 96x96 | static | Modal / overlay panel. NinePatchRect, 24px margins. |
+| `assets/ui/panel_dark.png` | 96x96 | static | Modal / overlay panel: the rulebook, the calibration puzzle, and the blueprint component popup. NinePatchRect, 24px margins. |
 | `assets/ui/panel_slot.png` | 96x96 | static | Inventory slot background. NinePatchRect, 24px margins. |
 | `assets/ui/panel_slot_selected.png` | 96x96 | static | Inventory slot, selected. A different PNG rather than a tint. NinePatchRect, 24px margins. |
 | `assets/ui/chip_surface.png` | 64x40 | static | Evidence chip, free surface info (grey). NinePatchRect, 24px margins. |
@@ -284,6 +284,27 @@ the file is displayed as-is and never animates.
 | `assets/env/debris_overlay.png` | 96x96 | `idle` 6 fr | Debris clutter on the seabed. Count falls as the ocean recovers. |
 | `assets/items/box_closed.png` | 160x160 | `closed` 2 fr, `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Mystery box, sealed. State `closed`. |
 | `assets/items/box_opened.png` | 160x160 | `opened` 2 fr | Mystery box, lid open. State `opened`. |
+| `assets/ui/blueprint_bg_cleaner_drone.png` | 960x540 | static | Blueprint schematic sheet for `cleaner_drone`. Components are positioned on top of it from normalized coordinates in the .tres. |
+| `assets/ui/blueprint_bg_penyaring_mikroplastik.png` | 960x540 | static | Blueprint schematic sheet for `penyaring_mikroplastik`. Components are positioned on top of it from normalized coordinates in the .tres. |
+| `assets/ui/blueprint_bg_penetral_b3.png` | 960x540 | static | Blueprint schematic sheet for `penetral_b3`. Components are positioned on top of it from normalized coordinates in the .tres. |
+| `assets/ui/comp_drone_body_done.png` | 128x128 | static | Blueprint component `drone_body`, done. A separate drawing, never the other one tinted. |
+| `assets/ui/comp_drone_body_locked.png` | 128x128 | static | Blueprint component `drone_body`, locked. A separate drawing, never the other one tinted. |
+| `assets/ui/comp_bio_core_done.png` | 128x128 | static | Blueprint component `bio_core`, done. A separate drawing, never the other one tinted. |
+| `assets/ui/comp_bio_core_locked.png` | 128x128 | static | Blueprint component `bio_core`, locked. A separate drawing, never the other one tinted. |
+| `assets/ui/comp_intake_fin_done.png` | 128x128 | static | Blueprint component `intake_fin`, done. A separate drawing, never the other one tinted. |
+| `assets/ui/comp_intake_fin_locked.png` | 128x128 | static | Blueprint component `intake_fin`, locked. A separate drawing, never the other one tinted. |
+| `assets/ui/comp_filter_mesh_done.png` | 128x128 | static | Blueprint component `filter_mesh`, done. A separate drawing, never the other one tinted. |
+| `assets/ui/comp_filter_mesh_locked.png` | 128x128 | static | Blueprint component `filter_mesh`, locked. A separate drawing, never the other one tinted. |
+| `assets/ui/comp_pump_housing_done.png` | 128x128 | static | Blueprint component `pump_housing`, done. A separate drawing, never the other one tinted. |
+| `assets/ui/comp_pump_housing_locked.png` | 128x128 | static | Blueprint component `pump_housing`, locked. A separate drawing, never the other one tinted. |
+| `assets/ui/comp_collection_tank_done.png` | 128x128 | static | Blueprint component `collection_tank`, done. A separate drawing, never the other one tinted. |
+| `assets/ui/comp_collection_tank_locked.png` | 128x128 | static | Blueprint component `collection_tank`, locked. A separate drawing, never the other one tinted. |
+| `assets/ui/comp_sealed_chamber_done.png` | 128x128 | static | Blueprint component `sealed_chamber`, done. A separate drawing, never the other one tinted. |
+| `assets/ui/comp_sealed_chamber_locked.png` | 128x128 | static | Blueprint component `sealed_chamber`, locked. A separate drawing, never the other one tinted. |
+| `assets/ui/comp_neutralizer_cell_done.png` | 128x128 | static | Blueprint component `neutralizer_cell`, done. A separate drawing, never the other one tinted. |
+| `assets/ui/comp_neutralizer_cell_locked.png` | 128x128 | static | Blueprint component `neutralizer_cell`, locked. A separate drawing, never the other one tinted. |
+| `assets/ui/comp_safety_valve_done.png` | 128x128 | static | Blueprint component `safety_valve`, done. A separate drawing, never the other one tinted. |
+| `assets/ui/comp_safety_valve_locked.png` | 128x128 | static | Blueprint component `safety_valve`, locked. A separate drawing, never the other one tinted. |
 | `assets/items/hotspots_banana_peel.png` | 160x160 | static | Hotspot rings for `banana_peel`. **Generated from `data/items/banana_peel.tres`** by `tools/gen_hotspot_overlays.gd` - never edit by hand, and do not draw it into the item art. |
 | `assets/items/hotspots_fish_bone.png` | 160x160 | static | Hotspot rings for `fish_bone`. **Generated from `data/items/fish_bone.tres`** by `tools/gen_hotspot_overlays.gd` - never edit by hand, and do not draw it into the item art. |
 | `assets/items/hotspots_pet_bottle.png` | 160x160 | static | Hotspot rings for `pet_bottle`. **Generated from `data/items/pet_bottle.tres`** by `tools/gen_hotspot_overlays.gd` - never edit by hand, and do not draw it into the item art. |
@@ -299,6 +320,6 @@ the file is displayed as-is and never animates.
 | `assets/items/hotspots_glass_jar.png` | 160x160 | static | Hotspot rings for `glass_jar`. **Generated from `data/items/glass_jar.tres`** by `tools/gen_hotspot_overlays.gd` - never edit by hand, and do not draw it into the item art. |
 | `assets/items/hotspots_fishing_net.png` | 160x160 | static | Hotspot rings for `fishing_net`. **Generated from `data/items/fishing_net.tres`** by `tools/gen_hotspot_overlays.gd` - never edit by hand, and do not draw it into the item art. |
 
-_113 PNGs, 86 animations across 31 SpriteFrames resources._
+_134 PNGs, 86 animations across 31 SpriteFrames resources._
 _Hotspot overlays are generated separately — see above._
 _Regenerate with_ `python3 tools/gen_placeholders.py`.

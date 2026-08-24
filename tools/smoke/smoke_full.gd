@@ -12,6 +12,8 @@ var verbose := false
 var fixed_seed := 0
 ## "" leaves the claw unmodified; "first" fits whatever is available.
 var upgrade_choice := "first"
+## Play the run without crafting anything, to read off the raw material supply.
+var no_craft := false
 
 
 func _init() -> void:
@@ -45,6 +47,7 @@ func _run() -> void:
 		game.feature_calibration_puzzle = false
 	if "--no-upgrade" in args:
 		upgrade_choice = ""
+	no_craft = "--no-craft" in args
 	main = load("res://main.tscn").instantiate()
 	root.add_child(main)
 	await process_frame
@@ -117,6 +120,8 @@ func _run() -> void:
 	assert(String(_current().name) == "GameOver", "run did not reach an ending")
 	if bad_mode:
 		assert(game.ocean_health == 0, "sorting everything wrong should bottom out the ocean")
+	elif no_craft:
+		print("supply run: nothing was crafted, the pool above is five days' worth")
 	else:
 		# What revision 3 promised the owner: every meta system reachable, and
 		# the reward loop visible, inside a normal run.
@@ -162,7 +167,7 @@ func _drive_after_day(scene: Node) -> void:
 	if _drive_tech(scene):
 		return
 	if game.equipped_upgrade == &"" and upgrade_choice != "":
-		for row: Control in scene.get_node("UiLayer/Root/GearPage/Rows").get_children():
+		for row: Control in scene.get_node("UiLayer/Root/GearPage/Scroll/Rows").get_children():
 			for child: Node in row.get_children():
 				if child is Button and not (child as Button).disabled:
 					(child as Button).pressed.emit()
@@ -174,6 +179,11 @@ func _drive_after_day(scene: Node) -> void:
 ## the diagram is rebuilt in between. Returns true while there was something to
 ## do, which keeps the screen open until the tab is worked out.
 func _drive_tech(scene: Node) -> bool:
+	# --no-craft measures what five days SUPPLY, with nothing spent. That is the
+	# number the component requirements have to be authored against, and it is
+	# not visible in a run that is busy spending it (revision 4 §3).
+	if no_craft:
+		return false
 	var page: Control = scene.get_node("UiLayer/Root/TechPage")
 	var popup: Control = scene.get_node("PopupLayer/Popup/Panel")
 	if scene.get_node("PopupLayer").visible:
@@ -184,6 +194,8 @@ func _drive_tech(scene: Node) -> bool:
 		return true
 	for sheet in game.blueprints.size():
 		var bp: BlueprintData = scene._current_blueprint()
+		if bp == null:
+			return false
 		if not page.get_node("CraftButton").disabled:
 			page.get_node("CraftButton").pressed.emit()
 			return true

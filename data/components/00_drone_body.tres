@@ -11,4 +11,4 @@ display_name = "Rangka Drone"
 locked_texture = ExtResource("2_locked")
 done_texture = ExtResource("3_done")
 diagram_position = Vector2(0.26, 0.34)
-requirements = { 1: 3 }
+requirements = { 1: 2 }

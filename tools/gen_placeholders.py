@@ -337,7 +337,11 @@ def gen_ui():
         save(img, "ui/%s.png" % name, desc + " NinePatchRect, 24px margins.")
 
     panel("panel_main", (26, 48, 66, 235), (86, 140, 170, 255), desc="Main UI panel.")
-    panel("panel_dark", (12, 22, 34, 245), (58, 96, 124, 255), desc="Modal / overlay panel.")
+    # Revision 4 §3 called for a `popup_panel.png` "or reuse the existing panel
+    # if one fits". This one fits: it is already the modal backing.
+    panel("panel_dark", (12, 22, 34, 245), (58, 96, 124, 255),
+          desc="Modal / overlay panel: the rulebook, the calibration puzzle, "
+               "and the blueprint component popup.")
     panel("panel_slot", (20, 38, 54, 220), (70, 112, 140, 255), desc="Inventory slot background.")
     panel("panel_slot_selected", (34, 68, 92, 235), (150, 210, 240, 255),
           desc="Inventory slot, selected. A different PNG rather than a tint.")

@@ -11,4 +11,4 @@ display_name = "Katup Pengaman"
 locked_texture = ExtResource("2_locked")
 done_texture = ExtResource("3_done")
 diagram_position = Vector2(0.48, 0.74)
-requirements = { 1: 2, 3: 1 }
+requirements = { 2: 2, 3: 1 }

@@ -11,4 +11,4 @@ display_name = "Jaring Penyaring"
 locked_texture = ExtResource("2_locked")
 done_texture = ExtResource("3_done")
 diagram_position = Vector2(0.24, 0.3)
-requirements = { 1: 4 }
+requirements = { 1: 2 }
