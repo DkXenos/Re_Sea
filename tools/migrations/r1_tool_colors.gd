@@ -1,8 +1,7 @@
-## Revision 1 migration: give each ToolData its accent colour.
-##
-## The .tres files are canonical now, so schema changes arrive as migrations
-## like this one rather than by regenerating everything from Python.
-##   godot --headless --script tools/migrations/r1_tool_colors.gd
+# one-off: give each ToolData its accent colour.
+# the .tres files are canonical so schema changes go through little scripts
+# like this instead of regenerating from python.
+#   godot --headless --script tools/migrations/r1_tool_colors.gd
 extends SceneTree
 
 const COLORS := {

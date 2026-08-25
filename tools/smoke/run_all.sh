@@ -50,15 +50,14 @@ static_check() {
   if [ -z "$hits" ]; then printf '  PASS  %s\n' "$name"
   else printf '  FAIL  %s\n' "$name"; printf '%s\n' "$hits" | sed 's/^/        /'; fail=1; fi
 }
-# Game objects animate through SpriteFrames, never through code (revision 1 §1).
+# game objects animate through SpriteFrames, never through code
 static_check "no tweens in game-object scripts" \
   "$(grep -n 'create_tween' scenes/claw/claw.gd scenes/claw/tank_item.gd \
       scenes/claw/fish.gd scenes/desk/bin_row.gd 2>/dev/null)"
 static_check "no tweened transforms or frames anywhere" \
   "$(grep -rnE 'tween_property\([^,]+, *"(position|rotation|scale|frame)' \
       --include='*.gd' scenes/ autoload/ systems/ 2>/dev/null)"
-# Every visual is a PNG on disk, nothing is drawn or built at runtime, and
-# nothing here decides what the designers' art looks like (revision 3 §1).
+# every visual is a PNG on disk, nothing drawn or built at runtime
 ASSET_SRC="scenes/ autoload/ systems/ data/ main.gd main.tscn"
 static_check "no drawn visuals, no 3D" \
   "$(grep -rnE '_draw\(|draw_rect|draw_circle|draw_line|draw_polygon|draw_texture|ColorRect|Polygon2D|Line2D|Node3D|Sprite3D|Camera3D' \
@@ -83,6 +82,33 @@ static_check "sprites are scaled only by a named display constant" \
 # Anything that differs between items lives in that item's .tres.
 static_check "no per-asset special cases in code" \
   "$(grep -rnE '\.id *== *&?"' --include='*.gd' $ASSET_SRC 2>/dev/null)"
+# Godot draws a Control itself for every part the theme leaves unset - that is
+# the one way engine-grey pixels get back on screen without a ColorRect. Every
+# themeable class the project uses must be answered in ui_theme.tres.
+THEMED='Button|CheckButton|CheckBox|HSlider|VSlider|LineEdit|TextEdit|ProgressBar|OptionButton|Panel|PanelContainer|RichTextLabel|Label|TabBar|TabContainer'
+untuned_controls() {
+  {
+    # declared in a scene
+    grep -rhoE "type=\"($THEMED)\"" --include='*.tscn' $ASSET_SRC 2>/dev/null \
+      | sed 's/.*type="//; s/"//'
+    # built in code, where no .tscn could have attached a theme by hand
+    grep -rhoE "\b($THEMED)\.new\(\)" --include='*.gd' $ASSET_SRC 2>/dev/null \
+      | sed 's/\.new()//'
+    # a ScrollContainer brings its scrollbars with it
+    if grep -rqE 'type="ScrollContainer"' --include='*.tscn' $ASSET_SRC 2>/dev/null; then
+      printf 'VScrollBar\nHScrollBar\n'
+    fi
+  } | sort -u | while read -r cls; do
+    [ -n "$cls" ] || continue
+    grep -q "^$cls/" assets/ui/ui_theme.tres \
+      || echo "$cls is used but has no ui_theme.tres entry - Godot draws it itself"
+  done
+}
+static_check "every Control class used is covered by the theme" "$(untuned_controls)"
+# ...and the theme has to actually reach them, including code-built Controls.
+static_check "the theme is applied project-wide" \
+  "$(grep -q '^theme/custom="res://assets/ui/ui_theme.tres"' project.godot \
+      || echo 'project.godot [gui] theme/custom is not set to ui_theme.tres')"
 static_check "exactly two autoloads" \
   "$(awk '/^\[autoload\]/{f=1;next} /^\[/{f=0} f&&/=/{n++} END{if(n!=2) print "found " n}' project.godot)"
 
@@ -98,9 +124,8 @@ check "smoke_claw --fail" godot --headless --script tools/smoke/smoke_claw.gd --
 check "smoke_full --bad"  godot --headless --script tools/smoke/smoke_full.gd -- --bad
 check "smoke_shift day 1"  godot --headless --script tools/smoke/smoke_shift.gd -- 1
 
-# Revision 2 §6: the experimental calibration puzzle must be genuinely
-# optional. One seed, one whole game each way, and the ocean has to end in the
-# same place - the flag is the only difference.
+# the experimental puzzle has to be genuinely optional. one seed, a whole game
+# each way, ocean has to end in the same place.
 echo "Feature flag:"
 ending() {
   run_limited godot --headless --script tools/smoke/smoke_full.gd -- --seed "$1" "${@:2}" \

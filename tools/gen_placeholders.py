@@ -135,7 +135,7 @@ def gen_items():
 # ----------------------------------------------------------------- mystery box
 
 def gen_boxes():
-    """The sealed box (revision 4 §2). Two states, two PNGs - never a tint.
+    """The sealed box. Two states, two PNGs, never a tint.
 
     Flat crate, thin outline, no gradient and no baked shadow, drawn exactly
     like the items so it reads as one more thing on the seabed. `closed` is what
@@ -168,9 +168,8 @@ def gen_boxes():
 def greyscale(c):
     """The locked component is drawn in the greyscale of its own colour.
 
-    It is a SEPARATE PNG, not the colour one with a filter over it at runtime -
-    revision 4 §3 is explicit that locked and done are two drawings. Doing the
-    conversion here, once, at draw time, is what keeps them the same shape."""
+    SEPARATE PNG, not the colour one with a runtime filter over it. Doing the
+    conversion here once at draw time keeps them the same shape."""
     v = int(round(0.299 * c[0] + 0.587 * c[1] + 0.114 * c[2]))
     return (v, v, v)
 
@@ -308,8 +307,7 @@ def gen_tools():
             if state == "using":
                 col = shade(t["color"], 1.3)
             elif state == "locked":
-                # A locked tool is its own drawing, not a dimmed one. Code must
-                # never express state by tinting designer art (rev 3 §1.4).
+                # locked is its own drawing, not a dimmed one
                 col = (96, 100, 108)
             if t["id"] == "rinse":
                 outlined(d, "rounded_rectangle", [26, 16, 62, 58], col, radius=8)
@@ -337,8 +335,7 @@ def gen_ui():
         save(img, "ui/%s.png" % name, desc + " NinePatchRect, 24px margins.")
 
     panel("panel_main", (26, 48, 66, 235), (86, 140, 170, 255), desc="Main UI panel.")
-    # Revision 4 §3 called for a `popup_panel.png` "or reuse the existing panel
-    # if one fits". This one fits: it is already the modal backing.
+    # reusing this as the component popup backing instead of a new png
     panel("panel_dark", (12, 22, 34, 245), (58, 96, 124, 255),
           desc="Modal / overlay panel: the rulebook, the calibration puzzle, "
                "and the blueprint component popup.")
@@ -407,6 +404,65 @@ def gen_ui():
     outlined(d, "ellipse", [2, 2, 69, 69], (198, 82, 72))
     save(img, "ui/joystick_knob.png", "Console joystick knob, offsets with claw")
 
+    # Godot draws sliders, checkboxes and scrollbars itself unless the theme
+    # hands it a texture for every part. Without these the settings screen and
+    # every scroll list would still be engine grey - the one place the "every
+    # visual is a PNG" rule used to leak.
+    for name, fill, border in (("slider_track", (20, 34, 48, 235), (70, 112, 140, 255)),
+                               ("slider_fill", (46, 104, 138, 245), (120, 186, 220, 255))):
+        img, d = canvas(64, 16)
+        d.rounded_rectangle([0, 0, 63, 15], radius=7, fill=fill, outline=border, width=2)
+        save(img, "ui/%s.png" % name, "Volume slider %s. NinePatch, 8px margins, stretched to width."
+             % name.split("_")[1])
+
+    for name, col in (("slider_grabber", (198, 216, 232)),
+                      ("slider_grabber_hover", (255, 255, 255))):
+        img, d = canvas(32, 32)
+        outlined(d, "ellipse", [1, 1, 30, 30], col, width=2)
+        save(img, "ui/%s.png" % name, "Volume slider knob%s."
+             % ("" if name.endswith("grabber") else ", hovered/held"))
+
+    # a toggle is two drawings, not one drawing plus a tint - same rule as bins
+    for name, track, knob, kx in (("toggle_off", (30, 40, 50, 240), (140, 152, 164), 6),
+                                  ("toggle_on", (30, 74, 62, 245), (120, 216, 168), 34)):
+        img, d = canvas(64, 32)
+        d.rounded_rectangle([0, 0, 63, 31], radius=15, fill=track,
+                            outline=shade(knob, 0.7) + (255,), width=2)
+        outlined(d, "ellipse", [kx, 4, kx + 23, 27], knob, width=2)
+        save(img, "ui/%s.png" % name, "Settings toggle, %s state." % name.split("_")[1])
+
+    for name, fill, border in (("scrollbar_track", (14, 26, 38, 200), (52, 84, 108, 255)),
+                               ("scrollbar_grabber", (62, 104, 134, 240), (110, 170, 205, 255)),
+                               ("scrollbar_grabber_hover", (92, 146, 182, 250), (170, 220, 245, 255))):
+        img, d = canvas(16, 64)
+        d.rounded_rectangle([0, 0, 15, 63], radius=7, fill=fill, outline=border, width=2)
+        save(img, "ui/%s.png" % name, "Scrollbar %s. NinePatch, 8px margins, stretched to length."
+             % name.split("_", 1)[1].replace("_", " "))
+
+    # TextureButtons sit outside the theme, so their states are their own files
+    for name, col, glyph in (("icon_pause_pressed", (150, 165, 185), "II"),):
+        img, d = canvas(48, 48)
+        outlined(d, "ellipse", [3, 3, 44, 44], col)
+        centered(d, (0, 0, 48, 48), glyph, shade(col, 0.35), 24)
+        save(img, "ui/%s.png" % name, "HUD icon (%s), pressed state" % glyph)
+
+    # the only text fields are in the debug overlay today, but a LineEdit Godot
+    # has no texture for is a LineEdit Godot draws grey
+    for name, fill, border in (("textfield_normal", (12, 24, 36, 240), (70, 112, 140, 255)),
+                               ("textfield_focus", (16, 34, 50, 245), (150, 210, 240, 255))):
+        img, d = canvas(64, 40)
+        d.rounded_rectangle([1, 1, 62, 38], radius=8, fill=fill, outline=border, width=2)
+        save(img, "ui/%s.png" % name, "Text field, %s. NinePatch, 12px margins."
+             % name.split("_")[1])
+
+    for name, ang in (("arrow_left_pressed", 180), ("arrow_right_pressed", 0)):
+        img, d = canvas(96, 96)
+        outlined(d, "ellipse", [4, 4, 91, 91], (36, 62, 84), width=3)
+        pts = [(70, 28), (70, 68), (30, 48)] if ang == 180 else [(26, 28), (26, 68), (66, 48)]
+        outlined(d, "polygon", pts, (150, 170, 190))
+        save(img, "ui/%s.png" % name, "Console arrow button (%s), pressed state"
+             % name.split("_")[1])
+
 
 # ----------------------------------------------------------------------- env
 
@@ -462,10 +518,9 @@ def gen_env():
 
 
 
-# --------------------------------------------------------------- ocean tiers
-# Revision 2 §1. The seabed backdrop, the coral and the debris are swapped by
-# tier, so the recovering ocean is something the player can see rather than a
-# number on a report. Counts and thresholds live in data/tiers/*.tres.
+# ocean tiers
+# seabed, coral and debris swap per tier so the recovery is something you can
+# see instead of a number. counts and thresholds are in data/tiers/*.tres.
 
 def gen_tiers():
     """Four seabed backdrops, murky to bright, plus coral and debris overlays."""
@@ -583,7 +638,7 @@ def gen_frames():
     n += 1
     frames_box()
     n += 1
-    # Ocean-tier overlays. They sway; nothing in code moves them (revision 1 §1).
+    # tier overlays. they sway, nothing in code moves them.
     for name in ("coral_healthy", "coral_dead", "debris_overlay"):
         write_frames("%s_frames" % name, [("idle", ["env/%s.png" % name], 6)], 3.0)
         n += 1

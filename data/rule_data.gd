@@ -1,30 +1,22 @@
-## A sorting rule. Rules are evaluated by priority so a later, higher-priority
-## rule can override an earlier one - that is how difficulty grows with zero
-## new code.
 class_name RuleData
 extends Resource
 
 @export var id: StringName
-@export var text: String ## shown verbatim in the rulebook
-## Compact form for the always-visible checklist in the inspect panel, e.g.
-## "Ada sisa kotoran -> RESIDU". The rulebook still shows `text` verbatim; this
-## exists because a six-sentence list will not fit beside the item, and it is
-## data rather than a truncation rule in code. Falls back to `text`.
+@export var text: String  # verbatim in the rulebook
+# short version for the checklist next to the item, falls back to text
 @export var short_text: String = ""
-## Property name on ItemData -> required value. An Array value means "any of".
-## e.g. {"has_residue": true}
+# ItemData property -> required value. array value means "any of".
 @export var applies_when: Dictionary = {}
 @export var forces_category: ItemData.Category
-@export var priority: int = 0 ## higher wins on conflict
+@export var priority: int = 0  # higher wins
 
-## An empty applies_when means this rule is rulebook text only and never
-## overrides anything - that is how the day 1 baseline rule states the default
-## without special-casing it in code.
+
 func label() -> String:
 	return short_text if short_text != "" else text
 
 
 func matches(item: ItemData) -> bool:
+	# empty applies_when = rulebook text only, never overrides anything
 	if applies_when.is_empty():
 		return false
 	for key: String in applies_when:
@@ -40,8 +32,7 @@ func matches(item: ItemData) -> bool:
 	return true
 
 
-## Numbers may arrive as int or float depending on how the .tres was authored,
-## so compare them numerically rather than by exact type.
+# ints and floats get mixed up depending on how the .tres was saved
 static func _same(a: Variant, b: Variant) -> bool:
 	var a_num := typeof(a) == TYPE_INT or typeof(a) == TYPE_FLOAT
 	var b_num := typeof(b) == TYPE_INT or typeof(b) == TYPE_FLOAT

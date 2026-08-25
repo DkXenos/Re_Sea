@@ -1,7 +1,6 @@
-## Proves the central claim of the data model: a 15th item, a 7th rule and a
-## 6th day can be added with new .tres files and zero code changes. Creates
-## them, drives both phases with them, then deletes them again.
-##   godot --headless --script tools/smoke/smoke_extensibility.gd
+# a 15th item, 7th rule and 6th day should all be addable with .tres files and
+# no code. makes them, plays both phases with them, deletes them again.
+#   godot --headless --script tools/smoke/smoke_extensibility.gd
 extends SceneTree
 
 const ITEM_PATH := "res://data/items/_tmp_test_item.tres"

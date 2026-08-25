@@ -1,27 +1,18 @@
-## The compact "what am I working toward" strip on the desk (revision 2 §2,
-## following revision 4 §3).
-##
-## One row per blueprint: name, a parts counter and a bar. Nothing here is
-## clickable - crafting happens in the Teknologi tab, and this is only a
-## reminder of what the day's sorting is feeding.
-##
-## Revision 4 replaced the flat "7 / 12 correctly sorted" counter this used to
-## show. Correct sorts now go into a spendable pool, so a per-category total
-## would be a number that goes DOWN when the player crafts, which reads as
-## losing progress. What is actually monotonic is parts assembled, so that is
-## what the bar tracks.
-##
-## The counts only move at the day report and in the tab after it. That is
-## deliberate: the desk never tells the player whether a sort was right, and a
-## counter that ticked up the moment they hit the correct bin would give the
-## answer away.
+# "what am i working toward" strip. one row per blueprint, nothing clickable,
+# crafting is in the Teknologi tab.
+#
+# tracks parts assembled, NOT the material pool - the pool goes down when you
+# craft and a bar that falls reads as losing progress.
+#
+# only moves at the day report. a counter ticking up the moment you hit the
+# right bin would give the answer away.
 extends Control
 
 const ROW_BG := preload("res://assets/ui/panel_slot.png")
 const BAR_BG := preload("res://assets/ui/meter_bg.png")
 const BAR_FILL := preload("res://assets/ui/meter_fill.png")
-## Three rows plus two 8px separators have to fit the 702px the desk gives this
-## strip. They did not, and the overflow ran underneath the rulebook button.
+# 3 rows + 2 separators have to fit in 702px. they didn't, and the overflow
+# ran under the rulebook button.
 const ROW_WIDTH := 228.0
 const BAR_WIDTH := 88.0
 
@@ -49,9 +40,8 @@ func _make_row(bp: BlueprintData) -> Control:
 
 	var bg := NinePatchRect.new()
 	bg.texture = ROW_BG
-	# 14, not the usual 24: a NinePatch whose top and bottom margins add up to
-	# more than the box is tall draws its corners on top of each other, which is
-	# what put a doubled edge under every row in this strip.
+	# 14 not 24 - if the ninepatch margins add up to more than the box height
+	# the corners draw over each other and you get a doubled edge
 	for side: String in ["left", "top", "right", "bottom"]:
 		bg.set("patch_margin_" + side, 14)
 	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -77,8 +67,7 @@ func _make_row(bp: BlueprintData) -> Control:
 		Color(0.6, 0.94, 0.72) if done else Color(0.86, 0.9, 0.94))
 	row.add_child(count)
 
-	# The bar is the meter PNG clipped to width, the same way the report's ocean
-	# meter is drawn - no shape is ever drawn in code.
+	# meter png clipped to width, same as the report's ocean meter
 	row.add_child(_meter(BAR_BG, Vector2(10, 26), Vector2(BAR_WIDTH, 5)))
 	var clip := Control.new()
 	clip.clip_contents = true
@@ -93,11 +82,10 @@ func _make_row(bp: BlueprintData) -> Control:
 	return row
 
 
-## A TextureRect refuses to shrink below its texture until expand_mode says it
-## may, and it clamps `size` at the moment you assign it - so setting the size
-## first and the expand mode afterwards silently leaves the rect at the PNG's
-## full 320x32. Three of these sat on top of the rulebook button and cut its
-## label in half. Order matters here; keep the assignment in this function.
+# ORDER MATTERS. a TextureRect clamps size when you assign it and won't go
+# below the texture until expand_mode allows it, so size-then-expand silently
+# leaves it at the full 320x32. three of these ended up covering the rulebook
+# button. don't inline this.
 func _meter(texture: Texture2D, at: Vector2, box: Vector2) -> TextureRect:
 	var rect := TextureRect.new()
 	rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
@@ -110,8 +98,7 @@ func _meter(texture: Texture2D, at: Vector2, box: Vector2) -> TextureRect:
 	return rect
 
 
-## The whole sheet's cost, so the tooltip still answers "what is this for?"
-## without the strip having to know how the parts are split up.
+# whole sheet cost for the tooltip
 func _requirement_text(bp: BlueprintData) -> String:
 	var parts: Array[String] = []
 	var required := bp.total_requirements()

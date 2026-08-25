@@ -1,7 +1,5 @@
-## Phase A. A fixed viewpoint facing the machine: the tank renders into a
-## SubViewport so the glass edge clips it for free, the console and HUD sit on
-## their own CanvasLayers above it, and a Camera2D inside the SubViewport
-## follows the claw across a seabed wider than the window.
+# tank renders into a SubViewport so the glass edge clips it for free. camera
+# inside follows the claw across a seabed wider than the window.
 extends Node2D
 
 const ITEM_SCENE := preload("res://scenes/claw/tank_item.tscn")
@@ -12,27 +10,22 @@ const FISH_FRAMES: Array[String] = [
 	"res://data/frames/fish_bg_large_frames.tres",
 ]
 const MINIMAP_DOT := preload("res://assets/ui/minimap_item.png")
-## The visible slice of the tank, in tank world units.
+# visible slice of the tank, in tank world units
 const TANK_VIEW := Vector2(1000.0, 368.0)
-## Where items come to rest, and the depths fish drift at.
+# where items rest, and the depths fish drift at
 const ITEM_REST_Y := Vector2(246.0, 278.0)
 const FISH_DEPTH_Y := Vector2(72.0, 208.0)
-## Nearest-layer mouse parallax in pixels. Small numbers - enough to read as
-## depth, not enough to distract.
+# mouse parallax, nearest layer. keep it small.
 const PARALLAX := [2.0, 4.0, 6.0]
-## How far the water background slides against the camera. Also small.
+# how far the water bg slides against the camera
 const BG_CAMERA_PARALLAX := 0.04
 
-## Seabed width in tank world units. The brief asked for 2.5x viewport width;
-## the viewport is 1280 but the tank window is only 1000 wide, so this is 2.6x
-## of what the player can actually see and stays under the 3x ceiling - past
-## that, searching becomes sweeping, which is boring. Tuning knob.
+# ~2.6x the tank window (1000 wide, not the 1280 viewport). wider than 3x and
+# searching turns into sweeping.
 @export var seabed_width: float = 2600.0
 
-## Fish density is an atmosphere knob, not a difficulty one - fish cannot be
-## grabbed and cost nothing. It came from the ocean tier in revision 2; revision
-## 3 deferred all tier ART, so it is a plain export again. When the designers
-## build the four tiers, this goes back to OceanTierData.fish_count.
+# atmosphere only, fish can't be grabbed.
+# TODO move this back onto OceanTierData.fish_count when the tier art exists
 @export var fish_count: int = 9
 @export var fish_speed_min: float = 25.0
 @export var fish_speed_max: float = 65.0
@@ -58,7 +51,7 @@ const BG_CAMERA_PARALLAX := 0.04
 
 var _day: DayData
 var _active: bool = true
-## Items that have not drifted in yet.
+# not drifted in yet
 var _pending: Array[ItemData] = []
 var _spawn_timer: float = 0.0
 var _knob_home: Vector2
@@ -92,10 +85,9 @@ func _ready() -> void:
 	_rebuild_bubbles(Game.vfx_intensity)
 
 
-## Everything that depends on how wide the seabed is, in one place.
+# everything that depends on seabed width, in one place
 func _setup_tank() -> void:
-	# One seabed PNG tiled across the width, rather than a 2600px asset the
-	# designers would have to redraw whenever the width is tuned.
+	# tile one PNG instead of asking for a 2600px asset every time this changes
 	_seabed.centered = false
 	_seabed.texture_repeat = CanvasItem.TEXTURE_REPEAT_ENABLED
 	_seabed.region_enabled = true
@@ -114,38 +106,24 @@ func _setup_tank() -> void:
 	_camera.reset_smoothing()
 
 
-## The ocean tier drives one text label in the shift bar and nothing else.
-##
-## Revision 2 swapped the seabed, tinted the water and scattered coral per tier.
-## Revision 3 DEFERRED all of that: four sets of tier art is polish on a reward
-## loop whose value is still unproven, and the label proves the loop just as
-## well. The tier data is still filled in and still computed - see
-## data/ocean_tier_data.gd for what the designers eventually draw, and the
-## dormant Decor node below the seabed for where it hangs.
+# tier only drives one label right now. the seabed swap / water tint / coral
+# is all still unbuilt - the Decor node under the seabed is where it goes.
 
-## The seabed opens partly stocked and fills up over the shift. Starting empty
-## would mean waiting, and waiting is dead time; starting full would mean there
-## is no reason to keep watching the tank.
+# starts partly stocked and fills up. empty = waiting, full = no reason to
+# watch the tank.
 func _spawn_items() -> void:
-	# The day's items plus its sealed boxes (revision 4 §2). A box drifts in,
-	# rests and is grabbed exactly like anything else - the tank does not know
-	# the difference and must not have to.
+	# items + boxes. tank doesn't know the difference and shouldn't have to.
 	var pool := _day.spawn_pool()
 	_shuffle(pool)
-	# The fraction is the intent, but the availability floor wins: on a small
-	# pool a 40% seed would open below min_available_items and the player would
-	# start by waiting.
+	# floor wins over the fraction, otherwise a small pool opens with 2 items
 	var seeded := mini(pool.size(),
 		maxi(_day.min_available_items, int(round(pool.size() * _day.initial_seed_fraction))))
 	var usable := seabed_width - 240.0
 	var lane := usable / maxf(1.0, float(seeded))
 	for i in seeded:
 		var node := _make_item(pool[i])
-		# Clamped to what the claw can actually reach. Without this the jitter
-		# on lane 0 could put an item at negative x, where no drop could ever
-		# touch it - and since it still counted as work waiting in the tank, a
-		# player aiming at it burned the whole shift on drops that grabbed
-		# nothing. Found by a run driven through real play (rev 3 §6).
+		# clamp to what the claw can reach. lane 0 jitter used to put items at
+		# negative x where nothing could ever grab them.
 		node.position = Vector2(
 			clampf(120.0 + lane * i + Game.rng.randf_range(-lane * 0.25, lane * 0.25),
 				_reach_min(), _reach_max()),
@@ -155,8 +133,7 @@ func _spawn_items() -> void:
 	_reset_spawn_timer()
 
 
-## The span an item may rest in: anywhere the claw can be placed. Derived from
-## the claw's own limits so the two can never drift apart.
+# read off the claw's own limits so the two can't drift apart
 func _reach_min() -> float:
 	return _claw.min_x
 
@@ -185,8 +162,7 @@ func _reset_spawn_timer() -> void:
 	_spawn_timer = Game.rng.randf_range(_day.spawn_interval_min, _day.spawn_interval_max)
 
 
-## The next item arrives on its timer, or immediately if the tank has dropped
-## below the day's floor - the player must never have a reason to sit and wait.
+# on a timer, or right away if we've dropped below the day's floor
 func _update_spawning(delta: float) -> void:
 	if _pending.is_empty():
 		return
@@ -213,14 +189,12 @@ func _spawn_fish() -> void:
 			Vector2(40.0, seabed_width - 40.0))
 
 
-## The one visible thing wired to the VFX slider, so the slider is testable.
+# only thing actually wired to the vfx slider
 func _rebuild_bubbles(intensity: float) -> void:
 	_clear(_bubbles)
 	_bubble_speeds.clear()
-	# Bubbles are AnimatedSprite2D like every other animated thing, playing
-	# "rise". Their upward travel is movement; the animation is the designer's.
-	# They are all one size: randomly scaling a sprite is code deciding what the
-	# art looks like, so size variation is the designers' to draw (rev 3 §1.5).
+	# all one size on purpose - don't randomly scale these, size variation is
+	# the designers' job to draw
 	var frames: SpriteFrames = load("res://data/frames/bubble_frames.tres")
 	for i in int(round(14.0 * clampf(intensity, 0.0, 1.0))):
 		var bubble := AnimatedSprite2D.new()
@@ -247,9 +221,7 @@ func _claw_progress() -> float:
 	return inverse_lerp(_claw.min_x, _claw.max_x, _claw.position.x)
 
 
-## Three CanvasLayers offset by a few pixels from the mouse, nearest moving
-## most, plus the water sliding against the camera. Cheaper and far more
-## predictable than a 3D camera.
+# three canvaslayers nudged by the mouse, nearest moves most
 func _update_parallax() -> void:
 	var vp := get_viewport_rect().size
 	if vp.x <= 0.0:
@@ -272,28 +244,24 @@ func _update_bubbles(delta: float) -> void:
 			bubble.position.x = randf_range(160.0, 1120.0)
 
 
-## Failure has to be the player's judgement, not a surprise, so the odds are on
-## screen before the drop - and they belong to the exact item the drop will
-## reach, because both come from the same prediction.
+# odds on screen before the drop, and for the exact item the drop will reach
 func _update_grip_preview() -> void:
 	if _claw.is_busy():
 		return
 	var target: Node2D = _claw.predict_target(_items.get_children())
 	_claw.predicted_target = target
-	# A rail that will not move has to say so, or it reads as a broken control
-	# rather than as the cost the player chose (rev 3 §4).
+	# say so when the rail is locked or it just reads as a broken control
 	if _claw.is_rail_locked():
 		_grip_label.text = Strings.t("claw_rail_locked")
 	elif target == null:
 		_grip_label.text = Strings.t("claw_grip_none")
 	else:
-		# Nothing in the tank has been identified yet, so the readout describes
-		# what the claw can see rather than naming it (revision 2 §3).
+		# nothing's identified yet, so describe it instead of naming it
 		_grip_label.text = "%s  -  %s" % [target.data.surface_label(),
 			Strings.tf("claw_grip_chance", {"n": int(round(target.grip_chance() * 100.0))})]
 
 
-## Without this, "where was that heavy thing" becomes tedious rather than tense.
+# without this "where was that heavy one" is just tedious
 func _update_minimap() -> void:
 	var width := _map.size.x
 	var scale_x := width / seabed_width
@@ -316,7 +284,7 @@ func _update_minimap() -> void:
 			_dots[i].position = Vector2(item.position.x * scale_x - 5.0, 9.0)
 
 
-## The claw does not know what a drop costs; the tank charges the shift.
+# claw doesn't know what a drop costs, we charge it here
 func _on_drop_started() -> void:
 	Game.spend(&"drop")
 	Game.stats["drops"] = int(Game.stats.get("drops", 0)) + 1
@@ -333,14 +301,12 @@ func _on_cycle_finished(result: Dictionary) -> void:
 		_show_toast(Strings.t("claw_slipped"))
 
 
-## True while the tank can still produce something to grab. The shift asks
-## this; the tank does not decide when the day ends any more.
+# shift_phase asks this. the tank doesn't decide when the day ends.
 func has_work() -> bool:
 	return not _pending.is_empty() or _items.get_child_count() > 0
 
 
-## Switching tabs costs nothing and stops nothing: items keep drifting in and a
-## cycle already in the air still lands. Only input and drawing are suspended.
+# switching tabs stops nothing, items keep drifting in. input + drawing only.
 func set_view_active(active: bool) -> void:
 	_active = active
 	for child in get_children():
@@ -357,8 +323,9 @@ func _show_toast(text: String) -> void:
 	tween.tween_property(_toast, "modulate:a", 0.0, 0.6)
 
 
-## queue_free() alone leaves the old children in the tree for the rest of the
-## frame, so a list rebuilt twice in one frame would briefly show both sets.
+# queue_free alone leaves them in the tree for the rest of the frame and you
+# get both lists at once
+
 func _clear(node: Node) -> void:
 	for child in node.get_children():
 		node.remove_child(child)

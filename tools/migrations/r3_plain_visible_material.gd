@@ -1,15 +1,13 @@
-## Post-playtest migration: `visible_material` is what an item LOOKS like, and
-## it is free information. Three items had a resin code in it - "PET bening",
-## "HDPE bening" - which is not something you can see. You read a resin code off
-## the moulded mark, and that is what `visible_label` and `tag_text` are for.
-##
-## Leaking it into the free field also blunted the best trap in the game: the
-## paint bottle is supposed to look exactly like the drinking-water bottle, and
-## only the residue tells them apart.
-##
-## The codes stay in `visible_label` and `tag_text`, where they are genuinely
-## printed on the object - and the rulebook now explains what each one means.
-##   godot --headless --script tools/migrations/r3_plain_visible_material.gd
+# one-off, after a playtest. visible_material is what it LOOKS like and it's
+# free info. three items had a resin code in there ("PET bening", "HDPE
+# bening") which you can't see - you read that off the moulded mark, which is
+# what visible_label and tag_text are for.
+#
+# it also killed the best trap in the game: the paint bottle is meant to look
+# exactly like the drinking water bottle and only the residue separates them.
+#
+# codes stay in visible_label/tag_text where they're actually printed.
+#   godot --headless --script tools/migrations/r3_plain_visible_material.gd
 extends SceneTree
 
 const PLAIN := {

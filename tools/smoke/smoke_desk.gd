@@ -1,6 +1,6 @@
-## Headless smoke test for the desk phase: fills the inventory, exercises every
-## tool on both a real hotspot and empty space, then sorts everything.
-##   godot --headless --script tools/smoke/smoke_desk.gd -- [day]
+# desk phase: fill the inventory, use every tool on a real hotspot and on
+# empty space, then sort everything.
+#   godot --headless --script tools/smoke/smoke_desk.gd -- [day]
 extends SceneTree
 
 var finished := false
@@ -11,8 +11,8 @@ func _init() -> void:
 	_run()
 
 
-## Normalized texture coordinate -> point inside the inspect surface, mirroring
-## inspect_panel._to_normalized().
+# normalized texture coord -> point in the inspect surface. mirrors
+# inspect_panel._to_normalized().
 func _point_for(n: Vector2) -> Vector2:
 	return Vector2(180, 180) + (n - Vector2(0.5, 0.5)) * 320.0
 

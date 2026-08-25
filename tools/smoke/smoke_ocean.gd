@@ -1,12 +1,11 @@
-## The tier and blueprint ARITHMETIC: thresholds cover every health value, a
-## perfect day never loses ground, and no bonus can push the meter past 100.
-##
-## What this deliberately no longer does is claim anything about how a real run
-## goes. Revision 2 asserted that here by setting health and stats by hand, and
-## that check passed for a whole revision while the tier never once moved in
-## actual play. Progression - two tier rises, two blueprints, the first by day
-## 2 - is now asserted in smoke_full, from a run that was played (rev 3 §6).
-##   godot --headless --script tools/smoke/smoke_ocean.gd
+# tier + blueprint ARITHMETIC only: thresholds cover every health value, a
+# perfect day never loses ground, no bonus pushes past 100.
+#
+# it says nothing about how a real run goes any more. that used to be asserted
+# here by setting health and stats by hand and it passed for ages while the
+# tier never actually moved in play. progression is checked in smoke_full now,
+# off a run that was actually played.
+#   godot --headless --script tools/smoke/smoke_ocean.gd
 extends SceneTree
 
 var game: Node
@@ -89,9 +88,8 @@ func _check_blueprints() -> void:
 			"a perfect day must raise the meter (day %d)" % (day + 1))
 		if game.visual_tier > before_tier:
 			tier_rises += 1
-		# Revision 4 §3: a blueprint is finished part by part out of the
-		# spendable pool, then assembled. Crafting whatever the pool can pay
-		# for is what a player working the tab would do.
+		# parts first out of the pool, then assemble. crafting whatever it can
+		# pay for is what someone working the tab would do.
 		for bp: BlueprintData in game.blueprints:
 			for component: ComponentData in bp.components:
 				game.craft_component(component)

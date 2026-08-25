@@ -1,6 +1,5 @@
-## Root scene switcher. A plain Node - this project is 2D only and main.tscn
-## never renders anything itself. Scenes are addressed by key through Events,
-## so no scene ever holds a path to another scene.
+# scene switcher. scenes are addressed by key through Events so nothing holds
+# a path to anything else.
 extends Node
 
 const SCENES: Dictionary = {
@@ -14,8 +13,7 @@ const SCENES: Dictionary = {
 	&"game_over": "res://scenes/game_over/game_over.tscn",
 }
 
-## Pausing only makes sense inside a run; on the menu and in the cutscene Esc
-## already means something else.
+# esc means something else on the menu / in the cutscene
 const PAUSABLE_KEYS: Array[StringName] = [&"day_start", &"shift", &"report", &"after_day"]
 
 @onready var _holder: Node = $SceneHolder
@@ -31,8 +29,7 @@ func _ready() -> void:
 	Events.scene_change_requested.connect(_on_scene_change_requested)
 	Events.phase_finished.connect(_on_phase_finished)
 	Events.debug_command.connect(_on_debug_command)
-	# Every action has to be reachable by mouse - the competition build gets
-	# demoed by strangers who will not read a control list.
+	# needs to be clickable, people won't read a control list
 	_pause_button.pressed.connect(func() -> void: _pause.toggle(not _pause.visible))
 	_on_scene_change_requested(&"main_menu")
 
@@ -47,8 +44,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			get_viewport().set_input_as_handled()
 
 
-## Only the commands that need the scene tree land here; the rest are handled
-## by Game, which owns the state they touch.
+# only the ones that need the tree, Game handles the rest
 func _on_debug_command(command: StringName, _arg: Variant) -> void:
 	if command != &"skip_day":
 		return
@@ -74,11 +70,12 @@ func _on_scene_change_requested(scene_key: StringName) -> void:
 		return
 	_current_key = scene_key
 	_pause_button.visible = scene_key in PAUSABLE_KEYS
+	#print("[Main] -> ", scene_key)
 	_swap.call_deferred(path)
 
 
 func _swap(path: String) -> void:
-	# A scene change always leaves the tree unpaused, whatever paused it.
+	# always unpause, whatever paused it
 	get_tree().paused = false
 	if is_instance_valid(_pause):
 		_pause.visible = false

@@ -27,6 +27,13 @@ window/size/viewport_height=720
 window/stretch/mode="canvas_items"
 window/stretch/aspect="keep"
 
+[gui]
+
+; project-wide so every Control gets the textured theme, including the ones
+; built in code (the settings sliders, the hotspot toggle) that never pass
+; through a .tscn where a theme could be attached by hand.
+theme/custom="res://assets/ui/ui_theme.tres"
+
 [input]
 
 claw_left={

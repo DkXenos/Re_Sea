@@ -1,16 +1,14 @@
-## Revision 2 §6, for the EXPERIMENTAL §5 feature. Two things only:
-##   1. the flag really gates it - with it false, no puzzle is ever built
-##   2. the order check works, failing is free, and retrying is immediate
-##
-## The "a full run with the flag off finishes with the same health" half of the
-## requirement is a shell check in run_all.sh: it runs the whole game twice on
-## one seed and compares the ending.
-##   godot --headless --script tools/smoke/smoke_puzzle.gd
+# the experimental puzzle. two things:
+#   1. the flag really gates it, false = no puzzle ever built
+#   2. order check works, failing is free, retry is immediate
+#
+# the "run with the flag off ends at the same health" half is in run_all.sh -
+# it runs the whole game twice on one seed and diffs the ending.
+#   godot --headless --script tools/smoke/smoke_puzzle.gd
 extends SceneTree
 
-## Loaded at runtime, not preloaded: a --script entry point compiles before the
-## autoloads register, and preloading a scene whose script says `Game` would
-## fail to compile it.
+# load at runtime, don't preload. a --script entry point compiles before the
+# autoloads register so preloading a scene that says `Game` won't compile.
 const PUZZLE_PATH := "res://scenes/puzzle/calibration_puzzle.tscn"
 
 var game: Node

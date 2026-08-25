@@ -1,6 +1,5 @@
-## Revision 2 §6: the two upgrades really are trade-offs, and only one of them
-## can ever be taken in a run.
-##   godot --headless --script tools/smoke/smoke_upgrades.gd
+# the upgrades really are trade-offs, and only one can be fitted at a time
+#   godot --headless --script tools/smoke/smoke_upgrades.gd
 extends SceneTree
 
 var game: Node
@@ -30,8 +29,8 @@ func _run() -> void:
 			"" if up.unlock_after_blueprints == 0 else
 			"  (opens after %d blueprint(s))" % up.unlock_after_blueprints])
 
-	# Two must be on the table from day one, or the system is not testable
-	# until the run is nearly over - which is what revision 3 exists to fix.
+	# two have to be available on day one or you can't test the system until
+	# the run is nearly over
 	var day_one: int = 0
 	for up: UpgradeData in game.upgrades:
 		if up.unlock_after_blueprints == 0:
@@ -51,7 +50,7 @@ func _run() -> void:
 	print("  cakar_ringan: drop %d (base %d), grip %+.2f"
 		% [game.cost_of(&"drop"), game.base_cost(&"drop"), game.grip_delta()])
 
-	# Revision 3: swapping is free and reversible, not a once-per-run choice.
+	# swapping is free and reversible, not a once-per-run choice
 	game.equip_upgrade(&"pemindai_kasar")
 	assert(game.equipped_upgrade == &"pemindai_kasar", "an upgrade must be swappable")
 	assert(game.cost_of(&"tool") == 2, "pemindai_kasar should probe for 2")

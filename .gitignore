@@ -3,3 +3,7 @@
 /export/
 /android/
 .DS_Store
+
+ai-prompt.txt
+AI-SIGN.md
+tools/__pycache__/

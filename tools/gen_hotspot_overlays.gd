@@ -1,21 +1,16 @@
-## Generates assets/items/hotspots_<id>.png from each ItemData's `hotspots`
-## array, and points `hotspot_overlay` at the result.
-##
-##   godot --headless --script tools/gen_hotspot_overlays.gd
-##   godot --headless --import
-##   godot --headless --script tools/gen_hotspot_overlays.gd
-##
-## Twice, with an import between: Godot cannot load a PNG it has not imported
-## yet, so the first pass writes the images and the second points each
-## ItemData.hotspot_overlay at them.
-##
-## The rings used to be drawn into the item PNGs themselves, which made the
-## search trivial and meant the owner was testing an easier game than the real
-## one. They are a separate, toggleable overlay now.
-##
-## This reads the .tres files, which are the single source of truth for hotspot
-## positions - so the rings can never drift from the data the game checks
-## against. Tool colours come from ToolData.color for the same reason.
+# writes assets/items/hotspots_<id>.png from each ItemData's `hotspots` array
+# and points hotspot_overlay at it.
+#
+#   godot --headless --script tools/gen_hotspot_overlays.gd
+#   godot --headless --import
+#   godot --headless --script tools/gen_hotspot_overlays.gd
+#
+# yes, twice, with an import in between. godot won't load a png it hasn't
+# imported, so pass 1 writes the images and pass 2 wires them up.
+#
+# rings used to be drawn into the item art itself which made the whole search
+# trivial. reads the .tres so the rings can't drift from the data the game
+# checks against, colours come from ToolData.color for the same reason.
 extends SceneTree
 
 const SIZE := 160
@@ -73,8 +68,8 @@ func _draw_overlay(item: ItemData, colors: Dictionary, out_path: String) -> void
 	img.save_png(ProjectSettings.globalize_path(out_path))
 
 
-## A dashed ring, drawn pixel by pixel. This is a generator writing a PNG, not
-## the game drawing a shape at runtime - the game only ever loads the file.
+# dashed ring, pixel by pixel. this is a generator writing a png, the game
+# only ever loads the file.
 func _dashed_ring(img: Image, centre: Vector2, radius: float, color: Color) -> void:
 	var inner := radius - RING_WIDTH * 0.5
 	var outer := radius + RING_WIDTH * 0.5

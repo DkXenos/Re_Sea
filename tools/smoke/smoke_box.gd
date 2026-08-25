@@ -1,11 +1,7 @@
-## Revision 4 §2: the sealed box, proved by driving the real UI.
-##
-## A box costs one drop like anything else and yields 2-3 items, so a grab and
-## the sorting load it creates are no longer the same number. What has to hold:
-## it is never sortable, opening it spends nothing, its contents are fixed by
-## the run seed rather than by when the player got round to opening it, and no
-## box ever contains another box.
-##   godot --headless --script tools/smoke/smoke_box.gd
+# the sealed box, driven through the real UI. what has to hold: never
+# sortable, opening costs nothing, contents fixed by the run seed and not by
+# when you got round to opening it, and no box inside a box.
+#   godot --headless --script tools/smoke/smoke_box.gd
 extends SceneTree
 
 const SEED := 77001

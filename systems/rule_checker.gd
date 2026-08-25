@@ -1,17 +1,11 @@
-## Turns an item plus the day's active rules into the one correct bin.
-##
-## Every rule that matches is collected and the highest priority wins, so a
-## later rule can override an earlier one. If nothing matches, the item's own
-## correct_category stands - that base value is what the item is made of, and
-## the rules are what the facility does about it today. This is why day 5 can
-## make aluminium recyclable again with a .tres and no code change.
+# item + today's rules -> the correct bin. highest priority match wins, and if
+# nothing matches the item's own correct_category stands.
 class_name RuleChecker
 extends RefCounted
 
 
-## A rule keys off an ItemData property, but the player learns that property by
-## revealing a field, and the two are not always the same name: is_multilayer is
-## learned by cutting the item open, which reveals true_material.
+# rule key -> the field the player has to reveal to know it. not always the
+# same name: is_multilayer comes from cutting the thing open.
 const RULE_KEY_TO_REVEAL: Dictionary = {
 	"has_residue": "has_residue",
 	"residue_type": "residue_type",
@@ -20,13 +14,12 @@ const RULE_KEY_TO_REVEAL: Dictionary = {
 	"tag_text": "tag_text",
 }
 
-## Properties the player can read for free, so a rule keyed on one of these is
-## satisfied the moment it matches.
+# readable for free
 const SURFACE_KEYS: Array[String] = ["visible_material", "visible_label", "weight",
 	"correct_category", "source_batch", "display_name"]
 
 
-## Returns {"category": int, "rule": RuleData or null}
+# {"category": int, "rule": RuleData or null}
 static func resolve(item: ItemData, rules: Array[RuleData]) -> Dictionary:
 	var category: int = item.correct_category
 	var winner: RuleData = null
@@ -39,8 +32,7 @@ static func resolve(item: ItemData, rules: Array[RuleData]) -> Dictionary:
 	return {"category": category, "rule": winner}
 
 
-## Which reveal each of a rule's conditions depends on. Surface conditions map
-## to "" because they cost nothing to know.
+# surface conditions come back as "" since they cost nothing to know
 static func required_fields(rule: RuleData) -> Array[String]:
 	var out: Array[String] = []
 	for key: String in rule.applies_when:
@@ -53,9 +45,7 @@ static func required_fields(rule: RuleData) -> Array[String]:
 	return out
 
 
-## True when the rule matches this item AND the player has actually uncovered
-## everything it keys on. This is what lets the panel light up the evidence the
-## player has earned, without giving away what they have not looked at.
+# rule matches AND the player actually uncovered what it keys on
 static func evidence_supports(entry: CarriedItem, rule: RuleData) -> bool:
 	if not rule.matches(entry.data):
 		return false
@@ -65,7 +55,6 @@ static func evidence_supports(entry: CarriedItem, rule: RuleData) -> bool:
 	return true
 
 
-## Rules the player has proved apply, highest priority last.
 static func supported_rules(entry: CarriedItem, rules: Array[RuleData]) -> Array[RuleData]:
 	var out: Array[RuleData] = []
 	for rule: RuleData in rules:
@@ -75,7 +64,7 @@ static func supported_rules(entry: CarriedItem, rules: Array[RuleData]) -> Array
 	return out
 
 
-## Records the verdict on the carried entry so the day report can explain it.
+# writes the verdict onto the entry so the report can explain it later
 static func judge(entry: CarriedItem, chosen: int, rules: Array[RuleData]) -> bool:
 	var verdict := resolve(entry.data, rules)
 	entry.expected_category = int(verdict["category"])

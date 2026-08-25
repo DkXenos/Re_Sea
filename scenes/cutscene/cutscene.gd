@@ -1,5 +1,4 @@
-## Skippable intro: static PNG plus a line of text, click or Enter to advance.
-## Placeholder text - the owner writes the real script later.
+# static png + a line of text, click or enter. text is placeholder.
 extends Node2D
 
 const STILLS: Array[String] = [

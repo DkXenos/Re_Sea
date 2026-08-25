@@ -1,14 +1,9 @@
-## The claw. Position is lerped and tweened by hand - there is no physics engine
-## involved and no RigidBody2D. Real physics is a multi-day tuning sink and is
-## out of scope.
-##
-## The whole cycle is one commitment: once the player drops, they have no
-## control until the claw is back at the rail. That is the point.
+# lerped by hand, no physics engine. once you drop you get no control back
+# until it's home again.
 extends Node2D
 
 signal cycle_finished(result: Dictionary)
-## Emitted the moment a drop commits, so the tank can charge the shift budget.
-## The claw does not know what a drop costs.
+# tank listens for this to charge the budget. claw has no idea what it costs.
 signal drop_started()
 
 const H_SPEED := 220.0
@@ -27,13 +22,10 @@ enum State { IDLE, DESCEND, CLOSE, RISE }
 @export var max_x: float = 930.0
 @export var max_depth: float = 215.0
 
-## Set by the console buttons; added to the keyboard axis so mouse and keys
-## drive exactly the same code path.
+# console buttons write this, gets added to the keyboard axis
 var button_axis: float = 0.0
 var can_drop: bool = true
-## False while the player is on the desk tab. An in-flight cycle still finishes
-## - you left the machine, you did not stop time - but the claw stops taking
-## input.
+# false on the desk tab. a cycle already in the air still finishes.
 var input_enabled: bool = true
 
 var state: State = State.IDLE
@@ -42,15 +34,11 @@ var _close_timer: float = 0.0
 var _grip_ok: bool = false
 var _slip_y: float = -1.0
 var _move_sfx_cooldown: float = 0.0
-## Seconds left before the rail will move again. Only ever non-zero when the
-## fitted upgrade traded rail responsiveness for speed (rev 3 §4); the claw
-## itself does not know which upgrade that is.
+# only non-zero if the equipped upgrade traded rail speed away
 var _rail_lockout: float = 0.0
 
-## What this drop is predicted to hit, set by the tank each frame from
-## predict_target(). The grab resolves to this exact node when it is still in
-## reach, so the percentage shown before the drop can never belong to a
-## different item than the one that comes up.
+# set by the tank every frame. the grab resolves to this exact node so the %
+# shown before the drop can't belong to a different item.
 var predicted_target: Node2D = null
 
 @onready var sprite: AnimatedSprite2D = $Sprite
@@ -68,8 +56,6 @@ func is_busy() -> bool:
 	return state != State.IDLE
 
 
-## The rail is re-engaging: the player can still drop, still think, still read.
-## Nothing is being spent while this runs.
 func is_rail_locked() -> bool:
 	return _rail_lockout > 0.0
 
@@ -100,7 +86,7 @@ func _process_idle(delta: float) -> void:
 		start_drop()
 
 
-## Public so the console drop button reaches exactly the same entry point.
+# public so the console button hits the same path as the key
 func start_drop() -> void:
 	if state != State.IDLE or not can_drop:
 		return
@@ -112,7 +98,7 @@ func start_drop() -> void:
 
 func _process_descend(delta: float) -> void:
 	position.y += DESCEND_SPEED * delta
-	# Stop early on contact so the claw closes around whatever it reached.
+	# stop early on contact, close around whatever it reached
 	if position.y >= max_depth or not grab_area.get_overlapping_areas().is_empty():
 		position.y = minf(position.y, max_depth)
 		state = State.CLOSE
@@ -131,8 +117,7 @@ func _process_close(delta: float) -> void:
 
 func _process_rise(delta: float) -> void:
 	position.y -= RISE_SPEED * delta
-	# A failed grip slips at a random height on the way up. That single
-	# behaviour supplies all the roguelite risk this prototype needs.
+	# failed grip = slips at a random height on the way up
 	if carried != null and not _grip_ok and _slip_y > 0.0 and position.y <= _slip_y:
 		_slip()
 	if position.y <= rail_y:
@@ -141,14 +126,9 @@ func _process_rise(delta: float) -> void:
 		_finish_cycle()
 
 
-## The item this drop would hit, found the way the descent will actually find
-## it: the claw stops at the FIRST contact, so the target is whichever item the
-## descending grab circle touches earliest - not the one nearest in x.
-##
-## That difference was a real bug. The preview measured horizontal distance to
-## the claw origin while the grab measured distance to the grab point, so with
-## overlapping items the preview named a neighbour and failure stopped being the
-## player's miscalculation.
+# has to find the target the same way the descent will - FIRST contact, not
+# nearest in x. these two disagreed for ages and the preview kept naming the
+# wrong item when two overlapped.
 func predict_target(candidates: Array) -> Node2D:
 	var reach := GRAB_RADIUS + ITEM_RADIUS
 	var best: Node2D = null
@@ -160,7 +140,7 @@ func predict_target(candidates: Array) -> Node2D:
 		var dx: float = absf(item.position.x - position.x)
 		if dx >= reach:
 			continue
-		# Claw height at which its grab circle first touches this item.
+		# claw height where the grab circle first touches this one
 		var contact_y: float = item.position.y - sqrt(reach * reach - dx * dx) - GRAB_OFFSET
 		if contact_y > max_depth:
 			continue
@@ -183,8 +163,7 @@ func _resolve_grab() -> void:
 	if _grip_ok:
 		Events.sfx_requested.emit(&"grab_success")
 	else:
-		# Slip somewhere in the middle of the rise, never at the very top or
-		# bottom, so the player always sees it happen.
+		# somewhere in the middle of the rise so they actually see it happen
 		_slip_y = lerpf(position.y, rail_y, Game.rng.randf_range(0.25, 0.8))
 		Events.sfx_requested.emit(&"grab_fail")
 
@@ -230,9 +209,8 @@ func _finish_cycle() -> void:
 	cycle_finished.emit(result)
 
 
-## The predicted item if the descent really did reach it, otherwise whatever is
-## actually in the claw. Honouring the prediction is what makes the preview a
-## promise rather than a hint.
+# honour the prediction if the descent really reached it, else whatever is
+# actually in there
 func _preferred_target() -> Node2D:
 	var overlapping := grab_area.get_overlapping_areas()
 	if predicted_target != null and predicted_target in overlapping:
@@ -240,8 +218,7 @@ func _preferred_target() -> Node2D:
 	return _nearest_overlap()
 
 
-## Nearest overlapping area to the grab point, so a crowded seabed still gives
-## the player the thing they aimed at.
+# nearest overlap to the grab point
 func _nearest_overlap() -> Node2D:
 	var best: Node2D = null
 	var best_dist := INF
@@ -254,8 +231,7 @@ func _nearest_overlap() -> Node2D:
 	return best
 
 
-## The cable is a texture stretched from the rail down to the claw - one PNG,
-## no line drawing.
+# cable is one PNG stretched, not a drawn line
 func _update_cable() -> void:
 	var length := maxf(1.0, position.y)
 	cable.position.y = -length * 0.5

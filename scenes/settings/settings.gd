@@ -1,5 +1,3 @@
-## Settings screen, reachable from the main menu. The same slider panel is
-## embedded in the pause overlay, so there is one implementation.
 extends Node2D
 
 

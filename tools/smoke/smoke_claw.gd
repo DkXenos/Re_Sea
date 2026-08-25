@@ -1,10 +1,9 @@
-## Headless smoke test for the claw phase. Plays a whole day of grabbing and
-## reports what ended up in the inventory.
-##   godot --headless --script tools/smoke/smoke_claw.gd
-##
-## The script passed to --script is compiled before the autoloads are
-## registered, so Game and Events are fetched from the tree rather than named
-## directly. Scripts inside the scenes compile later and use them normally.
+# plays a whole day of grabbing, prints what ended up in the inventory.
+#   godot --headless --script tools/smoke/smoke_claw.gd
+#
+# NOTE the --script file compiles before the autoloads register, so Game and
+# Events have to come off the tree here instead of by name. scripts inside the
+# scenes compile later and can use them normally.
 extends SceneTree
 
 var finished := false
@@ -66,10 +65,10 @@ func _run() -> void:
 	quit()
 
 
-## The percentage shown before a drop must belong to the item that actually
-## comes up. Crowding two items together is exactly the case that used to fail:
-## the preview measured horizontal distance to the claw origin while the grab
-## measured distance to the grab point, so it named the neighbour.
+# the % shown before a drop has to belong to the item that actually comes up.
+# two items crowded together is the case that used to break - preview measured
+# horizontal distance to the claw origin, grab measured distance to the grab
+# point, so it named the neighbour.
 func _check_targeting_promise(game: Node, claw: Node2D, items: Node2D) -> void:
 	if items.get_child_count() < 2:
 		return

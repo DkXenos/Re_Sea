@@ -7,8 +7,8 @@ var game: Node
 var main: Node
 var bad_mode := false
 var verbose := false
-## 0 means "let the game pick one". A fixed seed makes two runs comparable,
-## which is how the calibration puzzle is proved to be optional (revision 2 §6).
+# 0 = let the game pick. a fixed seed makes two runs comparable, which is how
+# the puzzle gets proved optional.
 var fixed_seed := 0
 ## "" leaves the claw unmodified; "first" fits whatever is available.
 var upgrade_choice := "first"
@@ -54,8 +54,8 @@ func _run() -> void:
 	await process_frame
 
 	var seen: Array[String] = []
-	# Revision 3 §6: the shape of the run is asserted from a run that was
-	# actually played, never from state set by hand.
+	# assert the shape of the run off a run that was actually played, never
+	# off state set by hand
 	var tier := int(game.visual_tier)
 	var tier_rises := 0
 	var claimed := 0
@@ -102,9 +102,8 @@ func _run() -> void:
 						% [b["shortfall"], b["clean_bonus"], b["delta"]])
 				scene.get_node("UiLayer/Root/NextButton").pressed.emit()
 			"AfterDay":
-				# Revision 3 §3: this screen is entered every day, so the
-				# harness works it the way a player would - craft anything the
-				# pool can pay for, keep an upgrade fitted, then move on.
+				# entered every day, so work it the way a player would - craft
+				# whatever the pool can pay for, keep an upgrade on, move on
 				if verbose and not seen_after.has(game.day_index):
 					seen_after[game.day_index] = true
 					print("     pool after day %d: %s" % [game.day_index + 1,
@@ -123,14 +122,12 @@ func _run() -> void:
 	elif no_craft:
 		print("supply run: nothing was crafted, the pool above is five days' worth")
 	else:
-		# What revision 3 promised the owner: every meta system reachable, and
-		# the reward loop visible, inside a normal run.
+		# every meta system has to be reachable inside one normal run
 		assert(tier_rises >= 2,
 			"a well-played run must cross at least two tier thresholds, crossed %d" % tier_rises)
 		assert(claimed >= 2,
 			"a well-played run must claim at least two blueprints, claimed %d" % claimed)
-		# Revision 4 §3: a well-played run crafts all three parts of one
-		# blueprint and presses CRAFT by the end of day 3.
+		# a well-played run finishes one whole blueprint by end of day 3
 		assert(first_claim_day > 0 and first_claim_day <= 3,
 			"the first blueprint must be built by the end of day 3, built on day %d"
 			% first_claim_day)
@@ -149,10 +146,9 @@ func _pool_line() -> String:
 	return "  ".join(parts)
 
 
-## Crafts every finished blueprint and keeps the first available upgrade
-## fitted, then continues. Driving the real buttons rather than calling Game
-## directly is the point: revision 2's tier check passed while never firing in
-## a real run, because it set state by hand (rev 3 §6).
+# crafts every finished blueprint, keeps the first available upgrade on.
+# driving the real buttons is the whole point - the old tier check called Game
+# directly and passed for ages without ever firing in a real run.
 func _drive_after_day(scene: Node) -> void:
 	# A claimed blueprint may open the calibration puzzle over this screen.
 	# Skipping it is what a player who does not want it would do.
@@ -160,10 +156,8 @@ func _drive_after_day(scene: Node) -> void:
 		if child is CanvasLayer and child.has_method("_close"):
 			child._close()
 			return
-	# Revision 4 §3: work the Teknologi tab the way a player would - page
-	# through the sheets, craft every part the pool can pay for, and press CRAFT
-	# on any sheet whose parts are all done. Driving the real buttons is the
-	# point; setting Game.crafted by hand would prove nothing about the tab.
+	# page through the sheets, craft what the pool can pay for, hit CRAFT on any
+	# sheet that's done. setting Game.crafted by hand proves nothing.
 	if _drive_tech(scene):
 		return
 	if game.equipped_upgrade == &"" and upgrade_choice != "":
@@ -179,9 +173,9 @@ func _drive_after_day(scene: Node) -> void:
 ## the diagram is rebuilt in between. Returns true while there was something to
 ## do, which keeps the screen open until the tab is worked out.
 func _drive_tech(scene: Node) -> bool:
-	# --no-craft measures what five days SUPPLY, with nothing spent. That is the
-	# number the component requirements have to be authored against, and it is
-	# not visible in a run that is busy spending it (revision 4 §3).
+	# --no-craft measures what 5 days SUPPLY with nothing spent. that's the
+	# number the component costs have to be written against, and you can't see
+	# it in a run that's busy spending.
 	if no_craft:
 		return false
 	var page: Control = scene.get_node("UiLayer/Root/TechPage")
@@ -248,9 +242,7 @@ func _drive_claw(scene: Node) -> void:
 func _drive_desk(scene: Node) -> void:
 	var inspect: Control = scene.get_node("UiLayer/Root/InspectPanel")
 	var bins: Control = scene.get_node("UiLayer/Root/BinRow")
-	# Revision 4 §2: a sealed box is not sortable, so the first thing a player
-	# does at the desk is open the ones they hauled up. Opening costs nothing,
-	# so there is never a reason to leave one shut.
+	# boxes aren't sortable, so open them first. free, so no reason not to.
 	var inventory: Control = scene.get_node("UiLayer/Root/InventoryPanel")
 	for card: Node in inventory.get_node("Scroll/Grid").get_children():
 		for child: Node in card.get_children():

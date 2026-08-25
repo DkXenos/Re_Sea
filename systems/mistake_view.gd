@@ -1,9 +1,5 @@
-## Builds the "here is what you got wrong and why" row.
-##
-## Extracted in revision 3 so the day report and the after-day screen show the
-## identical explanation. Two screens that both explain a mis-sort must never be
-## able to disagree about what the player missed, and the only way to guarantee
-## that is for there to be one of them.
+# the "here's what you got wrong" row. shared by the day report and the
+# after-day screen so the two can't disagree.
 class_name MistakeView
 extends RefCounted
 
@@ -15,8 +11,7 @@ const FIELD_LABELS: Dictionary = {
 }
 
 
-## The properties that decided this item's bin and that the player never spent
-## budget to look at. This is the line that should sting.
+# what decided the bin that they never bothered to look at
 static func missed_properties(entry: CarriedItem) -> Array[String]:
 	var out: Array[String] = []
 	if entry.broken_rule == null:
@@ -33,9 +28,7 @@ static func missed_properties(entry: CarriedItem) -> Array[String]:
 	return out
 
 
-## A PanelContainer sizes itself to its content, so a two-line rule never gets
-## clipped the way a fixed-height row would. Its background is the PNG-backed
-## stylebox from the shared theme.
+# PanelContainer not a fixed-height row, otherwise 2-line rules get clipped
 static func build_row(entry: CarriedItem, icon_size: int = 96) -> Control:
 	var row := PanelContainer.new()
 

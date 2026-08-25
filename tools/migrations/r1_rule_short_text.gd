@@ -1,6 +1,6 @@
-## Revision 1 migration: give each rule the compact form shown in the inspect
-## panel's always-visible checklist. The rulebook still prints `text` verbatim.
-##   godot --headless --script tools/migrations/r1_rule_short_text.gd
+# one-off: give each rule the short form for the inspect panel checklist. the
+# rulebook still prints `text` verbatim.
+#   godot --headless --script tools/migrations/r1_rule_short_text.gd
 extends SceneTree
 
 const SHORT := {

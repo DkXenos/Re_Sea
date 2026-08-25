@@ -1,5 +1,5 @@
-## The rules-for-today card. Day 1 is the tutorial: surface info only, one rule,
-## tools disabled. There is no separate tutorial system - the day data says it.
+# rules for today. day 1 is the tutorial - one rule, no tools. no separate
+# tutorial system, the day data does it.
 extends Node2D
 
 

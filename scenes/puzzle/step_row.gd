@@ -1,17 +1,13 @@
-## One draggable step in the calibration puzzle.
-##
-## EXPERIMENTAL - revision 2 §5. Everything in scenes/puzzle/ can be deleted
-## without touching the rest of the game.
+# one draggable step. experimental, see calibration_puzzle.gd.
 extends Control
 
 const ROW_BG := preload("res://assets/ui/panel_slot.png")
 
 var index: int = 0
 var step_text: String = ""
-## The puzzle that owns this row, handed over explicitly. Walking up a fixed
-## number of parents to find it is how this silently broke: the script sits on
-## the CanvasLayer, one level further up than the count assumed, so every drop
-## hit a bare Control and the reorder never happened.
+# hand it over explicitly. do NOT go get_parent().get_parent() - the script
+# is on the CanvasLayer, one further up than you'd think, and every drop just
+# silently hits a bare Control and does nothing.
 var puzzle: Node = null
 
 @onready var _label: Label = $Label
@@ -30,8 +26,7 @@ func set_position_number(number: int) -> void:
 	_label.text = "%d.  %s" % [number, step_text]
 
 
-## Godot's own drag and drop: the row hands itself over, and the row it lands
-## on asks the puzzle to swap them. No drag maths written by hand.
+# godot's built in drag/drop, no hand-written drag maths
 func _get_drag_data(_at: Vector2) -> Variant:
 	var preview := NinePatchRect.new()
 	preview.texture = ROW_BG

@@ -1,13 +1,9 @@
-## Settings persistence. Run progress is deliberately NOT saved - closing the
-## game loses the run, which is correct for a prototype.
+# settings only. run progress isn't saved, closing the game loses the run.
 class_name SaveSettings
 extends RefCounted
 
 const PATH := "user://settings.cfg"
 const DEFAULTS := {"master": 0.8, "music": 0.6, "sfx": 0.8, "vfx": 1.0}
-## On/off settings. `hotspots` draws the ring overlay marking where each tool
-## can be used; on by default, and an accessibility option rather than a
-## difficulty one.
 const TOGGLES := {"hotspots": true}
 
 static func load_all() -> Dictionary:

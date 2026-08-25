@@ -1,10 +1,7 @@
-## Revision 1 migration: replace max_grabs and per-tool charges with a single
-## shift budget, and add the drift-in spawn parameters.
-##
-##   godot --headless --script tools/migrations/r1_shift_budget.gd
-##
-## Budgets and quotas come from §5 of the revision brief. They are starting
-## points for tuning, recorded in PROGRESS.md as such.
+# one-off: replace max_grabs and per-tool charges with a single shift budget,
+# plus the drift-in spawn params.
+#   godot --headless --script tools/migrations/r1_shift_budget.gd
+# the budgets and quotas below are starting points, not tuned.
 extends SceneTree
 
 const DAYS := {

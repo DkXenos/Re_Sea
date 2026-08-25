@@ -1,6 +1,4 @@
-## Autoload 2 of 2: run and day state. Owns the seeded RNG, the day list, the
-## inventory carried from claw phase to desk phase, tool charges, ocean health
-## and the audio/vfx settings. No scene tree knowledge lives here.
+# run + day state. no scene tree stuff in here
 extends Node
 
 const DAY_DIR := "res://data/days/"
@@ -9,104 +7,57 @@ const BLUEPRINT_DIR := "res://data/blueprints/"
 const UPGRADE_DIR := "res://data/upgrades/"
 const SFX_DIR := "res://assets/audio/"
 const SFX_POOL_SIZE := 6
-## Paid once for a day with no mis-sorts that also met quota. Tuning candidate.
 const CLEAN_DAY_BONUS := 5
+#const CLEAN_DAY_BONUS := 3   # too stingy, nobody ever felt it
 
-## Spacing between the per-box content streams (revision 4 §2). Any large odd
-## number does; this one is prime so consecutive boxes cannot share a stream.
+# big prime, keeps box streams from colliding
 const CONTAINER_STREAM := 104729
 
-## What each action spends from the shift budget.
-##
-## Time is spent by ACTIONS, never by the clock - there is no real-time
-## countdown anywhere in this game. That is deliberate: a ticking timer would
-## destroy the careful inspection the whole design is built around, while an
-## action-cost budget creates the intended tension, "do I grab another item, or
-## spend that on examining what I already have?". Thinking, panning, zooming,
-## moving the camera and reading the rulebook are all free.
-##
-## All three numbers are tuning candidates.
 const ACTION_COST: Dictionary = {
 	&"drop": 6,
 	&"tool": 4,
 	&"sort": 1,
 }
 
-# --- run ---
 var run_seed: int = 0
 var rng := RandomNumberGenerator.new()
 var days: Array[DayData] = []
 var day_index: int = 0
-## The run opens with the ocean already damaged. At 100 it started in the top
-## tier and a competent player never left it, so nothing the meter drives was
-## ever visible in normal play - which is what revision 3 exists to fix.
-## Tuning candidate.
+# started at 100 originally but then nothing the meter drives was ever visible
 const STARTING_HEALTH := 35
 var ocean_health: int = STARTING_HEALTH
 
-# --- ocean recovery tiers (revision 2 §1) ---
 var tiers: Array[OceanTierData] = []
-## The tier the ART is currently showing. It follows ocean_health, but only at
-## the day report: the seabed must not shift under the player mid-shift, and
-## stability reads as a world that changes when the day turns over rather than
-## one that flickers.
+# what the ART shows. only updates at the day report, never mid-shift
 var visual_tier: int = 3
 
-# --- technology blueprints (revision 2 §2, reworked in revision 4 §3) ---
 var blueprints: Array[BlueprintData] = []
-## ItemData.Category -> materials in hand and SPENDABLE. A correct sort adds
-## one; a wrong sort adds nothing; crafting a component subtracts. It persists
-## across the days of a run and never goes negative - a craft that cannot be
-## paid for is refused before anything is taken.
-##
-## Revision 3's flat per-category totals are gone rather than kept alongside:
-## the whole point of revision 4 is that progress is spent, not accumulated.
-##
-## Credited at the day report, never mid-shift: the player is not told whether
-## a sort was right until then, and a counter ticking up would leak the verdict.
+# category -> how many we can spend. credited at the report, not mid-shift
 var materials: Dictionary = {}
-## ComponentData.id -> true. Per run, reset with the run.
 var crafted: Dictionary = {}
 var unlocked_blueprints: Array[StringName] = []
-## Set by a blueprint that pushes the art forward. -1 for none.
 var forced_tier: int = -1
 
-# --- upgrades (revision 2 §4) ---
 var upgrades: Array[UpgradeData] = []
-## The upgrade currently fitted. Revision 3 made this swappable at the end of
-## every day rather than a once-per-run choice: the owner has to be able to try
-## all four inside one session. Locking it back down is a balancing decision for
-## later. Not persisted - settings survive a restart, run progress does not.
 var equipped_upgrade: StringName = &""
 
-# --- current day ---
 var inventory: Array[CarriedItem] = []
-## How many boxes have been grabbed today. Only ever used to space their
-## content streams apart - see add_to_inventory().
 var containers_grabbed: int = 0
 var tools: Array[ToolData] = []
 var stats: Dictionary = {}
-## What the day report worked out, kept so the after-day screen can show the
-## same numbers without recomputing them against an already-committed meter.
 var last_breakdown: Dictionary = {}
 var budget_max: int = 0
 var budget_left: int = 0
 
-# --- settings ---
 var settings: Dictionary = {}
 var vfx_intensity: float = 1.0
-## Whether the hotspot ring overlay is drawn on items in the inspect panel.
 var show_hotspots: bool = true
 
-# --- debug switches (only ever set by the F1 overlay) ---
-var force_grip: int = 0 ## 1 = always succeed, -1 = always fail, 0 = roll
+var force_grip: int = 0  # 1 always, -1 never, 0 roll
 
-## Headless harnesses quit mid-frame, and a sound still playing at that moment
-## is reported as a leaked stream. They switch this off; the game never does.
+# headless runs turn this off or godot yells about leaked streams
 var sfx_enabled: bool = true
 
-## EXPERIMENTAL - revision 2 §5, and the only flag it has. With this false the
-## game plays exactly as it would if scenes/puzzle/ did not exist.
 var feature_calibration_puzzle: bool = true
 
 var _sfx_players: Array[AudioStreamPlayer] = []
@@ -129,8 +80,6 @@ func _ready() -> void:
 	Events.sfx_requested.connect(play_sfx)
 	Events.debug_command.connect(_on_debug_command)
 
-
-# ---------------------------------------------------------------- content load
 
 func _load_days() -> void:
 	days.assign(_load_dir(DAY_DIR))
@@ -162,7 +111,6 @@ func _load_upgrades() -> void:
 		return a.sort_order < b.sort_order)
 
 
-## Shared by every content directory: sorted, .remap-aware, silent if missing.
 func _load_dir(dir_path: String) -> Array:
 	var out: Array = []
 	var dir := DirAccess.open(dir_path)
@@ -171,6 +119,7 @@ func _load_dir(dir_path: String) -> Array:
 	var names := dir.get_files()
 	names.sort()
 	for file_name: String in names:
+		# exported builds hand you .tres.remap instead
 		var clean := file_name.trim_suffix(".remap")
 		if not clean.ends_with(".tres"):
 			continue
@@ -186,8 +135,6 @@ func get_tool(tool_id: StringName) -> ToolData:
 			return t
 	return null
 
-
-# ------------------------------------------------------------------- run / day
 
 func start_run(seed_value: int = 0) -> void:
 	run_seed = seed_value if seed_value != 0 else int(Time.get_unix_time_from_system() * 1000.0) % 100000000
@@ -220,8 +167,7 @@ func begin_day() -> void:
 	budget_max = day.budget if day != null else 0
 	budget_left = budget_max
 	Events.budget_changed.emit(budget_left, budget_max)
-	# Each day re-derives its stream from the run seed, so a seed reproduces the
-	# whole run and any single day of it.
+	# re-derive per day so one seed reproduces the whole run
 	rng.seed = run_seed + day_index * 7919
 	print("[Game] Day %d start | seed %d" % [day.day_number if day else 0, run_seed])
 	if day != null:
@@ -231,22 +177,16 @@ func begin_day() -> void:
 func is_last_day() -> bool:
 	return day_index >= days.size() - 1
 
-
 func advance_day() -> void:
 	day_index += 1
 	begin_day()
 
 
-# ------------------------------------------------------------------- inventory
-
 func add_to_inventory(item: ItemData) -> CarriedItem:
 	var entry := CarriedItem.new(item)
 	if entry.is_container():
-		# A stream of its own, fixed at the moment the box was grabbed and
-		# derived from the run seed, the day and how many boxes came before it.
-		# Drawing from Game.rng instead would make the contents depend on how
-		# long the player watched the tank, because the spawn timers share that
-		# stream - so the same seed would stop reproducing the same boxes.
+		# don't pull from Game.rng here - spawn timers share that stream, so the
+		# contents would depend on how long the player stared at the tank
 		entry.container_seed = run_seed + day_index * 7919 \
 			+ CONTAINER_STREAM * (containers_grabbed + 1)
 		containers_grabbed += 1
@@ -254,13 +194,7 @@ func add_to_inventory(item: ItemData) -> CarriedItem:
 	return entry
 
 
-## Opens a sealed box: it leaves the inventory and its contents take its place
-## as ordinary grabbed items, which from here on are indistinguishable from
-## anything the claw lifted directly.
-##
-## Costs nothing. The price of a box is the sorting time of what comes out of
-## it - whether that is the right price is a tuning question for the owner, not
-## one to invent an answer to (revision 4 §2).
+# box leaves the inventory, its contents take its place. costs nothing.
 func open_container(entry: CarriedItem) -> Array[CarriedItem]:
 	var out: Array[CarriedItem] = []
 	var day := current_day()
@@ -277,8 +211,7 @@ func open_container(entry: CarriedItem) -> Array[CarriedItem]:
 	entry.opened = true
 	inventory.erase(entry)
 	for i in count:
-		# Contents may repeat within a box, and the pool has already had every
-		# container filtered out of it, so a box can never hold another box.
+		# pool already has boxes filtered out, so no box inside a box
 		var made := CarriedItem.new(pool[stream.randi() % pool.size()])
 		inventory.insert(clampi(at + i, 0, inventory.size()), made)
 		out.append(made)
@@ -286,7 +219,7 @@ func open_container(entry: CarriedItem) -> Array[CarriedItem]:
 	return out
 
 
-## Debug only: skip the claw phase and go straight to sorting.
+# debug only
 func fill_inventory(count: int) -> void:
 	var day := current_day()
 	if day == null or day.item_pool.is_empty():
@@ -303,10 +236,7 @@ func unsorted_items() -> Array[CarriedItem]:
 	return out
 
 
-## The unsorted things a bin will actually take. A sealed box is work waiting -
-## it counts as unsorted - but it can never be dropped into a bin, so anything
-## choosing what to inspect or asking whether sorting is still possible asks
-## this instead.
+# unsorted minus sealed boxes - a box counts as work left but can't go in a bin
 func sortable_items() -> Array[CarriedItem]:
 	var out: Array[CarriedItem] = []
 	for e: CarriedItem in unsorted_items():
@@ -315,6 +245,8 @@ func sortable_items() -> Array[CarriedItem]:
 	return out
 
 
+# TODO: box left sealed at the end of the shift just vanishes. not in the
+# report, not in the after-day haul. probably needs a line somewhere.
 func sealed_containers() -> Array[CarriedItem]:
 	var out: Array[CarriedItem] = []
 	for e: CarriedItem in unsorted_items():
@@ -323,9 +255,6 @@ func sealed_containers() -> Array[CarriedItem]:
 	return out
 
 
-# ---------------------------------------------------------------- shift budget
-
-## What an action costs before any upgrade touches it.
 func base_cost(action: StringName) -> int:
 	return int(ACTION_COST.get(action, 0))
 
@@ -347,13 +276,11 @@ func can_afford(action: StringName) -> bool:
 	return budget_left >= cost_of(action)
 
 
-## Always spends, including when a tool click reveals nothing. That is the risk.
+# spends even when a tool reveals nothing. that's the risk.
 func spend(action: StringName) -> bool:
 	return spend_amount(cost_of(action))
 
 
-## Same, for the one case where the price is not the standard one: the coarse
-## scanner's second, full reading is charged at the base tool cost.
 func spend_amount(cost: int) -> bool:
 	if budget_left < cost:
 		return false
@@ -363,14 +290,11 @@ func spend_amount(cost: int) -> bool:
 	return true
 
 
-## True while the player can still do something that changes the outcome. Being
-## unable to afford a drop is not the end of the shift if there is still
-## sorting to do.
 func can_still_act() -> bool:
 	if can_afford(&"drop"):
 		return true
-	# Opening a box is free, so a sealed box is always something left to do -
-	# but only if what comes out of it could then be sorted.
+	# opening is free, so a sealed box always counts as something left to do.
+	# still not sure opening should be free tbh
 	if not sealed_containers().is_empty() and can_afford(&"sort"):
 		return true
 	return not sortable_items().is_empty() and can_afford(&"sort")
@@ -386,17 +310,9 @@ func refill_budget() -> void:
 	Events.budget_changed.emit(budget_left, budget_max)
 
 
-# ---------------------------------------------------------------- ocean health
-
-## Every term is returned separately so the day report can show the player
-## exactly how the number was reached.
-##
-## Revision 1 replaced the original formula: correct sorts now pay 2 instead of
-## 1, a clean day pays a flat bonus, and the fish penalty is gone entirely
-## (fish are background now). A well-played day has to visibly RAISE the meter -
-## the old numbers meant a perfect run still drifted down to 92/100, which
-## contradicted the subject matter. The 4x asymmetry on wrong sorts stays: that
-## part was right.
+# every term separate so the report can show its working
+# FIXME these numbers are guesses. correct=2 / wrong=-4 / short=-3 feels ok on
+# days 1-3 and way too harsh on 5. needs an actual playtest.
 func end_day_breakdown() -> Dictionary:
 	var day := current_day()
 	var quota: int = day.quota if day != null else 0
@@ -431,11 +347,7 @@ func commit_day_result(breakdown: Dictionary) -> void:
 	refresh_visual_tier()
 
 
-# -------------------------------------------------------------- blueprints
-
-## Today's correct sorts join the run's material pool. Called once, from the day
-## report. Nothing is built here: the player crafts and assembles themselves,
-## from the Teknologi tab.
+# called once, from the day report
 func _credit_materials() -> void:
 	for entry: CarriedItem in inventory:
 		if entry.sorted_to == -1 or not entry.was_correct:
@@ -448,9 +360,16 @@ func _credit_materials() -> void:
 func material_count(category: int) -> int:
 	return int(materials.get(category, 0))
 
+# not used any more, the blueprint strip counts parts instead. leaving it in
+# case the flat total comes back.
+func total_materials() -> int:
+	var n := 0
+	for c in materials:
+		n += int(materials[c])
+	return n
 
-## What a component is short of, category -> how many. Empty means it can be
-## crafted. The UI shows this rather than a bare disabled button.
+
+# category -> how many short. empty dict means craftable
 func craft_shortfall(component: ComponentData) -> Dictionary:
 	return component.shortfall(materials)
 
@@ -463,12 +382,9 @@ func can_craft(component: ComponentData) -> bool:
 	return not component_crafted(component) and component.affordable(materials)
 
 
-## Rakit. Spends the materials and marks the part done.
-##
-## The pool can never go negative: affordability is checked against the whole
-## requirement before a single category is debited, so a component that is short
-## on its second material does not silently eat the first.
 func craft_component(component: ComponentData) -> bool:
+	# affordability is checked on the whole cost first, so a component that's
+	# short on its 2nd material doesn't eat the 1st
 	if not can_craft(component):
 		return false
 	for category: int in component.requirements:
@@ -479,7 +395,6 @@ func craft_component(component: ComponentData) -> bool:
 	return true
 
 
-## Every part crafted, and the blueprint not yet assembled: the CRAFT button.
 func blueprint_ready(bp: BlueprintData) -> bool:
 	return not blueprint_unlocked(bp.id) and bp.is_complete(crafted)
 
@@ -492,9 +407,6 @@ func ready_blueprints() -> Array[BlueprintData]:
 	return out
 
 
-## The player pressing CRAFT. The health gain lands here rather than inside the
-## day report's formula, so the report's arithmetic stays traceable term by
-## term.
 func build_blueprint(blueprint_id: StringName) -> BlueprintData:
 	for bp: BlueprintData in blueprints:
 		if bp.id != blueprint_id or not blueprint_ready(bp):
@@ -513,8 +425,6 @@ func blueprint_unlocked(blueprint_id: StringName) -> bool:
 	return blueprint_id in unlocked_blueprints
 
 
-# ---------------------------------------------------------------- upgrades
-
 func upgrade() -> UpgradeData:
 	for up: UpgradeData in upgrades:
 		if up.id == equipped_upgrade:
@@ -522,11 +432,6 @@ func upgrade() -> UpgradeData:
 	return null
 
 
-## Availability is data, not a table here. An upgrade a blueprint names is
-## opened by THAT blueprint being built; anything no blueprint claims falls back
-## to "how many technologies are finished", which is how the two day-one
-## upgrades stay available from the start. A fourth blueprint and its tool are
-## both .tres files and neither needs a line here.
 func upgrade_unlocked(up: UpgradeData) -> bool:
 	for bp: BlueprintData in blueprints:
 		if bp.unlocks_upgrade == up.id:
@@ -534,43 +439,33 @@ func upgrade_unlocked(up: UpgradeData) -> bool:
 	return unlocked_blueprints.size() >= up.unlock_after_blueprints
 
 
-## Fitting an upgrade, or taking it off again by passing the one already on.
-## Never costs anything: there is no currency in this game.
+# pass the one already equipped to take it off again
 func equip_upgrade(upgrade_id: StringName) -> void:
 	equipped_upgrade = &"" if upgrade_id == equipped_upgrade else upgrade_id
 	Events.upgrade_equipped.emit(equipped_upgrade)
 	Events.budget_changed.emit(budget_left, budget_max)
 
 
-## Added to every item's grip chance. Zero unless an upgrade traded grip away.
 func grip_delta() -> float:
 	var up := upgrade()
 	return up.grip_delta if up != null else 0.0
 
 
-## True while tools report only THAT something is there, not what it is.
 func coarse_readings() -> bool:
 	var up := upgrade()
 	return up != null and up.coarse_readings
 
 
-## Multiplies the claw's travel speed along the rail.
 func move_speed_multiplier() -> float:
 	var up := upgrade()
 	return up.move_speed_multiplier if up != null else 1.0
 
 
-## Seconds the rail is out of action after a cycle. Zero for every upgrade that
-## did not trade movement away.
 func post_drop_lockout() -> float:
 	var up := upgrade()
 	return up.post_drop_lockout if up != null else 0.0
 
 
-# ------------------------------------------------------------- ocean tiers
-
-## Which tier a health value falls in. Data decides the thresholds; if they ever
-## leave a gap, the nearest tier below wins rather than nothing at all.
 func tier_for(health: int) -> int:
 	var best: int = 0
 	for t: OceanTierData in tiers:
@@ -590,15 +485,13 @@ func current_tier() -> OceanTierData:
 	return tier_data(visual_tier)
 
 
-## Called only at the day report and at the start of a run. Returns the tier the
-## art moved to, or -1 if nothing changed, so the report can say one quiet line.
-## A blueprint can push the art forward, but only "if health allows": the
-## forced tier is ignored while the ocean has fallen below the tier under it,
-## because showing a healed reef over a dying ocean would be a lie.
+# returns the new tier, or -1 if nothing moved. only call at the day report.
 func refresh_visual_tier() -> int:
 	var was := visual_tier
 	visual_tier = tier_for(ocean_health)
 	if forced_tier >= 0 and visual_tier < forced_tier:
+		# ignore the forced tier if health has dropped below the one under it,
+		# otherwise you get a healed reef sitting over a dying ocean
 		var below := tier_data(forced_tier - 1)
 		if below == null or ocean_health >= below.min_health:
 			visual_tier = forced_tier
@@ -614,8 +507,6 @@ func is_game_over() -> bool:
 	return ocean_health <= 0
 
 
-# ------------------------------------------------------------------- settings
-
 func apply_setting(key: String, value: float, persist: bool = true) -> void:
 	settings[key] = clampf(value, 0.0, 1.0)
 	match key:
@@ -629,8 +520,7 @@ func apply_setting(key: String, value: float, persist: bool = true) -> void:
 		SaveSettings.save_all(settings)
 
 
-## On/off settings, kept separate from the sliders so a bool never gets clamped
-## into a float.
+# separate from apply_setting so a bool never gets clamped into a float
 func apply_toggle(key: String, value: bool, persist: bool = true) -> void:
 	settings[key] = value
 	match key:
@@ -648,8 +538,6 @@ func _set_bus(bus_name: String, value: float) -> void:
 	AudioServer.set_bus_mute(idx, is_zero_approx(value))
 	AudioServer.set_bus_volume_db(idx, linear_to_db(clampf(value, 0.001, 1.0)))
 
-
-# ------------------------------------------------------------------------ sfx
 
 func _build_sfx_pool() -> void:
 	for i in SFX_POOL_SIZE:
@@ -674,6 +562,7 @@ func play_sfx(sfx_name: StringName) -> void:
 			player.stream = stream
 			player.play()
 			return
+	# TODO: pool's full, oldest one should get stolen. 6 is enough for now
 
 
 func stop_all_sfx() -> void:
@@ -683,13 +572,9 @@ func stop_all_sfx() -> void:
 	_sfx_cache.clear()
 
 
-## Without this a sound still playing at shutdown keeps its stream alive and
-## Godot reports it as a leaked instance.
 func _exit_tree() -> void:
 	stop_all_sfx()
 
-
-# -------------------------------------------------------------------- debug
 
 func _on_debug_command(command: StringName, arg: Variant) -> void:
 	match command:

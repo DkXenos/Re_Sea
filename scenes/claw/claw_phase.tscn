@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3]
+[gd_scene load_steps=21 format=3]
 
 [ext_resource type="Script" path="res://scenes/claw/claw_phase.gd" id="1_phase"]
 [ext_resource type="Script" path="res://scenes/claw/claw.gd" id="2_claw"]
@@ -11,6 +11,8 @@
 [ext_resource type="Texture2D" path="res://assets/claw/claw_cable.png" id="9_cable"]
 [ext_resource type="Texture2D" path="res://assets/ui/arrow_left.png" id="10_al"]
 [ext_resource type="Texture2D" path="res://assets/ui/arrow_right.png" id="11_ar"]
+[ext_resource type="Texture2D" path="res://assets/ui/arrow_left_pressed.png" id="11_alp"]
+[ext_resource type="Texture2D" path="res://assets/ui/arrow_right_pressed.png" id="11_arp"]
 [ext_resource type="Texture2D" path="res://assets/ui/joystick_base.png" id="12_jb"]
 [ext_resource type="Texture2D" path="res://assets/ui/joystick_knob.png" id="13_jk"]
 [ext_resource type="Theme" path="res://assets/ui/ui_theme.tres" id="14_theme"]
@@ -134,6 +136,7 @@ offset_top = 584.0
 offset_right = 216.0
 offset_bottom = 680.0
 texture_normal = ExtResource("10_al")
+texture_pressed = ExtResource("11_alp")
 
 [node name="ArrowRight" type="TextureButton" parent="FrameLayer"]
 offset_left = 250.0
@@ -141,6 +144,7 @@ offset_top = 584.0
 offset_right = 346.0
 offset_bottom = 680.0
 texture_normal = ExtResource("11_ar")
+texture_pressed = ExtResource("11_arp")
 
 [node name="DropButton" type="Button" parent="FrameLayer"]
 offset_left = 500.0

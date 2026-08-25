@@ -1,6 +1,4 @@
-## Pause overlay on layer 200. It embeds the same slider panel the settings
-## screen uses, so volume can be changed mid-run without unloading the scene
-## the player is standing in.
+# reuses the settings slider panel so volume works mid-run
 extends Control
 
 

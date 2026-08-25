@@ -1,17 +1,14 @@
-## Catches UI that overlaps or escapes its box.
-##
-## Written after a playtest found three separate versions of the same class of
-## bug on one screen: the desk still sat under a shift bar that had grown taller,
-## a NinePatch drew its corners on top of each other in a box shorter than its
-## margins, and three progress bars stayed at their PNG's full 320x32 - painting
-## over the rulebook button - because `size` was assigned before `expand_mode`.
-##
-## None of it was catchable by a headless run: everything still worked, it just
-## could not be read. So this asserts geometry.
-##   godot --headless --script tools/smoke/smoke_layout.gd
+# catches UI that overlaps or escapes its box.
+#
+# wrote this after finding three versions of the same bug on one screen: the
+# desk sitting under a shift bar that had got taller, a ninepatch drawing its
+# corners over each other, and three progress bars stuck at the png's full
+# 320x32 painting over the rulebook button. nothing crashed, it was just
+# unreadable, so a normal headless run caught none of it.
+#   godot --headless --script tools/smoke/smoke_layout.gd
 extends SceneTree
 
-## Everything above this belongs to the shift bar, which is drawn over the views.
+# everything above this is the shift bar, drawn over the views
 const BAR_BOTTOM := 74.0
 const VIEWPORT := Vector2(1280.0, 720.0)
 
@@ -51,17 +48,14 @@ func _rect(c: Control) -> Rect2:
 	return Rect2(c.global_position, c.size)
 
 
-## Two controls that both draw something must not sit on top of each other.
+# two controls that both draw must not sit on top of each other
 func _check_no_overlap(a: Control, b: Control, label: String) -> void:
 	if _rect(a).intersects(_rect(b)):
 		_fail("%s overlap: %s vs %s" % [label, _rect(a), _rect(b)])
 
 
-## Every descendant that draws has to stay inside the box it was given.
-##
-## A control with clip_contents on is the one exception, and it is not a
-## loophole: clipping is precisely the mechanism that makes an oversized child
-## safe, and it is how both progress meters in this game are filled.
+# everything that draws stays inside the box it was given. clip_contents is
+# the one exception - that's how both progress meters are filled.
 func _check_contained(parent: Control, label: String) -> void:
 	if parent.clip_contents:
 		return
@@ -80,8 +74,8 @@ func _check_contained(parent: Control, label: String) -> void:
 func _check_desk() -> void:
 	for item: ItemData in game.current_day().item_pool:
 		game.add_to_inventory(item)
-	# A box card is laid out by hand rather than by a container, so it is
-	# exactly the kind of thing this check exists for (revision 4 §2).
+	# box card is laid out by hand instead of by a container, exactly the kind
+	# of thing this check is for
 	if game.current_day().box_item != null:
 		game.add_to_inventory(game.current_day().box_item)
 	var desk: Node = load("res://scenes/desk/desk_phase.tscn").instantiate()

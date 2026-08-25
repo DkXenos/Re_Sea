@@ -1,9 +1,10 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://main.gd" id="1_main"]
 [ext_resource type="PackedScene" path="res://scenes/settings/pause_overlay.tscn" id="2_pause"]
 [ext_resource type="PackedScene" path="res://scenes/debug/debug_overlay.tscn" id="3_debug"]
 [ext_resource type="Texture2D" path="res://assets/ui/icon_pause.png" id="4_pauseicon"]
+[ext_resource type="Texture2D" path="res://assets/ui/icon_pause_pressed.png" id="5_pausepressed"]
 
 [node name="Main" type="Node"]
 process_mode = 3
@@ -24,6 +25,7 @@ offset_top = 12.0
 offset_right = 1264.0
 offset_bottom = 60.0
 texture_normal = ExtResource("4_pauseicon")
+texture_pressed = ExtResource("5_pausepressed")
 
 [node name="DebugLayer" type="CanvasLayer" parent="."]
 process_mode = 3

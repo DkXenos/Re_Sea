@@ -1,6 +1,7 @@
-## Every player-facing string in the game. All text is Indonesian; code,
-## comments and filenames stay English. Item names and rule text live in their
-## own .tres files - everything else lives here so re-wording is one file.
+# all player-facing text. indonesian. item names and rule text are in the
+# .tres files, everything else is here.
+# some of the wording in here is rough, needs a pass from someone who actually
+# writes well
 class_name Strings
 extends RefCounted
 
@@ -91,7 +92,7 @@ const TABLE: Dictionary = {
 	"field_no_tag": "tidak ada kode",
 	"field_multilayer_suffix": " (berlapis)",
 
-	# --- mystery box (revision 4) ---
+	# --- mystery box ---
 	"box_open": "Buka",
 	"box_sealed": "Kotak tersegel - belum tahu isinya",
 	"box_opened_toast": "Kotak dibuka: {n} barang masuk ke daftar",
@@ -128,7 +129,7 @@ const TABLE: Dictionary = {
 	"report_next": "Hari Berikutnya",
 	"report_perfect": "Tidak ada kesalahan. Kerja bagus.",
 
-	# --- after-day screen (revision 3) ---
+	# --- after-day screen ---
 	"after_title": "HARI {n} SELESAI",
 	"after_tab_result": "Hasil Hari Ini",
 	"after_tab_tech": "Teknologi",
@@ -139,7 +140,7 @@ const TABLE: Dictionary = {
 	"after_budget": "Waktu shift terpakai {spent} dari {max}, sisa {left}",
 	"after_health": "Kesehatan laut {before} -> {after}   (Laut: {tier})",
 
-	# --- blueprints (revision 2, reworked in revision 4) ---
+	# --- blueprints ---
 	"blueprint_requires": "Butuh: {v}",
 	"blueprint_done": "SELESAI",
 	"tech_prev": "\u2039",
@@ -160,16 +161,15 @@ const TABLE: Dictionary = {
 	"tech_rakit_done": "Terpasang",
 	"tech_close": "Tutup",
 
-	# --- upgrades (revision 2) ---
+	# --- upgrades ---
 	"upgrade_equip": "Pakai",
 	"upgrade_equipped": "Terpasang",
 	"upgrade_locked": "Terkunci",
 	"upgrade_benefit": "+ {v}",
 	"upgrade_cost": "- {v}",
 
-	# --- calibration puzzle (EXPERIMENTAL, revision 2 §5) ---
-	# Delete this block together with scenes/puzzle/. The step text and the
-	# failure lines live in that folder, so removing it removes the feature.
+	# --- calibration puzzle (EXPERIMENTAL) ---
+	# delete this block with scenes/puzzle/
 	"puzzle_title": "URUTKAN LANGKAH MESIN",
 	"puzzle_hint": "Seret langkah ke urutan yang benar, lalu jalankan. Salah urutan tidak menghukum - coba lagi sebanyak yang kamu mau.",
 	"puzzle_run": "Jalankan",
@@ -192,14 +192,8 @@ const TABLE: Dictionary = {
 	"pause_menu": "Menu Utama",
 }
 
-## The resin and material codes printed on real packaging, in plain Indonesian.
-##
-## A player who has never sorted waste has no reason to know what PET means, and
-## the game shows the code on the item, on its label and in the magnifier
-## reading. Explaining it is one page in a book that is already free to open.
-##
-## This is a fixed reference table, not per-item content, so it lives here with
-## the rest of the text rather than becoming fourteen more .tres files.
+# resin codes off real packaging. fixed reference table, not per-item content,
+# so it stays here instead of becoming 14 more .tres files.
 const CODES: Array = [
 	["PET 1", "plastik bening untuk botol minuman. Bisa didaur ulang kalau bersih."],
 	["HDPE 2", "plastik tebal untuk jerigen dan botol sabun. Bisa didaur ulang kalau bersih."],
@@ -219,7 +213,7 @@ static func t(key: String) -> String:
 	push_warning("Missing string key: %s" % key)
 	return key
 
-## t() with {placeholder} substitution, e.g. tf("day_label", {"n": 3})
+# t() with {placeholder} subs, e.g. tf("day_label", {"n": 3})
 static func tf(key: String, args: Dictionary) -> String:
 	return t(key).format(args)
 

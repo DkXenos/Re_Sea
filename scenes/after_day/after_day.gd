@@ -1,26 +1,18 @@
-## Between the day report and the next day. Revision 3's main change.
-##
-## Every meta system used to be reachable once per run, on a screen that fired
-## when a blueprint happened to complete. That meant the owner played four days
-## of a five-day game without seeing any of it. This screen is entered EVERY
-## day, so the blueprints, the upgrades and the day's result are all in front of
-## the player once per day whether anything completed or not.
-##
-## Three tabs, plain buttons swapping visibility. No transitions, no new
-## animation: everything here is a NinePatchRect over an existing UI PNG, text,
-## and buttons.
+# between the report and the next day. entered EVERY day - the old version
+# only fired when a blueprint happened to finish, which meant you could play
+# four days of five and never see any of the meta systems.
+#
+# three tabs, buttons swapping visibility. no transitions.
 extends Node2D
 
-## EXPERIMENTAL - revision 3 §5 moved the calibration puzzle's entry point here,
-## next to the blueprint it belongs to. Delete this line, the marked block in
-## _on_craft_blueprint(), and scenes/puzzle/, and the feature is gone.
+# experimental. to kill the puzzle: this line, the marked block in
+# _on_craft_blueprint(), and scenes/puzzle/.
 const CALIBRATION_PUZZLE := preload("res://scenes/puzzle/calibration_puzzle.tscn")
 
 const SLOT_BG := preload("res://assets/ui/panel_slot.png")
 const MARK_CORRECT := preload("res://assets/ui/icon_check.png")
 const MARK_WRONG := preload("res://assets/ui/icon_cross.png")
-## The table is laid out in item-texture units, read from the texture itself so
-## a designer delivering 256px items does not have to touch this (rev 3 §1.5).
+# laid out in item-texture units, read off the texture so 256px art still works
 const TABLE_COLUMNS := 7
 const TABLE_GAP := Vector2(12.0, 30.0)
 
@@ -39,7 +31,7 @@ enum Tab { RESULT, TECH, GEAR }
 @onready var _mistakes: VBoxContainer = $UiLayer/Root/ResultPage/MistakesScroll/Mistakes
 @onready var _gear_rows: VBoxContainer = $UiLayer/Root/GearPage/Scroll/Rows
 
-# --- Teknologi (revision 4 §3) ---
+# teknologi tab
 @onready var _tech: Control = $UiLayer/Root/TechPage
 @onready var _diagram: Control = $UiLayer/Root/TechPage/Diagram
 @onready var _craft_button: Button = $UiLayer/Root/TechPage/CraftButton
@@ -47,8 +39,9 @@ enum Tab { RESULT, TECH, GEAR }
 @onready var _popup: Control = $PopupLayer/Popup/Panel
 
 var _tab: Tab = Tab.RESULT
-## Which blueprint the selector is showing. There is no grid and no tabs inside
-## tabs - one sheet at a time, paged with the two arrows.
+# one sheet at a time, paged with the arrows. no tabs inside tabs.
+# TODO no way to tell from the arrows that another sheet is craftable. dot
+# indicator or something.
 var _sheet: int = 0
 var _popup_component: ComponentData = null
 
@@ -78,10 +71,15 @@ func _ready() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	# "advance" carries a mouse click for the click-anywhere screens. this one
+	# is a screen you poke around in - a click on dead space between tabs is
+	# not a request to start tomorrow. keyboard only here.
+	if event is InputEventMouseButton:
+		return
 	if not event.is_action_pressed(&"advance"):
 		return
-	# With a component popup open, Enter belongs to the popup. Without this it
-	# would fall through and start the next day out from under it.
+	# enter belongs to the popup when one is open, else it starts the next day
+	# right out from under it
 	if _popup_layer.visible:
 		_close_popup()
 	else:
@@ -103,11 +101,10 @@ func _finish() -> void:
 	Events.phase_finished.emit()
 
 
-# ------------------------------------------------------- tab 1: Hasil Hari Ini
+# tab 1: hasil hari ini
 
-## The day's haul, as the item art itself. A text list of names would say the
-## same thing and feel like a receipt; the point of this tab is that the work
-## became something.
+# the haul as actual art. a list of names says the same thing but feels like
+# a receipt.
 func _build_result() -> void:
 	_clear(_table)
 	var size := _item_size()
@@ -146,7 +143,7 @@ func _build_result() -> void:
 		MistakeView.add_line(_mistakes, Strings.t("report_perfect"), 17, Color(0.6, 0.9, 0.7))
 
 
-## Reads the authored size off the texture rather than assuming 160 (rev 3 §1.5).
+# read the size off the texture, don't assume 160
 func _item_size() -> Vector2:
 	for entry: CarriedItem in Game.inventory:
 		if entry.data.texture != null:
@@ -162,8 +159,7 @@ func _make_table_item(entry: CarriedItem, origin: Vector2, size: Vector2) -> Nod
 	sprite.texture = entry.data.texture
 	holder.add_child(sprite)
 
-	# Right or wrong is its own PNG sitting on top, never a tint on the item -
-	# recolouring designer art to mean something is exactly what §1.4 forbids.
+	# right/wrong is its own png on top, never a tint on the item
 	var mark := Sprite2D.new()
 	mark.texture = MARK_CORRECT if entry.was_correct else MARK_WRONG
 	mark.position = Vector2(size.x * 0.5 - 16.0, -size.y * 0.5 + 16.0)
@@ -171,15 +167,11 @@ func _make_table_item(entry: CarriedItem, origin: Vector2, size: Vector2) -> Nod
 	return holder
 
 
-# ------------------------------------------------------------ tab 2: Teknologi
+# tab 2: teknologi
 
-## A blueprint is a diagram of parts, each crafted on its own by spending
-## sorted materials, and one CRAFT button that assembles them (revision 4 §3).
-##
-## This is a FIXED-recipe system. Every requirement is authored in a .tres and
-## on screen before the player commits: there is no free-form combining, no
-## recipe to discover and no failure state. A craft the pool cannot pay for is
-## refused with the shortfall named, never attempted and lost.
+# fixed recipes. everything is authored in a .tres and on screen before you
+# commit - no combining, nothing to discover, no failure state. a craft you
+# can't pay for is refused with the shortfall named.
 func _build_tech() -> void:
 	var bp := _current_blueprint()
 	var pageable: bool = Game.blueprints.size() > 1
@@ -209,8 +201,7 @@ func _page_sheet(step: int) -> void:
 	_build_tech()
 
 
-## The pool, always on screen. It is what the player spends, so it is never
-## more than one glance away from the button that spends it.
+# keep the pool next to the button that spends it
 func _pool_text() -> String:
 	var parts: Array[String] = []
 	for category in ItemData.Category.values():
@@ -231,12 +222,8 @@ func _unlocks_text(bp: BlueprintData) -> String:
 	return ""
 
 
-## The sheet with its parts on top of it.
-##
-## Everything is laid out from the rect the background is ACTUALLY drawn at,
-## and every part is placed from its normalized 0-1 coordinate, so a designer
-## delivering a sheet at a different resolution keeps the parts aligned without
-## touching a number here. Part sizes scale with the sheet for the same reason.
+# laid out from the rect the background is ACTUALLY drawn at, parts placed
+# from their 0-1 coords. a sheet at another resolution still lines up.
 func _build_diagram(bp: BlueprintData) -> void:
 	_clear(_diagram)
 	if bp == null or bp.background == null:
@@ -261,15 +248,13 @@ func _build_diagram(bp: BlueprintData) -> void:
 		_diagram.add_child(_make_component(component, origin, drawn, scale_factor))
 
 
-## Crafted or not is two different PNGs, chosen here. Nothing is ever
-## greyscaled, tinted or shaded in code - §3 is explicit about it.
+# two pngs, we just pick one. no greyscaling in code.
 func _make_component(component: ComponentData, origin: Vector2, drawn: Vector2,
 		scale_factor: float) -> Control:
 	var done := Game.component_crafted(component)
 	var texture: Texture2D = component.done_texture if done else component.locked_texture
-	# Rounded to whole pixels. The fitted scale is rarely exact, and a part whose
-	# art was a millionth of a pixel wider than the box holding it counted as
-	# escaping its box in the layout check - correctly, if pointlessly.
+	# whole pixels. the fitted scale is never exact and the layout check counts
+	# a part 0.000001px wider than its box as escaping it.
 	var display: Vector2 = (texture.get_size() * scale_factor).round() \
 		if texture != null else Vector2(96, 96)
 
@@ -288,7 +273,7 @@ func _make_component(component: ComponentData, origin: Vector2, drawn: Vector2,
 	art.size = display
 	holder.add_child(art)
 
-	# Invisible hit area over the art, the same way an inventory card works.
+	# invisible hit area, same as the inventory cards
 	var button := Button.new()
 	button.flat = true
 	button.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -299,8 +284,7 @@ func _make_component(component: ComponentData, origin: Vector2, drawn: Vector2,
 	return holder
 
 
-## One large button, and it does not become pressable until every part is on
-## the diagram.
+# dead until every part is on the diagram
 func _refresh_craft_button(bp: BlueprintData) -> void:
 	if bp == null:
 		_craft_button.text = ""
@@ -318,7 +302,7 @@ func _refresh_craft_button(bp: BlueprintData) -> void:
 		_craft_button.disabled = true
 
 
-## "6 organik, 2 residu" - the fixed recipe, exactly as authored.
+# "6 organik, 2 residu"
 func _requirement_text(component: ComponentData) -> String:
 	var parts: Array[String] = []
 	for category: int in component.requirements:
@@ -327,11 +311,10 @@ func _requirement_text(component: ComponentData) -> String:
 	return Strings.tf("blueprint_requires", {"v": ", ".join(parts)})
 
 
-# ------------------------------------------------------- the component popup
+# component popup
 
-## Name, requirement, what the player actually holds, and Rakit. The pool is
-## repeated here beside the requirement so the decision never needs a second
-## screen, and the button says what is short rather than only being dead.
+# pool repeated here next to the requirement so you don't need a second screen.
+# button says what's short instead of just being dead.
 func _open_popup(component: ComponentData) -> void:
 	_popup_component = component
 	var done := Game.component_crafted(component)
@@ -386,21 +369,20 @@ func _on_craft_blueprint() -> void:
 	_build_tech()
 	_build_gear()
 	_build_result()
-	# --- revision 3 §5 (EXPERIMENTAL), the only call site ---
+	# --- experimental puzzle, only call site ---
 	if Game.feature_calibration_puzzle:
 		var puzzle: CanvasLayer = CALIBRATION_PUZZLE.instantiate()
 		if puzzle.setup(bp.id):
 			add_child(puzzle)
 			return
 		puzzle.free()
-	# --- end §5 ---
+	# --- end ---
 
 
-# ------------------------------------------------------------ tab 3: Peralatan
+# tab 3: peralatan
 
-## All four, always listed, so the player can see what they are working toward.
-## Fitting one is free and reversible - there is no currency in this game and an
-## upgrade is never bought.
+# all four always listed. fitting one is free and reversible, there's no
+# currency anywhere in this game.
 func _build_gear() -> void:
 	_clear(_gear_rows)
 	for up: UpgradeData in Game.upgrades:
@@ -420,8 +402,7 @@ func _make_gear_row(up: UpgradeData) -> Control:
 
 	MistakeView.add_line(lines, up.display_name, 18, Color(1, 1, 1))
 	if unlocked:
-		# Benefit and cost always appear together, so no upgrade can ever read
-		# as a pure improvement.
+		# benefit and cost together, always
 		MistakeView.add_line(lines, Strings.tf("upgrade_benefit", {"v": up.benefit_text}),
 			13, Color(0.6, 0.92, 0.72))
 		MistakeView.add_line(lines, Strings.tf("upgrade_cost", {"v": up.cost_text}),
@@ -448,7 +429,7 @@ func _on_equip(up: UpgradeData) -> void:
 	_build_gear()
 
 
-# ------------------------------------------------------------------- helpers
+# helpers
 
 func _panel_row(height: int) -> Control:
 	var row := Control.new()
@@ -463,8 +444,7 @@ func _panel_row(height: int) -> Control:
 	return row
 
 
-## queue_free() alone leaves the old children in the tree for the rest of the
-## frame, so a list rebuilt twice in one frame would briefly show both sets.
+# queue_free on its own isn't enough here
 func _clear(node: Node) -> void:
 	for child in node.get_children():
 		node.remove_child(child)

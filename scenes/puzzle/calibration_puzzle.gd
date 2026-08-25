@@ -1,36 +1,27 @@
-## EXPERIMENTAL - revision 2 §5. This may be cut.
-##
-## After a blueprint is built, the machine needs its operating sequence put in
-## order. Four steps, dragged into place, one button to run them. A wrong order
-## explains itself and can be retried immediately at no cost.
-##
-## Everything about it lives in this folder. To remove it entirely: delete
-## scenes/puzzle/, the `feature_calibration_puzzle` flag in autoload/game.gd,
-## the marked block in scenes/unlock/unlock_screen.gd, the marked block in
-## data/strings.gd, and its line in the layer table in CLAUDE.md. Nothing else
-## in the game knows it exists.
-##
-## Deliberately NOT built: block programming, loops, conditionals, an execution
-## engine, or a puzzle authoring system. This is a list with an order check.
+# EXPERIMENTAL, might get cut.
+#
+# put the machine's operating sequence in order. four steps, drag them, one
+# button to run. wrong order explains itself, retry is free.
+#
+# to rip it out: this folder, feature_calibration_puzzle in autoload/game.gd,
+# the marked block in after_day.gd, and the marked block in data/strings.gd.
+#
+# it is a list with an order check. not block programming, no loops, no
+# execution engine. don't let it grow into one.
 extends CanvasLayer
 
 signal finished()
 
 const STEP_ROW := preload("res://scenes/puzzle/step_row.tscn")
-## The whole reward. It is a flat bonus applied outside the day's formula, so
-## the puzzle cannot touch the health arithmetic, the budget or the blueprint
-## counters. Failing costs nothing.
+# flat bonus outside the day formula, so this can't touch the health maths.
+# failing costs nothing.
 const HEALTH_BONUS := 2
 
-## The two machines, and why each wrong order is wrong.
-##
-## `reasons` are pairs of indices into the correct order: if `before` ends up
-## ahead of `after`, that line is what the player is told. The lines carry the
-## whole educational value here, so each one says what actually goes wrong
-## rather than "salah urutan".
-##
-## This is content and it lives here rather than in strings.gd on purpose: §5
-## requires that deleting this folder removes the feature completely.
+# reasons are index pairs into the correct order - if `before` ends up ahead
+# of `after`, that's the line they get. say what actually goes wrong, not
+# "salah urutan".
+#
+# text lives here and not in strings.gd so deleting the folder kills it all.
 const SEQUENCES: Dictionary = {
 	&"penyaring_mikroplastik": {
 		"steps": ["Sedot air", "Saring partikel", "Kumpulkan residu", "Buang air bersih"],
@@ -73,8 +64,7 @@ var _reasons: Array = []
 var _solved: bool = false
 
 
-## Returns false when this blueprint has no sequence built, which is how the
-## caller knows to skip the puzzle entirely. Only two exist.
+# false = no sequence for this blueprint, caller skips the puzzle. only 2 exist.
 func setup(blueprint_id: StringName) -> bool:
 	if not SEQUENCES.has(blueprint_id):
 		return false
@@ -96,8 +86,7 @@ func _ready() -> void:
 	_rebuild()
 
 
-## Never opens on the correct order - the player would press Run and learn
-## nothing.
+# never open on the right order, they'd just hit Run and learn nothing
 func _shuffled_order() -> Array[int]:
 	var order: Array[int] = []
 	for i in _steps.size():
@@ -124,7 +113,7 @@ func _rebuild() -> void:
 		row.set_position_number(position + 1)
 
 
-## Called by a row that had another row dropped on it.
+# called by whichever row got dropped on
 func swap_rows(from_row: Control, to_row: Control) -> void:
 	if _solved:
 		return
@@ -164,8 +153,7 @@ func _on_run() -> void:
 	Events.sfx_requested.emit(&"bin_reject")
 
 
-## The first thing that actually goes wrong, in the order the machine would hit
-## it. Retrying is free and immediate.
+# first thing that breaks, in the order the machine would hit it
 func _failure_line() -> String:
 	for reason: Dictionary in _reasons:
 		if _order.find(int(reason["before"])) < _order.find(int(reason["after"])):

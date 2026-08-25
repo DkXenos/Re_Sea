@@ -1,11 +1,10 @@
-## The two invariants the shift model has to hold (revision 1 §10):
-##
-##   1. Budget accounting is exact - what was spent equals the sum of the
-##      actions taken, across a whole simulated day.
-##   2. An item is always reachable - the tank never drops below the day's
-##      min_available_items while the pool still has items to give.
-##
-##   godot --headless --script tools/smoke/smoke_shift.gd -- [day]
+# two invariants:
+#   1. budget accounting is exact - spent == sum of the actions taken, over a
+#      whole simulated day
+#   2. something is always reachable - the tank never drops below the day's
+#      min_available_items while the pool still has items
+#
+#   godot --headless --script tools/smoke/smoke_shift.gd -- [day]
 extends SceneTree
 
 

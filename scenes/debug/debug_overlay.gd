@@ -1,10 +1,5 @@
-## F1 debug overlay, active only in debug builds. Iteration speed is the single
-## biggest factor in how good this prototype gets, so this is not optional
-## scaffolding - it is the difference between testing day 5 in ten seconds and
-## replaying four days to get there.
-##
-## Everything here goes out as an Events.debug_command so no debug code has to
-## live inside the game scenes.
+# F1, debug builds only. everything goes out as Events.debug_command so none
+# of this has to live inside the game scenes.
 extends Control
 
 

@@ -1,14 +1,8 @@
-## The four bins. Always clickable - the player may sort with zero evidence at
-## any time, and nothing here tells them whether they were right. Correctness is
-## revealed in the day report, and that delay is what makes a decision weigh.
-##
-## "accept" plays when a bin takes an item, not when the answer was correct.
-## "reject" plays when the click could not be honoured at all.
+# four bins, always clickable. you can sort with zero evidence.
+# "accept" = the bin took it, NOT that it was right. "reject" = couldn't.
 extends Control
 
-## Bins are authored at 200x240 and shown at 144x173 so four fit across the
-## desk. One named constant in one file, quoted in ASSETS.md, per rev 3 §1.5 -
-## a designer needs to know the size their art is actually read at.
+# 200x240 art shown at 144x173, otherwise four don't fit across the desk
 const BIN_DISPLAY_SCALE := 0.72
 
 signal bin_chosen(category: int)
@@ -17,9 +11,11 @@ const CATEGORY_ASSETS: Array[String] = ["organic", "recyclable", "hazard", "land
 const CATEGORY_KEYS: Array[String] = ["bin_organic", "bin_recyclable", "bin_hazard", "bin_landfill"]
 
 var _sprites: Array[AnimatedSprite2D] = []
-var _highlighted: int = -1
+var _highlighted = -1
 
 
+# TODO the four bins are hardcoded to four here. adding a fifth category means
+# touching this + CATEGORY_KEYS + the enum. should read off the enum really.
 func _ready() -> void:
 	var slot := size.x / float(CATEGORY_ASSETS.size())
 	for i in CATEGORY_ASSETS.size():
@@ -49,9 +45,7 @@ func _ready() -> void:
 		add_child(button)
 
 
-## Marks the bin the player's own revealed evidence currently points at. This
-## is the other half of the chip highlight: the reasoning and its conclusion
-## light up together.
+# other half of the chip highlight - reasoning and conclusion light up together
 func highlight(category: int) -> void:
 	for i in _sprites.size():
 		var sprite := _sprites[i]

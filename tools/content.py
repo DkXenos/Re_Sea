@@ -1,10 +1,9 @@
-"""Drawing parameters for the placeholder art. **No game content lives here.**
+"""Drawing parameters for the placeholder art. No game content in here.
 
-Revision 1 made the `.tres` files in `data/` the single source of truth for
-everything the game reads: item properties, hotspots, rules, tools and days.
-This file holds only what a placeholder *drawing* needs - which shape, which
-colour, which two- or three-letter code - and becomes obsolete the moment the
-designers deliver real art.
+The .tres files in data/ are the only source of truth for anything the game
+reads - item properties, hotspots, rules, tools, days. This is just what a
+placeholder drawing needs (shape, colour, a 2-3 letter code) and it's dead
+the moment real art shows up.
 
 Hotspot rings are no longer drawn here at all. They are a separate overlay PNG
 per item, generated from the `.tres` by `tools/gen_hotspot_overlays.gd`, so the
@@ -41,7 +40,7 @@ TOOL_ART = [
     dict(id="cutter", name="Pemotong", color=(226, 106, 92)),
 ]
 
-# Background only since revision 1 - no collision, no grab, no penalty.
+# background only, no collision, no grab
 FISH = [("fish_bg_small", 96, 48, (244, 162, 97)),
         ("fish_bg_medium", 128, 64, (231, 111, 81)),
         ("fish_bg_large", 176, 88, (140, 196, 180))]
@@ -49,9 +48,8 @@ FISH = [("fish_bg_small", 96, 48, (244, 162, 97)),
 BINS = [("organic", (106, 153, 78)), ("recyclable", (58, 134, 183)),
         ("hazard", (198, 76, 65)), ("landfill", (120, 113, 108))]
 
-# Ocean-tier seabed backdrops (revision 2 §1): floor colour, ridge colour and
-# where the rocks sit. Tier 0 is murky and cluttered, tier 3 is bright and open.
-# The tier *thresholds and counts* are game content and live in data/tiers/.
+# tier seabeds: floor colour, ridge colour, where the rocks sit. 0 is murky
+# and cluttered, 3 is bright and open. thresholds/counts are in data/tiers/.
 TIER_SEABED = [
     ((66, 60, 44), (88, 80, 58), [(120, 34), (300, 30), (420, 22), (560, 36),
                                   (700, 40), (880, 18)]),
@@ -61,8 +59,8 @@ TIER_SEABED = [
 ]
 
 
-# Blueprint diagram art (revision 4 §3). Shape and colour only - what each
-# component COSTS is game content and lives in data/components/*.tres.
+# blueprint diagram art. shape and colour only - what a component COSTS is
+# game content and lives in data/components/*.tres.
 #
 # The sheet colour is per blueprint so three schematics are told apart at a
 # glance; the components are drawn in colour for `done` and in the greyscale of

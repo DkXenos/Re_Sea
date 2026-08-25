@@ -1,7 +1,6 @@
-## Revision 2 §3 migration: give every item the observed-property line the
-## inspect panel shows in place of its name until the name has been earned.
-## Properties describe only what a person could see or feel by handling it.
-##   godot --headless --script tools/migrations/r2_surface_properties.gd
+# one-off: give every item the property line the inspect panel shows instead
+# of the name. only things you could actually see or feel by handling it.
+#   godot --headless --script tools/migrations/r2_surface_properties.gd
 extends SceneTree
 
 const PROPS := {

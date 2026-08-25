@@ -1,4 +1,3 @@
-## Title screen. Play starts a fresh run and hands control to the flow graph.
 extends Node2D
 
 

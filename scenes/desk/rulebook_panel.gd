@@ -1,13 +1,6 @@
-## Toggleable rulebook. Open any time, pauses nothing. The challenge in this
-## game is hidden properties, never recall, so the rules are always one key away
-## and are shown verbatim from RuleData.text.
-##
-## It also carries the code glossary. The game prints PET, HDPE, PS and the rest
-## on items, labels and magnifier readings, and a player who has never sorted
-## waste has no reason to know what any of them mean. The codes are worth
-## keeping - they are the real system, and the whole lesson is that a code tells
-## you the material and never tells you whether the thing is clean - but only if
-## the game is willing to say what they are.
+# open any time, pauses nothing. the challenge is hidden properties, not
+# remembering rules. also holds the PET/HDPE/PS glossary since nobody who
+# hasn't sorted waste before knows what those mean.
 extends Control
 
 @onready var _title: Label = $Title
@@ -36,7 +29,7 @@ func _rebuild() -> void:
 		_add_line(Strings.t("rulebook_empty"), 18, Color(0.7, 0.75, 0.8))
 		_add_glossary()
 		return
-	# Grouped by the bin the rule forces, with rulebook-only rules under UMUM.
+	# grouped by forced bin, rulebook-only ones go under UMUM
 	var groups: Dictionary = {}
 	for rule: RuleData in day.active_rules:
 		var key: String = Strings.t("rulebook_general") if rule.applies_when.is_empty() \
@@ -52,7 +45,7 @@ func _rebuild() -> void:
 	_add_glossary()
 
 
-## What the codes printed on the items actually mean.
+# what the codes on the items mean
 func _add_glossary() -> void:
 	_add_line(Strings.t("rulebook_codes"), 21, Color(0.95, 0.83, 0.42))
 	_add_line(Strings.t("rulebook_codes_note"), 15, Color(0.72, 0.78, 0.85))
@@ -69,8 +62,7 @@ func _add_line(text: String, font_size: int, color: Color) -> void:
 	_list.add_child(label)
 
 
-## queue_free() alone leaves the old children in the tree for the rest of the
-## frame, so a list rebuilt twice in one frame would briefly show both sets.
+# see the other panels
 func _clear(node: Node) -> void:
 	for child in node.get_children():
 		node.remove_child(child)

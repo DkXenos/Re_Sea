@@ -1,5 +1,5 @@
-## The five legibility fixes of revision 1 §7, verified rather than eyeballed.
-##   godot --headless --script tools/smoke/smoke_inspect.gd
+# the inspect panel legibility stuff, checked instead of eyeballed
+#   godot --headless --script tools/smoke/smoke_inspect.gd
 extends SceneTree
 
 const CHIP_MATCH := preload("res://assets/ui/chip_match.png")

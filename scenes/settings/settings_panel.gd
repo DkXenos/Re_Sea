@@ -1,6 +1,5 @@
-## The four sliders, in one reusable Control so the settings screen and the
-## pause overlay are literally the same widget. A slider wired to nothing is a
-## broken feature, so all four do something on the frame they are moved.
+# four sliders, one Control, used by both the settings screen and the pause
+# overlay. all four actually do something.
 extends Control
 
 const ROWS: Array = [
@@ -19,8 +18,7 @@ func _ready() -> void:
 	_list.add_child(_make_toggle("hotspots", Strings.t("settings_hotspots")))
 
 
-## The hotspot rings are an accessibility option, not a difficulty setting: the
-## final art is meant to draw the hotspot into the item itself.
+# accessibility, not difficulty - final art draws the hotspot into the item
 func _make_toggle(key: String, label_text: String) -> Control:
 	var row := HBoxContainer.new()
 	var name_label := Label.new()
@@ -60,8 +58,7 @@ func _make_row(key: String, label_text: String) -> Control:
 	value_label.text = "%d%%" % int(round(slider.value * 100.0))
 	slider.value_changed.connect(func(v: float) -> void:
 		value_label.text = "%d%%" % int(round(v * 100.0))
-		# Writes straight through to the audio bus (or, for vfx, to the global
-		# intensity float) and persists to user://settings.cfg.
+		# straight through to the bus, then saved to user://settings.cfg
 		Game.apply_setting(key, v))
 	row.add_child(slider)
 	return row

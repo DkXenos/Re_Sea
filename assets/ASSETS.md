@@ -1,35 +1,24 @@
-# Asset Manifest
+# Assets
 
-For the designers. **Every visual in the game is one PNG from this list.** The
-code never draws a shape and never uses a `ColorRect` — if you can see it on
-screen, it came from a file below.
+List of every PNG in the game. Everything you see on screen is one of these -
+nothing is drawn in code.
 
-## The replacement rule
+## replacing art
 
-**Same path, same pixel size, flat art, no baked lighting.** That is the whole
-contract. Everything below expands on it.
+Short version: **same path, same pixel size, flat art, no baked lighting.**
 
-1. Drop your PNG at **exactly the same path** with **exactly the same pixel
-   size** as the table says. Nothing else needs to change — no code, no scenes.
-2. Keep the transparent background. Items, claw, fish, bins and tools are cut
-   out; only the `env/` backgrounds are opaque.
-3. Keep the art inside the stated canvas. The anchor point is the centre of the
-   canvas for everything except `ui/` panels, which stretch from their corners.
-4. **Do not bake lighting, shadows or glow into the art.** Lighting and shaders
-   are a later pass by the owner, applied per `CanvasLayer` and to the tank's
-   `SubViewport` as a whole. Art that already has a light direction painted in
-   will fight it.
-5. **One PNG is one whole thing.** The game shows one texture per node — a
-   bottle is one file, not a body plus a cap plus a label. The only thing ever
-   layered on top of an item is the hotspot ring overlay, which is a debug aid
-   (see below).
-6. **State is a different drawing, never a tint.** A locked tool, a highlighted
-   bin, a selected slot — each is its own PNG or its own named animation. The
-   code never recolours your art to mean something, because that breaks the
-   moment your palette differs from the placeholder's.
-7. Every sprite is displayed at **scale 1** at its authored size, with exactly
-   three exceptions. Each is one named constant in one file, and this is the
-   list — if you need to know the size your art is actually read at, it is here.
+1. Drop the PNG at the same path and the same size as the table says. No code
+   or scene changes needed.
+2. Keep the transparent background. Only the `env/` backgrounds are opaque.
+3. Stay inside the canvas. Anchor is the centre, except `ui/` panels which
+   stretch from the corners.
+4. No baked lighting, shadows or glow. Lighting is a later pass done per
+   CanvasLayer, and art with a light direction painted in will fight it.
+5. One PNG is one whole thing. A bottle is one file, not body + cap + label.
+6. State is a different drawing, not a tint. Locked tool, highlighted bin,
+   selected slot - each gets its own PNG. The code never recolours art.
+7. Everything is displayed at scale 1 except these three (four now, with the
+   box):
 
    | What | Authored | Displayed | Constant |
    |------|----------|-----------|----------|
@@ -38,55 +27,73 @@ contract. Everything below expands on it.
    | Bin on the desk | 200×240 | 144×173 | `BinRow.BIN_DISPLAY_SCALE` = 0.72 |
    | Box on its inventory card | 160×160 | 64×64 | `InventoryPanel.BOX_CARD_SCALE` = 0.4 |
 
-   Everywhere else, the pixel size in the table below is the size on screen.
+   Everywhere else the size in the table is the size on screen.
 
-## How to animate something
+## UI chrome — buttons, panels, sliders, scrollbars, text fields
 
-**No animation in this game is written in code.** Anything that moves visually
-is an `AnimatedSprite2D` playing a named animation from a `SpriteFrames`
-resource in `data/frames/`. Code only decides *which* animation plays and
-*when* — never what it looks like.
+These are the parts Godot would otherwise draw itself. They are all PNGs in
+`assets/ui/`, wired up in one place: `assets/ui/ui_theme.tres`, which
+`project.godot` applies to the whole game. **Replace the PNG and every screen
+follows — you never touch a scene.**
 
-Every animation already exists with **one placeholder frame**. To animate it:
+| Part | Files |
+|------|-------|
+| Button | `button_normal` / `button_hover` / `button_pressed` / `button_disabled` |
+| Panels & boxes | `panel_main`, `panel_dark`, `panel_slot`, `panel_slot_selected` |
+| Volume slider | `slider_track`, `slider_fill`, `slider_grabber`, `slider_grabber_hover` |
+| On/off toggle | `toggle_off`, `toggle_on` |
+| Scrollbar | `scrollbar_track`, `scrollbar_grabber`, `scrollbar_grabber_hover` |
+| Text field | `textfield_normal`, `textfield_focus` |
 
-1. Draw your frames and save them next to the existing file, numbered:
-   `claw_closing_01.png`, `claw_closing_02.png`, …
-2. Open the matching `data/frames/*.tres` in Godot and drop the frames into
-   that animation.
+The stretchy ones (buttons, panels, sliders, scrollbars, text fields) are
+**nine-patch**: the corners stay put and the middle stretches. Keep your border
+inside the margin the table further down names for that file, or the corners
+will smear. The small square PNGs are drawn at the size given; a button is 64×64
+art stretched to whatever the button needs.
 
-Do not add nodes, rename animations, or replace the `SpriteFrames` — the game
-looks animations up by name. The **target frames** column is what we are
-designing for; fewer works, the animation just plays shorter.
+## animating something
 
-## Hotspots — read this before drawing any item
+No animation is written in code. Anything that moves is an AnimatedSprite2D
+playing a named animation out of a SpriteFrames in `data/frames/`. The code
+only picks which one and when.
 
-Items carry 2–3 invisible hotspots — a seam, a label corner, a stained patch —
-and a tool only reveals its property when clicked on the matching one.
+Every animation already exists with one placeholder frame. To fill it in:
 
-Hotspot positions live in `data/items/*.tres`. The rings you see are **not part
-of the item art**: they are a separate overlay, `assets/items/hotspots_<id>.png`,
-generated from that data by `tools/gen_hotspot_overlays.gd`, and the player can
-switch them off.
+1. Draw the frames, save them next to the existing file numbered
+   `claw_closing_01.png`, `claw_closing_02.png` etc
+2. Open the matching `data/frames/*.tres` in Godot and drop them in
 
-**In the final art the hotspot must become a real drawn feature of the item at
-the same coordinates** — draw the stain where the rinse ring is, the printed
-code where the magnifier ring is, the cut seam where the cutter ring is. The
-overlay then survives only as an accessibility aid, not as the way the puzzle is
-solved. Never edit `hotspots_<id>.png` by hand; move the coordinates in the
-`.tres` and re-run the generator.
+Don't rename animations or swap the SpriteFrames out, they're looked up by
+name. The frame counts in the table are what I'm designing for - fewer is fine,
+it just plays shorter.
 
-Ring colours match the tool: rinse blue, swab pink, magnifier yellow, cutter
-red. Those come from `ToolData.color` in `data/tools/*.tres`.
+## hotspots
 
-## No AI generation
+Items have 2-3 invisible hotspots (a seam, a label corner, a stain) and a tool
+only reveals its property if you click the right one. Positions are in
+`data/items/*.tres`.
 
-No asset in this project — image or audio — may be AI generated. The current
-files are drawn programmatically by `tools/gen_placeholders.py` and
-`tools/gen_sounds.py`.
+The rings are NOT part of the item art. They're a separate overlay,
+`assets/items/hotspots_<id>.png`, generated from the .tres by
+`tools/gen_hotspot_overlays.gd`. Don't edit those by hand - move the coords in
+the .tres and re-run it.
+
+In the final art the hotspot should be an actual drawn feature at the same
+coords: the stain where the rinse ring is, the printed code where the magnifier
+ring is, the seam where the cutter ring is. Then the overlay is just an
+accessibility toggle instead of how you solve it.
+
+Ring colours come from `ToolData.color` - rinse blue, swab pink, magnifier
+yellow, cutter red.
+
+## no AI art
+
+Nothing here, image or audio, is AI generated and nothing should be. The
+current files come out of `tools/gen_placeholders.py` and `gen_sounds.py`.
 
 ---
 
-## Animations
+## animations
 
 | SpriteFrames | Animation | Placeholder frame | Target frames |
 |--------------|-----------|-------------------|---------------|
@@ -177,11 +184,10 @@ files are drawn programmatically by `tools/gen_placeholders.py` and
 | `data/frames/coral_dead_frames.tres` | `idle` | `assets/env/coral_dead.png` | 6 |
 | `data/frames/debris_overlay_frames.tres` | `idle` | `assets/env/debris_overlay.png` | 6 |
 
-## Every PNG
+## every PNG
 
-`Animated` names the `SpriteFrames` animations this PNG is the placeholder
-frame for, with the frame count the final version should have. `static` means
-the file is displayed as-is and never animates.
+`Animated` = which SpriteFrames animations this PNG is the placeholder frame
+for, and the frame count the real thing should have. `static` = shown as-is.
 
 | Path | Size | Animated | What it is |
 |------|------|----------|-----------|
@@ -265,6 +271,20 @@ the file is displayed as-is and never animates.
 | `assets/ui/arrow_right.png` | 96x96 | static | Console arrow button (right) |
 | `assets/ui/joystick_base.png` | 128x128 | static | Console joystick base |
 | `assets/ui/joystick_knob.png` | 72x72 | static | Console joystick knob, offsets with claw |
+| `assets/ui/slider_track.png` | 64x16 | static | Volume slider track. NinePatch, 8px margins, stretched to width. |
+| `assets/ui/slider_fill.png` | 64x16 | static | Volume slider fill, the part left of the knob. NinePatch, 8px margins. |
+| `assets/ui/slider_grabber.png` | 32x32 | static | Volume slider knob. |
+| `assets/ui/slider_grabber_hover.png` | 32x32 | static | Volume slider knob, hovered/held. |
+| `assets/ui/toggle_off.png` | 64x32 | static | Settings toggle, off state. Own drawing, not a tint of the on state. |
+| `assets/ui/toggle_on.png` | 64x32 | static | Settings toggle, on state. |
+| `assets/ui/scrollbar_track.png` | 16x64 | static | Scrollbar track. NinePatch, 8px margins, stretched to length. |
+| `assets/ui/scrollbar_grabber.png` | 16x64 | static | Scrollbar grabber. NinePatch, 8px margins, stretched to length. |
+| `assets/ui/scrollbar_grabber_hover.png` | 16x64 | static | Scrollbar grabber, hovered/dragged. |
+| `assets/ui/textfield_normal.png` | 64x40 | static | Text field. NinePatch, 12px margins, stretched. |
+| `assets/ui/textfield_focus.png` | 64x40 | static | Text field, focused. NinePatch, 12px margins. |
+| `assets/ui/icon_pause_pressed.png` | 48x48 | static | Pause button, pressed state. |
+| `assets/ui/arrow_left_pressed.png` | 96x96 | static | Console arrow button (left), pressed state. |
+| `assets/ui/arrow_right_pressed.png` | 96x96 | static | Console arrow button (right), pressed state. |
 | `assets/env/water_bg.png` | 1280x720 | static | Full-screen water background, layer 0 |
 | `assets/env/seabed.png` | 1000x140 | static | Seabed floor inside the tank SubViewport, z_index -10 |
 | `assets/env/tank_frame.png` | 1040x460 | static | Machine frame around the tank. Centre is transparent. |
@@ -284,42 +304,55 @@ the file is displayed as-is and never animates.
 | `assets/env/debris_overlay.png` | 96x96 | `idle` 6 fr | Debris clutter on the seabed. Count falls as the ocean recovers. |
 | `assets/items/box_closed.png` | 160x160 | `closed` 2 fr, `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Mystery box, sealed. State `closed`. |
 | `assets/items/box_opened.png` | 160x160 | `opened` 2 fr | Mystery box, lid open. State `opened`. |
-| `assets/ui/blueprint_bg_cleaner_drone.png` | 960x540 | static | Blueprint schematic sheet for `cleaner_drone`. Components are positioned on top of it from normalized coordinates in the .tres. |
-| `assets/ui/blueprint_bg_penyaring_mikroplastik.png` | 960x540 | static | Blueprint schematic sheet for `penyaring_mikroplastik`. Components are positioned on top of it from normalized coordinates in the .tres. |
-| `assets/ui/blueprint_bg_penetral_b3.png` | 960x540 | static | Blueprint schematic sheet for `penetral_b3`. Components are positioned on top of it from normalized coordinates in the .tres. |
-| `assets/ui/comp_drone_body_done.png` | 128x128 | static | Blueprint component `drone_body`, done. A separate drawing, never the other one tinted. |
-| `assets/ui/comp_drone_body_locked.png` | 128x128 | static | Blueprint component `drone_body`, locked. A separate drawing, never the other one tinted. |
-| `assets/ui/comp_bio_core_done.png` | 128x128 | static | Blueprint component `bio_core`, done. A separate drawing, never the other one tinted. |
-| `assets/ui/comp_bio_core_locked.png` | 128x128 | static | Blueprint component `bio_core`, locked. A separate drawing, never the other one tinted. |
-| `assets/ui/comp_intake_fin_done.png` | 128x128 | static | Blueprint component `intake_fin`, done. A separate drawing, never the other one tinted. |
-| `assets/ui/comp_intake_fin_locked.png` | 128x128 | static | Blueprint component `intake_fin`, locked. A separate drawing, never the other one tinted. |
-| `assets/ui/comp_filter_mesh_done.png` | 128x128 | static | Blueprint component `filter_mesh`, done. A separate drawing, never the other one tinted. |
-| `assets/ui/comp_filter_mesh_locked.png` | 128x128 | static | Blueprint component `filter_mesh`, locked. A separate drawing, never the other one tinted. |
-| `assets/ui/comp_pump_housing_done.png` | 128x128 | static | Blueprint component `pump_housing`, done. A separate drawing, never the other one tinted. |
-| `assets/ui/comp_pump_housing_locked.png` | 128x128 | static | Blueprint component `pump_housing`, locked. A separate drawing, never the other one tinted. |
-| `assets/ui/comp_collection_tank_done.png` | 128x128 | static | Blueprint component `collection_tank`, done. A separate drawing, never the other one tinted. |
-| `assets/ui/comp_collection_tank_locked.png` | 128x128 | static | Blueprint component `collection_tank`, locked. A separate drawing, never the other one tinted. |
-| `assets/ui/comp_sealed_chamber_done.png` | 128x128 | static | Blueprint component `sealed_chamber`, done. A separate drawing, never the other one tinted. |
-| `assets/ui/comp_sealed_chamber_locked.png` | 128x128 | static | Blueprint component `sealed_chamber`, locked. A separate drawing, never the other one tinted. |
-| `assets/ui/comp_neutralizer_cell_done.png` | 128x128 | static | Blueprint component `neutralizer_cell`, done. A separate drawing, never the other one tinted. |
-| `assets/ui/comp_neutralizer_cell_locked.png` | 128x128 | static | Blueprint component `neutralizer_cell`, locked. A separate drawing, never the other one tinted. |
-| `assets/ui/comp_safety_valve_done.png` | 128x128 | static | Blueprint component `safety_valve`, done. A separate drawing, never the other one tinted. |
-| `assets/ui/comp_safety_valve_locked.png` | 128x128 | static | Blueprint component `safety_valve`, locked. A separate drawing, never the other one tinted. |
-| `assets/items/hotspots_banana_peel.png` | 160x160 | static | Hotspot rings for `banana_peel`. **Generated from `data/items/banana_peel.tres`** by `tools/gen_hotspot_overlays.gd` - never edit by hand, and do not draw it into the item art. |
-| `assets/items/hotspots_fish_bone.png` | 160x160 | static | Hotspot rings for `fish_bone`. **Generated from `data/items/fish_bone.tres`** by `tools/gen_hotspot_overlays.gd` - never edit by hand, and do not draw it into the item art. |
-| `assets/items/hotspots_pet_bottle.png` | 160x160 | static | Hotspot rings for `pet_bottle`. **Generated from `data/items/pet_bottle.tres`** by `tools/gen_hotspot_overlays.gd` - never edit by hand, and do not draw it into the item art. |
-| `assets/items/hotspots_alu_can.png` | 160x160 | static | Hotspot rings for `alu_can`. **Generated from `data/items/alu_can.tres`** by `tools/gen_hotspot_overlays.gd` - never edit by hand, and do not draw it into the item art. |
-| `assets/items/hotspots_styrofoam_tray.png` | 160x160 | static | Hotspot rings for `styrofoam_tray`. **Generated from `data/items/styrofoam_tray.tres`** by `tools/gen_hotspot_overlays.gd` - never edit by hand, and do not draw it into the item art. |
-| `assets/items/hotspots_car_battery.png` | 160x160 | static | Hotspot rings for `car_battery`. **Generated from `data/items/car_battery.tres`** by `tools/gen_hotspot_overlays.gd` - never edit by hand, and do not draw it into the item art. |
-| `assets/items/hotspots_oil_jerrycan.png` | 160x160 | static | Hotspot rings for `oil_jerrycan`. **Generated from `data/items/oil_jerrycan.tres`** by `tools/gen_hotspot_overlays.gd` - never edit by hand, and do not draw it into the item art. |
-| `assets/items/hotspots_paint_bottle.png` | 160x160 | static | Hotspot rings for `paint_bottle`. **Generated from `data/items/paint_bottle.tres`** by `tools/gen_hotspot_overlays.gd` - never edit by hand, and do not draw it into the item art. |
-| `assets/items/hotspots_juice_carton.png` | 160x160 | static | Hotspot rings for `juice_carton`. **Generated from `data/items/juice_carton.tres`** by `tools/gen_hotspot_overlays.gd` - never edit by hand, and do not draw it into the item art. |
-| `assets/items/hotspots_eco_tote.png` | 160x160 | static | Hotspot rings for `eco_tote`. **Generated from `data/items/eco_tote.tres`** by `tools/gen_hotspot_overlays.gd` - never edit by hand, and do not draw it into the item art. |
-| `assets/items/hotspots_paper_cup.png` | 160x160 | static | Hotspot rings for `paper_cup`. **Generated from `data/items/paper_cup.tres`** by `tools/gen_hotspot_overlays.gd` - never edit by hand, and do not draw it into the item art. |
-| `assets/items/hotspots_spray_can.png` | 160x160 | static | Hotspot rings for `spray_can`. **Generated from `data/items/spray_can.tres`** by `tools/gen_hotspot_overlays.gd` - never edit by hand, and do not draw it into the item art. |
-| `assets/items/hotspots_glass_jar.png` | 160x160 | static | Hotspot rings for `glass_jar`. **Generated from `data/items/glass_jar.tres`** by `tools/gen_hotspot_overlays.gd` - never edit by hand, and do not draw it into the item art. |
-| `assets/items/hotspots_fishing_net.png` | 160x160 | static | Hotspot rings for `fishing_net`. **Generated from `data/items/fishing_net.tres`** by `tools/gen_hotspot_overlays.gd` - never edit by hand, and do not draw it into the item art. |
+| `assets/ui/blueprint_bg_cleaner_drone.png` | 960x540 | static | Blueprint schematic sheet for `cleaner_drone`. Parts sit on top from normalized coords in the .tres. |
+| `assets/ui/blueprint_bg_penyaring_mikroplastik.png` | 960x540 | static | Blueprint schematic sheet for `penyaring_mikroplastik`. Parts sit on top from normalized coords in the .tres. |
+| `assets/ui/blueprint_bg_penetral_b3.png` | 960x540 | static | Blueprint schematic sheet for `penetral_b3`. Parts sit on top from normalized coords in the .tres. |
+| `assets/ui/comp_drone_body_done.png` | 128x128 | static | Blueprint component `drone_body`, done. |
+| `assets/ui/comp_drone_body_locked.png` | 128x128 | static | Blueprint component `drone_body`, locked. |
+| `assets/ui/comp_bio_core_done.png` | 128x128 | static | Blueprint component `bio_core`, done. |
+| `assets/ui/comp_bio_core_locked.png` | 128x128 | static | Blueprint component `bio_core`, locked. |
+| `assets/ui/comp_intake_fin_done.png` | 128x128 | static | Blueprint component `intake_fin`, done. |
+| `assets/ui/comp_intake_fin_locked.png` | 128x128 | static | Blueprint component `intake_fin`, locked. |
+| `assets/ui/comp_filter_mesh_done.png` | 128x128 | static | Blueprint component `filter_mesh`, done. |
+| `assets/ui/comp_filter_mesh_locked.png` | 128x128 | static | Blueprint component `filter_mesh`, locked. |
+| `assets/ui/comp_pump_housing_done.png` | 128x128 | static | Blueprint component `pump_housing`, done. |
+| `assets/ui/comp_pump_housing_locked.png` | 128x128 | static | Blueprint component `pump_housing`, locked. |
+| `assets/ui/comp_collection_tank_done.png` | 128x128 | static | Blueprint component `collection_tank`, done. |
+| `assets/ui/comp_collection_tank_locked.png` | 128x128 | static | Blueprint component `collection_tank`, locked. |
+| `assets/ui/comp_sealed_chamber_done.png` | 128x128 | static | Blueprint component `sealed_chamber`, done. |
+| `assets/ui/comp_sealed_chamber_locked.png` | 128x128 | static | Blueprint component `sealed_chamber`, locked. |
+| `assets/ui/comp_neutralizer_cell_done.png` | 128x128 | static | Blueprint component `neutralizer_cell`, done. |
+| `assets/ui/comp_neutralizer_cell_locked.png` | 128x128 | static | Blueprint component `neutralizer_cell`, locked. |
+| `assets/ui/comp_safety_valve_done.png` | 128x128 | static | Blueprint component `safety_valve`, done. |
+| `assets/ui/comp_safety_valve_locked.png` | 128x128 | static | Blueprint component `safety_valve`, locked. |
+| `assets/items/hotspots_banana_peel.png` | 160x160 | static | Hotspot rings for `banana_peel`. **Generated from `data/items/banana_peel.tres`**, don't edit by hand. |
+| `assets/items/hotspots_fish_bone.png` | 160x160 | static | Hotspot rings for `fish_bone`. **Generated from `data/items/fish_bone.tres`**, don't edit by hand. |
+| `assets/items/hotspots_pet_bottle.png` | 160x160 | static | Hotspot rings for `pet_bottle`. **Generated from `data/items/pet_bottle.tres`**, don't edit by hand. |
+| `assets/items/hotspots_alu_can.png` | 160x160 | static | Hotspot rings for `alu_can`. **Generated from `data/items/alu_can.tres`**, don't edit by hand. |
+| `assets/items/hotspots_styrofoam_tray.png` | 160x160 | static | Hotspot rings for `styrofoam_tray`. **Generated from `data/items/styrofoam_tray.tres`**, don't edit by hand. |
+| `assets/items/hotspots_car_battery.png` | 160x160 | static | Hotspot rings for `car_battery`. **Generated from `data/items/car_battery.tres`**, don't edit by hand. |
+| `assets/items/hotspots_oil_jerrycan.png` | 160x160 | static | Hotspot rings for `oil_jerrycan`. **Generated from `data/items/oil_jerrycan.tres`**, don't edit by hand. |
+| `assets/items/hotspots_paint_bottle.png` | 160x160 | static | Hotspot rings for `paint_bottle`. **Generated from `data/items/paint_bottle.tres`**, don't edit by hand. |
+| `assets/items/hotspots_juice_carton.png` | 160x160 | static | Hotspot rings for `juice_carton`. **Generated from `data/items/juice_carton.tres`**, don't edit by hand. |
+| `assets/items/hotspots_eco_tote.png` | 160x160 | static | Hotspot rings for `eco_tote`. **Generated from `data/items/eco_tote.tres`**, don't edit by hand. |
+| `assets/items/hotspots_paper_cup.png` | 160x160 | static | Hotspot rings for `paper_cup`. **Generated from `data/items/paper_cup.tres`**, don't edit by hand. |
+| `assets/items/hotspots_spray_can.png` | 160x160 | static | Hotspot rings for `spray_can`. **Generated from `data/items/spray_can.tres`**, don't edit by hand. |
+| `assets/items/hotspots_glass_jar.png` | 160x160 | static | Hotspot rings for `glass_jar`. **Generated from `data/items/glass_jar.tres`**, don't edit by hand. |
+| `assets/items/hotspots_fishing_net.png` | 160x160 | static | Hotspot rings for `fishing_net`. **Generated from `data/items/fishing_net.tres`**, don't edit by hand. |
 
-_134 PNGs, 86 animations across 31 SpriteFrames resources._
-_Hotspot overlays are generated separately — see above._
-_Regenerate with_ `python3 tools/gen_placeholders.py`.
+## The font — the one thing that is not a PNG yet
+
+Every visual in the table above is a file you can replace. Text is not: the game
+currently renders with **Godot's built-in font**, because no typeface has been
+chosen. That is the only pixel on screen that is not yours yet.
+
+To claim it, drop a `.ttf` or `.otf` at `assets/ui/fonts/ui_font.ttf`, then add
+one line to `assets/ui/ui_theme.tres` under `[resource]`:
+
+    default_font = ExtResource("<the font's id>")
+
+Sizes stay where they are (`default_font_size = 18`, buttons 20) so nothing
+re-lays out. Pick something that reads at 18px — this is a text-heavy game.
+
+Regenerate placeholders with `python3 tools/gen_placeholders.py`. Hotspot
+overlays are separate, see above.

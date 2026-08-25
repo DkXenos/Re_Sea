@@ -1,7 +1,6 @@
-## Verifies the ocean-health arithmetic, term by term, against the revision 1
-## formula:
-##   health += correct*2 - wrong*4 - max(0, quota-sorted)*3 + clean_day_bonus
-##   godot --headless --script tools/smoke/smoke_report.gd
+# ocean health arithmetic, term by term:
+#   health += correct*2 - wrong*4 - max(0, quota-sorted)*3 + clean_day_bonus
+#   godot --headless --script tools/smoke/smoke_report.gd
 extends SceneTree
 
 

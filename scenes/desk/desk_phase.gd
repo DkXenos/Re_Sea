@@ -1,8 +1,5 @@
-## Phase B. Open the inventory, inspect an item, decide which bin it belongs in.
-##
-## The tension is not "which bin" - it is "is this item worth spending a tool
-## charge on?" Bins are always clickable, tools are always spendable, and
-## nothing here tells the player whether they were right.
+# inventory, inspect, pick a bin. bins are always clickable and nothing here
+# ever says whether you got it right.
 extends Node2D
 
 @onready var _inventory: Control = $UiLayer/Root/InventoryPanel
@@ -31,7 +28,7 @@ func _ready() -> void:
 	_inventory.select_first()
 
 
-## Only the debug command that needs the currently inspected item lands here.
+# only the debug command that needs the inspected item
 func _on_debug_command(command: StringName, _arg: Variant) -> void:
 	match command:
 		&"reveal_all":
@@ -43,8 +40,7 @@ func _on_debug_command(command: StringName, _arg: Variant) -> void:
 			_inventory.select_first()
 
 
-## The desk is a view inside the shift, not a phase: it never decides that the
-## day is over, and it keeps its state when the player switches to the tank.
+# a view inside the shift, not a phase. keeps its state across tab switches.
 func set_view_active(active: bool) -> void:
 	_active = active
 	for child in get_children():
@@ -66,14 +62,12 @@ func _unhandled_input(event: InputEvent) -> void:
 		_rulebook.toggle(not _rulebook.visible)
 		get_viewport().set_input_as_handled()
 	elif event.is_action_pressed(&"inventory"):
-		# The grid is always on screen here, so this is a shortcut to the next
-		# unsorted item rather than a panel toggle.
+		# grid is always up, so this jumps to the next unsorted one
 		_inventory.select_first()
 		get_viewport().set_input_as_handled()
 
 
-## Null means the inventory holds nothing a bin would take - either everything
-## is sorted, or the only things left are sealed boxes waiting to be opened.
+# null = nothing left a bin would take (or only sealed boxes)
 func _on_item_selected(entry: CarriedItem) -> void:
 	if entry == null:
 		_inspect.clear()
@@ -93,8 +87,7 @@ func _on_bin_chosen(category: int) -> void:
 		Events.sfx_requested.emit(&"bin_reject")
 		_show_toast(Strings.t("budget_too_low"))
 		return
-	# The verdict is recorded but deliberately not shown. The day report is
-	# where the player finds out, and that delay is the point.
+	# recorded but not shown. they find out at the day report.
 	var correct := RuleChecker.judge(entry, category, _day.active_rules)
 	Game.stats["sorted"] = int(Game.stats.get("sorted", 0)) + 1
 	var key := "correct" if correct else "wrong"

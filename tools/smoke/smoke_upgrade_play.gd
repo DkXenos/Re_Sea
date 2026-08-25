@@ -1,10 +1,8 @@
-## Revision 3 §6: the day-1 upgrades measurably change play, proved by PLAYING
-## rather than by reading the resource.
-##
-## Revision 2's tier check passed while the tier never once fired in a real run,
-## because the check set health by hand. This drives the real ShiftPhase scene:
-## the same seed, the same drops, the only difference being what is fitted.
-##   godot --headless --script tools/smoke/smoke_upgrade_play.gd
+# the day-1 upgrades measurably change play, by PLAYING not by reading the
+# resource. the old tier check passed for ages while the tier never once fired
+# in a real run, because it set health by hand. this drives the real
+# ShiftPhase: same seed, same drops, only difference is what's fitted.
+#   godot --headless --script tools/smoke/smoke_upgrade_play.gd
 extends SceneTree
 
 const SEED := 8080

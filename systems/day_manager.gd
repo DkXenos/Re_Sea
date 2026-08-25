@@ -1,17 +1,5 @@
-## The flow graph, kept out of main.gd so the scene switcher stays a switcher.
-## Advancing the day is a deliberate state change made here, in one place.
-##
-##   main_menu -> cutscene -> day_start -> shift -> report -> after_day
-##                                  ^                              |
-##                                  +---------- next day ----------+
-##
-## Revision 2 inserted a screen that fired only when a blueprint happened to
-## complete, which meant most days showed none of the meta systems at all.
-## Revision 3 replaced it with `after_day`, entered every single day.
-##
-## Revision 1 collapsed `claw` and `desk` into one `shift`: they are sibling
-## views inside it, switchable at any time, sharing one budget and one
-## inventory. They are no longer phases and no longer appear here.
+# flow graph. kept out of main.gd so that stays a plain scene switcher.
+# menu -> cutscene -> day_start -> shift -> report -> after_day -> day_start...
 class_name DayManager
 extends RefCounted
 
@@ -27,9 +15,7 @@ static func advance_from(key: StringName) -> StringName:
 	return &"main_menu"
 
 
-## The ocean bottoming out ends the run immediately; otherwise the run ends
-## after the last day. Both land on the same scene, which reads
-## Game.ocean_health to decide whether it is a loss or a win.
+# same scene for win and lose, it reads ocean_health to work out which
 static func _after_day() -> StringName:
 	if Game.is_game_over() or Game.is_last_day():
 		return &"game_over"

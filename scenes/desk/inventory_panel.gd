@@ -1,22 +1,19 @@
-## The grid of everything the claw brought up today. Cards are built from
-## Game.unsorted_items() so nothing here knows how items got into the tank.
+# grid of what the claw brought up. built off Game.unsorted_items().
 extends Control
 
 signal item_selected(entry: CarriedItem)
 
 const SLOT_BG := preload("res://assets/ui/panel_slot.png")
-## Selection is a different PNG, not a tint on the plain one (rev 3 §1.4).
+# selected is a separate png, not a tint
 const SLOT_BG_SELECTED := preload("res://assets/ui/panel_slot_selected.png")
 
-## The box is authored at 160x160 like every item and read at 64x64 on its card.
-## One named constant, quoted in ASSETS.md, the way the other three display
-## scales are (rev 3 §1.5).
+# 160x160 art at 64x64 on the card
 const BOX_CARD_SCALE := 0.4
-## How long the opened crate is on screen before the card fades, and how long
-## the fade takes. UI feedback only - revision 4 §1 allows a fade on the card
-## and on nothing in the tank.
+# card fade only. don't fade anything in the tank.
 const OPEN_HOLD := 0.35
 const OPEN_FADE := 0.35
+# TODO opening 2 boxes fast makes both cards fade at once and it looks like a
+# bug. should probably queue them.
 
 @onready var _grid: GridContainer = $Scroll/Grid
 @onready var _title: Label = $Title
@@ -44,7 +41,7 @@ func _make_card(entry: CarriedItem) -> Control:
 	card.custom_minimum_size = Vector2(250, 84)
 
 	var bg := NinePatchRect.new()
-	# Selection is a different PNG, not a tint (rev 3 §1.4).
+	# different png again, not a tint
 	bg.texture = SLOT_BG_SELECTED if entry == _selected else SLOT_BG
 	for side: String in ["left", "top", "right", "bottom"]:
 		bg.set("patch_margin_" + side, 24)
@@ -52,9 +49,8 @@ func _make_card(entry: CarriedItem) -> Control:
 	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	card.add_child(bg)
 
-	# The icon and the text live in a container. Setting a Label's size by hand
-	# does not survive contact with the layout: it kept one line and ran off the
-	# card, so a three-word property line was cut mid-word.
+	# has to be a container. setting the label size by hand doesn't survive the
+	# layout pass and the property line runs off the card mid-word.
 	var columns := HBoxContainer.new()
 	columns.set_anchors_preset(Control.PRESET_FULL_RECT)
 	columns.offset_left = 8
@@ -73,9 +69,7 @@ func _make_card(entry: CarriedItem) -> Control:
 	icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	columns.add_child(icon)
 
-	# Revision 2 §3: an item names itself only once the player has earned the
-	# name. Until then the card lists what can be observed, so choosing what to
-	# inspect is a judgement about properties rather than a look-up by label.
+	# name only shows once it's earned, properties until then
 	var known := entry.name_known()
 	var label := Label.new()
 	label.text = entry.label()
@@ -88,7 +82,7 @@ func _make_card(entry: CarriedItem) -> Control:
 		label.add_theme_color_override("font_color", Color(0.78, 0.84, 0.9))
 	columns.add_child(label)
 
-	# Invisible hit area; the visible card is the PNG panel plus the item PNG.
+	# invisible hit area over the card
 	var button := Button.new()
 	button.flat = true
 	button.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -100,12 +94,7 @@ func _make_card(entry: CarriedItem) -> Control:
 	return card
 
 
-## A sealed box (revision 4 §2). It is a card like any other, but it has no bin
-## buttons and no inspect tools: its one interaction is Buka.
-##
-## The crate is an AnimatedSprite2D from the start, playing `closed` and then
-## `opened`, so the two states are two drawings and the designers add frames
-## without touching this scene. Nothing here tints anything.
+# sealed box. same card, but no bins and no tools - only Buka.
 func _make_box_card(entry: CarriedItem) -> Control:
 	var card := Control.new()
 	card.custom_minimum_size = Vector2(250, 84)
@@ -144,13 +133,9 @@ func _make_box_card(entry: CarriedItem) -> Control:
 	return card
 
 
-## Buka. The crate swaps to its opened drawing, the card fades out, and the
-## contents take its place in the list.
-##
-## The state change hangs off a SceneTree timer rather than off the tween: the
-## panel rebuilds itself whenever the player switches back to the desk, and a
-## tween whose target had been freed would leave the box open on screen and
-## unopened in the inventory.
+# scene tree timer, NOT the tween. the panel rebuilds itself when you switch
+# back to the desk and a tween on a freed node leaves the box open on screen
+# but still unopened in the inventory.
 func _on_open_pressed(entry: CarriedItem, card: Control, crate: AnimatedSprite2D,
 		button: Button) -> void:
 	if entry.opened:
@@ -175,8 +160,7 @@ func _finish_open(entry: CarriedItem) -> void:
 		select_first()
 
 
-## The first thing a bin would actually take. A sealed box sits in the list but
-## can never be sorted, so the desk never opens on one.
+# first thing a bin would take, so the desk never opens on a sealed box
 func select_first() -> void:
 	var entries := Game.sortable_items()
 	_selected = entries[0] if not entries.is_empty() else null
@@ -184,8 +168,7 @@ func select_first() -> void:
 	item_selected.emit(_selected)
 
 
-## queue_free() alone leaves the old children in the tree for the rest of the
-## frame, so a list rebuilt twice in one frame would briefly show both sets.
+# same deal as the other panels, queue_free isn't enough on its own
 func _clear(node: Node) -> void:
 	for child in node.get_children():
 		node.remove_child(child)

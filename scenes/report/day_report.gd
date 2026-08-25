@@ -1,13 +1,9 @@
-## The emotional payoff. Every mis-sorted item is shown with the property the
-## player did not check and the rule it broke, and only then does the ocean
-## meter move.
-##
-## Every term of the health formula is printed on its own line with its own
-## number. Showing only the final figure would make the number feel arbitrary;
-## the player has to be able to trace it.
+# every mis-sort with the property they didn't check and the rule it broke,
+# then the meter moves. every term of the formula gets its own line - just
+# showing the final number makes it feel made up.
 extends Node2D
 
-const METER_WIDTH := 320.0
+const METER_WIDTH := 320.0  # keep in sync with meter_bg.png
 
 @onready var _title: Label = $UiLayer/Root/TitleLabel
 @onready var _quota: Label = $UiLayer/Root/QuotaLabel
@@ -35,17 +31,13 @@ func _ready() -> void:
 	_build_breakdown()
 	_animate_meter()
 	Events.sfx_requested.emit(&"day_end")
-	# Committing here, after the numbers are on screen, keeps the report the
-	# single place the ocean meter can change - and, since revision 2, the
-	# single place the ocean's ART can change.
+	# commit after the numbers are up. this is the only place the meter moves.
 	var tier_before := Game.visual_tier
 	Game.commit_day_result(_result)
 	_show_tier_line(tier_before)
 
 
-## One quiet sentence when the ocean crosses a tier boundary, and nothing at
-## all when it does not. The restraint is deliberate: the meter moving a little
-## every day is the reward, and a fanfare would cheapen it.
+# one line on a tier change, nothing otherwise. no fanfare.
 func _show_tier_line(tier_before: int) -> void:
 	_tier_line.text = ""
 	if Game.visual_tier == tier_before:
@@ -64,7 +56,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 
 
-# ------------------------------------------------------------------- mistakes
+# mistakes
 
 func _build_mistakes() -> void:
 	var any := false
@@ -88,7 +80,7 @@ func _add_line(parent: Node, text: String, font_size: int, color: Color) -> void
 	MistakeView.add_line(parent, text, font_size, color)
 
 
-# ------------------------------------------------------------------ breakdown
+# breakdown
 
 func _build_breakdown() -> void:
 	_add_term(Strings.t("report_correct"), "%d x (+2)" % _result["correct"],

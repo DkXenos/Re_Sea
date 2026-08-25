@@ -1,15 +1,10 @@
-## One shift, two views. The tank and the desk are tabs of the same day rather
-## than sequential phases: they share one budget and one inventory, and the
-## player moves between them freely at no cost.
-##
-## Switching is free on purpose. The decision this game is built around is "grab
-## another item or examine the one already in hand", and that decision is only
-## real if looking at the desk does not itself cost anything.
+# one shift, two views. tank and desk are tabs, not phases - same budget,
+# same inventory, switching costs nothing.
 extends Node2D
 
 enum View { CLAW, DESK }
 
-const END_DELAY := 1.4
+const END_DELAY := 1.4  # 0.8 felt abrupt
 
 @onready var _claw_view: Node2D = $ClawView
 @onready var _desk_view: Node2D = $DeskView
@@ -68,16 +63,12 @@ func _refresh_bar() -> void:
 		int(Game.stats.get("sorted", 0)), _day.quota]
 	_budget_label.text = "%s %d / %d" % [Strings.t("budget_label"),
 		Game.budget_left, Game.budget_max]
-	# The tab button says where it goes, how much work is waiting there, and
-	# which key does it - strangers demoing this will not read a control list.
-	# Revision 3 §2.3: the ocean's state is a text label, not four sets of art.
-	# Revision 3 §4: the active upgrade and what it changed are on screen while
-	# playing, so its influence is legible in the shift rather than in a menu.
+	# tab button says where it goes, how much is waiting and which key. people
+	# demoing this won't read a control list.
 	var tier := Game.current_tier()
 	_ocean_label.text = Strings.tf("ocean_label",
 		{"v": tier.display_name if tier != null else "?", "n": Game.ocean_health})
-	# The costs come from Game either way, so the label can never disagree with
-	# what the shift actually charges.
+	# costs come from Game so the label can't disagree with what we charge
 	var costs := {"drop": Game.cost_of(&"drop"), "tool": Game.cost_of(&"tool"),
 		"sort": Game.cost_of(&"sort")}
 	var up := Game.upgrade()
@@ -96,9 +87,8 @@ func _refresh_bar() -> void:
 		_switch_button.tooltip_text = ""
 
 
-## The shift is over when the budget can no longer buy any useful action, or
-## when there is genuinely nothing left to do. Ending early with quota met is a
-## legitimate strategic choice, which is what the End Shift button is for.
+# over when the budget can't buy anything useful. ending early once quota is
+# met is fine, that's what the button is for.
 func _check_shift_over() -> void:
 	if _finished:
 		return

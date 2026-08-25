@@ -1,11 +1,4 @@
-## Background atmosphere. Revision 1 removed every interaction: no Area2D, no
-## collision, no grab, no penalty. Punishing the player for something that was
-## never a decision read as unfair and the system bought nothing; as background,
-## fish carry the underwater feel the designers' art will live in.
-##
-## Motion is a sine drift driven by game state, which §1 allows. The fish itself
-## is an AnimatedSprite2D playing "swim" - nothing about how it looks is decided
-## here.
+# background only. no area2d, no collision, you can't grab these.
 extends Node2D
 
 var speed: float = 55.0
@@ -20,10 +13,8 @@ var _t: float = 0.0
 @onready var sprite: AnimatedSprite2D = $Sprite
 
 
-## depth 0 = far, 1 = near. Depth picks WHICH fish swims here - the three sizes
-## are three different PNGs - and how fast and how far it drifts. It never
-## scales or tints the sprite: that would be code deciding what the designers'
-## art looks like (rev 3 §1.4, §1.5).
+# depth 0 = far, 1 = near. picks speed and drift, never scale or tint - the
+# three sizes are three separate PNGs.
 func setup(frames: SpriteFrames, y: float, spd: float, dir: int, depth: float,
 		travel: Vector2) -> void:
 	if sprite == null:

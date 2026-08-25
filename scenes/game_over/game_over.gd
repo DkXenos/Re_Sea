@@ -1,5 +1,4 @@
-## One scene for both endings: the ocean meter decides which. Losing means the
-## meter bottomed out; surviving all five days is the win.
+# both endings, the meter decides which
 extends Node2D
 
 

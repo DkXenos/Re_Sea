@@ -1,11 +1,9 @@
-## Revision 3 §1.6 migration: ItemData no longer carries revealed_by_rinse /
-## _swab / _magnifier / _cutter. Which tool reveals what is the "tool" key on
-## each hotspot, which was always the value the game actually checked - the
-## booleans were a second, per-tool source of truth that a fifth tool would
-## have needed a code change to extend.
-##
-## Re-saving each item drops the dead keys from the .tres.
-##   godot --headless --script tools/migrations/r3_drop_revealed_by.gd
+# one-off: kill revealed_by_rinse/_swab/_magnifier/_cutter off ItemData. which
+# tool reveals what is the "tool" key on the hotspot, which is what the game
+# was checking anyway - the booleans were a second source of truth and a fifth
+# tool would have needed a code change.
+# re-saving each item drops the dead keys.
+#   godot --headless --script tools/migrations/r3_drop_revealed_by.gd
 extends SceneTree
 
 

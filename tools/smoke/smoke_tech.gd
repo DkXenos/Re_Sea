@@ -1,12 +1,11 @@
-## Revision 4 §3: the material pool and the component crafting built on it.
-##
-## Two jobs. First the rules that must never bend - the pool is spendable, it
-## never goes negative, a short craft is refused with the shortfall named, and a
-## fourth component is a .tres and no code. Then the tuning question the brief
-## refused to let anyone guess at: does a real five-day run actually SUPPLY the
-## authored requirements, and by which day.
-##   godot --headless --script tools/smoke/smoke_tech.gd
-##   godot --headless --script tools/smoke/smoke_tech.gd -- --supply
+# material pool + component crafting.
+#
+# two jobs. the rules that can't bend (pool is spendable, never negative, short
+# craft refused with the shortfall named, 4th component is a .tres and no
+# code), then the tuning question: does a real 5-day run actually supply what
+# the components cost, and by which day.
+#   godot --headless --script tools/smoke/smoke_tech.gd
+#   godot --headless --script tools/smoke/smoke_tech.gd -- --supply
 extends SceneTree
 
 const EXTRA_PATH := "res://data/components/_tmp_fourth_part.tres"
@@ -181,7 +180,7 @@ func _check_unlocks_a_tool() -> void:
 	print("  three blueprints open three Peralatan entries, each equippable")
 
 
-## The central claim of §3's data model: a fourth part is a .tres.
+# the whole point of the data model: a fourth part is a .tres, nothing else
 func _check_fourth_component_needs_no_code() -> void:
 	game.start_run(9182)
 	var bp: BlueprintData = game.blueprints[0]
