@@ -13,9 +13,9 @@ extends CanvasLayer
 signal finished()
 
 const STEP_ROW := preload("res://scenes/puzzle/step_row.tscn")
-# flat bonus outside the day formula, so this can't touch the health maths.
+# flat budget bonus, kept outside the day formula so it stays self-contained.
 # failing costs nothing.
-const HEALTH_BONUS := 2
+const BUDGET_BONUS := 4
 
 # reasons are index pairs into the correct order - if `before` ends up ahead
 # of `after`, that's the line they get. say what actually goes wrong, not
@@ -143,9 +143,12 @@ func _on_run() -> void:
 		_solved = true
 		_run.disabled = true
 		_skip.text = Strings.t("puzzle_continue")
-		_message.text = Strings.tf("puzzle_success", {"n": HEALTH_BONUS})
+		# health is gone, so a solved machine pays in the resource that is left
+		Game.budget_left += BUDGET_BONUS
+		Game.budget_max += BUDGET_BONUS
+		Events.budget_changed.emit(Game.budget_left, Game.budget_max)
+		_message.text = Strings.tf("puzzle_success", {"n": BUDGET_BONUS})
 		_message.add_theme_color_override("font_color", Color(0.6, 0.92, 0.72))
-		Game.set_ocean_health(Game.ocean_health + HEALTH_BONUS)
 		Events.sfx_requested.emit(&"bin_accept")
 		return
 	_message.text = _failure_line()

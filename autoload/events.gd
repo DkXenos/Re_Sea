@@ -16,7 +16,8 @@ signal item_sorted(entry: CarriedItem, chosen: int, correct: bool)
 signal container_opened(box: CarriedItem, contents: Array)
 signal rulebook_toggled(open: bool)
 
-signal ocean_health_changed(value: int)
+## the seabed moved to a new tier - one blueprint built, one step healthier
+signal ocean_tier_changed(tier: int)
 signal sfx_requested(sfx_name: StringName)
 signal vfx_intensity_changed(value: float)
 signal hotspots_visible_changed(value: bool)

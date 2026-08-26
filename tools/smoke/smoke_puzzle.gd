@@ -2,7 +2,7 @@
 #   1. the flag really gates it, false = no puzzle ever built
 #   2. order check works, failing is free, retry is immediate
 #
-# the "run with the flag off ends at the same health" half is in run_all.sh -
+# the "run with the flag off ends at the same tier" half is in run_all.sh -
 # it runs the whole game twice on one seed and diffs the ending.
 #   godot --headless --script tools/smoke/smoke_puzzle.gd
 extends SceneTree
@@ -64,11 +64,8 @@ func _check_sequence(blueprint_id: StringName) -> void:
 		"dropping one row on another must swap them")
 	print("  %s drag reorder works: %s -> %s" % [blueprint_id, before, puzzle._order])
 
-	# Away from the ceiling, so a +2 bonus is actually visible.
-	game.set_ocean_health(50)
-	# Wrong order: a readable line that is not the generic fallback, no health
-	# change, and the puzzle stays open for another try.
-	var health_before: int = game.ocean_health
+	# Wrong order: a readable line that is not the generic fallback, no reward,
+	# and the puzzle stays open for another try.
 	var budget_before: int = game.budget_left
 	var backwards: Array[int] = [3, 2, 1, 0]
 	puzzle._order = backwards
@@ -78,8 +75,7 @@ func _check_sequence(blueprint_id: StringName) -> void:
 	assert(failure != "", "a wrong order must say something")
 	assert(failure != Strings.t("puzzle_wrong"),
 		"a wrong order must explain WHY, not just that it is wrong")
-	assert(game.ocean_health == health_before, "failing must cost no health")
-	assert(game.budget_left == budget_before, "failing must cost no shift budget")
+	assert(game.budget_left == budget_before, "failing must pay no shift budget")
 	assert(not puzzle._solved, "a failed run must be retryable")
 
 	# Right order: the flat bonus, once.
@@ -87,13 +83,12 @@ func _check_sequence(blueprint_id: StringName) -> void:
 	puzzle._order = correct
 	puzzle._on_run()
 	assert(puzzle._solved, "the correct order must solve it")
-	assert(game.ocean_health == health_before + puzzle.HEALTH_BONUS,
-		"solving pays the flat bonus and nothing else")
-	assert(game.budget_left == budget_before, "solving must not touch the shift budget")
+	assert(game.budget_left == budget_before + puzzle.BUDGET_BONUS,
+		"solving pays the flat budget bonus")
 	puzzle._on_run()
-	assert(game.ocean_health == health_before + puzzle.HEALTH_BONUS,
+	assert(game.budget_left == budget_before + puzzle.BUDGET_BONUS,
 		"the bonus must not be payable twice")
-	print("  %s solved: health %+d, budget untouched" % [blueprint_id, puzzle.HEALTH_BONUS])
+	print("  %s solved: shift budget %+d, paid once" % [blueprint_id, puzzle.BUDGET_BONUS])
 
 	puzzle._close()
 	await process_frame

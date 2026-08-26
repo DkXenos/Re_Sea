@@ -1,13 +1,13 @@
-# both endings, the meter decides which
+# three endings, decided by how many machines were built - nothing else.
 extends Node2D
 
 
 func _ready() -> void:
-	var lost := Game.is_game_over()
+	var kind := Game.ending_kind()
 	var root := $UiLayer/Root
-	root.get_node("TitleLabel").text = Strings.t("over_title") if lost else Strings.t("win_title")
-	root.get_node("BodyLabel").text = Strings.t("over_body") if lost \
-		else Strings.tf("win_body", {"n": Game.ocean_health})
+	root.get_node("TitleLabel").text = Strings.t("end_%s_title" % kind)
+	root.get_node("BodyLabel").text = Strings.tf("end_%s_body" % kind,
+		{"have": Game.unlocked_blueprints.size(), "need": Game.blueprints.size()})
 	var retry: Button = root.get_node("Buttons/RetryButton")
 	var menu: Button = root.get_node("Buttons/MenuButton")
 	retry.text = Strings.t("over_retry")

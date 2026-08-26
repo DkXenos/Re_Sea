@@ -15,6 +15,4 @@ flavour_text = "Menyaring serpihan plastik kecil dari air, lalu mengumpulkannya 
 components = Array[ExtResource("1_comp")]([ExtResource("2_c0"), ExtResource("3_c1"), ExtResource("4_c2")])
 background = ExtResource("8_bg")
 unlocks_upgrade = &"cengkeraman_kuat"
-health_gain = 10
-forces_tier = -1
 sort_order = 1

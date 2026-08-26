@@ -127,9 +127,8 @@ func _build_result() -> void:
 			"bad": int(result.get("wrong", 0)), "left": unsorted}),
 		Strings.tf("after_budget", {"spent": int(Game.stats.get("spent", 0)),
 			"left": Game.budget_left, "max": Game.budget_max}),
-		Strings.tf("after_health", {"before": int(result.get("health_before", 0)),
-			"after": int(result.get("health_after", 0)),
-			"tier": tier.display_name if tier != null else "?"}),
+		Strings.tf("after_sea", {"tier": tier.display_name if tier != null else "?",
+			"have": Game.unlocked_blueprints.size(), "need": Game.blueprints.size()}),
 	])
 
 	_clear(_mistakes)
@@ -228,7 +227,9 @@ func _build_diagram(bp: BlueprintData) -> void:
 	_clear(_diagram)
 	if bp == null or bp.background == null:
 		return
-	var sheet := bp.background.get_size()
+	# the centrepiece is part of the sheet, so the sheet is what changes state
+	var sheet_texture := bp.sheet(Game.crafted, Game.blueprint_unlocked(bp.id))
+	var sheet := sheet_texture.get_size()
 	var box := _diagram.size
 	var scale_factor: float = minf(box.x / sheet.x, box.y / sheet.y)
 	var drawn := sheet * scale_factor
@@ -239,7 +240,7 @@ func _build_diagram(bp: BlueprintData) -> void:
 	background.stretch_mode = TextureRect.STRETCH_SCALE
 	background.custom_minimum_size = Vector2.ZERO
 	background.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	background.texture = bp.background
+	background.texture = sheet_texture
 	background.position = origin
 	background.size = drawn
 	_diagram.add_child(background)
@@ -294,8 +295,7 @@ func _refresh_craft_button(bp: BlueprintData) -> void:
 		_craft_button.text = Strings.t("tech_craft_done")
 		_craft_button.disabled = true
 	elif Game.blueprint_ready(bp):
-		_craft_button.text = Strings.tf("tech_craft",
-			{"v": bp.display_name, "n": bp.health_gain})
+		_craft_button.text = Strings.tf("tech_craft", {"v": bp.display_name})
 		_craft_button.disabled = false
 	else:
 		_craft_button.text = Strings.t("tech_craft_locked")

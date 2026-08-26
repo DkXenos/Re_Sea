@@ -36,17 +36,17 @@ func _build() -> void:
 	_button(list, "Grip: roll normally",
 		func() -> void: Events.debug_command.emit(&"force_grip", 0))
 
-	var health_row := HBoxContainer.new()
-	var health_field := LineEdit.new()
-	health_field.placeholder_text = "ocean health 0-100"
-	health_field.custom_minimum_size = Vector2(180, 0)
-	health_row.add_child(health_field)
-	var health_apply := Button.new()
-	health_apply.text = "Set"
-	health_apply.pressed.connect(func() -> void:
-		Events.debug_command.emit(&"set_health", int(health_field.text)))
-	health_row.add_child(health_apply)
-	list.add_child(health_row)
+	var tier_row := HBoxContainer.new()
+	var tier_field := LineEdit.new()
+	tier_field.placeholder_text = "seabed tier 0-3"
+	tier_field.custom_minimum_size = Vector2(180, 0)
+	tier_row.add_child(tier_field)
+	var tier_apply := Button.new()
+	tier_apply.text = "Set"
+	tier_apply.pressed.connect(func() -> void:
+		Events.debug_command.emit(&"set_tier", int(tier_field.text)))
+	tier_row.add_child(tier_apply)
+	list.add_child(tier_row)
 
 	var seed_row := HBoxContainer.new()
 	var seed_field: LineEdit = LineEdit.new()

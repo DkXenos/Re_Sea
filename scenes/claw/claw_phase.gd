@@ -25,7 +25,7 @@ const BG_CAMERA_PARALLAX := 0.04
 @export var seabed_width: float = 2600.0
 
 # atmosphere only, fish can't be grabbed.
-# TODO move this back onto OceanTierData.fish_count when the tier art exists
+# fallback only - OceanTierData.fish_count wins whenever a tier is loaded
 @export var fish_count: int = 9
 @export var fish_speed_min: float = 25.0
 @export var fish_speed_max: float = 65.0
@@ -34,6 +34,7 @@ const BG_CAMERA_PARALLAX := 0.04
 @onready var _bg_layer: CanvasLayer = $BgLayer
 @onready var _glass_layer: CanvasLayer = $GlassLayer
 @onready var _seabed: Sprite2D = $TankLayer/TankContainer/TankViewport/TankWorld/Seabed
+@onready var _decor: Node2D = $TankLayer/TankContainer/TankViewport/TankWorld/Decor
 @onready var _items: Node2D = $TankLayer/TankContainer/TankViewport/TankWorld/Items
 @onready var _fish: Node2D = $TankLayer/TankContainer/TankViewport/TankWorld/FishHolder
 @onready var _claw: Node2D = $TankLayer/TankContainer/TankViewport/TankWorld/Claw
@@ -80,6 +81,7 @@ func _ready() -> void:
 	Events.vfx_intensity_changed.connect(_rebuild_bubbles)
 	_hint.text = Strings.t("claw_hint")
 	_toast.text = ""
+	_dress_tank()
 	_spawn_items()
 	_spawn_fish()
 	_rebuild_bubbles(Game.vfx_intensity)
@@ -88,6 +90,10 @@ func _ready() -> void:
 # everything that depends on seabed width, in one place
 func _setup_tank() -> void:
 	# tile one PNG instead of asking for a 2600px asset every time this changes
+	# the tier decides which floor this is before the region is measured off it
+	var tier := Game.current_tier()
+	if tier != null and tier.seabed != null:
+		_seabed.texture = tier.seabed
 	_seabed.centered = false
 	_seabed.texture_repeat = CanvasItem.TEXTURE_REPEAT_ENABLED
 	_seabed.region_enabled = true
@@ -105,9 +111,6 @@ func _setup_tank() -> void:
 	_camera.position = Vector2(_claw.position.x, TANK_VIEW.y * 0.5)
 	_camera.reset_smoothing()
 
-
-# tier only drives one label right now. the seabed swap / water tint / coral
-# is all still unbuilt - the Decor node under the seabed is where it goes.
 
 # starts partly stocked and fills up. empty = waiting, full = no reason to
 # watch the tank.
@@ -175,12 +178,48 @@ func _update_spawning(delta: float) -> void:
 	_reset_spawn_timer()
 
 
+## Coral and debris for the current tier. Both are AnimatedSprite2D playing a
+## named animation from the tier's SpriteFrames - the tier swaps the resource,
+## never the colour, so a filthy seabed is different art rather than a tint.
+func _dress_tank() -> void:
+	_clear(_decor)
+	var tier := Game.current_tier()
+	if tier == null:
+		return
+	var margin := 90.0
+	var span := seabed_width - margin * 2.0
+	# coral sits on the floor, debris scatters just above it
+	# z_index on a child is relative to Decor's own -8, so these stay small:
+	# 0 and 1 land at -8 and -7, both above the Seabed at -10.
+	for spec: Array in [[tier.coral_count, tier.coral_frames, 0.0, 0],
+			[tier.debris_count, tier.debris_frames, 16.0, 1]]:
+		var count: int = int(spec[0])
+		var frames: SpriteFrames = spec[1]
+		if frames == null or count <= 0:
+			continue
+		var lane := span / float(count)
+		for i in count:
+			var node := AnimatedSprite2D.new()
+			node.sprite_frames = frames
+			node.z_index = int(spec[3])
+			# spread one per lane so they never stack into a clump
+			node.position = Vector2(
+				margin + lane * (float(i) + Game.rng.randf_range(0.2, 0.8)),
+				ITEM_REST_Y.y + float(spec[2]) + Game.rng.randf_range(-6.0, 10.0))
+			node.flip_h = Game.rng.randf() < 0.5
+			if frames.has_animation(&"idle"):
+				node.play(&"idle")
+			_decor.add_child(node)
+
+
 func _spawn_fish() -> void:
-	for i in fish_count:
+	var tier := Game.current_tier()
+	var count: int = tier.fish_count if tier != null else fish_count
+	for i in count:
 		var node: Node2D = FISH_SCENE.instantiate()
 		_fish.add_child(node)
 		var frames: SpriteFrames = load(FISH_FRAMES[i % FISH_FRAMES.size()])
-		var depth: float = float(i) / maxf(1.0, float(fish_count - 1))
+		var depth: float = float(i) / maxf(1.0, float(count - 1))
 		node.setup(frames,
 			Game.rng.randf_range(FISH_DEPTH_Y.x, FISH_DEPTH_Y.y),
 			Game.rng.randf_range(fish_speed_min, fish_speed_max),

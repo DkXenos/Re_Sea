@@ -129,7 +129,7 @@ check "smoke_shift day 1"  godot --headless --script tools/smoke/smoke_shift.gd 
 echo "Feature flag:"
 ending() {
   run_limited godot --headless --script tools/smoke/smoke_full.gd -- --seed "$1" "${@:2}" \
-    2>&1 | grep -o 'reached ending: health=[0-9]*'
+    2>&1 | grep -o 'reached ending: [a-z]* built=[0-9]*'
 }
 with=$(ending 20260823)
 without=$(ending 20260823 --no-puzzle)

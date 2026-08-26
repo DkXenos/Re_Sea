@@ -1,0 +1,351 @@
+<title>Cakar Laut Art Board</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Mono:wght@400;500;600&family=Public+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+
+<style>
+/* ---- tokens: complete light palette on bare :root ---- */
+:root{
+  --ground:#E7EDEB; --surface:#FCFDFD; --surface-2:#F1F5F4;
+  --ink:#0B1A20; --body:#243940; --muted:#5E7278; --faint:#8699A0;
+  --line:#CFD9D7; --line-soft:#E0E8E6;
+  --accent:#D24E13; --accent-ink:#FFFFFF; --accent-soft:#FBEAE1;
+  --marine:#1F7784; --marine-soft:#E0F0F1;
+  --check-a:#E4EAE8; --check-b:#F6F9F8;
+  --shadow:0 1px 2px rgba(11,26,32,.06), 0 8px 20px -14px rgba(11,26,32,.30);
+  --focus:#D24E13;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ground:#071219; --surface:#0E1F27; --surface-2:#132831;
+    --ink:#E2ECEB; --body:#B9CBCC; --muted:#7F959B; --faint:#647C83;
+    --line:#1C333D; --line-soft:#162A33;
+    --accent:#FF7539; --accent-ink:#25150C; --accent-soft:#2A1810;
+    --marine:#4FBACB; --marine-soft:#0E2B31;
+    --check-a:#12242C; --check-b:#0C1C23;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 24px -16px rgba(0,0,0,.75);
+    --focus:#FF7539;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#071219; --surface:#0E1F27; --surface-2:#132831;
+  --ink:#E2ECEB; --body:#B9CBCC; --muted:#7F959B; --faint:#647C83;
+  --line:#1C333D; --line-soft:#162A33;
+  --accent:#FF7539; --accent-ink:#25150C; --accent-soft:#2A1810;
+  --marine:#4FBACB; --marine-soft:#0E2B31;
+  --check-a:#12242C; --check-b:#0C1C23;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 24px -16px rgba(0,0,0,.75);
+  --focus:#FF7539;
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--ground); color:var(--body);
+  font-family:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:15px; line-height:1.55; -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3{font-family:"Bricolage Grotesque","Public Sans",system-ui,sans-serif;color:var(--ink);text-wrap:balance;margin:0}
+code,.mono{font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px;border-radius:4px}
+
+.wrap{max-width:1240px;margin:0 auto;padding:0 24px}
+
+/* ---- masthead ---- */
+header.top{border-bottom:1px solid var(--line);background:var(--surface)}
+.top .wrap{padding-top:38px;padding-bottom:30px;display:flex;flex-wrap:wrap;gap:28px;align-items:flex-end;justify-content:space-between}
+.brand{display:flex;flex-direction:column;gap:9px;min-width:0}
+.eyebrow{
+  font-family:"IBM Plex Mono",monospace;font-size:11.5px;font-weight:500;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--accent);
+  display:flex;align-items:center;gap:9px;
+}
+.eyebrow::before{content:"";width:22px;height:2px;background:var(--accent);flex:none}
+h1{font-size:clamp(30px,4.6vw,46px);font-weight:800;letter-spacing:-.022em;line-height:1.04}
+.lede{max-width:56ch;color:var(--muted);font-size:15.5px}
+.tally{display:flex;gap:26px;flex:none}
+.tally div{display:flex;flex-direction:column;gap:1px}
+.tally b{font-family:"Bricolage Grotesque",sans-serif;font-size:29px;font-weight:800;color:var(--ink);line-height:1;font-variant-numeric:tabular-nums}
+.tally span{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint)}
+
+/* ---- command bar ---- */
+.bar{position:sticky;top:0;z-index:20;background:var(--surface);border-bottom:1px solid var(--line)}
+.bar .wrap{display:flex;flex-wrap:wrap;gap:12px;align-items:center;padding-top:12px;padding-bottom:12px}
+.search{position:relative;flex:1 1 250px;min-width:200px}
+.search input{
+  width:100%;padding:9px 13px 9px 34px;border-radius:7px;
+  border:1px solid var(--line);background:var(--surface-2);color:var(--ink);
+  font-family:"IBM Plex Mono",monospace;font-size:13px;
+}
+.search input::placeholder{color:var(--faint)}
+.search svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);width:14px;height:14px;stroke:var(--faint);fill:none;stroke-width:2}
+.pills{display:flex;flex-wrap:wrap;gap:6px}
+.pill{
+  border:1px solid var(--line);background:transparent;color:var(--muted);
+  font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.04em;
+  padding:6px 11px;border-radius:999px;cursor:pointer;white-space:nowrap;
+}
+.pill:hover{border-color:var(--accent);color:var(--ink)}
+.pill[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.pill b{font-weight:500;opacity:.65;margin-left:5px}
+.toggle{
+  display:flex;align-items:center;gap:8px;border:1px solid var(--line);
+  border-radius:7px;padding:6px 11px;cursor:pointer;color:var(--muted);
+  font-family:"IBM Plex Mono",monospace;font-size:11.5px;white-space:nowrap;background:transparent;
+}
+.toggle[aria-pressed="true"]{border-color:var(--accent);color:var(--ink)}
+.toggle i{width:26px;height:15px;border-radius:999px;background:var(--line);position:relative;flex:none;transition:background .15s}
+.toggle i::after{content:"";position:absolute;top:2px;left:2px;width:11px;height:11px;border-radius:50%;background:var(--surface);transition:transform .15s}
+.toggle[aria-pressed="true"] i{background:var(--accent)}
+.toggle[aria-pressed="true"] i::after{transform:translateX(11px)}
+
+/* ---- primer ---- */
+.primer{padding:26px 0 4px}
+.primer .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(258px,1fr));gap:14px}
+.note{background:var(--surface);border:1px solid var(--line-soft);border-left:2px solid var(--accent);border-radius:8px;padding:14px 16px}
+.note.sea{border-left-color:var(--marine)}
+.note h3{font-size:13.5px;font-weight:600;letter-spacing:-.01em;margin-bottom:4px}
+.note p{margin:0;font-size:13.5px;color:var(--muted)}
+
+/* ---- groups ---- */
+section.group{padding:34px 0 6px;scroll-margin-top:70px}
+.ghead{display:flex;flex-wrap:wrap;gap:14px 22px;align-items:baseline;border-bottom:1px solid var(--line);padding-bottom:13px;margin-bottom:20px}
+.ghead h2{font-size:23px;font-weight:700;letter-spacing:-.018em}
+.gcount{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--faint);letter-spacing:.1em;text-transform:uppercase}
+.gnote{flex:1 1 340px;min-width:0;color:var(--muted);font-size:14px}
+.gnote em{color:var(--body);font-style:normal;border-bottom:1px dotted var(--faint)}
+.gwarn{display:block;margin-top:3px;color:var(--accent);font-size:13px}
+
+.grid-a{display:grid;grid-template-columns:repeat(auto-fill,minmax(196px,1fr));gap:14px}
+
+/* ---- tile ---- */
+.tile{background:var(--surface);border:1px solid var(--line-soft);border-radius:9px;overflow:hidden;display:flex;flex-direction:column;box-shadow:var(--shadow)}
+.plate{
+  position:relative;display:grid;place-items:center;padding:14px;min-height:132px;
+  background-color:var(--check-b);
+  background-image:
+    linear-gradient(45deg,var(--check-a) 25%,transparent 25%,transparent 75%,var(--check-a) 75%),
+    linear-gradient(45deg,var(--check-a) 25%,transparent 25%,transparent 75%,var(--check-a) 75%);
+  background-size:14px 14px; background-position:0 0,7px 7px;
+  border-bottom:1px solid var(--line-soft);
+}
+.plate img{max-width:100%;max-height:118px;display:block;image-rendering:auto}
+body.actual .plate{overflow:auto;justify-items:start}
+body.actual .plate img{max-width:none;max-height:none}
+.meta{padding:11px 12px 12px;display:flex;flex-direction:column;gap:7px;flex:1}
+.fname{
+  font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:500;color:var(--ink);
+  background:none;border:0;padding:0;text-align:left;cursor:pointer;word-break:break-all;line-height:1.35;
+}
+.fname:hover{color:var(--accent)}
+.fname .cp{color:var(--faint);font-size:10px;margin-left:5px;opacity:0;transition:opacity .12s}
+.fname:hover .cp,.fname:focus-visible .cp{opacity:1}
+.desc{font-size:12.5px;color:var(--muted);margin:0;flex:1}
+.desc code{font-size:11.5px;color:var(--body);background:var(--surface-2);padding:1px 4px;border-radius:3px}
+.chips{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.chip{
+  font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.05em;
+  padding:2.5px 7px;border-radius:4px;border:1px solid var(--line);color:var(--muted);white-space:nowrap;
+}
+.chip.size{color:var(--ink);border-color:var(--line);background:var(--surface-2);font-weight:500}
+.chip.cut{color:var(--marine);border-color:var(--marine);background:var(--marine-soft)}
+.chip.opq{color:var(--accent);border-color:var(--accent);background:var(--accent-soft)}
+.chip.np{color:var(--accent);border-color:var(--accent);background:var(--accent-soft)}
+.chip.an{color:var(--muted)}
+
+.empty{padding:46px 0;text-align:center;color:var(--faint);font-family:"IBM Plex Mono",monospace;font-size:13px}
+footer{margin-top:44px;border-top:1px solid var(--line);background:var(--surface)}
+footer .wrap{padding:24px 24px 40px;color:var(--faint);font-size:12.5px;display:flex;flex-wrap:wrap;gap:8px 26px}
+footer code{color:var(--muted);font-size:12px}
+
+#toast{
+  position:fixed;left:50%;bottom:26px;transform:translate(-50%,14px);
+  background:var(--ink);color:var(--ground);font-family:"IBM Plex Mono",monospace;font-size:12px;
+  padding:9px 15px;border-radius:7px;opacity:0;pointer-events:none;transition:opacity .16s,transform .16s;z-index:60;
+}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+@media (max-width:640px){
+  .top .wrap{padding-top:28px;padding-bottom:22px}
+  .tally{gap:18px}
+  .grid-a{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+}
+</style>
+
+<header class="top">
+  <div class="wrap">
+    <div class="brand">
+      <div class="eyebrow">Cakar Laut &middot; art sourcing</div>
+      <h1>Every picture in the game</h1>
+      <p class="lede">The current placeholder for each file, at the exact size the game reads it.
+      Find a replacement, save it under the same filename, run the installer.</p>
+    </div>
+    <div class="tally">
+      <div><b>__TOTAL__</b><span>files</span></div>
+      <div><b id="tCut">0</b><span>cut&#8209;out</span></div>
+      <div><b id="tOpq">0</b><span>opaque</span></div>
+    </div>
+  </div>
+</header>
+
+<div class="bar">
+  <div class="wrap">
+    <label class="search">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg>
+      <input id="q" type="search" placeholder="filter by filename or description" aria-label="Filter assets">
+    </label>
+    <div class="pills" id="pills"></div>
+    <button class="toggle" id="actual" aria-pressed="false">
+      <i aria-hidden="true"></i> actual size
+    </button>
+  </div>
+</div>
+
+<main class="wrap">
+  <div class="primer">
+    <div class="grid">
+      <div class="note">
+        <h3>Anything on a checkerboard needs a transparent background</h3>
+        <p>The squares behind a picture are the page showing you there is nothing there. A JPEG has no
+        transparency, so a JPEG of a bottle gives you a bottle on a white rectangle.</p>
+      </div>
+      <div class="note">
+        <h3>9&#8209;slice files get stretched</h3>
+        <p>Corners stay put, the middle stretches to fill a button or panel. A photograph smears. Use a plain
+        frame or a flat texture with nothing important in the middle.</p>
+      </div>
+      <div class="note sea">
+        <h3>Size is a target, not a requirement</h3>
+        <p>Drop in any resolution. The installer scales and centre&#8209;crops to the size shown. Higher
+        resolution is better; matching the shape matters more than matching the pixels.</p>
+      </div>
+    </div>
+  </div>
+  <div id="out"></div>
+  <div class="empty" id="none" hidden>nothing matches that filter</div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>Drop files into <code>assets_incoming/&lt;folder&gt;/</code></span>
+    <span>Install with <code>python3 tools/install_incoming.py</code></span>
+    <span>Undo with <code>--restore</code></span>
+    <span>Rebuild this page with <code>python3 tools/make_asset_board.py</code></span>
+  </div>
+</footer>
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+const DATA = __DATA__, GROUPS = __GROUPS__;
+const out = document.getElementById("out"), none = document.getElementById("none");
+let q = "", only = "";
+
+document.getElementById("tCut").textContent = DATA.filter(r => r.cut).length;
+document.getElementById("tOpq").textContent = DATA.filter(r => !r.cut).length;
+
+const pills = document.getElementById("pills");
+[{k:"",t:"all",n:DATA.length}].concat(GROUPS.map(g=>({k:g.k,t:g.k,n:g.n}))).forEach(p=>{
+  const b = document.createElement("button");
+  b.className = "pill"; b.type = "button";
+  b.setAttribute("aria-pressed", String(p.k === only));
+  b.innerHTML = p.t + "<b>" + p.n + "</b>";
+  b.addEventListener("click", () => {
+    only = p.k;
+    [...pills.children].forEach((c,i) => c.setAttribute("aria-pressed", String(i === [...pills.children].indexOf(b))));
+    render();
+  });
+  pills.appendChild(b);
+});
+
+function esc(s){ return String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+/* manifest prose uses `backticks` for ids and paths */
+function fmt(s){ return esc(s).replace(/`([^`]+)`/g, "<code>$1</code>"); }
+
+function tile(r){
+  const [w,h] = r.sz.split("x").map(Number);
+  const el = document.createElement("article");
+  el.className = "tile";
+  const chips = [
+    '<span class="chip size">' + w + "&times;" + h + "</span>",
+    r.cut ? '<span class="chip cut">cut-out</span>' : '<span class="chip opq">opaque</span>',
+    r.np ? '<span class="chip np">9-slice ' + r.np + "px</span>" : "",
+    r.an ? '<span class="chip an">' + esc(r.an) + "</span>" : ""
+  ].join("");
+  el.innerHTML =
+    '<div class="plate"><img src="data:image/png;base64,' + r.b + '" alt="' + esc(r.n) +
+      '" width="' + w + '" height="' + h + '" loading="lazy"></div>' +
+    '<div class="meta">' +
+      '<button class="fname" type="button" data-n="' + esc(r.n) + '">' + esc(r.n) +
+        '<span class="cp">copy</span></button>' +
+      '<div class="chips">' + chips + "</div>" +
+      '<p class="desc">' + fmt(r.d) + "</p>" +
+    "</div>";
+  return el;
+}
+
+function render(){
+  out.textContent = "";
+  const term = q.trim().toLowerCase();
+  let shown = 0;
+  GROUPS.forEach(g => {
+    if (only && g.k !== only) return;
+    const rows = DATA.filter(r => r.g === g.k &&
+      (!term || (r.n + " " + r.d).toLowerCase().includes(term)));
+    if (!rows.length) return;
+    shown += rows.length;
+    const sec = document.createElement("section");
+    sec.className = "group"; sec.id = "g-" + g.k;
+    sec.innerHTML =
+      '<div class="ghead"><h2>' + esc(g.t) + '</h2>' +
+      '<span class="gcount">' + rows.length + " of " + g.n + " &middot; assets/" + g.k + "/</span>" +
+      '<p class="gnote">' + g.s + '<span class="gwarn">' + g.w + "</span></p></div>";
+    const grid = document.createElement("div");
+    grid.className = "grid-a";
+    rows.forEach(r => grid.appendChild(tile(r)));
+    sec.appendChild(grid);
+    out.appendChild(sec);
+  });
+  none.hidden = shown > 0;
+}
+
+document.getElementById("q").addEventListener("input", e => { q = e.target.value; render(); });
+
+const actual = document.getElementById("actual");
+actual.addEventListener("click", () => {
+  const on = actual.getAttribute("aria-pressed") !== "true";
+  actual.setAttribute("aria-pressed", String(on));
+  document.body.classList.toggle("actual", on);
+});
+
+const toast = document.getElementById("toast");
+let tid;
+out.addEventListener("click", e => {
+  const b = e.target.closest(".fname");
+  if (!b) return;
+  const name = b.dataset.n;
+  const done = () => {
+    toast.textContent = "copied  " + name;
+    toast.classList.add("on");
+    clearTimeout(tid); tid = setTimeout(() => toast.classList.remove("on"), 1500);
+  };
+  try {
+    navigator.clipboard.writeText(name).then(done, () => fallback(name, done));
+  } catch (_) { fallback(name, done); }
+});
+function fallback(text, done){
+  try {
+    const t = document.createElement("textarea");
+    t.value = text; t.style.position = "fixed"; t.style.opacity = "0";
+    document.body.appendChild(t); t.select(); document.execCommand("copy"); t.remove();
+    done();
+  } catch (_) {
+    toast.textContent = "select and copy: " + text;
+    toast.classList.add("on");
+    clearTimeout(tid); tid = setTimeout(() => toast.classList.remove("on"), 2600);
+  }
+}
+
+render();
+</script>

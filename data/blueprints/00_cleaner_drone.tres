@@ -5,6 +5,8 @@
 [ext_resource type="Resource" path="res://data/components/01_bio_core.tres" id="3_c1"]
 [ext_resource type="Resource" path="res://data/components/02_intake_fin.tres" id="4_c2"]
 [ext_resource type="Texture2D" path="res://assets/ui/blueprint_bg_cleaner_drone.png" id="8_bg"]
+[ext_resource type="Texture2D" path="res://assets/ui/blueprint_bg_cleaner_drone_ready.png" id="8_bgr"]
+[ext_resource type="Texture2D" path="res://assets/ui/blueprint_bg_cleaner_drone_done.png" id="8_bgd"]
 [ext_resource type="Script" path="res://data/blueprint_data.gd" id="9_script"]
 
 [resource]
@@ -14,7 +16,7 @@ display_name = "Drone Pembersih"
 flavour_text = "Drone kecil yang menyusuri dasar laut dan menyedot serpihan sampah yang terlalu halus untuk dijangkau cakar."
 components = Array[ExtResource("1_comp")]([ExtResource("2_c0"), ExtResource("3_c1"), ExtResource("4_c2")])
 background = ExtResource("8_bg")
+background_ready = ExtResource("8_bgr")
+background_done = ExtResource("8_bgd")
 unlocks_upgrade = &"rel_cepat"
-health_gain = 8
-forces_tier = -1
 sort_order = 0

@@ -15,9 +15,9 @@ static func advance_from(key: StringName) -> StringName:
 	return &"main_menu"
 
 
-# same scene for win and lose, it reads ocean_health to work out which
+# one scene for all three endings, it reads the blueprint count to pick
 static func _after_day() -> StringName:
-	if Game.is_game_over() or Game.is_last_day():
+	if Game.is_last_day():
 		return &"game_over"
 	Game.advance_day()
 	return &"day_start"

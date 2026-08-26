@@ -121,14 +121,9 @@ func _add_term(label_text: String, detail: String, value: int, font_size: int = 
 	_breakdown.add_child(row)
 
 
+# the bar tracks machines built, which is the only thing that changes the sea now
 func _animate_meter() -> void:
-	var before: int = int(_result["health_before"])
-	var after: int = int(_result["health_after"])
-	_meter_clip.size.x = METER_WIDTH * before / 100.0
-	_health_label.text = "%s %d" % [Strings.t("report_health"), before]
-	var tween := create_tween()
-	tween.tween_interval(0.5)
-	tween.tween_method(func(v: float) -> void:
-		_meter_clip.size.x = METER_WIDTH * v / 100.0
-		_health_label.text = "%s %d" % [Strings.t("report_health"), int(round(v))],
-		float(before), float(after), 0.9)
+	var built: int = Game.unlocked_blueprints.size()
+	var total: int = maxi(1, Game.blueprints.size())
+	_meter_clip.size.x = METER_WIDTH * built / float(total)
+	_health_label.text = Strings.tf("report_machines", {"have": built, "need": total})

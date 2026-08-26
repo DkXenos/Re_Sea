@@ -15,6 +15,4 @@ flavour_text = "Wadah tertutup untuk limbah berbahaya, supaya tidak ada yang boc
 components = Array[ExtResource("1_comp")]([ExtResource("2_c0"), ExtResource("3_c1"), ExtResource("4_c2")])
 background = ExtResource("8_bg")
 unlocks_upgrade = &"lengan_ganda"
-health_gain = 12
-forces_tier = 3
 sort_order = 2

@@ -24,8 +24,6 @@ var rng := RandomNumberGenerator.new()
 var days: Array[DayData] = []
 var day_index: int = 0
 # started at 100 originally but then nothing the meter drives was ever visible
-const STARTING_HEALTH := 35
-var ocean_health: int = STARTING_HEALTH
 
 var tiers: Array[OceanTierData] = []
 # what the ART shows. only updates at the day report, never mid-shift
@@ -36,7 +34,6 @@ var blueprints: Array[BlueprintData] = []
 var materials: Dictionary = {}
 var crafted: Dictionary = {}
 var unlocked_blueprints: Array[StringName] = []
-var forced_tier: int = -1
 
 var upgrades: Array[UpgradeData] = []
 var equipped_upgrade: StringName = &""
@@ -96,7 +93,7 @@ func _load_tools() -> void:
 func _load_tiers() -> void:
 	tiers.assign(_load_dir(TIER_DIR))
 	tiers.sort_custom(func(a: OceanTierData, b: OceanTierData) -> bool:
-		return a.min_health < b.min_health)
+		return a.tier < b.tier)
 
 
 func _load_blueprints() -> void:
@@ -140,16 +137,13 @@ func start_run(seed_value: int = 0) -> void:
 	run_seed = seed_value if seed_value != 0 else int(Time.get_unix_time_from_system() * 1000.0) % 100000000
 	rng.seed = run_seed
 	day_index = 0
-	ocean_health = STARTING_HEALTH
 	force_grip = 0
 	materials = {}
 	crafted = {}
 	unlocked_blueprints = []
-	forced_tier = -1
 	equipped_upgrade = &""
 	last_breakdown = {}
-	visual_tier = tier_for(ocean_health)
-	Events.ocean_health_changed.emit(ocean_health)
+	visual_tier = tier_for(unlocked_blueprints.size())
 	begin_day()
 
 
@@ -323,8 +317,6 @@ func end_day_breakdown() -> Dictionary:
 	var quota_met: bool = sorted_count >= quota
 	var clean_bonus: int = CLEAN_DAY_BONUS if wrong == 0 and quota_met else 0
 	var delta: int = (correct * 2) - (wrong * 4) - shortfall + clean_bonus
-	var before: int = ocean_health
-	var after: int = clampi(before + delta, 0, 100)
 	return {
 		"correct": correct,
 		"wrong": wrong,
@@ -333,16 +325,12 @@ func end_day_breakdown() -> Dictionary:
 		"shortfall": shortfall,
 		"clean_bonus": clean_bonus,
 		"delta": delta,
-		"health_before": before,
-		"health_after": after,
 		"quota_met": quota_met,
 	}
 
 
 func commit_day_result(breakdown: Dictionary) -> void:
 	last_breakdown = breakdown
-	ocean_health = int(breakdown["health_after"])
-	Events.ocean_health_changed.emit(ocean_health)
 	_credit_materials()
 	refresh_visual_tier()
 
@@ -412,9 +400,6 @@ func build_blueprint(blueprint_id: StringName) -> BlueprintData:
 		if bp.id != blueprint_id or not blueprint_ready(bp):
 			continue
 		unlocked_blueprints.append(bp.id)
-		if bp.forces_tier >= 0:
-			forced_tier = maxi(forced_tier, bp.forces_tier)
-		set_ocean_health(ocean_health + bp.health_gain)
 		refresh_visual_tier()
 		Events.blueprints_changed.emit()
 		return bp
@@ -466,12 +451,14 @@ func post_drop_lockout() -> float:
 	return up.post_drop_lockout if up != null else 0.0
 
 
-func tier_for(health: int) -> int:
-	var best: int = 0
+## The seabed reflects the machines you have actually built. One blueprint,
+## one tier - so finishing a machine is the thing that visibly heals the ocean,
+## rather than a hidden score nobody can see moving.
+func tier_for(blueprints_built: int) -> int:
+	var highest: int = 0
 	for t: OceanTierData in tiers:
-		if health >= t.min_health:
-			best = maxi(best, t.tier)
-	return best
+		highest = maxi(highest, t.tier)
+	return clampi(blueprints_built, 0, highest)
 
 
 func tier_data(tier: int) -> OceanTierData:
@@ -485,26 +472,24 @@ func current_tier() -> OceanTierData:
 	return tier_data(visual_tier)
 
 
-# returns the new tier, or -1 if nothing moved. only call at the day report.
+# returns the new tier, or -1 if nothing moved.
 func refresh_visual_tier() -> int:
 	var was := visual_tier
-	visual_tier = tier_for(ocean_health)
-	if forced_tier >= 0 and visual_tier < forced_tier:
-		# ignore the forced tier if health has dropped below the one under it,
-		# otherwise you get a healed reef sitting over a dying ocean
-		var below := tier_data(forced_tier - 1)
-		if below == null or ocean_health >= below.min_health:
-			visual_tier = forced_tier
-	return visual_tier if visual_tier != was else -1
+	visual_tier = tier_for(unlocked_blueprints.size())
+	if visual_tier == was:
+		return -1
+	Events.ocean_tier_changed.emit(visual_tier)
+	return visual_tier
 
 
-func set_ocean_health(value: int) -> void:
-	ocean_health = clampi(value, 0, 100)
-	Events.ocean_health_changed.emit(ocean_health)
-
-
-func is_game_over() -> bool:
-	return ocean_health <= 0
+## Which of the three endings this run earned. Every blueprint built is the good
+## one, none at all is the bad one, anything between is the regular one - so it
+## scales if a fourth blueprint is ever authored.
+func ending_kind() -> StringName:
+	var built: int = unlocked_blueprints.size()
+	if built <= 0:
+		return &"bad"
+	return &"good" if built >= blueprints.size() else &"regular"
 
 
 func apply_setting(key: String, value: float, persist: bool = true) -> void:
@@ -580,7 +565,10 @@ func _on_debug_command(command: StringName, arg: Variant) -> void:
 	match command:
 		&"refill_budget": refill_budget()
 		&"fill_inventory": fill_inventory(int(arg))
-		&"set_health": set_ocean_health(int(arg))
+		&"set_tier":
+			# jump the seabed straight to a tier without building the machines
+			visual_tier = clampi(int(arg), 0, tiers.size() - 1)
+			Events.ocean_tier_changed.emit(visual_tier)
 		&"force_grip": force_grip = int(arg)
 		&"set_seed":
 			run_seed = int(arg)

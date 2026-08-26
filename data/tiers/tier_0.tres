@@ -9,8 +9,6 @@
 script = ExtResource("1_script")
 tier = 0
 display_name = "Buruk"
-min_health = 0
-max_health = 25
 water_tint = Color(0.62, 0.70, 0.62, 1)
 seabed = ExtResource("2_seabed")
 fish_count = 0

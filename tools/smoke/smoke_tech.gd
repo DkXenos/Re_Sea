@@ -143,14 +143,15 @@ func _check_build_gate() -> void:
 			"an unfinished blueprint could be assembled")
 		game.craft_component(bp.components[index])
 	assert(game.blueprint_ready(bp), "every part crafted but the blueprint is not ready")
-	var health_before: int = game.ocean_health
+	var tier_before: int = game.visual_tier
 	assert(game.build_blueprint(bp.id) != null, "a finished blueprint refused to assemble")
 	assert(game.blueprint_unlocked(bp.id), "assembling did not record the blueprint")
-	assert(game.ocean_health == mini(100, health_before + bp.health_gain),
-		"assembling did not pay its ocean bonus")
+	assert(game.visual_tier == tier_before + 1,
+		"assembling a machine must raise the seabed one tier: %d -> %d"
+		% [tier_before, game.visual_tier])
 	assert(game.build_blueprint(bp.id) == null, "a blueprint was assembled twice")
-	print("  CRAFT opens only on the last part, pays +%d, and fires once"
-		% bp.health_gain)
+	print("  CRAFT opens only on the last part, lifts the sea to tier %d, fires once"
+		% game.visual_tier)
 
 
 ## The tool it opens joins the Peralatan list rather than starting a second

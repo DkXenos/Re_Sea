@@ -31,11 +31,11 @@ func _run() -> void:
 	game.start_run(4242)
 	events.debug_command.emit(&"set_seed", 31337)
 	assert(game.run_seed == 31337, "set_seed failed")
-	events.debug_command.emit(&"set_health", 42)
-	assert(game.ocean_health == 42, "set_health failed")
+	events.debug_command.emit(&"set_tier", 2)
+	assert(game.visual_tier == 2, "set_tier failed")
 	events.debug_command.emit(&"force_grip", -1)
 	assert(game.force_grip == -1, "force_grip failed")
-	print("seed=%d health=%d force_grip=%d" % [game.run_seed, game.ocean_health, game.force_grip])
+	print("seed=%d tier=%d force_grip=%d" % [game.run_seed, game.visual_tier, game.force_grip])
 
 	game.advance_day() # day 2 has tool charges
 	events.debug_command.emit(&"fill_inventory", 6)

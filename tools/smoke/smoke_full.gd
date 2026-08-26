@@ -81,7 +81,7 @@ func _run() -> void:
 		var kind := scene.name
 		if seen.is_empty() or seen[-1] != String(kind) + "|" + str(game.day_index):
 			seen.append(String(kind) + "|" + str(game.day_index))
-			print("-> %-10s day_index=%d health=%d" % [kind, game.day_index, game.ocean_health])
+			print("-> %-10s day_index=%d tier=%d" % [kind, game.day_index, game.visual_tier])
 		match String(kind):
 			"MainMenu":
 				scene.get_node("UiLayer/Root/Buttons/PlayButton").pressed.emit()
@@ -110,7 +110,8 @@ func _run() -> void:
 						_pool_line()])
 				_drive_after_day(scene)
 			"GameOver":
-				print("reached ending: health=%d title=%s" % [game.ocean_health,
+				print("reached ending: %s built=%d title=%s" % [game.ending_kind(),
+					game.unlocked_blueprints.size(),
 					scene.get_node("UiLayer/Root/TitleLabel").text])
 				break
 	print("frames=%d  scenes visited=%d" % [guard, seen.size()])
@@ -118,7 +119,9 @@ func _run() -> void:
 		% [tier_rises, claimed, first_claim_day])
 	assert(String(_current().name) == "GameOver", "run did not reach an ending")
 	if bad_mode:
-		assert(game.ocean_health == 0, "sorting everything wrong should bottom out the ocean")
+		assert(game.ending_kind() == &"bad",
+			"sorting everything wrong should never build a machine, got the %s ending"
+			% game.ending_kind())
 	elif no_craft:
 		print("supply run: nothing was crafted, the pool above is five days' worth")
 	else:

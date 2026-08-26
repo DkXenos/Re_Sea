@@ -67,7 +67,7 @@ func _refresh_bar() -> void:
 	# demoing this won't read a control list.
 	var tier := Game.current_tier()
 	_ocean_label.text = Strings.tf("ocean_label",
-		{"v": tier.display_name if tier != null else "?", "n": Game.ocean_health})
+		{"v": tier.display_name if tier != null else "?"})
 	# costs come from Game so the label can't disagree with what we charge
 	var costs := {"drop": Game.cost_of(&"drop"), "tool": Game.cost_of(&"tool"),
 		"sort": Game.cost_of(&"sort")}
