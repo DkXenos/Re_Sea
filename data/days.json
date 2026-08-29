@@ -1,0 +1,280 @@
+{
+  "_README": [
+    "Single source of truth for what each shift contains.",
+    "Edit this file, then run: python3 tools/gen_days.py",
+    "That rewrites data/days/day_*.tres, which is what the game loads.",
+    "tools/smoke/smoke_content.gd fails if the two ever disagree.",
+    "",
+    "items: an exact list, not chances. Every entry spawns exactly once,",
+    "in shuffled order. Repeat an id to have it appear more than once.",
+    "The bin an item belongs in is decided by that day's rules, so the same",
+    "id can be DAUR ULANG on day 1 and RESIDU on day 2 - see the balance",
+    "table printed by tools/day_balance.py.",
+    "",
+    "spawn_interval_min/max: seconds between arrivals once the opening",
+    "items are down. min_available_items: if the tank drops to this many,",
+    "the next item arrives immediately instead of waiting."
+  ],
+  "days": [
+    {
+      "day": 1,
+      "quota": 5,
+      "budget": 90,
+      "rules": [
+        "r_baseline"
+      ],
+      "tools": [],
+      "items": [
+        "banana_peel",
+        "fish_bone",
+        "pet_bottle",
+        "alu_can",
+        "paper_cup",
+        "styrofoam_tray"
+      ],
+      "item_counts": {
+        "alu_can": 1,
+        "banana_peel": 1,
+        "fish_bone": 1,
+        "paper_cup": 1,
+        "pet_bottle": 1,
+        "styrofoam_tray": 1
+      },
+      "box": {
+        "item": "",
+        "count": 0,
+        "contents_min": 2,
+        "contents_max": 3
+      },
+      "spawning": {
+        "initial_seed_fraction": 0.5,
+        "spawn_interval_min": 8.0,
+        "spawn_interval_max": 14.0,
+        "min_available_items": 2
+      },
+      "modifier": "",
+      "intro_text": "Hari pertama. Pilah dari yang terlihat saja - alat periksa belum ada. Setiap cakar, periksa dan buang memakai waktu shift; berpikir gratis."
+    },
+    {
+      "day": 2,
+      "quota": 6,
+      "budget": 110,
+      "rules": [
+        "r_baseline",
+        "r_residue"
+      ],
+      "tools": [
+        "rinse",
+        "magnifier"
+      ],
+      "items": [
+        "banana_peel",
+        "fish_bone",
+        "banana_peel",
+        "pet_bottle",
+        "juice_carton",
+        "eco_tote",
+        "alu_can",
+        "car_battery"
+      ],
+      "item_counts": {
+        "alu_can": 1,
+        "banana_peel": 2,
+        "car_battery": 1,
+        "eco_tote": 1,
+        "fish_bone": 1,
+        "juice_carton": 1,
+        "pet_bottle": 1
+      },
+      "box": {
+        "item": "mystery_box",
+        "count": 1,
+        "contents_min": 2,
+        "contents_max": 3
+      },
+      "spawning": {
+        "initial_seed_fraction": 0.4,
+        "spawn_interval_min": 8.0,
+        "spawn_interval_max": 14.0,
+        "min_available_items": 2
+      },
+      "modifier": "",
+      "intro_text": "Alat periksa datang. Bilas untuk melihat sisa kotoran, kaca pembesar untuk membaca kode. Keduanya memakai waktu shift."
+    },
+    {
+      "day": 3,
+      "quota": 8,
+      "budget": 130,
+      "rules": [
+        "r_baseline",
+        "r_residue",
+        "r_chem_residue"
+      ],
+      "tools": [
+        "rinse",
+        "magnifier",
+        "swab"
+      ],
+      "items": [
+        "banana_peel",
+        "fish_bone",
+        "pet_bottle",
+        "spray_can",
+        "car_battery",
+        "oil_jerrycan",
+        "paint_bottle",
+        "styrofoam_tray",
+        "alu_can",
+        "paper_cup"
+      ],
+      "item_counts": {
+        "alu_can": 1,
+        "banana_peel": 1,
+        "car_battery": 1,
+        "fish_bone": 1,
+        "oil_jerrycan": 1,
+        "paint_bottle": 1,
+        "paper_cup": 1,
+        "pet_bottle": 1,
+        "spray_can": 1,
+        "styrofoam_tray": 1
+      },
+      "box": {
+        "item": "mystery_box",
+        "count": 1,
+        "contents_min": 2,
+        "contents_max": 3
+      },
+      "spawning": {
+        "initial_seed_fraction": 0.4,
+        "spawn_interval_min": 8.0,
+        "spawn_interval_max": 14.0,
+        "min_available_items": 2
+      },
+      "modifier": "",
+      "intro_text": "Usap kimia tersedia. Tidak semua sisa kotoran sama bahayanya."
+    },
+    {
+      "day": 4,
+      "quota": 10,
+      "budget": 150,
+      "rules": [
+        "r_baseline",
+        "r_residue",
+        "r_chem_residue",
+        "r_multilayer"
+      ],
+      "tools": [
+        "rinse",
+        "magnifier",
+        "swab",
+        "cutter"
+      ],
+      "items": [
+        "banana_peel",
+        "fish_bone",
+        "fish_bone",
+        "pet_bottle",
+        "spray_can",
+        "car_battery",
+        "oil_jerrycan",
+        "glass_jar",
+        "styrofoam_tray",
+        "juice_carton",
+        "eco_tote",
+        "fishing_net"
+      ],
+      "item_counts": {
+        "banana_peel": 1,
+        "car_battery": 1,
+        "eco_tote": 1,
+        "fish_bone": 2,
+        "fishing_net": 1,
+        "glass_jar": 1,
+        "juice_carton": 1,
+        "oil_jerrycan": 1,
+        "pet_bottle": 1,
+        "spray_can": 1,
+        "styrofoam_tray": 1
+      },
+      "box": {
+        "item": "mystery_box",
+        "count": 2,
+        "contents_min": 2,
+        "contents_max": 3
+      },
+      "spawning": {
+        "initial_seed_fraction": 0.4,
+        "spawn_interval_min": 8.0,
+        "spawn_interval_max": 14.0,
+        "min_available_items": 2
+      },
+      "modifier": "",
+      "intro_text": "Pemotong tersedia. Yang terlihat seperti kertas belum tentu kertas - tapi setiap pemeriksaan mengurangi jatah cakar."
+    },
+    {
+      "day": 5,
+      "quota": 12,
+      "budget": 160,
+      "rules": [
+        "r_baseline",
+        "r_residue",
+        "r_chem_residue",
+        "r_multilayer",
+        "r_flammable",
+        "r_alu_always"
+      ],
+      "tools": [
+        "rinse",
+        "magnifier",
+        "swab",
+        "cutter"
+      ],
+      "items": [
+        "banana_peel",
+        "fish_bone",
+        "pet_bottle",
+        "alu_can",
+        "car_battery",
+        "oil_jerrycan",
+        "paint_bottle",
+        "spray_can",
+        "styrofoam_tray",
+        "paper_cup",
+        "juice_carton",
+        "eco_tote",
+        "fishing_net",
+        "styrofoam_tray"
+      ],
+      "item_counts": {
+        "alu_can": 1,
+        "banana_peel": 1,
+        "car_battery": 1,
+        "eco_tote": 1,
+        "fish_bone": 1,
+        "fishing_net": 1,
+        "juice_carton": 1,
+        "oil_jerrycan": 1,
+        "paint_bottle": 1,
+        "paper_cup": 1,
+        "pet_bottle": 1,
+        "spray_can": 1,
+        "styrofoam_tray": 2
+      },
+      "box": {
+        "item": "mystery_box",
+        "count": 2,
+        "contents_min": 2,
+        "contents_max": 3
+      },
+      "spawning": {
+        "initial_seed_fraction": 0.4,
+        "spawn_interval_min": 8.0,
+        "spawn_interval_max": 14.0,
+        "min_available_items": 2
+      },
+      "modifier": "",
+      "intro_text": "Aturan bertambah dan barang bertambah, tapi waktu shift hampir sama. Perhatikan aturan aluminium yang baru."
+    }
+  ]
+}

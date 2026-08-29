@@ -5,7 +5,6 @@
 [ext_resource type="Texture2D" uid="uid://c0ss82ew10ogj" path="res://assets/ui/button_normal.png" id="3_k4cr1"]
 [ext_resource type="Texture2D" uid="uid://d1ldocyt870qu" path="res://assets/ui/button_pressed.png" id="4_g2k3a"]
 [ext_resource type="Texture2D" uid="uid://stv631a2ieo7" path="res://assets/ui/panel_main.png" id="5_jjarc"]
-
 [ext_resource type="Texture2D" uid="uid://dc6a7p3t7vcah" path="res://assets/ui/slider_track.png" id="6_sltr"]
 [ext_resource type="Texture2D" uid="uid://dhp37wyapm73s" path="res://assets/ui/slider_fill.png" id="7_slfl"]
 [ext_resource type="Texture2D" uid="uid://dj2et4abuhg0i" path="res://assets/ui/slider_grabber.png" id="8_slgr"]
@@ -62,6 +61,73 @@ texture_margin_top = 20.0
 texture_margin_right = 20.0
 texture_margin_bottom = 20.0
 
+[sub_resource type="StyleBoxEmpty" id="SBE_check_disabled"]
+
+[sub_resource type="StyleBoxEmpty" id="SBE_check_focus"]
+
+[sub_resource type="StyleBoxEmpty" id="SBE_check_hover"]
+
+[sub_resource type="StyleBoxEmpty" id="SBE_check_normal"]
+
+[sub_resource type="StyleBoxEmpty" id="SBE_check_pressed"]
+
+[sub_resource type="StyleBoxTexture" id="SBT_scroll_grab"]
+texture = ExtResource("13_sbgr")
+texture_margin_left = 8.0
+texture_margin_top = 8.0
+texture_margin_right = 8.0
+texture_margin_bottom = 8.0
+
+[sub_resource type="StyleBoxTexture" id="SBT_scroll_grab_hi"]
+texture = ExtResource("14_sbgh")
+texture_margin_left = 8.0
+texture_margin_top = 8.0
+texture_margin_right = 8.0
+texture_margin_bottom = 8.0
+
+[sub_resource type="StyleBoxTexture" id="SBT_scroll_track"]
+texture = ExtResource("12_sbtr")
+texture_margin_left = 8.0
+texture_margin_top = 8.0
+texture_margin_right = 8.0
+texture_margin_bottom = 8.0
+
+[sub_resource type="StyleBoxTexture" id="SBT_slider_fill"]
+texture = ExtResource("7_slfl")
+texture_margin_left = 8.0
+texture_margin_top = 8.0
+texture_margin_right = 8.0
+texture_margin_bottom = 8.0
+
+[sub_resource type="StyleBoxTexture" id="SBT_slider_track"]
+texture = ExtResource("6_sltr")
+texture_margin_left = 8.0
+texture_margin_top = 8.0
+texture_margin_right = 8.0
+texture_margin_bottom = 8.0
+
+[sub_resource type="StyleBoxTexture" id="SBT_field_focus"]
+content_margin_left = 10.0
+content_margin_top = 6.0
+content_margin_right = 10.0
+content_margin_bottom = 6.0
+texture = ExtResource("16_tff")
+texture_margin_left = 12.0
+texture_margin_top = 12.0
+texture_margin_right = 12.0
+texture_margin_bottom = 12.0
+
+[sub_resource type="StyleBoxTexture" id="SBT_field"]
+content_margin_left = 10.0
+content_margin_top = 6.0
+content_margin_right = 10.0
+content_margin_bottom = 6.0
+texture = ExtResource("15_tfn")
+texture_margin_left = 12.0
+texture_margin_top = 12.0
+texture_margin_right = 12.0
+texture_margin_bottom = 12.0
+
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_63028"]
 content_margin_left = 16.0
 content_margin_top = 16.0
@@ -84,93 +150,28 @@ texture_margin_top = 24.0
 texture_margin_right = 24.0
 texture_margin_bottom = 24.0
 
-[sub_resource type="StyleBoxTexture" id="SBT_slider_track"]
-texture = ExtResource("6_sltr")
-texture_margin_left = 8.0
-texture_margin_top = 8.0
-texture_margin_right = 8.0
-texture_margin_bottom = 8.0
-
-[sub_resource type="StyleBoxTexture" id="SBT_slider_fill"]
-texture = ExtResource("7_slfl")
-texture_margin_left = 8.0
-texture_margin_top = 8.0
-texture_margin_right = 8.0
-texture_margin_bottom = 8.0
-
-[sub_resource type="StyleBoxTexture" id="SBT_scroll_track"]
-texture = ExtResource("12_sbtr")
-texture_margin_left = 8.0
-texture_margin_top = 8.0
-texture_margin_right = 8.0
-texture_margin_bottom = 8.0
-
-[sub_resource type="StyleBoxTexture" id="SBT_scroll_grab"]
-texture = ExtResource("13_sbgr")
-texture_margin_left = 8.0
-texture_margin_top = 8.0
-texture_margin_right = 8.0
-texture_margin_bottom = 8.0
-
-[sub_resource type="StyleBoxTexture" id="SBT_scroll_grab_hi"]
-texture = ExtResource("14_sbgh")
-texture_margin_left = 8.0
-texture_margin_top = 8.0
-texture_margin_right = 8.0
-texture_margin_bottom = 8.0
-
-[sub_resource type="StyleBoxTexture" id="SBT_field"]
-content_margin_left = 10.0
-content_margin_top = 6.0
-content_margin_right = 10.0
-content_margin_bottom = 6.0
-texture = ExtResource("15_tfn")
-texture_margin_left = 12.0
-texture_margin_top = 12.0
-texture_margin_right = 12.0
-texture_margin_bottom = 12.0
-
-[sub_resource type="StyleBoxTexture" id="SBT_field_focus"]
-content_margin_left = 10.0
-content_margin_top = 6.0
-content_margin_right = 10.0
-content_margin_bottom = 6.0
-texture = ExtResource("16_tff")
-texture_margin_left = 12.0
-texture_margin_top = 12.0
-texture_margin_right = 12.0
-texture_margin_bottom = 12.0
-
-[sub_resource type="StyleBoxEmpty" id="SBE_check_normal"]
-
-[sub_resource type="StyleBoxEmpty" id="SBE_check_hover"]
-
-[sub_resource type="StyleBoxEmpty" id="SBE_check_pressed"]
-
-[sub_resource type="StyleBoxEmpty" id="SBE_check_disabled"]
-
-[sub_resource type="StyleBoxEmpty" id="SBE_check_focus"]
-
 [resource]
 default_font_size = 18
-Button/colors/font_color = Color(0.88, 0.94, 0.98, 1)
-Button/colors/font_disabled_color = Color(0.45, 0.5, 0.55, 1)
-Button/colors/font_hover_color = Color(1, 1, 1, 1)
+Button/colors/font_color = Color(0.11, 0.13, 0.15, 1)
+Button/colors/font_disabled_color = Color(0.42, 0.44, 0.46, 1)
+Button/colors/font_focus_color = Color(0.11, 0.13, 0.15, 1)
+Button/colors/font_hover_color = Color(0.02, 0.03, 0.04, 1)
+Button/colors/font_pressed_color = Color(0.08, 0.09, 0.1, 1)
 Button/font_sizes/font_size = 20
 Button/styles/disabled = SubResource("StyleBoxTexture_e1g2j")
 Button/styles/focus = SubResource("StyleBoxTexture_45kcn")
 Button/styles/hover = SubResource("StyleBoxTexture_45kcn")
 Button/styles/normal = SubResource("StyleBoxTexture_q4rak")
 Button/styles/pressed = SubResource("StyleBoxTexture_vsr3o")
+CheckButton/icons/checked = ExtResource("11_tgon")
+CheckButton/icons/checked_disabled = ExtResource("11_tgon")
+CheckButton/icons/unchecked = ExtResource("10_tgof")
+CheckButton/icons/unchecked_disabled = ExtResource("10_tgof")
 CheckButton/styles/disabled = SubResource("SBE_check_disabled")
 CheckButton/styles/focus = SubResource("SBE_check_focus")
 CheckButton/styles/hover = SubResource("SBE_check_hover")
 CheckButton/styles/normal = SubResource("SBE_check_normal")
 CheckButton/styles/pressed = SubResource("SBE_check_pressed")
-CheckButton/icons/checked = ExtResource("11_tgon")
-CheckButton/icons/checked_disabled = ExtResource("11_tgon")
-CheckButton/icons/unchecked = ExtResource("10_tgof")
-CheckButton/icons/unchecked_disabled = ExtResource("10_tgof")
 HScrollBar/styles/grabber = SubResource("SBT_scroll_grab")
 HScrollBar/styles/grabber_highlight = SubResource("SBT_scroll_grab_hi")
 HScrollBar/styles/grabber_pressed = SubResource("SBT_scroll_grab_hi")
@@ -181,11 +182,11 @@ HSlider/icons/grabber_highlight = ExtResource("9_slgh")
 HSlider/styles/grabber_area = SubResource("SBT_slider_fill")
 HSlider/styles/grabber_area_highlight = SubResource("SBT_slider_fill")
 HSlider/styles/slider = SubResource("SBT_slider_track")
+Label/colors/font_color = Color(0.87, 0.92, 0.96, 1)
 LineEdit/colors/font_color = Color(0.87, 0.92, 0.96, 1)
 LineEdit/styles/focus = SubResource("SBT_field_focus")
 LineEdit/styles/normal = SubResource("SBT_field")
 LineEdit/styles/read_only = SubResource("SBT_field")
-Label/colors/font_color = Color(0.87, 0.92, 0.96, 1)
 Panel/styles/panel = SubResource("StyleBoxTexture_63028")
 PanelContainer/styles/panel = SubResource("StyleBoxTexture_07ixe")
 RichTextLabel/colors/font_color = Color(0.87, 0.92, 0.96, 1)

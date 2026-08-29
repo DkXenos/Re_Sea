@@ -1,28 +1,33 @@
 [gd_resource type="Resource" script_class="DayData" format=3]
 
-[ext_resource type="Script" path="res://data/rule_data.gd" id="1_p0xa3"]
-[ext_resource type="Resource" path="res://data/rules/r_baseline.tres" id="2_m3wj7"]
-[ext_resource type="Resource" path="res://data/rules/r_residue.tres" id="3_1ipuw"]
-[ext_resource type="Script" path="res://data/item_data.gd" id="4_100ek"]
-[ext_resource type="Resource" path="res://data/items/banana_peel.tres" id="5_80l45"]
-[ext_resource type="Resource" path="res://data/items/fish_bone.tres" id="6_bnhly"]
-[ext_resource type="Resource" path="res://data/items/pet_bottle.tres" id="7_e51uk"]
-[ext_resource type="Resource" path="res://data/items/alu_can.tres" id="8_he6va"]
-[ext_resource type="Resource" path="res://data/items/styrofoam_tray.tres" id="9_30eif"]
-[ext_resource type="Resource" path="res://data/items/car_battery.tres" id="10_m3vtm"]
-[ext_resource type="Resource" path="res://data/items/oil_jerrycan.tres" id="11_br5qx"]
-[ext_resource type="Resource" path="res://data/items/paint_bottle.tres" id="12_46dms"]
-[ext_resource type="Resource" path="res://data/items/mystery_box.tres" id="90_box"]
-[ext_resource type="Script" path="res://data/day_data.gd" id="13_fj25p"]
+[ext_resource type="Script" path="res://data/rule_data.gd" id="1_rule_data"]
+[ext_resource type="Resource" path="res://data/rules/r_baseline.tres" id="2_r_baseline"]
+[ext_resource type="Resource" path="res://data/rules/r_residue.tres" id="3_r_residue"]
+[ext_resource type="Script" path="res://data/item_data.gd" id="4_item_data"]
+[ext_resource type="Resource" path="res://data/items/banana_peel.tres" id="5_banana_peel"]
+[ext_resource type="Resource" path="res://data/items/fish_bone.tres" id="6_fish_bone"]
+[ext_resource type="Resource" path="res://data/items/pet_bottle.tres" id="7_pet_bottle"]
+[ext_resource type="Resource" path="res://data/items/juice_carton.tres" id="8_juice_carton"]
+[ext_resource type="Resource" path="res://data/items/eco_tote.tres" id="9_eco_tote"]
+[ext_resource type="Resource" path="res://data/items/alu_can.tres" id="10_alu_can"]
+[ext_resource type="Resource" path="res://data/items/car_battery.tres" id="11_car_battery"]
+[ext_resource type="Resource" path="res://data/items/mystery_box.tres" id="12_mystery_box"]
+[ext_resource type="Script" path="res://data/day_data.gd" id="13_day_data"]
 
 [resource]
-script = ExtResource("13_fj25p")
+script = ExtResource("13_day_data")
 day_number = 2
-active_rules = Array[ExtResource("1_p0xa3")]([ExtResource("2_m3wj7"), ExtResource("3_1ipuw")])
-item_pool = Array[ExtResource("4_100ek")]([ExtResource("5_80l45"), ExtResource("6_bnhly"), ExtResource("7_e51uk"), ExtResource("8_he6va"), ExtResource("9_30eif"), ExtResource("10_m3vtm"), ExtResource("11_br5qx"), ExtResource("12_46dms")])
-box_item = ExtResource("90_box")
+active_rules = Array[ExtResource("1_rule_data")]([ExtResource("2_r_baseline"), ExtResource("3_r_residue")])
+item_pool = Array[ExtResource("4_item_data")]([ExtResource("5_banana_peel"), ExtResource("6_fish_bone"), ExtResource("5_banana_peel"), ExtResource("7_pet_bottle"), ExtResource("8_juice_carton"), ExtResource("9_eco_tote"), ExtResource("10_alu_can"), ExtResource("11_car_battery")])
+box_item = ExtResource("12_mystery_box")
 box_spawn_count = 1
+box_contents_min = 2
+box_contents_max = 3
 quota = 6
 budget = 110
 available_tools = Array[StringName]([&"rinse", &"magnifier"])
+initial_seed_fraction = 0.4
+spawn_interval_min = 8.0
+spawn_interval_max = 14.0
+min_available_items = 2
 intro_text = "Alat periksa datang. Bilas untuk melihat sisa kotoran, kaca pembesar untuk membaca kode. Keduanya memakai waktu shift."

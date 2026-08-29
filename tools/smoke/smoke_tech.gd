@@ -24,6 +24,7 @@ func _run() -> void:
 	game.start_run(9182)
 
 	_check_content()
+	_check_supply_covers_demand()
 	_check_pool_is_spendable()
 	_check_never_negative()
 	_check_shortfall_is_named()
@@ -71,6 +72,37 @@ func _check_content() -> void:
 
 
 ## The pool is spent, not accumulated. Crafting takes the materials away.
+## Every category the blueprints ask for has to be findable in the bins, with
+## room to spare. This is measured on the RESOLVED category - the day's rules
+## move items between bins, so a pool full of recyclables can still hand you
+## almost no DAUR ULANG. It sat at a margin of one for a long time, meaning a
+## single mis-sort quietly made the good ending impossible.
+const MIN_MARGIN := 3
+
+func _check_supply_covers_demand() -> void:
+	var names: Array[String] = ["ORGANIK", "DAUR ULANG", "B3", "RESIDU"]
+	var demand: Dictionary = {}
+	for bp: BlueprintData in game.blueprints:
+		for category: int in bp.total_requirements():
+			demand[category] = int(demand.get(category, 0)) + int(bp.total_requirements()[category])
+	var supply: Dictionary = {}
+	for day: DayData in game.days:
+		for item: ItemData in day.item_pool:
+			if item.is_container:
+				continue
+			var got: int = int(RuleChecker.resolve(item, day.active_rules)["category"])
+			supply[got] = int(supply.get(got, 0)) + 1
+	for category: int in demand:
+		var need: int = int(demand[category])
+		var have: int = int(supply.get(category, 0))
+		assert(have - need >= MIN_MARGIN,
+			("%s: blueprints need %d but only %d are findable across all five days "
+			+ "(margin %+d, want at least %+d). A player who mis-sorts a couple "
+			+ "can no longer reach the good ending.")
+			% [names[category], need, have, have - need, MIN_MARGIN])
+		print("  %-11s need %2d, findable %2d (margin %+d)" % [names[category], need, have, have - need])
+
+
 func _check_pool_is_spendable() -> void:
 	game.start_run(9182)
 	var component: ComponentData = game.blueprints[0].components[0]

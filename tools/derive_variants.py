@@ -63,15 +63,25 @@ def panels():
 
 # ---------------------------------------------------------------- buttons
 def buttons():
-    """Buttons share the panel material so the console reads as one object."""
-    base = load("ui/panel_main.png").resize((64, 64), Image.LANCZOS)
-    for name, mul, ring in (
-            ("normal", 1.35, (96, 156, 190, 255)),
-            ("hover", 1.75, (150, 210, 240, 255)),
-            ("pressed", 0.95, (86, 140, 170, 255)),
-            ("disabled", 0.6, (70, 78, 88, 255))):
-        save(edge_glow(relevel(base, mul), ring, 2), "ui/button_%s.png" % name,
-             "panel material at %.0f%% + border - %s state" % (mul * 100, name))
+    """Only button_normal was supplied, so the other three states are that same
+    plate re-lit: brighter when the pointer is over it, darker and flatter when
+    it is held, washed out when it cannot be pressed."""
+    base = load("ui/button_normal.png")
+    for name, mul, add in (("hover", 1.12, 8),
+                           ("pressed", 0.78, -6),
+                           ("disabled", 0.62, 0)):
+        out = relevel(base, mul, add)
+        if name == "disabled":
+            # the plate is already grey, so draining colour does nothing. Flatten
+            # the bevel instead: a button with no raised edge reads as dead even
+            # at a glance, which dimming alone does not achieve.
+            a = np.array(out).astype(np.float32)
+            flat = a[..., :3].mean()
+            a[..., :3] = a[..., :3] * 0.35 + flat * 0.65
+            out = Image.fromarray(a.astype(np.uint8), "RGBA")
+        save(out, "ui/button_%s.png" % name,
+             "button_normal re-lit to %.0f%%%s - %s state"
+             % (mul * 100, ", bevel flattened" if name == "disabled" else "", name))
 
 
 # ---------------------------------------------------------------- bins

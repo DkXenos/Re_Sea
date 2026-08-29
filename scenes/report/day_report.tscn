@@ -1,97 +1,106 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene format=3 uid="uid://cujta04jr6ha1"]
 
-[ext_resource type="Script" path="res://scenes/report/day_report.gd" id="1_rep"]
-[ext_resource type="Texture2D" path="res://assets/env/water_bg.png" id="2_bg"]
-[ext_resource type="Texture2D" path="res://assets/ui/panel_dark.png" id="3_pdark"]
-[ext_resource type="Texture2D" path="res://assets/ui/meter_bg.png" id="4_mbg"]
-[ext_resource type="Texture2D" path="res://assets/ui/meter_fill.png" id="5_mfill"]
-[ext_resource type="Theme" path="res://assets/ui/ui_theme.tres" id="6_theme"]
+[ext_resource type="Script" uid="uid://qa4rnfpq00h6" path="res://scenes/report/day_report.gd" id="1_rep"]
+[ext_resource type="Texture2D" uid="uid://bqoyx86g0v3fd" path="res://assets/env/water_bg.png" id="2_bg"]
+[ext_resource type="Texture2D" uid="uid://dvjjme3fo4ea2" path="res://assets/ui/panel_dark.png" id="3_pdark"]
+[ext_resource type="Texture2D" uid="uid://bth6wnhumbaj7" path="res://assets/ui/meter_bg.png" id="4_mbg"]
+[ext_resource type="Texture2D" uid="uid://dm2g77w77yq75" path="res://assets/ui/meter_fill.png" id="5_mfill"]
+[ext_resource type="Theme" uid="uid://bpxj4j7ei2hhx" path="res://assets/ui/ui_theme.tres" id="6_theme"]
 
-[node name="DayReport" type="Node2D"]
+[node name="DayReport" type="Node2D" unique_id=950863523]
 script = ExtResource("1_rep")
 
-[node name="BgLayer" type="CanvasLayer" parent="."]
+[node name="BgLayer" type="CanvasLayer" parent="." unique_id=1650632731]
 layer = 0
 
-[node name="Bg" type="TextureRect" parent="BgLayer"]
+[node name="Bg" type="TextureRect" parent="BgLayer" unique_id=1679924243]
 offset_right = 1280.0
 offset_bottom = 720.0
 mouse_filter = 2
 texture = ExtResource("2_bg")
 expand_mode = 1
 
-[node name="UiLayer" type="CanvasLayer" parent="."]
+[node name="UiLayer" type="CanvasLayer" parent="." unique_id=1690282511]
 layer = 100
 
-[node name="Root" type="Control" parent="UiLayer"]
+[node name="Root" type="Control" parent="UiLayer" unique_id=1942694767]
+layout_mode = 3
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 2
 theme = ExtResource("6_theme")
 
-[node name="TitleLabel" type="Label" parent="UiLayer/Root"]
+[node name="TitleLabel" type="Label" parent="UiLayer/Root" unique_id=423377784]
+layout_mode = 0
 offset_left = 40.0
 offset_top = 22.0
 offset_right = 700.0
 offset_bottom = 66.0
 theme_override_font_sizes/font_size = 32
 
-[node name="QuotaLabel" type="Label" parent="UiLayer/Root"]
+[node name="QuotaLabel" type="Label" parent="UiLayer/Root" unique_id=1279477050]
+layout_mode = 0
 offset_left = 42.0
 offset_top = 70.0
 offset_right = 700.0
 offset_bottom = 100.0
 theme_override_font_sizes/font_size = 19
 
-[node name="MistakesBg" type="NinePatchRect" parent="UiLayer/Root"]
+[node name="MistakesBg" type="NinePatchRect" parent="UiLayer/Root" unique_id=756898176]
+layout_mode = 0
 offset_left = 34.0
 offset_top = 108.0
 offset_right = 700.0
 offset_bottom = 692.0
-mouse_filter = 2
 texture = ExtResource("3_pdark")
 patch_margin_left = 24
 patch_margin_top = 24
 patch_margin_right = 24
 patch_margin_bottom = 24
 
-[node name="MistakesTitle" type="Label" parent="UiLayer/Root"]
+[node name="MistakesTitle" type="Label" parent="UiLayer/Root" unique_id=1677647024]
+layout_mode = 0
 offset_left = 52.0
 offset_top = 120.0
 offset_right = 686.0
 offset_bottom = 148.0
 theme_override_font_sizes/font_size = 20
 
-[node name="MistakesScroll" type="ScrollContainer" parent="UiLayer/Root"]
+[node name="MistakesScroll" type="ScrollContainer" parent="UiLayer/Root" unique_id=866820913]
+layout_mode = 0
 offset_left = 48.0
 offset_top = 154.0
 offset_right = 688.0
 offset_bottom = 680.0
 
-[node name="Mistakes" type="VBoxContainer" parent="UiLayer/Root/MistakesScroll"]
+[node name="Mistakes" type="VBoxContainer" parent="UiLayer/Root/MistakesScroll" unique_id=257781870]
 custom_minimum_size = Vector2(628, 0)
+layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="BreakdownBg" type="NinePatchRect" parent="UiLayer/Root"]
+[node name="BreakdownBg" type="NinePatchRect" parent="UiLayer/Root" unique_id=1653717643]
+layout_mode = 0
 offset_left = 720.0
 offset_top = 108.0
 offset_right = 1246.0
 offset_bottom = 420.0
-mouse_filter = 2
 texture = ExtResource("3_pdark")
 patch_margin_left = 24
 patch_margin_top = 24
 patch_margin_right = 24
 patch_margin_bottom = 24
 
-[node name="Breakdown" type="VBoxContainer" parent="UiLayer/Root"]
+[node name="Breakdown" type="VBoxContainer" parent="UiLayer/Root" unique_id=818115256]
+layout_mode = 0
 offset_left = 744.0
 offset_top = 130.0
 offset_right = 1214.0
 offset_bottom = 400.0
 theme_override_constants/separation = 10
 
-[node name="MeterBgRect" type="TextureRect" parent="UiLayer/Root"]
+[node name="MeterBgRect" type="TextureRect" parent="UiLayer/Root" unique_id=1881560878]
+layout_mode = 0
 offset_left = 744.0
 offset_top = 500.0
 offset_right = 1064.0
@@ -99,28 +108,32 @@ offset_bottom = 532.0
 mouse_filter = 2
 texture = ExtResource("4_mbg")
 
-[node name="MeterClip" type="Control" parent="UiLayer/Root"]
+[node name="MeterClip" type="Control" parent="UiLayer/Root" unique_id=2083187788]
 clip_contents = true
+anchors_preset = 0
 offset_left = 744.0
 offset_top = 500.0
 offset_right = 1064.0
 offset_bottom = 532.0
 mouse_filter = 2
 
-[node name="MeterFill" type="TextureRect" parent="UiLayer/Root/MeterClip"]
+[node name="MeterFill" type="TextureRect" parent="UiLayer/Root/MeterClip" unique_id=1358662762]
+layout_mode = 0
 offset_right = 320.0
 offset_bottom = 32.0
 mouse_filter = 2
 texture = ExtResource("5_mfill")
 
-[node name="HealthLabel" type="Label" parent="UiLayer/Root"]
+[node name="HealthLabel" type="Label" parent="UiLayer/Root" unique_id=1177108760]
+layout_mode = 0
 offset_left = 744.0
 offset_top = 456.0
 offset_right = 1224.0
 offset_bottom = 490.0
 theme_override_font_sizes/font_size = 22
 
-[node name="TierLine" type="Label" parent="UiLayer/Root"]
+[node name="TierLine" type="Label" parent="UiLayer/Root" unique_id=2034239306]
+layout_mode = 0
 offset_left = 744.0
 offset_top = 540.0
 offset_right = 1246.0
@@ -128,7 +141,8 @@ offset_bottom = 584.0
 theme_override_font_sizes/font_size = 16
 autowrap_mode = 3
 
-[node name="NextButton" type="Button" parent="UiLayer/Root"]
+[node name="NextButton" type="Button" parent="UiLayer/Root" unique_id=453991622]
+layout_mode = 0
 offset_left = 1000.0
 offset_top = 620.0
 offset_right = 1246.0

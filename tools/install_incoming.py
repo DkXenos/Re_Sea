@@ -53,6 +53,9 @@ FIT = {
     "ui/meter_fill.png": "stretch",
     "ui/minimap_bg.png": "stretch",
     "ui/panel_main.png": "cover",       # nine-patch plate, square to square
+    # a nine-patch plate has to fill its patch exactly - letterboxing one
+    # leaves transparent gutters that show up as holes in every button
+    "ui/button_normal.png": "stretch",
 }
 
 # Background removal leaves a haze of alpha 1-8 where it should be 0. Left in,

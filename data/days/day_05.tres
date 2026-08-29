@@ -1,38 +1,43 @@
 [gd_resource type="Resource" script_class="DayData" format=3]
 
-[ext_resource type="Script" path="res://data/rule_data.gd" id="1_iock1"]
-[ext_resource type="Resource" path="res://data/rules/r_baseline.tres" id="2_2mgca"]
-[ext_resource type="Resource" path="res://data/rules/r_residue.tres" id="3_7iw8q"]
-[ext_resource type="Resource" path="res://data/rules/r_chem_residue.tres" id="4_rt1rh"]
-[ext_resource type="Resource" path="res://data/rules/r_multilayer.tres" id="5_ncpma"]
-[ext_resource type="Resource" path="res://data/rules/r_flammable.tres" id="6_be1lu"]
-[ext_resource type="Resource" path="res://data/rules/r_alu_always.tres" id="7_ucesi"]
-[ext_resource type="Script" path="res://data/item_data.gd" id="8_tqqxb"]
-[ext_resource type="Resource" path="res://data/items/banana_peel.tres" id="9_8qpwf"]
-[ext_resource type="Resource" path="res://data/items/fish_bone.tres" id="10_axbku"]
-[ext_resource type="Resource" path="res://data/items/pet_bottle.tres" id="11_r621r"]
-[ext_resource type="Resource" path="res://data/items/alu_can.tres" id="12_wksii"]
-[ext_resource type="Resource" path="res://data/items/styrofoam_tray.tres" id="13_oboq6"]
-[ext_resource type="Resource" path="res://data/items/car_battery.tres" id="14_4j7ba"]
-[ext_resource type="Resource" path="res://data/items/oil_jerrycan.tres" id="15_vlya8"]
-[ext_resource type="Resource" path="res://data/items/paint_bottle.tres" id="16_tnx5v"]
-[ext_resource type="Resource" path="res://data/items/juice_carton.tres" id="17_jaaxc"]
-[ext_resource type="Resource" path="res://data/items/eco_tote.tres" id="18_f3gij"]
-[ext_resource type="Resource" path="res://data/items/paper_cup.tres" id="19_05fvb"]
-[ext_resource type="Resource" path="res://data/items/spray_can.tres" id="20_uw8fa"]
-[ext_resource type="Resource" path="res://data/items/glass_jar.tres" id="21_cxlrb"]
-[ext_resource type="Resource" path="res://data/items/fishing_net.tres" id="22_srjg0"]
-[ext_resource type="Resource" path="res://data/items/mystery_box.tres" id="90_box"]
-[ext_resource type="Script" path="res://data/day_data.gd" id="23_27d48"]
+[ext_resource type="Script" path="res://data/rule_data.gd" id="1_rule_data"]
+[ext_resource type="Resource" path="res://data/rules/r_baseline.tres" id="2_r_baseline"]
+[ext_resource type="Resource" path="res://data/rules/r_residue.tres" id="3_r_residue"]
+[ext_resource type="Resource" path="res://data/rules/r_chem_residue.tres" id="4_r_chem_residue"]
+[ext_resource type="Resource" path="res://data/rules/r_multilayer.tres" id="5_r_multilayer"]
+[ext_resource type="Resource" path="res://data/rules/r_flammable.tres" id="6_r_flammable"]
+[ext_resource type="Resource" path="res://data/rules/r_alu_always.tres" id="7_r_alu_always"]
+[ext_resource type="Script" path="res://data/item_data.gd" id="8_item_data"]
+[ext_resource type="Resource" path="res://data/items/banana_peel.tres" id="9_banana_peel"]
+[ext_resource type="Resource" path="res://data/items/fish_bone.tres" id="10_fish_bone"]
+[ext_resource type="Resource" path="res://data/items/pet_bottle.tres" id="11_pet_bottle"]
+[ext_resource type="Resource" path="res://data/items/alu_can.tres" id="12_alu_can"]
+[ext_resource type="Resource" path="res://data/items/car_battery.tres" id="13_car_battery"]
+[ext_resource type="Resource" path="res://data/items/oil_jerrycan.tres" id="14_oil_jerrycan"]
+[ext_resource type="Resource" path="res://data/items/paint_bottle.tres" id="15_paint_bottle"]
+[ext_resource type="Resource" path="res://data/items/spray_can.tres" id="16_spray_can"]
+[ext_resource type="Resource" path="res://data/items/styrofoam_tray.tres" id="17_styrofoam_tray"]
+[ext_resource type="Resource" path="res://data/items/paper_cup.tres" id="18_paper_cup"]
+[ext_resource type="Resource" path="res://data/items/juice_carton.tres" id="19_juice_carton"]
+[ext_resource type="Resource" path="res://data/items/eco_tote.tres" id="20_eco_tote"]
+[ext_resource type="Resource" path="res://data/items/fishing_net.tres" id="21_fishing_net"]
+[ext_resource type="Resource" path="res://data/items/mystery_box.tres" id="22_mystery_box"]
+[ext_resource type="Script" path="res://data/day_data.gd" id="23_day_data"]
 
 [resource]
-script = ExtResource("23_27d48")
+script = ExtResource("23_day_data")
 day_number = 5
-active_rules = Array[ExtResource("1_iock1")]([ExtResource("2_2mgca"), ExtResource("3_7iw8q"), ExtResource("4_rt1rh"), ExtResource("5_ncpma"), ExtResource("6_be1lu"), ExtResource("7_ucesi")])
-item_pool = Array[ExtResource("8_tqqxb")]([ExtResource("9_8qpwf"), ExtResource("10_axbku"), ExtResource("11_r621r"), ExtResource("12_wksii"), ExtResource("13_oboq6"), ExtResource("14_4j7ba"), ExtResource("15_vlya8"), ExtResource("16_tnx5v"), ExtResource("17_jaaxc"), ExtResource("18_f3gij"), ExtResource("19_05fvb"), ExtResource("20_uw8fa"), ExtResource("21_cxlrb"), ExtResource("22_srjg0")])
-box_item = ExtResource("90_box")
+active_rules = Array[ExtResource("1_rule_data")]([ExtResource("2_r_baseline"), ExtResource("3_r_residue"), ExtResource("4_r_chem_residue"), ExtResource("5_r_multilayer"), ExtResource("6_r_flammable"), ExtResource("7_r_alu_always")])
+item_pool = Array[ExtResource("8_item_data")]([ExtResource("9_banana_peel"), ExtResource("10_fish_bone"), ExtResource("11_pet_bottle"), ExtResource("12_alu_can"), ExtResource("13_car_battery"), ExtResource("14_oil_jerrycan"), ExtResource("15_paint_bottle"), ExtResource("16_spray_can"), ExtResource("17_styrofoam_tray"), ExtResource("18_paper_cup"), ExtResource("19_juice_carton"), ExtResource("20_eco_tote"), ExtResource("21_fishing_net"), ExtResource("17_styrofoam_tray")])
+box_item = ExtResource("22_mystery_box")
 box_spawn_count = 2
+box_contents_min = 2
+box_contents_max = 3
 quota = 12
 budget = 160
 available_tools = Array[StringName]([&"rinse", &"magnifier", &"swab", &"cutter"])
+initial_seed_fraction = 0.4
+spawn_interval_min = 8.0
+spawn_interval_max = 14.0
+min_available_items = 2
 intro_text = "Aturan bertambah dan barang bertambah, tapi waktu shift hampir sama. Perhatikan aturan aluminium yang baru."

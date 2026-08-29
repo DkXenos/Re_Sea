@@ -109,6 +109,11 @@ static_check "every Control class used is covered by the theme" "$(untuned_contr
 static_check "the theme is applied project-wide" \
   "$(grep -q '^theme/custom="res://assets/ui/ui_theme.tres"' project.godot \
       || echo 'project.godot [gui] theme/custom is not set to ui_theme.tres')"
+# data/days.json is the file a human edits; data/days/*.tres is generated from
+# it. If someone hand-edits a .tres the two silently disagree and the JSON stops
+# describing the game.
+static_check "day_*.tres matches data/days.json" \
+  "$(python3 tools/gen_days.py --check 2>&1 | grep -v '^every day' || true)"
 static_check "exactly two autoloads" \
   "$(awk '/^\[autoload\]/{f=1;next} /^\[/{f=0} f&&/=/{n++} END{if(n!=2) print "found " n}' project.godot)"
 
