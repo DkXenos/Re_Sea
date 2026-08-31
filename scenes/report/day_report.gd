@@ -1,9 +1,8 @@
 # every mis-sort with the property they didn't check and the rule it broke,
-# then the meter moves. no points anywhere - what the day is worth is the
-# material it hands the workshop, and that is the after-day screen's job.
+# and what the day put in the store. no points and no progress bar - what the
+# day is worth is the material, and how far the machines have got is the
+# Technology tab's job on the next screen.
 extends Node2D
-
-const METER_WIDTH := 320.0  # keep in sync with meter_bg.png
 
 @onready var _title: Label = $UiLayer/Root/TitleLabel
 @onready var _quota: Label = $UiLayer/Root/QuotaLabel
@@ -11,8 +10,6 @@ const METER_WIDTH := 320.0  # keep in sync with meter_bg.png
 @onready var _mistakes: VBoxContainer = $UiLayer/Root/MistakesScroll/Mistakes
 @onready var _recovered_title: Label = $UiLayer/Root/RecoveredTitle
 @onready var _recovered: VBoxContainer = $UiLayer/Root/Recovered
-@onready var _health_label: Label = $UiLayer/Root/HealthLabel
-@onready var _meter_clip: Control = $UiLayer/Root/MeterClip
 @onready var _next: Button = $UiLayer/Root/NextButton
 
 var _result: Dictionary
@@ -29,9 +26,8 @@ func _ready() -> void:
 	_next.pressed.connect(func() -> void: Events.phase_finished.emit())
 	_build_mistakes()
 	_build_recovered()
-	_animate_meter()
 	Events.sfx_requested.emit(&"day_end")
-	# commit after the numbers are up. this is the only place the meter moves.
+	# commit after the numbers are up
 	Game.commit_day_result(_result)
 
 
@@ -86,11 +82,3 @@ func _make_row(entry: CarriedItem) -> Control:
 
 func _add_line(parent: Node, text: String, font_size: int, color: Color) -> void:
 	MistakeView.add_line(parent, text, font_size, color)
-
-
-# the bar tracks machines built, which is the only thing that changes the sea now
-func _animate_meter() -> void:
-	var built: int = Game.unlocked_blueprints.size()
-	var total: int = maxi(1, Game.blueprints.size())
-	_meter_clip.size.x = METER_WIDTH * built / float(total)
-	_health_label.text = Strings.tf("report_machines", {"have": built, "need": total})

@@ -5,6 +5,8 @@ extends Node2D
 enum View { CLAW, DESK }
 
 const END_DELAY := 1.4  # 0.8 felt abrupt
+# a line worth reading needs longer than the plain "time is up" does
+const END_DELAY_MESSAGE := 3.0
 
 @onready var _claw_view: Node2D = $ClawView
 @onready var _desk_view: Node2D = $DeskView
@@ -102,7 +104,31 @@ func _end_shift() -> void:
 	_finished = true
 	_switch_button.disabled = true
 	_end_button.disabled = true
-	_status.text = Strings.t("shift_over")
 	Events.sfx_requested.emit(&"day_end")
-	var timer := get_tree().create_timer(END_DELAY)
+	var closing := _closing_line()
+	_status.text = closing["text"]
+	if closing["sfx"] != &"":
+		Events.sfx_requested.emit(closing["sfx"])
+	var timer := get_tree().create_timer(
+		END_DELAY_MESSAGE if closing["special"] else END_DELAY)
 	timer.timeout.connect(func() -> void: Events.phase_finished.emit())
+
+
+# nothing left in the water, nothing left waiting to drift in, nothing left on
+# the desk. the day's whole delivery went through your hands.
+func sea_cleared() -> bool:
+	return not _claw_view.has_work() and Game.unsorted_items().is_empty()
+
+
+# The two shifts worth saying something about: one where nothing was sorted at
+# all, and one that took every last piece out of the water. Everything between
+# those is ordinary, and the report says it better than a flash of text can.
+# {"text": String, "sfx": StringName, "special": bool}
+func _closing_line() -> Dictionary:
+	if int(Game.stats.get("sorted", 0)) == 0:
+		return {"text": Strings.t("shift_nothing_sorted"),
+			"sfx": &"reveal_nothing", "special": true}
+	if sea_cleared():
+		return {"text": Strings.t("shift_sea_cleared"),
+			"sfx": &"reveal_success", "special": true}
+	return {"text": Strings.t("shift_over"), "sfx": &"", "special": false}

@@ -47,6 +47,8 @@ const TABLE: Dictionary = {
 	"shift_to_claw": "To the Claw Machine",
 	"shift_unsorted": "{n} still unsorted",
 	"shift_over": "Shift time is up",
+	"shift_nothing_sorted": "Shift over, and not one thing sorted. Nothing reaches the workshop today.",
+	"shift_sea_cleared": "Every last piece out of the water and into a bin. The seabed is clear.",
 	"ocean_label": "Machines built: {have} / {need}",
 	"upgrade_active": "Gear fitted: {v}  -  drop {drop} · tool {tool} · sort {sort}",
 	"upgrade_none": "No gear fitted  -  drop {drop} · tool {tool} · sort {sort}",
@@ -118,7 +120,6 @@ const TABLE: Dictionary = {
 
 	# --- day report ---
 	"report_title": "DAY {n} REPORT",
-	"report_machines": "Machines built {have} / {need}",
 	"report_quota_met": "Target reached",
 	"report_quota_failed": "Target missed",
 	"report_recovered": "MATERIAL RECOVERED",

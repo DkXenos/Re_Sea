@@ -113,6 +113,12 @@ switching tabs are all free.
 Tank and desk are two views of one shift, Tab between them. shift_phase.gd
 decides when the day ends, not either view.
 
+Two endings get their own line instead of "Shift time is up": sorting nothing
+at all, and clearing the water (nothing left in the tank, nothing pending,
+nothing unsorted). Both are picked in `_closing_line()` at the moment the shift
+ends - the state they read has moved on by the time the report draws, so it
+cannot be worked out later.
+
 ## before committing
 
 ```
