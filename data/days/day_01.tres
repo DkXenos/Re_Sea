@@ -9,13 +9,15 @@
 [ext_resource type="Resource" path="res://data/items/alu_can.tres" id="7_alu_can"]
 [ext_resource type="Resource" path="res://data/items/paper_cup.tres" id="8_paper_cup"]
 [ext_resource type="Resource" path="res://data/items/styrofoam_tray.tres" id="9_styrofoam_tray"]
-[ext_resource type="Script" path="res://data/day_data.gd" id="10_day_data"]
+[ext_resource type="Resource" path="res://data/items/daun.tres" id="10_daun"]
+[ext_resource type="Resource" path="res://data/items/koran.tres" id="11_koran"]
+[ext_resource type="Script" path="res://data/day_data.gd" id="12_day_data"]
 
 [resource]
-script = ExtResource("10_day_data")
+script = ExtResource("12_day_data")
 day_number = 1
 active_rules = Array[ExtResource("1_rule_data")]([ExtResource("2_r_baseline")])
-item_pool = Array[ExtResource("3_item_data")]([ExtResource("4_banana_peel"), ExtResource("5_fish_bone"), ExtResource("6_pet_bottle"), ExtResource("7_alu_can"), ExtResource("8_paper_cup"), ExtResource("9_styrofoam_tray")])
+item_pool = Array[ExtResource("3_item_data")]([ExtResource("4_banana_peel"), ExtResource("5_fish_bone"), ExtResource("6_pet_bottle"), ExtResource("7_alu_can"), ExtResource("8_paper_cup"), ExtResource("9_styrofoam_tray"), ExtResource("10_daun"), ExtResource("11_koran")])
 quota = 5
 budget = 90
 available_tools = Array[StringName]([])

@@ -21,15 +21,17 @@
 [ext_resource type="Resource" path="res://data/items/juice_carton.tres" id="19_juice_carton"]
 [ext_resource type="Resource" path="res://data/items/eco_tote.tres" id="20_eco_tote"]
 [ext_resource type="Resource" path="res://data/items/fishing_net.tres" id="21_fishing_net"]
-[ext_resource type="Resource" path="res://data/items/mystery_box.tres" id="22_mystery_box"]
-[ext_resource type="Script" path="res://data/day_data.gd" id="23_day_data"]
+[ext_resource type="Resource" path="res://data/items/baju_b3.tres" id="22_baju_b3"]
+[ext_resource type="Resource" path="res://data/items/tisu_b3.tres" id="23_tisu_b3"]
+[ext_resource type="Resource" path="res://data/items/mystery_box.tres" id="24_mystery_box"]
+[ext_resource type="Script" path="res://data/day_data.gd" id="25_day_data"]
 
 [resource]
-script = ExtResource("23_day_data")
+script = ExtResource("25_day_data")
 day_number = 5
 active_rules = Array[ExtResource("1_rule_data")]([ExtResource("2_r_baseline"), ExtResource("3_r_residue"), ExtResource("4_r_chem_residue"), ExtResource("5_r_multilayer"), ExtResource("6_r_flammable"), ExtResource("7_r_alu_always")])
-item_pool = Array[ExtResource("8_item_data")]([ExtResource("9_banana_peel"), ExtResource("10_fish_bone"), ExtResource("11_pet_bottle"), ExtResource("12_alu_can"), ExtResource("13_car_battery"), ExtResource("14_oil_jerrycan"), ExtResource("15_paint_bottle"), ExtResource("16_spray_can"), ExtResource("17_styrofoam_tray"), ExtResource("18_paper_cup"), ExtResource("19_juice_carton"), ExtResource("20_eco_tote"), ExtResource("21_fishing_net"), ExtResource("17_styrofoam_tray")])
-box_item = ExtResource("22_mystery_box")
+item_pool = Array[ExtResource("8_item_data")]([ExtResource("9_banana_peel"), ExtResource("10_fish_bone"), ExtResource("11_pet_bottle"), ExtResource("12_alu_can"), ExtResource("13_car_battery"), ExtResource("14_oil_jerrycan"), ExtResource("15_paint_bottle"), ExtResource("16_spray_can"), ExtResource("17_styrofoam_tray"), ExtResource("18_paper_cup"), ExtResource("19_juice_carton"), ExtResource("20_eco_tote"), ExtResource("21_fishing_net"), ExtResource("17_styrofoam_tray"), ExtResource("22_baju_b3"), ExtResource("23_tisu_b3")])
+box_item = ExtResource("24_mystery_box")
 box_spawn_count = 2
 box_contents_min = 2
 box_contents_max = 3

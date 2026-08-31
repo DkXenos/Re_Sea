@@ -30,12 +30,16 @@
         "pet_bottle",
         "alu_can",
         "paper_cup",
-        "styrofoam_tray"
+        "styrofoam_tray",
+        "daun",
+        "koran"
       ],
       "item_counts": {
         "alu_can": 1,
         "banana_peel": 1,
+        "daun": 1,
         "fish_bone": 1,
+        "koran": 1,
         "paper_cup": 1,
         "pet_bottle": 1,
         "styrofoam_tray": 1
@@ -75,15 +79,21 @@
         "juice_carton",
         "eco_tote",
         "alu_can",
-        "car_battery"
+        "car_battery",
+        "apel",
+        "kantong_plastik",
+        "gelas_kertas_bersih"
       ],
       "item_counts": {
         "alu_can": 1,
+        "apel": 1,
         "banana_peel": 2,
         "car_battery": 1,
         "eco_tote": 1,
         "fish_bone": 1,
+        "gelas_kertas_bersih": 1,
         "juice_carton": 1,
+        "kantong_plastik": 1,
         "pet_bottle": 1
       },
       "box": {
@@ -125,11 +135,16 @@
         "paint_bottle",
         "styrofoam_tray",
         "alu_can",
-        "paper_cup"
+        "paper_cup",
+        "cangkang_telur",
+        "tisu_bekas",
+        "botol_kaca"
       ],
       "item_counts": {
         "alu_can": 1,
         "banana_peel": 1,
+        "botol_kaca": 1,
+        "cangkang_telur": 1,
         "car_battery": 1,
         "fish_bone": 1,
         "oil_jerrycan": 1,
@@ -137,7 +152,8 @@
         "paper_cup": 1,
         "pet_bottle": 1,
         "spray_can": 1,
-        "styrofoam_tray": 1
+        "styrofoam_tray": 1,
+        "tisu_bekas": 1
       },
       "box": {
         "item": "mystery_box",
@@ -182,9 +198,14 @@
         "styrofoam_tray",
         "juice_carton",
         "eco_tote",
-        "fishing_net"
+        "fishing_net",
+        "pizza",
+        "baju_organik",
+        "baju_daur_ulang"
       ],
       "item_counts": {
+        "baju_daur_ulang": 1,
+        "baju_organik": 1,
         "banana_peel": 1,
         "car_battery": 1,
         "eco_tote": 1,
@@ -194,6 +215,7 @@
         "juice_carton": 1,
         "oil_jerrycan": 1,
         "pet_bottle": 1,
+        "pizza": 1,
         "spray_can": 1,
         "styrofoam_tray": 1
       },
@@ -244,10 +266,13 @@
         "juice_carton",
         "eco_tote",
         "fishing_net",
-        "styrofoam_tray"
+        "styrofoam_tray",
+        "baju_b3",
+        "tisu_b3"
       ],
       "item_counts": {
         "alu_can": 1,
+        "baju_b3": 1,
         "banana_peel": 1,
         "car_battery": 1,
         "eco_tote": 1,
@@ -259,7 +284,8 @@
         "paper_cup": 1,
         "pet_bottle": 1,
         "spray_can": 1,
-        "styrofoam_tray": 2
+        "styrofoam_tray": 2,
+        "tisu_b3": 1
       },
       "box": {
         "item": "mystery_box",

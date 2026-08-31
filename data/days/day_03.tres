@@ -15,15 +15,18 @@
 [ext_resource type="Resource" path="res://data/items/styrofoam_tray.tres" id="13_styrofoam_tray"]
 [ext_resource type="Resource" path="res://data/items/alu_can.tres" id="14_alu_can"]
 [ext_resource type="Resource" path="res://data/items/paper_cup.tres" id="15_paper_cup"]
-[ext_resource type="Resource" path="res://data/items/mystery_box.tres" id="16_mystery_box"]
-[ext_resource type="Script" path="res://data/day_data.gd" id="17_day_data"]
+[ext_resource type="Resource" path="res://data/items/cangkang_telur.tres" id="16_cangkang_telur"]
+[ext_resource type="Resource" path="res://data/items/tisu_bekas.tres" id="17_tisu_bekas"]
+[ext_resource type="Resource" path="res://data/items/botol_kaca.tres" id="18_botol_kaca"]
+[ext_resource type="Resource" path="res://data/items/mystery_box.tres" id="19_mystery_box"]
+[ext_resource type="Script" path="res://data/day_data.gd" id="20_day_data"]
 
 [resource]
-script = ExtResource("17_day_data")
+script = ExtResource("20_day_data")
 day_number = 3
 active_rules = Array[ExtResource("1_rule_data")]([ExtResource("2_r_baseline"), ExtResource("3_r_residue"), ExtResource("4_r_chem_residue")])
-item_pool = Array[ExtResource("5_item_data")]([ExtResource("6_banana_peel"), ExtResource("7_fish_bone"), ExtResource("8_pet_bottle"), ExtResource("9_spray_can"), ExtResource("10_car_battery"), ExtResource("11_oil_jerrycan"), ExtResource("12_paint_bottle"), ExtResource("13_styrofoam_tray"), ExtResource("14_alu_can"), ExtResource("15_paper_cup")])
-box_item = ExtResource("16_mystery_box")
+item_pool = Array[ExtResource("5_item_data")]([ExtResource("6_banana_peel"), ExtResource("7_fish_bone"), ExtResource("8_pet_bottle"), ExtResource("9_spray_can"), ExtResource("10_car_battery"), ExtResource("11_oil_jerrycan"), ExtResource("12_paint_bottle"), ExtResource("13_styrofoam_tray"), ExtResource("14_alu_can"), ExtResource("15_paper_cup"), ExtResource("16_cangkang_telur"), ExtResource("17_tisu_bekas"), ExtResource("18_botol_kaca")])
+box_item = ExtResource("19_mystery_box")
 box_spawn_count = 1
 box_contents_min = 2
 box_contents_max = 3

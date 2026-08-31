@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="SpriteFrames" path="res://data/frames/item_daun_frames.tres" id="1_fr"]
+[ext_resource type="Script" path="res://data/item_data.gd" id="2_sc"]
+[ext_resource type="Texture2D" path="res://assets/items/hotspots_daun.png" id="2_vlfx1"]
+[ext_resource type="Texture2D" path="res://assets/items/item_daun.png" id="3_tx"]
+
+[resource]
+script = ExtResource("2_sc")
+id = &"daun"
+display_name = "Daun Kering"
+texture = ExtResource("3_tx")
+frames = ExtResource("1_fr")
+hotspot_overlay = ExtResource("2_vlfx1")
+weight = 0.1
+surface_properties = Array[String](["ringan", "kering", "mudah remuk"])
+visible_material = "daun"
+source_batch = &"kiriman_arus"

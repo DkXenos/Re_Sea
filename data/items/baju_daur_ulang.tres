@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="SpriteFrames" path="res://data/frames/item_baju_daur_ulang_frames.tres" id="1_fr"]
+[ext_resource type="Texture2D" path="res://assets/items/hotspots_baju_daur_ulang.png" id="2_a1ht4"]
+[ext_resource type="Script" path="res://data/item_data.gd" id="2_sc"]
+[ext_resource type="Texture2D" path="res://assets/items/item_baju_daur_ulang.png" id="3_tx"]
+
+[resource]
+script = ExtResource("2_sc")
+id = &"baju_daur_ulang"
+display_name = "Baju Poliester"
+texture = ExtResource("3_tx")
+frames = ExtResource("1_fr")
+hotspot_overlay = ExtResource("2_a1ht4")
+weight = 0.6
+surface_properties = Array[String](["lembut", "serat sintetis", "cepat kering"])
+visible_material = "kain poliester"
+visible_label = "POLIESTER"
+correct_category = 1
+source_batch = &"pabrik_tekstil"

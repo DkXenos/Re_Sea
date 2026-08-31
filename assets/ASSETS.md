@@ -146,6 +146,45 @@ current files come out of `tools/gen_placeholders.py` and `gen_sounds.py`.
 | `data/frames/item_fishing_net_frames.tres` | `idle` | `assets/items/item_fishing_net.png` | 2 |
 | `data/frames/item_fishing_net_frames.tres` | `wobble` | `assets/items/item_fishing_net.png` | 4 |
 | `data/frames/item_fishing_net_frames.tres` | `sinking` | `assets/items/item_fishing_net.png` | 6 |
+| `data/frames/item_baju_organik_frames.tres` | `idle` | `assets/items/item_baju_organik.png` | 2 |
+| `data/frames/item_baju_organik_frames.tres` | `wobble` | `assets/items/item_baju_organik.png` | 4 |
+| `data/frames/item_baju_organik_frames.tres` | `sinking` | `assets/items/item_baju_organik.png` | 6 |
+| `data/frames/item_baju_daur_ulang_frames.tres` | `idle` | `assets/items/item_baju_daur_ulang.png` | 2 |
+| `data/frames/item_baju_daur_ulang_frames.tres` | `wobble` | `assets/items/item_baju_daur_ulang.png` | 4 |
+| `data/frames/item_baju_daur_ulang_frames.tres` | `sinking` | `assets/items/item_baju_daur_ulang.png` | 6 |
+| `data/frames/item_baju_b3_frames.tres` | `idle` | `assets/items/item_baju_b3.png` | 2 |
+| `data/frames/item_baju_b3_frames.tres` | `wobble` | `assets/items/item_baju_b3.png` | 4 |
+| `data/frames/item_baju_b3_frames.tres` | `sinking` | `assets/items/item_baju_b3.png` | 6 |
+| `data/frames/item_gelas_kertas_bersih_frames.tres` | `idle` | `assets/items/item_gelas_kertas_bersih.png` | 2 |
+| `data/frames/item_gelas_kertas_bersih_frames.tres` | `wobble` | `assets/items/item_gelas_kertas_bersih.png` | 4 |
+| `data/frames/item_gelas_kertas_bersih_frames.tres` | `sinking` | `assets/items/item_gelas_kertas_bersih.png` | 6 |
+| `data/frames/item_tisu_bekas_frames.tres` | `idle` | `assets/items/item_tisu_bekas.png` | 2 |
+| `data/frames/item_tisu_bekas_frames.tres` | `wobble` | `assets/items/item_tisu_bekas.png` | 4 |
+| `data/frames/item_tisu_bekas_frames.tres` | `sinking` | `assets/items/item_tisu_bekas.png` | 6 |
+| `data/frames/item_tisu_b3_frames.tres` | `idle` | `assets/items/item_tisu_b3.png` | 2 |
+| `data/frames/item_tisu_b3_frames.tres` | `wobble` | `assets/items/item_tisu_b3.png` | 4 |
+| `data/frames/item_tisu_b3_frames.tres` | `sinking` | `assets/items/item_tisu_b3.png` | 6 |
+| `data/frames/item_apel_frames.tres` | `idle` | `assets/items/item_apel.png` | 2 |
+| `data/frames/item_apel_frames.tres` | `wobble` | `assets/items/item_apel.png` | 4 |
+| `data/frames/item_apel_frames.tres` | `sinking` | `assets/items/item_apel.png` | 6 |
+| `data/frames/item_botol_kaca_frames.tres` | `idle` | `assets/items/item_botol_kaca.png` | 2 |
+| `data/frames/item_botol_kaca_frames.tres` | `wobble` | `assets/items/item_botol_kaca.png` | 4 |
+| `data/frames/item_botol_kaca_frames.tres` | `sinking` | `assets/items/item_botol_kaca.png` | 6 |
+| `data/frames/item_cangkang_telur_frames.tres` | `idle` | `assets/items/item_cangkang_telur.png` | 2 |
+| `data/frames/item_cangkang_telur_frames.tres` | `wobble` | `assets/items/item_cangkang_telur.png` | 4 |
+| `data/frames/item_cangkang_telur_frames.tres` | `sinking` | `assets/items/item_cangkang_telur.png` | 6 |
+| `data/frames/item_daun_frames.tres` | `idle` | `assets/items/item_daun.png` | 2 |
+| `data/frames/item_daun_frames.tres` | `wobble` | `assets/items/item_daun.png` | 4 |
+| `data/frames/item_daun_frames.tres` | `sinking` | `assets/items/item_daun.png` | 6 |
+| `data/frames/item_kantong_plastik_frames.tres` | `idle` | `assets/items/item_kantong_plastik.png` | 2 |
+| `data/frames/item_kantong_plastik_frames.tres` | `wobble` | `assets/items/item_kantong_plastik.png` | 4 |
+| `data/frames/item_kantong_plastik_frames.tres` | `sinking` | `assets/items/item_kantong_plastik.png` | 6 |
+| `data/frames/item_koran_frames.tres` | `idle` | `assets/items/item_koran.png` | 2 |
+| `data/frames/item_koran_frames.tres` | `wobble` | `assets/items/item_koran.png` | 4 |
+| `data/frames/item_koran_frames.tres` | `sinking` | `assets/items/item_koran.png` | 6 |
+| `data/frames/item_pizza_frames.tres` | `idle` | `assets/items/item_pizza.png` | 2 |
+| `data/frames/item_pizza_frames.tres` | `wobble` | `assets/items/item_pizza.png` | 4 |
+| `data/frames/item_pizza_frames.tres` | `sinking` | `assets/items/item_pizza.png` | 6 |
 | `data/frames/bin_organic_frames.tres` | `idle` | `assets/bins/bin_organic.png` | 2 |
 | `data/frames/bin_organic_frames.tres` | `accept` | `assets/bins/bin_organic_accept.png` | 6 |
 | `data/frames/bin_organic_frames.tres` | `reject` | `assets/bins/bin_organic_reject.png` | 6 |
@@ -205,6 +244,19 @@ for, and the frame count the real thing should have. `static` = shown as-is.
 | `assets/items/item_spray_can.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `spray_can` |
 | `assets/items/item_glass_jar.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `glass_jar` |
 | `assets/items/item_fishing_net.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `fishing_net` |
+| `assets/items/item_baju_organik.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `baju_organik` |
+| `assets/items/item_baju_daur_ulang.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `baju_daur_ulang` |
+| `assets/items/item_baju_b3.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `baju_b3` |
+| `assets/items/item_gelas_kertas_bersih.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `gelas_kertas_bersih` |
+| `assets/items/item_tisu_bekas.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `tisu_bekas` |
+| `assets/items/item_tisu_b3.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `tisu_b3` |
+| `assets/items/item_apel.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `apel` |
+| `assets/items/item_botol_kaca.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `botol_kaca` |
+| `assets/items/item_cangkang_telur.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `cangkang_telur` |
+| `assets/items/item_daun.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `daun` |
+| `assets/items/item_kantong_plastik.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `kantong_plastik` |
+| `assets/items/item_koran.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `koran` |
+| `assets/items/item_pizza.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `pizza` |
 | `assets/claw/claw_open.png` | 160x160 | `open` 4 fr | Claw arm, open pose |
 | `assets/claw/claw_closing.png` | 160x160 | `closing` 6 fr | Claw arm, closing pose |
 | `assets/claw/claw_closed.png` | 160x160 | `closed` 2 fr | Claw arm, closed pose |
@@ -339,6 +391,19 @@ for, and the frame count the real thing should have. `static` = shown as-is.
 | `assets/items/hotspots_spray_can.png` | 160x160 | static | Hotspot rings for `spray_can`. **Generated from `data/items/spray_can.tres`**, don't edit by hand. |
 | `assets/items/hotspots_glass_jar.png` | 160x160 | static | Hotspot rings for `glass_jar`. **Generated from `data/items/glass_jar.tres`**, don't edit by hand. |
 | `assets/items/hotspots_fishing_net.png` | 160x160 | static | Hotspot rings for `fishing_net`. **Generated from `data/items/fishing_net.tres`**, don't edit by hand. |
+| `assets/items/hotspots_baju_organik.png` | 160x160 | static | Hotspot rings for `baju_organik`. **Generated from `data/items/baju_organik.tres`**, don't edit by hand. |
+| `assets/items/hotspots_baju_daur_ulang.png` | 160x160 | static | Hotspot rings for `baju_daur_ulang`. **Generated from `data/items/baju_daur_ulang.tres`**, don't edit by hand. |
+| `assets/items/hotspots_baju_b3.png` | 160x160 | static | Hotspot rings for `baju_b3`. **Generated from `data/items/baju_b3.tres`**, don't edit by hand. |
+| `assets/items/hotspots_gelas_kertas_bersih.png` | 160x160 | static | Hotspot rings for `gelas_kertas_bersih`. **Generated from `data/items/gelas_kertas_bersih.tres`**, don't edit by hand. |
+| `assets/items/hotspots_tisu_bekas.png` | 160x160 | static | Hotspot rings for `tisu_bekas`. **Generated from `data/items/tisu_bekas.tres`**, don't edit by hand. |
+| `assets/items/hotspots_tisu_b3.png` | 160x160 | static | Hotspot rings for `tisu_b3`. **Generated from `data/items/tisu_b3.tres`**, don't edit by hand. |
+| `assets/items/hotspots_apel.png` | 160x160 | static | Hotspot rings for `apel`. **Generated from `data/items/apel.tres`**, don't edit by hand. |
+| `assets/items/hotspots_botol_kaca.png` | 160x160 | static | Hotspot rings for `botol_kaca`. **Generated from `data/items/botol_kaca.tres`**, don't edit by hand. |
+| `assets/items/hotspots_cangkang_telur.png` | 160x160 | static | Hotspot rings for `cangkang_telur`. **Generated from `data/items/cangkang_telur.tres`**, don't edit by hand. |
+| `assets/items/hotspots_daun.png` | 160x160 | static | Hotspot rings for `daun`. **Generated from `data/items/daun.tres`**, don't edit by hand. |
+| `assets/items/hotspots_kantong_plastik.png` | 160x160 | static | Hotspot rings for `kantong_plastik`. **Generated from `data/items/kantong_plastik.tres`**, don't edit by hand. |
+| `assets/items/hotspots_koran.png` | 160x160 | static | Hotspot rings for `koran`. **Generated from `data/items/koran.tres`**, don't edit by hand. |
+| `assets/items/hotspots_pizza.png` | 160x160 | static | Hotspot rings for `pizza`. **Generated from `data/items/pizza.tres`**, don't edit by hand. |
 
 ## The font — the one thing that is not a PNG yet
 

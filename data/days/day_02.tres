@@ -11,15 +11,18 @@
 [ext_resource type="Resource" path="res://data/items/eco_tote.tres" id="9_eco_tote"]
 [ext_resource type="Resource" path="res://data/items/alu_can.tres" id="10_alu_can"]
 [ext_resource type="Resource" path="res://data/items/car_battery.tres" id="11_car_battery"]
-[ext_resource type="Resource" path="res://data/items/mystery_box.tres" id="12_mystery_box"]
-[ext_resource type="Script" path="res://data/day_data.gd" id="13_day_data"]
+[ext_resource type="Resource" path="res://data/items/apel.tres" id="12_apel"]
+[ext_resource type="Resource" path="res://data/items/kantong_plastik.tres" id="13_kantong_plastik"]
+[ext_resource type="Resource" path="res://data/items/gelas_kertas_bersih.tres" id="14_gelas_kertas_bersih"]
+[ext_resource type="Resource" path="res://data/items/mystery_box.tres" id="15_mystery_box"]
+[ext_resource type="Script" path="res://data/day_data.gd" id="16_day_data"]
 
 [resource]
-script = ExtResource("13_day_data")
+script = ExtResource("16_day_data")
 day_number = 2
 active_rules = Array[ExtResource("1_rule_data")]([ExtResource("2_r_baseline"), ExtResource("3_r_residue")])
-item_pool = Array[ExtResource("4_item_data")]([ExtResource("5_banana_peel"), ExtResource("6_fish_bone"), ExtResource("5_banana_peel"), ExtResource("7_pet_bottle"), ExtResource("8_juice_carton"), ExtResource("9_eco_tote"), ExtResource("10_alu_can"), ExtResource("11_car_battery")])
-box_item = ExtResource("12_mystery_box")
+item_pool = Array[ExtResource("4_item_data")]([ExtResource("5_banana_peel"), ExtResource("6_fish_bone"), ExtResource("5_banana_peel"), ExtResource("7_pet_bottle"), ExtResource("8_juice_carton"), ExtResource("9_eco_tote"), ExtResource("10_alu_can"), ExtResource("11_car_battery"), ExtResource("12_apel"), ExtResource("13_kantong_plastik"), ExtResource("14_gelas_kertas_bersih")])
+box_item = ExtResource("15_mystery_box")
 box_spawn_count = 1
 box_contents_min = 2
 box_contents_max = 3
