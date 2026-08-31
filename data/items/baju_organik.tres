@@ -8,12 +8,12 @@
 [resource]
 script = ExtResource("2_sc")
 id = &"baju_organik"
-display_name = "Baju Serat Alami"
+display_name = "Natural Fibre Shirt"
 texture = ExtResource("3_tx")
 frames = ExtResource("1_fr")
 hotspot_overlay = ExtResource("2_nmldh")
 weight = 0.6
-surface_properties = Array[String](["lembut", "serat alami", "menyerap air"])
-visible_material = "kain katun"
-visible_label = "KATUN 100%"
-source_batch = &"pabrik_tekstil"
+surface_properties = Array[String](["soft", "natural fibre", "soaks up water"])
+visible_material = "cotton fabric"
+visible_label = "COTTON 100%"
+source_batch = &"textile_mill"

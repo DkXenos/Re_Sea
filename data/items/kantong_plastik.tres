@@ -8,13 +8,13 @@
 [resource]
 script = ExtResource("2_sc")
 id = &"kantong_plastik"
-display_name = "Kantong Plastik"
+display_name = "Plastic Bag"
 texture = ExtResource("3_tx")
 frames = ExtResource("1_fr")
 hotspot_overlay = ExtResource("2_utg0i")
 weight = 0.2
-surface_properties = Array[String](["lentur", "ringan", "berkerisik"])
-visible_material = "plastik"
+surface_properties = Array[String](["flexible", "light", "crinkly"])
+visible_material = "plastic"
 visible_label = "HDPE 2"
 correct_category = 1
-source_batch = &"rumah_tangga"
+source_batch = &"household"

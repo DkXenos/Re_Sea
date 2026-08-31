@@ -7,7 +7,7 @@
 [resource]
 script = ExtResource("1_script")
 id = &"safety_valve"
-display_name = "Katup Pengaman"
+display_name = "Safety Valve"
 locked_texture = ExtResource("2_locked")
 done_texture = ExtResource("3_done")
 diagram_position = Vector2(0.48, 0.74)

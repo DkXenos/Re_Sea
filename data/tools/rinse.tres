@@ -7,10 +7,10 @@
 [resource]
 script = ExtResource("3_8l6xf")
 id = &"rinse"
-display_name = "Bilas"
+display_name = "Rinse"
 frames = ExtResource("1_p6up3")
 icon = ExtResource("2_xv6lh")
 reveals_field = "has_residue"
 default_charges = 4
-description = "Menyiram permukaan untuk melihat apakah masih ada sisa kotoran di baliknya."
+description = "Rinses the surface to see whether there is residue left underneath."
 color = Color(0.3764706, 0.69803923, 0.9019608, 1)

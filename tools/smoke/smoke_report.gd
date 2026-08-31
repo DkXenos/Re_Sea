@@ -1,5 +1,6 @@
-# ocean health arithmetic, term by term:
-#   health += correct*2 - wrong*4 - max(0, quota-sorted)*3 + clean_day_bonus
+# what a day is worth, now that there is no day score:
+#   only correctly sorted items reach the material store, and a wrong bin
+#   loses the item outright.
 #   godot --headless --script tools/smoke/smoke_report.gd
 extends SceneTree
 
@@ -16,51 +17,58 @@ func _run() -> void:
 	game.advance_day()
 	game.advance_day() # day 3, quota 8
 
-	# --- a messy day: mistakes and a shortfall, no clean bonus ---
+	# --- the breakdown counts, it does not score ---
 	game.stats = {"correct": 4, "wrong": 2, "sorted": 6, "grabs_used": 12}
 	var b: Dictionary = game.end_day_breakdown()
-	var expected_shortfall: int = maxi(0, 8 - 6) * 3
-	var expected_delta: int = 4 * 2 - 2 * 4 - expected_shortfall
-	print("messy: quota %d sorted %d shortfall -%d clean +%d delta %+d" %
-		[b["quota"], b["sorted"], b["shortfall"], b["clean_bonus"], b["delta"]])
-	assert(int(b["shortfall"]) == expected_shortfall, "shortfall penalty wrong")
-	assert(int(b["clean_bonus"]) == 0, "clean bonus must not pay on a day with mistakes")
-	assert(int(b["delta"]) == expected_delta, "day score delta wrong")
+	print("messy: quota %d sorted %d correct %d wrong %d" %
+		[b["quota"], b["sorted"], b["correct"], b["wrong"]])
 	assert(not b["quota_met"], "quota should not be met")
-	assert(not b.has("fish"), "the fish penalty must be gone entirely")
+	for gone: String in ["delta", "shortfall", "clean_bonus", "fish"]:
+		assert(not b.has(gone), "%s is a score term and must be gone entirely" % gone)
 
-	# --- a clean day has to score positively ---
 	game.stats = {"correct": 8, "wrong": 0, "sorted": 8, "grabs_used": 10}
-	var clean: Dictionary = game.end_day_breakdown()
-	print("clean: correct %d clean +%d delta %+d" %
-		[clean["correct"], clean["clean_bonus"], clean["delta"]])
-	assert(int(clean["clean_bonus"]) == 5, "clean day bonus not paid")
-	assert(int(clean["delta"]) == 8 * 2 + 5, "clean day delta wrong")
-	assert(int(clean["delta"]) > 0, "a perfectly played day must score positively")
+	assert(game.end_day_breakdown()["quota_met"], "quota met should read as met")
 
-	# A clean day that misses quota gets no bonus - the bonus needs both.
-	game.stats = {"correct": 5, "wrong": 0, "sorted": 5, "grabs_used": 8}
-	var short_clean: Dictionary = game.end_day_breakdown()
-	assert(int(short_clean["clean_bonus"]) == 0, "clean bonus needs quota met too")
-	print("clean but short of quota: clean +%d (correctly withheld)" %
-		short_clean["clean_bonus"])
+	# --- a wrong bin pays nothing, and the report says so ---
+	var day: DayData = game.current_day()
+	var rules: Array[RuleData] = day.active_rules
+	var right: int = 0
+	var wrong: int = 0
+	game.begin_day()
+	for item: ItemData in day.item_pool:
+		if item.is_container:
+			continue
+		var entry: CarriedItem = game.add_to_inventory(item)
+		var correct_bin: int = int(RuleChecker.resolve(item, rules)["category"])
+		# every third item goes in the wrong bin on purpose
+		var into: int = correct_bin if (right + wrong) % 3 != 2 else (correct_bin + 1) % 4
+		if RuleChecker.judge(entry, into, rules):
+			right += 1
+		else:
+			wrong += 1
+	assert(right > 0 and wrong > 0, "the fixture needs both a correct and a wrong sort")
 
-	# --- the 4x asymmetry on wrong sorts survives the revision ---
-	game.stats = {"correct": 1, "wrong": 0, "sorted": 8, "grabs_used": 8}
-	var one_right: int = int(game.end_day_breakdown()["delta"])
-	game.stats = {"correct": 0, "wrong": 1, "sorted": 8, "grabs_used": 8}
-	var one_wrong: int = int(game.end_day_breakdown()["delta"])
-	assert(one_wrong == -4 and one_right == 2 + 5,
-		"wrong sorts must still cost 4, twice what a correct sort pays")
-	print("asymmetry intact: one correct %+d, one wrong %+d" % [one_right - 5, one_wrong])
+	var recovered: Dictionary = game.day_recovered()
+	var total: int = 0
+	for category: int in recovered:
+		total += int(recovered[category])
+	print("sorted %d right, %d wrong -> %d recovered" % [right, wrong, total])
+	assert(total == right, "recovered material must equal the correct sorts, not %d" % total)
 
-	# a disastrous day must score negatively, a perfect one positively
-	game.stats = {"correct": 0, "wrong": 5, "sorted": 5, "grabs_used": 5}
-	assert(int(game.end_day_breakdown()["delta"]) < 0, "a bad day must score negative")
-	game.stats = {"correct": 8, "wrong": 0, "sorted": 8, "grabs_used": 8}
-	assert(int(game.end_day_breakdown()["delta"]) > 0, "a good day must score positive")
-	print("day score sign ok")
-	print("formula verified")
+	# and every unit of it is filed under the bin it BELONGED in
+	for entry: CarriedItem in game.inventory:
+		if entry.sorted_to == -1 or entry.was_correct:
+			continue
+		assert(entry.sorted_to != entry.expected_category, "a wrong sort matched its bin")
+
+	# --- committing the day moves exactly that much into the store ---
+	var before: Dictionary = game.materials.duplicate()
+	game.commit_day_result(game.end_day_breakdown())
+	var gained: int = 0
+	for category: int in game.materials:
+		gained += int(game.materials[category]) - int(before.get(category, 0))
+	assert(gained == right, "the store gained %d from %d correct sorts" % [gained, right])
+	print("material store credited %d, wrong sorts credited nothing" % gained)
 
 	game.stop_all_sfx()
 	for i in 10:

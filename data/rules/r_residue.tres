@@ -5,8 +5,8 @@
 [resource]
 script = ExtResource("1_f88a7")
 id = &"r_residue"
-text = "Barang yang masih ada sisa kotoran tidak bisa didaur ulang. Buang ke RESIDU."
-short_text = "Ada sisa kotoran  ->  RESIDU"
+text = "Anything with residue still on it cannot be recycled. It goes in LANDFILL."
+short_text = "Any residue left  ->  LANDFILL"
 applies_when = {
 "has_residue": true
 }

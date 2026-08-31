@@ -7,7 +7,7 @@
 [resource]
 script = ExtResource("1_script")
 id = &"collection_tank"
-display_name = "Tangki Penampung"
+display_name = "Collection Tank"
 locked_texture = ExtResource("2_locked")
 done_texture = ExtResource("3_done")
 diagram_position = Vector2(0.38, 0.74)

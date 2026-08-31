@@ -1,5 +1,9 @@
 # tank renders into a SubViewport so the glass edge clips it for free. camera
 # inside follows the claw across a seabed wider than the window.
+#
+# the sea only exists inside that viewport. everything outside the frame is the
+# hull we are sitting in, so the window really is a window - move the claw and
+# the water moves behind it.
 extends Node2D
 
 const ITEM_SCENE := preload("res://scenes/claw/tank_item.tscn")
@@ -17,24 +21,50 @@ const ITEM_REST_Y := Vector2(246.0, 278.0)
 const FISH_DEPTH_Y := Vector2(72.0, 208.0)
 # mouse parallax, nearest layer. keep it small.
 const PARALLAX := [2.0, 4.0, 6.0]
-# how far the water bg slides against the camera
-const BG_CAMERA_PARALLAX := 0.04
+
+# The depth layers behind the seabed, furthest first. `scroll` is how much of
+# the camera's travel that layer takes:
+#
+#   0.0  painted on the glass - never moves, however far the claw goes
+#   1.0  the world itself - the seabed, the items, the claw
+#
+# `repeat` turns a row into scenery: that many copies of the cut-out spread
+# along the layer, planted on the seabed at the size the manifest installed it
+# at. Leave it out and the row is one continuous backdrop instead.
+#
+# Add a row and it shows up. Nothing here says how big anything is: every layer
+# is sized from its own texture, so art at any resolution lands in the window at
+# its true proportions. A backdrop is only ever scaled UP far enough to reach
+# across its own travel and the window crops the rest, so no layer is ever
+# stretched on one axis.
+const PARALLAX_LAYERS: Array[Dictionary] = [
+	{"texture": "res://assets/env/water_bg.png", "scroll": 0.12},
+	{"texture": "res://assets/env/coral_dead.png", "scroll": 0.4, "repeat": 7},
+	{"texture": "res://assets/env/coral_healthy.png", "scroll": 0.62, "repeat": 5},
+]
+# far enough behind the seabed (-10) that nothing can land between them
+const PARALLAX_Z := -20
+# where the foot of a piece of scenery sits, so it looks planted in the seabed
+# rather than floating over it. same units as ITEM_REST_Y.
+const SCENERY_BASE_Y := Vector2(250.0, 286.0)
+# the span a backdrop needs works out exact, which means the far end of the
+# rail lands on the boundary and a rounding error there is a visible sliver of
+# nothing. a few pixels of slack costs nothing and removes the class of bug.
+const PARALLAX_OVERSCAN := 8.0
 
 # ~2.6x the tank window (1000 wide, not the 1280 viewport). wider than 3x and
 # searching turns into sweeping.
 @export var seabed_width: float = 2600.0
 
 # atmosphere only, fish can't be grabbed.
-# fallback only - OceanTierData.fish_count wins whenever a tier is loaded
 @export var fish_count: int = 9
 @export var fish_speed_min: float = 25.0
 @export var fish_speed_max: float = 65.0
 
 @onready var _tank_layer: CanvasLayer = $TankLayer
-@onready var _bg_layer: CanvasLayer = $BgLayer
 @onready var _glass_layer: CanvasLayer = $GlassLayer
+@onready var _parallax: Node2D = $TankLayer/TankContainer/TankViewport/TankWorld/Parallax
 @onready var _seabed: Sprite2D = $TankLayer/TankContainer/TankViewport/TankWorld/Seabed
-@onready var _decor: Node2D = $TankLayer/TankContainer/TankViewport/TankWorld/Decor
 @onready var _items: Node2D = $TankLayer/TankContainer/TankViewport/TankWorld/Items
 @onready var _fish: Node2D = $TankLayer/TankContainer/TankViewport/TankWorld/FishHolder
 @onready var _claw: Node2D = $TankLayer/TankContainer/TankViewport/TankWorld/Claw
@@ -58,6 +88,11 @@ var _spawn_timer: float = 0.0
 var _knob_home: Vector2
 var _bubble_speeds: Array[float] = []
 var _dots: Array[TextureRect] = []
+var _layers: Array[Sprite2D] = []
+# per layer, matched by index: how much camera travel it takes, and where it
+# sits when the camera is at its leftmost
+var _layer_scroll: Array[float] = []
+var _layer_base: Array[float] = []
 
 
 func _ready() -> void:
@@ -67,6 +102,7 @@ func _ready() -> void:
 		return
 	_knob_home = _knob.position
 	_setup_tank()
+	_setup_parallax()
 	_claw.cycle_finished.connect(_on_cycle_finished)
 	_claw.drop_started.connect(_on_drop_started)
 	$FrameLayer/ArrowLeft.button_down.connect(func() -> void: _claw.button_axis = -1.0)
@@ -81,7 +117,6 @@ func _ready() -> void:
 	Events.vfx_intensity_changed.connect(_rebuild_bubbles)
 	_hint.text = Strings.t("claw_hint")
 	_toast.text = ""
-	_dress_tank()
 	_spawn_items()
 	_spawn_fish()
 	_rebuild_bubbles(Game.vfx_intensity)
@@ -90,10 +125,6 @@ func _ready() -> void:
 # everything that depends on seabed width, in one place
 func _setup_tank() -> void:
 	# tile one PNG instead of asking for a 2600px asset every time this changes
-	# the tier decides which floor this is before the region is measured off it
-	var tier := Game.current_tier()
-	if tier != null and tier.seabed != null:
-		_seabed.texture = tier.seabed
 	_seabed.centered = false
 	_seabed.texture_repeat = CanvasItem.TEXTURE_REPEAT_ENABLED
 	_seabed.region_enabled = true
@@ -110,6 +141,94 @@ func _setup_tank() -> void:
 	_camera.limit_bottom = int(TANK_VIEW.y)
 	_camera.position = Vector2(_claw.position.x, TANK_VIEW.y * 0.5)
 	_camera.reset_smoothing()
+
+
+# Builds every row of PARALLAX_LAYERS into sprites. A scenery copy is just
+# another entry with its own offset, so the per-frame loop stays flat.
+func _setup_parallax() -> void:
+	# its own stream: pulling from Game.rng here would shift every item spawn
+	var scatter := RandomNumberGenerator.new()
+	scatter.seed = Game.run_seed + Game.day_index * 7919 + 31
+
+	for i in PARALLAX_LAYERS.size():
+		var row: Dictionary = PARALLAX_LAYERS[i]
+		var path := String(row["texture"])
+		if not ResourceLoader.exists(path):
+			push_warning("Parallax layer texture missing: %s" % path)
+			continue
+		var texture: Texture2D = load(path)
+		var scroll := clampf(float(row.get("scroll", 0.0)), 0.0, 1.0)
+		var base := _camera_min() * scroll - TANK_VIEW.x * 0.5 - PARALLAX_OVERSCAN * 0.5
+		var copies := int(row.get("repeat", 0))
+		if copies <= 0:
+			_add_layer(_backdrop_sprite(texture, scroll, i), scroll, base)
+			continue
+		# a strict spread would read as fence posts, so each copy gets its own
+		# slot on the layer and wanders inside it
+		var span := _layer_span(scroll) - texture.get_width()
+		var slot := span / float(copies)
+		for j in copies:
+			var sprite := _scenery_sprite(texture, i, scatter)
+			_add_layer(sprite, scroll,
+				base + slot * (float(j) + scatter.randf_range(0.05, 0.95)))
+	_update_parallax_layers()
+
+
+func _add_layer(sprite: Sprite2D, scroll: float, base: float) -> void:
+	_parallax.add_child(sprite)
+	_layers.append(sprite)
+	_layer_scroll.append(scroll)
+	_layer_base.append(base)
+
+
+# one continuous picture, stretched across nothing - scaled uniformly until it
+# covers the window and its own travel, and cropped by the window from there
+func _backdrop_sprite(texture: Texture2D, scroll: float, depth: int) -> Sprite2D:
+	var sprite := Sprite2D.new()
+	sprite.texture = texture
+	sprite.centered = false
+	sprite.z_index = PARALLAX_Z + depth
+	sprite.scale = _fit_scale(texture, _layer_span(scroll))
+	# whatever is taller than the window hangs off both edges equally, so a tall
+	# picture shows its middle rather than its top
+	sprite.position.y = (TANK_VIEW.y - texture.get_height() * sprite.scale.y) * 0.5
+	return sprite
+
+
+# a cut-out at the size the manifest gave it, standing on the seabed
+func _scenery_sprite(texture: Texture2D, depth: int, scatter: RandomNumberGenerator) -> Sprite2D:
+	var sprite := Sprite2D.new()
+	sprite.texture = texture
+	sprite.centered = false
+	sprite.z_index = PARALLAX_Z + depth
+	sprite.position.y = scatter.randf_range(SCENERY_BASE_Y.x, SCENERY_BASE_Y.y) \
+		- texture.get_height()
+	return sprite
+
+
+# How wide a layer has to be to still fill the window at both ends of the rail.
+# A layer that takes none of the camera's travel only ever needs the window;
+# one that takes all of it needs the whole seabed.
+func _layer_span(scroll: float) -> float:
+	return TANK_VIEW.x + (_camera_max() - _camera_min()) * scroll + PARALLAX_OVERSCAN
+
+
+# Uniform, so nothing is stretched: big enough to fill the window's height AND
+# reach across `span`, whichever demands more. The window crops the surplus.
+func _fit_scale(texture: Texture2D, span: float) -> Vector2:
+	var size := texture.get_size()
+	if size.x <= 0.0 or size.y <= 0.0:
+		return Vector2.ONE
+	return Vector2.ONE * maxf(span / size.x, TANK_VIEW.y / size.y)
+
+
+# the camera is clamped by its own limits, so the centre never leaves this range
+func _camera_min() -> float:
+	return TANK_VIEW.x * 0.5
+
+
+func _camera_max() -> float:
+	return seabed_width - TANK_VIEW.x * 0.5
 
 
 # starts partly stocked and fills up. empty = waiting, full = no reason to
@@ -178,43 +297,8 @@ func _update_spawning(delta: float) -> void:
 	_reset_spawn_timer()
 
 
-## Coral and debris for the current tier. Both are AnimatedSprite2D playing a
-## named animation from the tier's SpriteFrames - the tier swaps the resource,
-## never the colour, so a filthy seabed is different art rather than a tint.
-func _dress_tank() -> void:
-	_clear(_decor)
-	var tier := Game.current_tier()
-	if tier == null:
-		return
-	var margin := 90.0
-	var span := seabed_width - margin * 2.0
-	# coral sits on the floor, debris scatters just above it
-	# z_index on a child is relative to Decor's own -8, so these stay small:
-	# 0 and 1 land at -8 and -7, both above the Seabed at -10.
-	for spec: Array in [[tier.coral_count, tier.coral_frames, 0.0, 0],
-			[tier.debris_count, tier.debris_frames, 16.0, 1]]:
-		var count: int = int(spec[0])
-		var frames: SpriteFrames = spec[1]
-		if frames == null or count <= 0:
-			continue
-		var lane := span / float(count)
-		for i in count:
-			var node := AnimatedSprite2D.new()
-			node.sprite_frames = frames
-			node.z_index = int(spec[3])
-			# spread one per lane so they never stack into a clump
-			node.position = Vector2(
-				margin + lane * (float(i) + Game.rng.randf_range(0.2, 0.8)),
-				ITEM_REST_Y.y + float(spec[2]) + Game.rng.randf_range(-6.0, 10.0))
-			node.flip_h = Game.rng.randf() < 0.5
-			if frames.has_animation(&"idle"):
-				node.play(&"idle")
-			_decor.add_child(node)
-
-
 func _spawn_fish() -> void:
-	var tier := Game.current_tier()
-	var count: int = tier.fish_count if tier != null else fish_count
+	var count: int = fish_count
 	for i in count:
 		var node: Node2D = FISH_SCENE.instantiate()
 		_fish.add_child(node)
@@ -260,17 +344,25 @@ func _claw_progress() -> float:
 	return inverse_lerp(_claw.min_x, _claw.max_x, _claw.position.x)
 
 
-# three canvaslayers nudged by the mouse, nearest moves most
+# the tank and the glass are nudged by the mouse, the hull is not - we are
+# sitting in it, so it has no business moving.
 func _update_parallax() -> void:
 	var vp := get_viewport_rect().size
 	if vp.x <= 0.0:
 		return
 	var m := get_viewport().get_mouse_position() / vp - Vector2(0.5, 0.5)
-	var camera_slide := (_camera.get_screen_center_position().x - seabed_width * 0.5) \
-		* BG_CAMERA_PARALLAX
-	_bg_layer.offset = -m * PARALLAX[0] - Vector2(camera_slide, 0.0)
 	_tank_layer.offset = -m * PARALLAX[1]
 	_glass_layer.offset = -m * PARALLAX[2]
+	_update_parallax_layers()
+
+
+# A sprite sitting still in the world slides a full pixel across the window for
+# every pixel the camera moves. Giving back (1 - scroll) of that movement is
+# what makes a layer look further away.
+func _update_parallax_layers() -> void:
+	var centre := _camera.get_screen_center_position().x
+	for i in _layers.size():
+		_layers[i].position.x = _layer_base[i] + centre * (1.0 - _layer_scroll[i])
 
 
 func _update_bubbles(delta: float) -> void:

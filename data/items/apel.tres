@@ -8,11 +8,11 @@
 [resource]
 script = ExtResource("2_sc")
 id = &"apel"
-display_name = "Sisa Apel"
+display_name = "Apple Core"
 texture = ExtResource("3_tx")
 frames = ExtResource("1_fr")
 hotspot_overlay = ExtResource("2_nhd75")
 weight = 0.3
-surface_properties = Array[String](["lunak", "berair", "berbau manis"])
-visible_material = "sisa buah"
-source_batch = &"rumah_tangga"
+surface_properties = Array[String](["mushy", "watery", "sweet smell"])
+visible_material = "fruit scraps"
+source_batch = &"household"

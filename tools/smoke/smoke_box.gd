@@ -1,5 +1,6 @@
 # the sealed box, driven through the real UI. what has to hold: never
-# sortable, opening costs nothing, contents fixed by the run seed and not by
+# sortable, opening costs nothing, the empty crate is kept and sortable,
+# contents fixed by the run seed and not by
 # when you got round to opening it, and no box inside a box.
 #   godot --headless --script tools/smoke/smoke_box.gd
 extends SceneTree
@@ -108,8 +109,8 @@ func _check_open_through_the_desk() -> void:
 	var budget_before: int = game.budget_left
 	var inventory_before: int = game.inventory.size()
 	button.pressed.emit()
-	# The card holds the opened crate on screen and then fades, so the swap
-	# lands on a timer rather than on the next frame.
+	# The card holds the opened crate on screen briefly, so the swap lands on a
+	# timer rather than on the next frame.
 	var waited: int = 0
 	while not box.opened and waited < 400:
 		waited += 1
@@ -117,14 +118,18 @@ func _check_open_through_the_desk() -> void:
 	assert(box.opened, "Buka did not open the box within %d frames" % waited)
 	assert(game.budget_left == budget_before,
 		"opening a box spent %d budget" % [budget_before - game.budget_left])
-	assert(not game.inventory.has(box), "the opened box stayed in the inventory")
+	# the empty crate is rubbish too - it stays, and a bin will now take it
+	assert(game.inventory.has(box), "the opened crate was thrown away instead of kept")
+	assert(box in game.sortable_items(), "the opened crate cannot be sorted")
+	assert(box.display_texture() != box.data.texture,
+		"the opened crate still draws its closed art")
 
-	var gained: int = game.inventory.size() - inventory_before + 1
+	var gained: int = game.inventory.size() - inventory_before
 	assert(gained >= day.box_contents_min and gained <= day.box_contents_max,
 		"a box yielded %d items, outside %d-%d"
 		% [gained, day.box_contents_min, day.box_contents_max])
-	assert(_open_button(inventory) == null, "the opened box still has a card")
-	print("  Buka: %d items into the inventory, budget untouched at %d"
+	assert(_open_button(inventory) == null, "the opened crate still offers Buka")
+	print("  Buka: %d items out, empty crate kept and sortable, budget still %d"
 		% [gained, game.budget_left])
 
 	# What came out is an ordinary grabbed item from here on: it inspects, it

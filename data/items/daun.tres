@@ -7,12 +7,12 @@
 
 [resource]
 script = ExtResource("2_sc")
-id = &"daun"
-display_name = "Daun Kering"
+id = &"leaves"
+display_name = "Dry Leaves"
 texture = ExtResource("3_tx")
 frames = ExtResource("1_fr")
 hotspot_overlay = ExtResource("2_vlfx1")
 weight = 0.1
-surface_properties = Array[String](["ringan", "kering", "mudah remuk"])
-visible_material = "daun"
-source_batch = &"kiriman_arus"
+surface_properties = Array[String](["light", "dry", "crushes easily"])
+visible_material = "leaves"
+source_batch = &"current_delivery"

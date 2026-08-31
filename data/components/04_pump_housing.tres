@@ -7,7 +7,7 @@
 [resource]
 script = ExtResource("1_script")
 id = &"pump_housing"
-display_name = "Rumah Pompa"
+display_name = "Pump Housing"
 locked_texture = ExtResource("2_locked")
 done_texture = ExtResource("3_done")
 diagram_position = Vector2(0.58, 0.42)

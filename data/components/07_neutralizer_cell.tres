@@ -7,7 +7,7 @@
 [resource]
 script = ExtResource("1_script")
 id = &"neutralizer_cell"
-display_name = "Sel Penetral"
+display_name = "Neutraliser Cell"
 locked_texture = ExtResource("2_locked")
 done_texture = ExtResource("3_done")
 diagram_position = Vector2(0.66, 0.34)

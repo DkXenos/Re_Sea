@@ -7,7 +7,7 @@
 [resource]
 script = ExtResource("1_script")
 id = &"sealed_chamber"
-display_name = "Bilik Tersegel"
+display_name = "Sealed Chamber"
 locked_texture = ExtResource("2_locked")
 done_texture = ExtResource("3_done")
 diagram_position = Vector2(0.3, 0.36)

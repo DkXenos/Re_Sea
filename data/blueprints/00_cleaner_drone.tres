@@ -12,8 +12,8 @@
 [resource]
 script = ExtResource("9_script")
 id = &"cleaner_drone"
-display_name = "Drone Pembersih"
-flavour_text = "Drone kecil yang menyusuri dasar laut dan menyedot serpihan sampah yang terlalu halus untuk dijangkau cakar."
+display_name = "Cleaner Drone"
+flavour_text = "A small drone that crawls the seabed and sucks up the fragments too fine for the claw to reach."
 components = Array[ExtResource("1_comp")]([ExtResource("2_c0"), ExtResource("3_c1"), ExtResource("4_c2")])
 background = ExtResource("8_bg")
 background_ready = ExtResource("8_bgr")

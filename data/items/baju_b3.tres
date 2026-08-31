@@ -8,12 +8,12 @@
 [resource]
 script = ExtResource("2_sc")
 id = &"baju_b3"
-display_name = "Baju Kena Pestisida"
+display_name = "Pesticide-Soaked Shirt"
 texture = ExtResource("3_tx")
 frames = ExtResource("1_fr")
 hotspot_overlay = ExtResource("2_imd61")
 weight = 0.7
-surface_properties = Array[String](["bernoda gelap", "bau menyengat", "lembap"])
-visible_material = "kain terkena pestisida"
+surface_properties = Array[String](["dark stains", "sharp smell", "damp"])
+visible_material = "pesticide-soaked fabric"
 correct_category = 2
-source_batch = &"pabrik_tekstil"
+source_batch = &"textile_mill"

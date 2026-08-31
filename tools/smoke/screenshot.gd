@@ -69,7 +69,7 @@ func _run() -> void:
 			await process_frame
 		var inspect: Control = scene.get_node("DeskView/UiLayer/Root/InspectPanel")
 		for e in game.inventory:
-			if e.data.id == &"oil_jerrycan":
+			if e.data.id == &"tisu_b3":
 				inspect.show_entry(e)
 				inspect._armed = &"rinse"
 				inspect._use_tool_at(Vector2(160, 160) + (Vector2(0.38, 0.70) - Vector2(0.5, 0.5)) * 288.0)

@@ -8,11 +8,11 @@
 [resource]
 script = ExtResource("2_1bwea")
 id = &"banana_peel"
-display_name = "Kulit Pisang"
+display_name = "Banana Peel"
 texture = ExtResource("3_w3u2i")
 frames = ExtResource("1_p1vj8")
 hotspot_overlay = ExtResource("2_w3u2i")
 weight = 0.3
-surface_properties = Array[String](["lunak", "berserat", "berbau"])
-visible_material = "kulit buah"
-source_batch = &"rumah_tangga"
+surface_properties = Array[String](["mushy", "stringy", "smelly"])
+visible_material = "fruit peel"
+source_batch = &"household"

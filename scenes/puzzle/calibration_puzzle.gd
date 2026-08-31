@@ -19,34 +19,34 @@ const BUDGET_BONUS := 4
 
 # reasons are index pairs into the correct order - if `before` ends up ahead
 # of `after`, that's the line they get. say what actually goes wrong, not
-# "salah urutan".
+# "wrong order".
 #
 # text lives here and not in strings.gd so deleting the folder kills it all.
 const SEQUENCES: Dictionary = {
 	&"penyaring_mikroplastik": {
-		"steps": ["Sedot air", "Saring partikel", "Kumpulkan residu", "Buang air bersih"],
+		"steps": ["Draw in water", "Strain the particles", "Collect the residue", "Release clean water"],
 		"reasons": [
 			{"before": 3, "after": 1,
-				"text": "Air dibuang sebelum disaring. Residunya ikut keluar."},
+				"text": "The water was released before it was strained. The residue went out with it."},
 			{"before": 1, "after": 0,
-				"text": "Belum ada air yang disedot, jadi tidak ada yang bisa disaring."},
+				"text": "No water has been drawn in yet, so there is nothing to strain."},
 			{"before": 3, "after": 2,
-				"text": "Air dibuang sebelum residunya dikumpulkan. Residunya hanyut lagi."},
+				"text": "The water was released before the residue was collected. It washed straight back out."},
 			{"before": 2, "after": 1,
-				"text": "Residu dikumpulkan sebelum penyaringan. Belum ada apa pun yang terkumpul."},
+				"text": "The residue was collected before anything was strained. Nothing had gathered yet."},
 		],
 	},
 	&"penetral_b3": {
-		"steps": ["Isolasi wadah", "Netralkan zat", "Uji keasaman", "Segel dan simpan"],
+		"steps": ["Isolate the vessel", "Neutralise the chemical", "Test the acidity", "Seal and store"],
 		"reasons": [
 			{"before": 1, "after": 0,
-				"text": "Wadah belum diisolasi. Zatnya bocor."},
+				"text": "The vessel was never isolated. The chemical escaped."},
 			{"before": 3, "after": 0,
-				"text": "Disegel sebelum wadahnya diisolasi. Bahayanya ikut tersegel di tempat yang salah."},
+				"text": "Sealed before the vessel was isolated. The hazard got sealed in the wrong place."},
 			{"before": 2, "after": 1,
-				"text": "Diuji sebelum diproses. Hasilnya hanya menunjukkan keadaan awal."},
+				"text": "Tested before it was processed. The reading only shows where it started."},
 			{"before": 3, "after": 2,
-				"text": "Disegel sebelum diuji. Tidak ada yang tahu isinya sudah aman atau belum."},
+				"text": "Sealed before it was tested. Nobody knows whether what is inside is safe."},
 		],
 	},
 }

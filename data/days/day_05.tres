@@ -5,33 +5,31 @@
 [ext_resource type="Resource" path="res://data/rules/r_residue.tres" id="3_r_residue"]
 [ext_resource type="Resource" path="res://data/rules/r_chem_residue.tres" id="4_r_chem_residue"]
 [ext_resource type="Resource" path="res://data/rules/r_multilayer.tres" id="5_r_multilayer"]
-[ext_resource type="Resource" path="res://data/rules/r_flammable.tres" id="6_r_flammable"]
-[ext_resource type="Resource" path="res://data/rules/r_alu_always.tres" id="7_r_alu_always"]
-[ext_resource type="Script" path="res://data/item_data.gd" id="8_item_data"]
+[ext_resource type="Script" path="res://data/item_data.gd" id="6_item_data"]
+[ext_resource type="Resource" path="res://data/items/apel.tres" id="7_apel"]
+[ext_resource type="Resource" path="res://data/items/baju_organik.tres" id="8_baju_organik"]
 [ext_resource type="Resource" path="res://data/items/banana_peel.tres" id="9_banana_peel"]
-[ext_resource type="Resource" path="res://data/items/fish_bone.tres" id="10_fish_bone"]
-[ext_resource type="Resource" path="res://data/items/pet_bottle.tres" id="11_pet_bottle"]
-[ext_resource type="Resource" path="res://data/items/alu_can.tres" id="12_alu_can"]
-[ext_resource type="Resource" path="res://data/items/car_battery.tres" id="13_car_battery"]
-[ext_resource type="Resource" path="res://data/items/oil_jerrycan.tres" id="14_oil_jerrycan"]
-[ext_resource type="Resource" path="res://data/items/paint_bottle.tres" id="15_paint_bottle"]
-[ext_resource type="Resource" path="res://data/items/spray_can.tres" id="16_spray_can"]
-[ext_resource type="Resource" path="res://data/items/styrofoam_tray.tres" id="17_styrofoam_tray"]
-[ext_resource type="Resource" path="res://data/items/paper_cup.tres" id="18_paper_cup"]
-[ext_resource type="Resource" path="res://data/items/juice_carton.tres" id="19_juice_carton"]
-[ext_resource type="Resource" path="res://data/items/eco_tote.tres" id="20_eco_tote"]
-[ext_resource type="Resource" path="res://data/items/fishing_net.tres" id="21_fishing_net"]
-[ext_resource type="Resource" path="res://data/items/baju_b3.tres" id="22_baju_b3"]
-[ext_resource type="Resource" path="res://data/items/tisu_b3.tres" id="23_tisu_b3"]
-[ext_resource type="Resource" path="res://data/items/mystery_box.tres" id="24_mystery_box"]
-[ext_resource type="Script" path="res://data/day_data.gd" id="25_day_data"]
+[ext_resource type="Resource" path="res://data/items/cangkang_telur.tres" id="10_cangkang_telur"]
+[ext_resource type="Resource" path="res://data/items/daun.tres" id="11_daun"]
+[ext_resource type="Resource" path="res://data/items/pizza.tres" id="12_pizza"]
+[ext_resource type="Resource" path="res://data/items/baju_daur_ulang.tres" id="13_baju_daur_ulang"]
+[ext_resource type="Resource" path="res://data/items/botol_kaca.tres" id="14_botol_kaca"]
+[ext_resource type="Resource" path="res://data/items/gelas_kertas_bersih.tres" id="15_gelas_kertas_bersih"]
+[ext_resource type="Resource" path="res://data/items/kantong_plastik.tres" id="16_kantong_plastik"]
+[ext_resource type="Resource" path="res://data/items/koran.tres" id="17_koran"]
+[ext_resource type="Resource" path="res://data/items/baju_b3.tres" id="18_baju_b3"]
+[ext_resource type="Resource" path="res://data/items/tisu_b3.tres" id="19_tisu_b3"]
+[ext_resource type="Resource" path="res://data/items/paper_cup.tres" id="20_paper_cup"]
+[ext_resource type="Resource" path="res://data/items/tisu_bekas.tres" id="21_tisu_bekas"]
+[ext_resource type="Resource" path="res://data/items/mystery_box.tres" id="22_mystery_box"]
+[ext_resource type="Script" path="res://data/day_data.gd" id="23_day_data"]
 
 [resource]
-script = ExtResource("25_day_data")
+script = ExtResource("23_day_data")
 day_number = 5
-active_rules = Array[ExtResource("1_rule_data")]([ExtResource("2_r_baseline"), ExtResource("3_r_residue"), ExtResource("4_r_chem_residue"), ExtResource("5_r_multilayer"), ExtResource("6_r_flammable"), ExtResource("7_r_alu_always")])
-item_pool = Array[ExtResource("8_item_data")]([ExtResource("9_banana_peel"), ExtResource("10_fish_bone"), ExtResource("11_pet_bottle"), ExtResource("12_alu_can"), ExtResource("13_car_battery"), ExtResource("14_oil_jerrycan"), ExtResource("15_paint_bottle"), ExtResource("16_spray_can"), ExtResource("17_styrofoam_tray"), ExtResource("18_paper_cup"), ExtResource("19_juice_carton"), ExtResource("20_eco_tote"), ExtResource("21_fishing_net"), ExtResource("17_styrofoam_tray"), ExtResource("22_baju_b3"), ExtResource("23_tisu_b3")])
-box_item = ExtResource("24_mystery_box")
+active_rules = Array[ExtResource("1_rule_data")]([ExtResource("2_r_baseline"), ExtResource("3_r_residue"), ExtResource("4_r_chem_residue"), ExtResource("5_r_multilayer")])
+item_pool = Array[ExtResource("6_item_data")]([ExtResource("7_apel"), ExtResource("8_baju_organik"), ExtResource("9_banana_peel"), ExtResource("10_cangkang_telur"), ExtResource("11_daun"), ExtResource("12_pizza"), ExtResource("13_baju_daur_ulang"), ExtResource("14_botol_kaca"), ExtResource("15_gelas_kertas_bersih"), ExtResource("16_kantong_plastik"), ExtResource("17_koran"), ExtResource("18_baju_b3"), ExtResource("19_tisu_b3"), ExtResource("18_baju_b3"), ExtResource("19_tisu_b3"), ExtResource("20_paper_cup"), ExtResource("21_tisu_bekas"), ExtResource("20_paper_cup"), ExtResource("21_tisu_bekas")])
+box_item = ExtResource("22_mystery_box")
 box_spawn_count = 2
 box_contents_min = 2
 box_contents_max = 3
@@ -42,4 +40,4 @@ initial_seed_fraction = 0.4
 spawn_interval_min = 8.0
 spawn_interval_max = 14.0
 min_available_items = 2
-intro_text = "Aturan bertambah dan barang bertambah, tapi waktu shift hampir sama. Perhatikan aturan aluminium yang baru."
+intro_text = "More rules and more items, on nearly the same shift time. Watch for the new foil rule."

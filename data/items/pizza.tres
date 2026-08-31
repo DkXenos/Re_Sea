@@ -8,11 +8,11 @@
 [resource]
 script = ExtResource("2_sc")
 id = &"pizza"
-display_name = "Potongan Pizza"
+display_name = "Pizza Slice"
 texture = ExtResource("3_tx")
 frames = ExtResource("1_fr")
 hotspot_overlay = ExtResource("2_mufjc")
 weight = 0.4
-surface_properties = Array[String](["lunak", "berminyak", "berbau"])
-visible_material = "sisa makanan"
-source_batch = &"kedai_pantai"
+surface_properties = Array[String](["mushy", "greasy", "smelly"])
+visible_material = "food scraps"
+source_batch = &"beach_cafe"

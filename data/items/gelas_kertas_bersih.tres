@@ -8,13 +8,13 @@
 [resource]
 script = ExtResource("2_sc")
 id = &"gelas_kertas_bersih"
-display_name = "Gelas Kertas Bersih"
+display_name = "Clean Paper Cup"
 texture = ExtResource("3_tx")
 frames = ExtResource("1_fr")
 hotspot_overlay = ExtResource("2_lqikr")
 weight = 0.4
-surface_properties = Array[String](["kaku", "ringan", "kering"])
-visible_material = "kertas"
-visible_label = "KERTAS"
+surface_properties = Array[String](["stiff", "light", "dry"])
+visible_material = "paper"
+visible_label = "PAPER"
 correct_category = 1
-source_batch = &"kedai_pantai"
+source_batch = &"beach_cafe"

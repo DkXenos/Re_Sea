@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b6xea6l62hk1s"
-path="res://.godot/imported/debris_overlay.png-1a7bd4bf3208c624dbf163bc561bf614.ctex"
+uid="uid://bt6qjpcaml7v"
+path="res://.godot/imported/hull_wall.png-b9bd4f1b1e8d9383087676701f575621.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/env/debris_overlay.png"
-dest_files=["res://.godot/imported/debris_overlay.png-1a7bd4bf3208c624dbf163bc561bf614.ctex"]
+source_file="res://assets/env/hull_wall.png"
+dest_files=["res://.godot/imported/hull_wall.png-b9bd4f1b1e8d9383087676701f575621.ctex"]
 
 [params]
 

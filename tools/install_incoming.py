@@ -58,6 +58,24 @@ FIT = {
     "ui/button_normal.png": "stretch",
 }
 
+# a source filed under another name, or in a subfolder of the group
+ALIAS = {
+    "items/box_closed.png": "boxes/Close",
+    "items/box_opened.png": "boxes/Open",
+}
+
+# slots trimmed to ONE shared alpha box instead of each to its own. the open
+# and closed crate are the same object - crop them apart and the base jumps
+# sideways the moment the lid opens.
+TRIM_TOGETHER = [
+    ["items/box_closed.png", "items/box_opened.png"],
+    # a group of one is just "trim this to its own subject", which is what a
+    # scenery cut-out wants: the manifest size should be the coral, not the
+    # coral plus whatever margin the canvas happened to have
+    ["env/coral_dead.png"],
+    ["env/coral_healthy.png"],
+]
+
 # Background removal leaves a haze of alpha 1-8 where it should be 0. Left in,
 # it shows as a dirty rectangle over the art behind.
 ALPHA_FLOOR = 8
@@ -86,13 +104,44 @@ def targets():
     return out
 
 
-def find_source(gdir, stem):
+def find_source(gdir, stem, alias=None):
     """The file the designer dropped in, whatever extension they saved it as."""
+    stems = [stem, stem.replace(".png", "")]
+    if alias:
+        stems = [alias, alias.upper(), alias.lower()] + stems
     for ext in SOURCE_EXT:
-        for cand in (stem + ext, stem.replace(".png", "") + ext):
-            p = os.path.join(gdir, cand)
-            if os.path.isfile(p):
-                return p
+        for base in stems:
+            for cand in (base + ext, base + ext.upper()):
+                p = os.path.join(gdir, cand)
+                if os.path.isfile(p):
+                    return p
+    return None
+
+
+def shared_trim(group, name):
+    """The alpha box to crop to, unioned over every slot in this one's group.
+
+    Returns None when the slot trims on its own (which is everything except the
+    crate pair). Sources come in with whatever dead margin the designer left
+    around the subject; trimming each file separately re-centres them one by
+    one, so a two-state object drifts between its states."""
+    slot = "%s/%s" % (group, name)
+    for members in TRIM_TOGETHER:
+        if slot not in members:
+            continue
+        box = None
+        for other in members:
+            ogroup, oname = other.split("/", 1)
+            src = find_source(os.path.join(INCOMING, ogroup), oname, ALIAS.get(other))
+            if src is None:
+                return None
+            with Image.open(src) as im:
+                b = im.convert("RGBA").getchannel("A").getbbox()
+            if b is None:
+                return None
+            box = b if box is None else (min(box[0], b[0]), min(box[1], b[1]),
+                                         max(box[2], b[2]), max(box[3], b[3]))
+        return box
     return None
 
 
@@ -160,7 +209,7 @@ def main():
             continue
         done = []
         for name, size in sorted(files.items()):
-            src = find_source(gdir, name)
+            src = find_source(gdir, name, ALIAS.get("%s/%s" % (group, name)))
             if src is None:
                 missing += 1
                 continue
@@ -172,6 +221,9 @@ def main():
                 warned += 1
                 continue
             im = im.convert("RGBA")
+            trim = shared_trim(group, name)
+            if trim is not None:
+                im = im.crop(trim)
             note = ""
             got_alpha = im.getchannel("A").getextrema()[0] != 255
             mode = FIT.get("%s/%s" % (group, name),

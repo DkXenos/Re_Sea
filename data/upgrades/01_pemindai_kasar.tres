@@ -5,9 +5,9 @@
 [resource]
 script = ExtResource("1_script")
 id = &"pemindai_kasar"
-display_name = "Pemindai Kasar"
-benefit_text = "Memakai alat hanya butuh 2 waktu shift, bukan 4."
-cost_text = "Hasilnya kasar - hanya tahu ada sesuatu di titik itu. Bacaan pastinya butuh sekali lagi dengan biaya normal."
+display_name = "Coarse Scanner"
+benefit_text = "Using a tool costs 2 shift time instead of 4."
+cost_text = "The reading is coarse - it only tells you something is there. Reading it properly costs one more use at the normal price."
 drop_cost = -1
 tool_cost = 2
 grip_delta = 0.0

@@ -7,7 +7,7 @@
 [resource]
 script = ExtResource("1_script")
 id = &"drone_body"
-display_name = "Rangka Drone"
+display_name = "Drone Body"
 locked_texture = ExtResource("2_locked")
 done_texture = ExtResource("3_done")
 diagram_position = Vector2(0.26, 0.34)

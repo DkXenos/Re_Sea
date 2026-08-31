@@ -1,6 +1,6 @@
 # every mis-sort with the property they didn't check and the rule it broke,
-# then the meter moves. every term of the formula gets its own line - just
-# showing the final number makes it feel made up.
+# then the meter moves. no points anywhere - what the day is worth is the
+# material it hands the workshop, and that is the after-day screen's job.
 extends Node2D
 
 const METER_WIDTH := 320.0  # keep in sync with meter_bg.png
@@ -9,10 +9,10 @@ const METER_WIDTH := 320.0  # keep in sync with meter_bg.png
 @onready var _quota: Label = $UiLayer/Root/QuotaLabel
 @onready var _mistakes_title: Label = $UiLayer/Root/MistakesTitle
 @onready var _mistakes: VBoxContainer = $UiLayer/Root/MistakesScroll/Mistakes
-@onready var _breakdown: VBoxContainer = $UiLayer/Root/Breakdown
+@onready var _recovered_title: Label = $UiLayer/Root/RecoveredTitle
+@onready var _recovered: VBoxContainer = $UiLayer/Root/Recovered
 @onready var _health_label: Label = $UiLayer/Root/HealthLabel
 @onready var _meter_clip: Control = $UiLayer/Root/MeterClip
-@onready var _tier_line: Label = $UiLayer/Root/TierLine
 @onready var _next: Button = $UiLayer/Root/NextButton
 
 var _result: Dictionary
@@ -28,26 +28,11 @@ func _ready() -> void:
 	_next.text = Strings.t("report_next")
 	_next.pressed.connect(func() -> void: Events.phase_finished.emit())
 	_build_mistakes()
-	_build_breakdown()
+	_build_recovered()
 	_animate_meter()
 	Events.sfx_requested.emit(&"day_end")
 	# commit after the numbers are up. this is the only place the meter moves.
-	var tier_before := Game.visual_tier
 	Game.commit_day_result(_result)
-	_show_tier_line(tier_before)
-
-
-# one line on a tier change, nothing otherwise. no fanfare.
-func _show_tier_line(tier_before: int) -> void:
-	_tier_line.text = ""
-	if Game.visual_tier == tier_before:
-		return
-	var tier := Game.current_tier()
-	if tier == null:
-		return
-	_tier_line.text = tier.transition_text
-	_tier_line.add_theme_color_override("font_color",
-		Color(0.62, 0.9, 0.86) if Game.visual_tier > tier_before else Color(0.9, 0.74, 0.62))
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -72,53 +57,35 @@ func _build_mistakes() -> void:
 		_mistakes.add_child(label)
 
 
+# what the day actually paid out. a wrong bin is not a smaller payout, it is
+# no payout - the item is gone, so it never shows up here.
+func _build_recovered() -> void:
+	_recovered_title.text = Strings.t("report_recovered")
+	var recovered := Game.day_recovered()
+	if recovered.is_empty():
+		_add_line(_recovered, Strings.t("report_recovered_none"), 16,
+			Color(0.95, 0.72, 0.6))
+	else:
+		for category in ItemData.Category.values():
+			if not recovered.has(category):
+				continue
+			_add_line(_recovered, Strings.tf("report_recovered_line",
+				{"n": int(recovered[category]), "v": Strings.category_name(category)}),
+				19, Color(0.6, 0.9, 0.7))
+	var wrong: int = int(_result["wrong"])
+	if wrong > 0:
+		_add_line(_recovered, Strings.tf("report_wasted", {"n": wrong}), 15,
+			Color(0.95, 0.55, 0.5))
+	_add_line(_recovered, Strings.t("report_recovered_note"), 13,
+		Color(0.72, 0.78, 0.85))
+
+
 func _make_row(entry: CarriedItem) -> Control:
 	return MistakeView.build_row(entry)
 
 
 func _add_line(parent: Node, text: String, font_size: int, color: Color) -> void:
 	MistakeView.add_line(parent, text, font_size, color)
-
-
-# breakdown
-
-func _build_breakdown() -> void:
-	_add_term(Strings.t("report_correct"), "%d x (+2)" % _result["correct"],
-		2 * int(_result["correct"]))
-	_add_term(Strings.t("report_wrong"), "%d x (-4)" % _result["wrong"], -4 * int(_result["wrong"]))
-	_add_term(Strings.t("report_shortfall"),
-		"%d x (-3)" % maxi(0, int(_result["quota"]) - int(_result["sorted"])),
-		-int(_result["shortfall"]))
-	_add_term(Strings.t("report_clean_bonus"),
-		"" if int(_result["clean_bonus"]) > 0 else "-", int(_result["clean_bonus"]))
-	var rule := HSeparator.new()
-	_breakdown.add_child(rule)
-	_add_term(Strings.t("report_total"), "", int(_result["delta"]), 22)
-
-
-func _add_term(label_text: String, detail: String, value: int, font_size: int = 18) -> void:
-	var row := HBoxContainer.new()
-	var name_label := Label.new()
-	name_label.text = label_text
-	name_label.custom_minimum_size = Vector2(230, 0)
-	name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	name_label.add_theme_font_size_override("font_size", font_size)
-	row.add_child(name_label)
-	var detail_label := Label.new()
-	detail_label.text = detail
-	detail_label.custom_minimum_size = Vector2(120, 0)
-	detail_label.add_theme_font_size_override("font_size", font_size - 3)
-	detail_label.add_theme_color_override("font_color", Color(0.68, 0.74, 0.8))
-	row.add_child(detail_label)
-	var value_label := Label.new()
-	value_label.text = "%+d" % value
-	value_label.custom_minimum_size = Vector2(100, 0)
-	value_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	value_label.add_theme_font_size_override("font_size", font_size)
-	value_label.add_theme_color_override("font_color",
-		Color(0.6, 0.9, 0.7) if value >= 0 else Color(0.95, 0.55, 0.5))
-	row.add_child(value_label)
-	_breakdown.add_child(row)
 
 
 # the bar tracks machines built, which is the only thing that changes the sea now

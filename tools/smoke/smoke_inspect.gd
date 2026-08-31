@@ -49,13 +49,13 @@ func _run() -> void:
 		% [rules_shown, day.active_rules.size()])
 
 	# --- 7.5 hotspot overlay is a separate, switchable sprite ---
-	var jerrycan = _find(game.inventory, &"oil_jerrycan")
-	inspect.show_entry(jerrycan)
+	var cup = _find(game.inventory, &"tisu_b3")
+	inspect.show_entry(cup)
 	await process_frame
 	var overlay: Sprite2D = inspect.get_node(
 		"ViewportBox/ItemViewport/ItemRoot/Hotspots")
 	assert(overlay.texture != null, "hotspot overlay texture missing")
-	assert(overlay.texture == jerrycan.data.hotspot_overlay,
+	assert(overlay.texture == cup.data.hotspot_overlay,
 		"overlay is not the one the item's data points at")
 	assert(overlay.visible, "hotspot rings should be on by default")
 	game.apply_toggle("hotspots", false)
@@ -66,7 +66,7 @@ func _run() -> void:
 
 	# --- 7.3 the question line frames the decision from surface info ---
 	var question: String = inspect.get_node("Question").text
-	assert(jerrycan.data.visible_material in question,
+	assert(cup.data.visible_material in question,
 		"the question line does not mention what the item looks like")
 	print("7.3 question line: \"%s\"" % question)
 
@@ -79,7 +79,7 @@ func _run() -> void:
 	# Rinse the grimy patch: residue found -> the residue rule fires -> RESIDU.
 	inspect._armed = &"rinse"
 	inspect._use_tool_at(_point_for(Vector2(0.38, 0.70)))
-	assert(jerrycan.is_revealed("has_residue"), "rinse hotspot did not reveal")
+	assert(cup.is_revealed("has_residue"), "rinse hotspot did not reveal")
 	assert(hinted[-1] == ItemData.Category.LANDFILL,
 		"residue evidence should point at RESIDU")
 	var lit_chips := 0
@@ -90,16 +90,16 @@ func _run() -> void:
 	print("7.2 after rinse: %d chip(s) lit, bin hint -> %s"
 		% [lit_chips, Strings.category_name(hinted[-1])])
 
-	# Swab it: the residue is engine oil, so the chemical rule outranks the
+	# Swab it: the residue is solvent paint, so the chemical rule outranks the
 	# residue rule and the hint moves to B3.
 	inspect._armed = &"swab"
 	inspect._use_tool_at(_point_for(Vector2(0.62, 0.60)))
-	assert(jerrycan.is_revealed("residue_type"), "swab hotspot did not reveal")
+	assert(cup.is_revealed("residue_type"), "swab hotspot did not reveal")
 	assert(hinted[-1] == ItemData.Category.HAZARD,
 		"a higher-priority rule should move the hint to B3")
 	print("7.2 after swab: bin hint -> %s (higher-priority rule took over)"
 		% Strings.category_name(hinted[-1]))
-	assert(hinted[-1] == int(RuleChecker.resolve(jerrycan.data, day.active_rules)["category"]),
+	assert(hinted[-1] == int(RuleChecker.resolve(cup.data, day.active_rules)["category"]),
 		"the hint disagrees with the answer the game will actually judge")
 
 	# --- 7.4 a tool that finds nothing says so, and says what it cost ---

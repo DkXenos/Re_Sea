@@ -2,13 +2,10 @@
 extends Node
 
 const DAY_DIR := "res://data/days/"
-const TIER_DIR := "res://data/tiers/"
 const BLUEPRINT_DIR := "res://data/blueprints/"
 const UPGRADE_DIR := "res://data/upgrades/"
 const SFX_DIR := "res://assets/audio/"
 const SFX_POOL_SIZE := 6
-const CLEAN_DAY_BONUS := 5
-#const CLEAN_DAY_BONUS := 3   # too stingy, nobody ever felt it
 
 # big prime, keeps box streams from colliding
 const CONTAINER_STREAM := 104729
@@ -24,10 +21,6 @@ var rng := RandomNumberGenerator.new()
 var days: Array[DayData] = []
 var day_index: int = 0
 # started at 100 originally but then nothing the meter drives was ever visible
-
-var tiers: Array[OceanTierData] = []
-# what the ART shows. only updates at the day report, never mid-shift
-var visual_tier: int = 3
 
 var blueprints: Array[BlueprintData] = []
 # category -> how many we can spend. credited at the report, not mid-shift
@@ -71,7 +64,6 @@ func _ready() -> void:
 			apply_setting(key, float(settings[key]), false)
 	_load_days()
 	_load_tools()
-	_load_tiers()
 	_load_blueprints()
 	_load_upgrades()
 	Events.sfx_requested.connect(play_sfx)
@@ -88,12 +80,6 @@ func _load_days() -> void:
 func _load_tools() -> void:
 	tools.assign(_load_dir("res://data/tools/"))
 	tools.sort_custom(func(a: ToolData, b: ToolData) -> bool: return a.sort_order < b.sort_order)
-
-
-func _load_tiers() -> void:
-	tiers.assign(_load_dir(TIER_DIR))
-	tiers.sort_custom(func(a: OceanTierData, b: OceanTierData) -> bool:
-		return a.tier < b.tier)
 
 
 func _load_blueprints() -> void:
@@ -143,7 +129,6 @@ func start_run(seed_value: int = 0) -> void:
 	unlocked_blueprints = []
 	equipped_upgrade = &""
 	last_breakdown = {}
-	visual_tier = tier_for(unlocked_blueprints.size())
 	begin_day()
 
 
@@ -188,7 +173,8 @@ func add_to_inventory(item: ItemData) -> CarriedItem:
 	return entry
 
 
-# box leaves the inventory, its contents take its place. costs nothing.
+# the box stays - it is rubbish too, so opening it adds the contents and leaves
+# the empty crate behind to be sorted like anything else. costs nothing.
 func open_container(entry: CarriedItem) -> Array[CarriedItem]:
 	var out: Array[CarriedItem] = []
 	var day := current_day()
@@ -203,11 +189,10 @@ func open_container(entry: CarriedItem) -> Array[CarriedItem]:
 	var count := day.contents_count(stream)
 	var at := inventory.find(entry)
 	entry.opened = true
-	inventory.erase(entry)
 	for i in count:
 		# pool already has boxes filtered out, so no box inside a box
 		var made := CarriedItem.new(pool[stream.randi() % pool.size()])
-		inventory.insert(clampi(at + i, 0, inventory.size()), made)
+		inventory.insert(clampi(at + 1 + i, 0, inventory.size()), made)
 		out.append(made)
 	Events.container_opened.emit(entry, out)
 	return out
@@ -230,11 +215,12 @@ func unsorted_items() -> Array[CarriedItem]:
 	return out
 
 
-# unsorted minus sealed boxes - a box counts as work left but can't go in a bin
+# unsorted minus SEALED boxes. an opened crate is ordinary rubbish and goes in a
+# bin like anything else - only a box you haven't opened yet is unsortable.
 func sortable_items() -> Array[CarriedItem]:
 	var out: Array[CarriedItem] = []
 	for e: CarriedItem in unsorted_items():
-		if not e.is_container():
+		if not e.is_container() or e.opened:
 			out.append(e)
 	return out
 
@@ -304,44 +290,46 @@ func refill_budget() -> void:
 	Events.budget_changed.emit(budget_left, budget_max)
 
 
-# every term separate so the report can show its working
-# FIXME these numbers are guesses. correct=2 / wrong=-4 / short=-3 feels ok on
-# days 1-3 and way too harsh on 5. needs an actual playtest.
+# a count of what happened, no points. there is no day score - the only thing
+# a day pays out is the correctly sorted material, credited below.
 func end_day_breakdown() -> Dictionary:
 	var day := current_day()
 	var quota: int = day.quota if day != null else 0
-	var correct: int = int(stats.get("correct", 0))
-	var wrong: int = int(stats.get("wrong", 0))
 	var sorted_count: int = int(stats.get("sorted", 0))
-	var shortfall: int = maxi(0, quota - sorted_count) * 3
-	var quota_met: bool = sorted_count >= quota
-	var clean_bonus: int = CLEAN_DAY_BONUS if wrong == 0 and quota_met else 0
-	var delta: int = (correct * 2) - (wrong * 4) - shortfall + clean_bonus
 	return {
-		"correct": correct,
-		"wrong": wrong,
+		"correct": int(stats.get("correct", 0)),
+		"wrong": int(stats.get("wrong", 0)),
 		"sorted": sorted_count,
 		"quota": quota,
-		"shortfall": shortfall,
-		"clean_bonus": clean_bonus,
-		"delta": delta,
-		"quota_met": quota_met,
+		"quota_met": sorted_count >= quota,
 	}
 
 
 func commit_day_result(breakdown: Dictionary) -> void:
 	last_breakdown = breakdown
 	_credit_materials()
-	refresh_visual_tier()
 
 
-# called once, from the day report
-func _credit_materials() -> void:
+# category -> how many of today's items went into the RIGHT bin.
+#
+# This is the only door into the material store. An item dropped in the wrong
+# bin is gone: it is not counted here, so it never becomes blueprint material.
+# Nothing else in the codebase may add to `materials`.
+func day_recovered() -> Dictionary:
+	var out: Dictionary = {}
 	for entry: CarriedItem in inventory:
 		if entry.sorted_to == -1 or not entry.was_correct:
 			continue
 		var category: int = entry.expected_category
-		materials[category] = int(materials.get(category, 0)) + 1
+		out[category] = int(out.get(category, 0)) + 1
+	return out
+
+
+# called once, from the day report
+func _credit_materials() -> void:
+	var recovered := day_recovered()
+	for category: int in recovered:
+		materials[category] = int(materials.get(category, 0)) + int(recovered[category])
 	Events.blueprints_changed.emit()
 
 
@@ -400,7 +388,6 @@ func build_blueprint(blueprint_id: StringName) -> BlueprintData:
 		if bp.id != blueprint_id or not blueprint_ready(bp):
 			continue
 		unlocked_blueprints.append(bp.id)
-		refresh_visual_tier()
 		Events.blueprints_changed.emit()
 		return bp
 	return null
@@ -449,37 +436,6 @@ func move_speed_multiplier() -> float:
 func post_drop_lockout() -> float:
 	var up := upgrade()
 	return up.post_drop_lockout if up != null else 0.0
-
-
-## The seabed reflects the machines you have actually built. One blueprint,
-## one tier - so finishing a machine is the thing that visibly heals the ocean,
-## rather than a hidden score nobody can see moving.
-func tier_for(blueprints_built: int) -> int:
-	var highest: int = 0
-	for t: OceanTierData in tiers:
-		highest = maxi(highest, t.tier)
-	return clampi(blueprints_built, 0, highest)
-
-
-func tier_data(tier: int) -> OceanTierData:
-	for t: OceanTierData in tiers:
-		if t.tier == tier:
-			return t
-	return null
-
-
-func current_tier() -> OceanTierData:
-	return tier_data(visual_tier)
-
-
-# returns the new tier, or -1 if nothing moved.
-func refresh_visual_tier() -> int:
-	var was := visual_tier
-	visual_tier = tier_for(unlocked_blueprints.size())
-	if visual_tier == was:
-		return -1
-	Events.ocean_tier_changed.emit(visual_tier)
-	return visual_tier
 
 
 ## Which of the three endings this run earned. Every blueprint built is the good
@@ -565,10 +521,6 @@ func _on_debug_command(command: StringName, arg: Variant) -> void:
 	match command:
 		&"refill_budget": refill_budget()
 		&"fill_inventory": fill_inventory(int(arg))
-		&"set_tier":
-			# jump the seabed straight to a tier without building the machines
-			visual_tier = clampi(int(arg), 0, tiers.size() - 1)
-			Events.ocean_tier_changed.emit(visual_tier)
 		&"force_grip": force_grip = int(arg)
 		&"set_seed":
 			run_seed = int(arg)

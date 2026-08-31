@@ -65,9 +65,8 @@ func _refresh_bar() -> void:
 		Game.budget_left, Game.budget_max]
 	# tab button says where it goes, how much is waiting and which key. people
 	# demoing this won't read a control list.
-	var tier := Game.current_tier()
 	_ocean_label.text = Strings.tf("ocean_label",
-		{"v": tier.display_name if tier != null else "?"})
+		{"have": Game.unlocked_blueprints.size(), "need": Game.blueprints.size()})
 	# costs come from Game so the label can't disagree with what we charge
 	var costs := {"drop": Game.cost_of(&"drop"), "tool": Game.cost_of(&"tool"),
 		"sort": Game.cost_of(&"sort")}

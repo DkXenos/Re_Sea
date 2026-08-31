@@ -22,6 +22,16 @@ func _init(item_data: ItemData) -> void:
 func is_container() -> bool:
 	return data != null and data.is_container
 
+
+# an opened crate draws its opened art; everything else draws its own texture
+func display_texture() -> Texture2D:
+	if data == null:
+		return null
+	if is_container() and opened and data.frames != null \
+			and data.frames.has_animation(&"opened"):
+		return data.frames.get_frame_texture(&"opened", 0)
+	return data.texture
+
 # the name is a conclusion - you get it once you've learned something or
 # committed it to a bin. before that the panel shows properties instead.
 func name_known() -> bool:

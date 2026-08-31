@@ -9,9 +9,8 @@ const SLOT_BG_SELECTED := preload("res://assets/ui/panel_slot_selected.png")
 
 # 160x160 art at 64x64 on the card
 const BOX_CARD_SCALE := 0.4
-# card fade only. don't fade anything in the tank.
-const OPEN_HOLD := 0.35
-const OPEN_FADE := 0.35
+# how long the opened crate is shown before the list rebuilds.
+const OPEN_HOLD := 0.5
 # TODO opening 2 boxes fast makes both cards fade at once and it looks like a
 # bug. should probably queue them.
 
@@ -32,8 +31,8 @@ func refresh() -> void:
 	var entries := Game.unsorted_items()
 	_empty.visible = entries.is_empty()
 	for entry: CarriedItem in entries:
-		_grid.add_child(_make_box_card(entry) if entry.is_container()
-			else _make_card(entry))
+		_grid.add_child(_make_box_card(entry)
+			if entry.is_container() and not entry.opened else _make_card(entry))
 
 
 func _make_card(entry: CarriedItem) -> Control:
@@ -62,7 +61,7 @@ func _make_card(entry: CarriedItem) -> Control:
 	card.add_child(columns)
 
 	var icon := TextureRect.new()
-	icon.texture = entry.data.texture
+	icon.texture = entry.display_texture()
 	icon.custom_minimum_size = Vector2(64, 64)
 	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
@@ -94,7 +93,7 @@ func _make_card(entry: CarriedItem) -> Control:
 	return card
 
 
-# sealed box. same card, but no bins and no tools - only Buka.
+# sealed box. same card, but no bins and no tools - only Open.
 func _make_box_card(entry: CarriedItem) -> Control:
 	var card := Control.new()
 	card.custom_minimum_size = Vector2(250, 84)
@@ -133,21 +132,18 @@ func _make_box_card(entry: CarriedItem) -> Control:
 	return card
 
 
-# scene tree timer, NOT the tween. the panel rebuilds itself when you switch
-# back to the desk and a tween on a freed node leaves the box open on screen
-# but still unopened in the inventory.
-func _on_open_pressed(entry: CarriedItem, card: Control, crate: AnimatedSprite2D,
+# scene tree timer, NOT a tween. the panel rebuilds itself when you switch back
+# to the desk, and a tween on a freed node leaves the box open on screen but
+# still unopened in the inventory. the crate is not removed any more - it stays
+# in the list and turns into an ordinary sortable card on the rebuild.
+func _on_open_pressed(entry: CarriedItem, _card: Control, crate: AnimatedSprite2D,
 		button: Button) -> void:
 	if entry.opened:
 		return
 	button.disabled = true
 	crate.play(&"opened")
 	Events.sfx_requested.emit(&"bin_accept")
-	var fade := create_tween()
-	fade.tween_interval(OPEN_HOLD)
-	fade.tween_property(card, "modulate:a", 0.0, OPEN_FADE)
-	get_tree().create_timer(OPEN_HOLD + OPEN_FADE).timeout.connect(
-		_finish_open.bind(entry))
+	get_tree().create_timer(OPEN_HOLD).timeout.connect(_finish_open.bind(entry))
 
 
 func _finish_open(entry: CarriedItem) -> void:

@@ -1,5 +1,5 @@
 # "what am i working toward" strip. one row per blueprint, nothing clickable,
-# crafting is in the Teknologi tab.
+# crafting is in the Technology tab.
 #
 # tracks parts assembled, NOT the material pool - the pool goes down when you
 # craft and a bar that falls reads as losing progress.
@@ -49,10 +49,15 @@ func _make_row(bp: BlueprintData) -> Control:
 
 	var name_label := Label.new()
 	name_label.text = bp.display_name
+	# ORDER MATTERS, same trap as _meter below. a Label's minimum size is its
+	# whole text until clip_text says otherwise, so assigning size first just
+	# gets clamped straight back up and a long name walks out of the strip and
+	# under the rulebook button.
+	name_label.clip_text = true
+	name_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	name_label.position = Vector2(10, 4)
 	name_label.size = Vector2(ROW_WIDTH - 72, 26)
 	name_label.add_theme_font_size_override("font_size", 13)
-	name_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	name_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	row.add_child(name_label)
 

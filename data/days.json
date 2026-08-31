@@ -5,11 +5,24 @@
     "That rewrites data/days/day_*.tres, which is what the game loads.",
     "tools/smoke/smoke_content.gd fails if the two ever disagree.",
     "",
-    "items: an exact list, not chances. Every entry spawns exactly once,",
-    "in shuffled order. Repeat an id to have it appear more than once.",
-    "The bin an item belongs in is decided by that day's rules, so the same",
-    "id can be DAUR ULANG on day 1 and RESIDU on day 2 - see the balance",
-    "table printed by tools/day_balance.py.",
+    "A day says WHAT IT CONTAINS in one of two ways:",
+    "",
+    "  mix   - how many items land in each bin, e.g. {\"organic\": 5, \"landfill\": 3}.",
+    "          The generator picks real items whose category resolves to that bin",
+    "          UNDER THAT DAY'S RULES, round-robining in id order so the same JSON",
+    "          always expands to the same list. Add a new item to data/items and",
+    "          re-run gen_days.py and it joins the rotation automatically.",
+    "          Bins: organic, recyclable, hazard, landfill.",
+    "          \"exclude\": [ids] keeps specific items out of the draw.",
+    "",
+    "  items - an exact list, when a day has to hold still. Wins over mix.",
+    "          Day 1 uses this: smoke_upgrade_play measures grip on whatever the",
+    "          seeded shuffle puts first, and only items heavier than 0.333 leave",
+    "          the grip chance unclamped, so day 1's contents are pinned by hand.",
+    "",
+    "The bin an item belongs in is decided by that day's rules, so the same id can",
+    "be RECYCLABLE on day 1 and LANDFILL on day 2 - which is why mix is resolved",
+    "per-day rather than once globally.",
     "",
     "spawn_interval_min/max: seconds between arrivals once the opening",
     "items are down. min_available_items: if the tank drops to this many,",
@@ -25,24 +38,20 @@
       ],
       "tools": [],
       "items": [
-        "banana_peel",
-        "fish_bone",
-        "pet_bottle",
-        "alu_can",
-        "paper_cup",
-        "styrofoam_tray",
-        "daun",
-        "koran"
+        "koran",
+        "botol_kaca",
+        "gelas_kertas_bersih",
+        "pizza",
+        "baju_organik",
+        "baju_daur_ulang"
       ],
       "item_counts": {
-        "alu_can": 1,
-        "banana_peel": 1,
-        "daun": 1,
-        "fish_bone": 1,
+        "baju_daur_ulang": 1,
+        "baju_organik": 1,
+        "botol_kaca": 1,
+        "gelas_kertas_bersih": 1,
         "koran": 1,
-        "paper_cup": 1,
-        "pet_bottle": 1,
-        "styrofoam_tray": 1
+        "pizza": 1
       },
       "box": {
         "item": "",
@@ -57,7 +66,7 @@
         "min_available_items": 2
       },
       "modifier": "",
-      "intro_text": "Hari pertama. Pilah dari yang terlihat saja - alat periksa belum ada. Setiap cakar, periksa dan buang memakai waktu shift; berpikir gratis."
+      "intro_text": "First day. Sort on what you can see - there are no inspection tools yet. Every drop, inspection and sort spends shift time; thinking is free."
     },
     {
       "day": 2,
@@ -71,31 +80,6 @@
         "rinse",
         "magnifier"
       ],
-      "items": [
-        "banana_peel",
-        "fish_bone",
-        "banana_peel",
-        "pet_bottle",
-        "juice_carton",
-        "eco_tote",
-        "alu_can",
-        "car_battery",
-        "apel",
-        "kantong_plastik",
-        "gelas_kertas_bersih"
-      ],
-      "item_counts": {
-        "alu_can": 1,
-        "apel": 1,
-        "banana_peel": 2,
-        "car_battery": 1,
-        "eco_tote": 1,
-        "fish_bone": 1,
-        "gelas_kertas_bersih": 1,
-        "juice_carton": 1,
-        "kantong_plastik": 1,
-        "pet_bottle": 1
-      },
       "box": {
         "item": "mystery_box",
         "count": 1,
@@ -109,7 +93,12 @@
         "min_available_items": 2
       },
       "modifier": "",
-      "intro_text": "Alat periksa datang. Bilas untuk melihat sisa kotoran, kaca pembesar untuk membaca kode. Keduanya memakai waktu shift."
+      "intro_text": "The inspection tools arrive. Rinse to find residue, magnifier to read codes. Both spend shift time.",
+      "mix": {
+        "organic": 5,
+        "recyclable": 4,
+        "landfill": 2
+      }
     },
     {
       "day": 3,
@@ -125,36 +114,6 @@
         "magnifier",
         "swab"
       ],
-      "items": [
-        "banana_peel",
-        "fish_bone",
-        "pet_bottle",
-        "spray_can",
-        "car_battery",
-        "oil_jerrycan",
-        "paint_bottle",
-        "styrofoam_tray",
-        "alu_can",
-        "paper_cup",
-        "cangkang_telur",
-        "tisu_bekas",
-        "botol_kaca"
-      ],
-      "item_counts": {
-        "alu_can": 1,
-        "banana_peel": 1,
-        "botol_kaca": 1,
-        "cangkang_telur": 1,
-        "car_battery": 1,
-        "fish_bone": 1,
-        "oil_jerrycan": 1,
-        "paint_bottle": 1,
-        "paper_cup": 1,
-        "pet_bottle": 1,
-        "spray_can": 1,
-        "styrofoam_tray": 1,
-        "tisu_bekas": 1
-      },
       "box": {
         "item": "mystery_box",
         "count": 1,
@@ -168,7 +127,13 @@
         "min_available_items": 2
       },
       "modifier": "",
-      "intro_text": "Usap kimia tersedia. Tidak semua sisa kotoran sama bahayanya."
+      "intro_text": "The chem swab is available. Not all residue is equally dangerous.",
+      "mix": {
+        "organic": 6,
+        "recyclable": 5,
+        "hazard": 2,
+        "landfill": 3
+      }
     },
     {
       "day": 4,
@@ -186,39 +151,6 @@
         "swab",
         "cutter"
       ],
-      "items": [
-        "banana_peel",
-        "fish_bone",
-        "fish_bone",
-        "pet_bottle",
-        "spray_can",
-        "car_battery",
-        "oil_jerrycan",
-        "glass_jar",
-        "styrofoam_tray",
-        "juice_carton",
-        "eco_tote",
-        "fishing_net",
-        "pizza",
-        "baju_organik",
-        "baju_daur_ulang"
-      ],
-      "item_counts": {
-        "baju_daur_ulang": 1,
-        "baju_organik": 1,
-        "banana_peel": 1,
-        "car_battery": 1,
-        "eco_tote": 1,
-        "fish_bone": 2,
-        "fishing_net": 1,
-        "glass_jar": 1,
-        "juice_carton": 1,
-        "oil_jerrycan": 1,
-        "pet_bottle": 1,
-        "pizza": 1,
-        "spray_can": 1,
-        "styrofoam_tray": 1
-      },
       "box": {
         "item": "mystery_box",
         "count": 2,
@@ -232,7 +164,13 @@
         "min_available_items": 2
       },
       "modifier": "",
-      "intro_text": "Pemotong tersedia. Yang terlihat seperti kertas belum tentu kertas - tapi setiap pemeriksaan mengurangi jatah cakar."
+      "intro_text": "The cutter is available. What looks like paper is not always paper - but every inspection eats into your drops.",
+      "mix": {
+        "organic": 6,
+        "recyclable": 5,
+        "hazard": 4,
+        "landfill": 3
+      }
     },
     {
       "day": 5,
@@ -242,9 +180,7 @@
         "r_baseline",
         "r_residue",
         "r_chem_residue",
-        "r_multilayer",
-        "r_flammable",
-        "r_alu_always"
+        "r_multilayer"
       ],
       "tools": [
         "rinse",
@@ -252,41 +188,6 @@
         "swab",
         "cutter"
       ],
-      "items": [
-        "banana_peel",
-        "fish_bone",
-        "pet_bottle",
-        "alu_can",
-        "car_battery",
-        "oil_jerrycan",
-        "paint_bottle",
-        "spray_can",
-        "styrofoam_tray",
-        "paper_cup",
-        "juice_carton",
-        "eco_tote",
-        "fishing_net",
-        "styrofoam_tray",
-        "baju_b3",
-        "tisu_b3"
-      ],
-      "item_counts": {
-        "alu_can": 1,
-        "baju_b3": 1,
-        "banana_peel": 1,
-        "car_battery": 1,
-        "eco_tote": 1,
-        "fish_bone": 1,
-        "fishing_net": 1,
-        "juice_carton": 1,
-        "oil_jerrycan": 1,
-        "paint_bottle": 1,
-        "paper_cup": 1,
-        "pet_bottle": 1,
-        "spray_can": 1,
-        "styrofoam_tray": 2,
-        "tisu_b3": 1
-      },
       "box": {
         "item": "mystery_box",
         "count": 2,
@@ -300,7 +201,13 @@
         "min_available_items": 2
       },
       "modifier": "",
-      "intro_text": "Aturan bertambah dan barang bertambah, tapi waktu shift hampir sama. Perhatikan aturan aluminium yang baru."
+      "intro_text": "More rules and more items, on nearly the same shift time. Watch for the new foil rule.",
+      "mix": {
+        "organic": 6,
+        "recyclable": 5,
+        "hazard": 4,
+        "landfill": 4
+      }
     }
   ]
 }

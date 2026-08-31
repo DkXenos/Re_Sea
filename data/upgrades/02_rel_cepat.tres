@@ -5,9 +5,9 @@
 [resource]
 script = ExtResource("1_script")
 id = &"rel_cepat"
-display_name = "Rel Cepat"
-benefit_text = "Cakar bergeser 60% lebih cepat di sepanjang rel."
-cost_text = "Setelah setiap turun, rel butuh 2 detik untuk siap lagi sebelum bisa digeser."
+display_name = "Fast Rail"
+benefit_text = "The claw travels the rail 60% faster."
+cost_text = "After every drop the rail needs 2 seconds to reset before it will move again."
 drop_cost = -1
 tool_cost = -1
 grip_delta = 0.0
@@ -15,5 +15,5 @@ coarse_readings = false
 move_speed_multiplier = 1.6
 post_drop_lockout = 2.0
 unlock_after_blueprints = 1
-unlock_text = "Terbuka setelah Drone Pembersih selesai dibangun."
+unlock_text = "Unlocked once the Cleaner Drone is built."
 sort_order = 2

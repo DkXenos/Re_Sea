@@ -11,7 +11,7 @@ enum Category { ORGANIC, RECYCLABLE, HAZARD, LANDFILL }
 @export var hotspot_overlay: Texture2D
 @export var weight: float = 1.0  # grip chance
 
-# sealed box. never sorted, the desk gives it a Buka button instead.
+# sealed box. never sorted, the desk gives it an Open button instead.
 @export var is_container: bool = false
 
 # what it looks/feels like before any tool. free info.

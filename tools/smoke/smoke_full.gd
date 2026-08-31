@@ -56,8 +56,6 @@ func _run() -> void:
 	var seen: Array[String] = []
 	# assert the shape of the run off a run that was actually played, never
 	# off state set by hand
-	var tier := int(game.visual_tier)
-	var tier_rises := 0
 	var claimed := 0
 	var first_claim_day := 0
 	var seen_after: Dictionary = {}
@@ -65,9 +63,6 @@ func _run() -> void:
 	while guard < 40000:
 		guard += 1
 		await physics_frame
-		if int(game.visual_tier) > tier:
-			tier_rises += 1
-		tier = int(game.visual_tier)
 		if game.unlocked_blueprints.size() > claimed:
 			claimed = game.unlocked_blueprints.size()
 			if first_claim_day == 0:
@@ -81,7 +76,7 @@ func _run() -> void:
 		var kind := scene.name
 		if seen.is_empty() or seen[-1] != String(kind) + "|" + str(game.day_index):
 			seen.append(String(kind) + "|" + str(game.day_index))
-			print("-> %-10s day_index=%d tier=%d" % [kind, game.day_index, game.visual_tier])
+			print("-> %-10s day_index=%d built=%d" % [kind, game.day_index, game.unlocked_blueprints.size()])
 		match String(kind):
 			"MainMenu":
 				scene.get_node("UiLayer/Root/Buttons/PlayButton").pressed.emit()
@@ -96,10 +91,9 @@ func _run() -> void:
 			"DayReport":
 				if verbose:
 					var b: Dictionary = scene._result
-					print("     quota %d, sorted %d, correct %d, wrong %d, "
-						% [b["quota"], b["sorted"], b["correct"], b["wrong"]]
-						+ "shortfall -%d, clean +%d, delta %+d"
-						% [b["shortfall"], b["clean_bonus"], b["delta"]])
+					print("     quota %d, sorted %d, correct %d, wrong %d, met %s"
+						% [b["quota"], b["sorted"], b["correct"], b["wrong"],
+						b["quota_met"]])
 				scene.get_node("UiLayer/Root/NextButton").pressed.emit()
 			"AfterDay":
 				# entered every day, so work it the way a player would - craft
@@ -115,8 +109,8 @@ func _run() -> void:
 					scene.get_node("UiLayer/Root/TitleLabel").text])
 				break
 	print("frames=%d  scenes visited=%d" % [guard, seen.size()])
-	print("tier rises=%d  blueprints claimed=%d  first claim on day %d"
-		% [tier_rises, claimed, first_claim_day])
+	print("blueprints claimed=%d  first claim on day %d"
+		% [claimed, first_claim_day])
 	assert(String(_current().name) == "GameOver", "run did not reach an ending")
 	if bad_mode:
 		assert(game.ending_kind() == &"bad",
@@ -126,8 +120,6 @@ func _run() -> void:
 		print("supply run: nothing was crafted, the pool above is five days' worth")
 	else:
 		# every meta system has to be reachable inside one normal run
-		assert(tier_rises >= 2,
-			"a well-played run must cross at least two tier thresholds, crossed %d" % tier_rises)
 		assert(claimed >= 2,
 			"a well-played run must claim at least two blueprints, claimed %d" % claimed)
 		# a well-played run finishes one whole blueprint by end of day 3
@@ -150,7 +142,7 @@ func _pool_line() -> String:
 
 
 # crafts every finished blueprint, keeps the first available upgrade on.
-# driving the real buttons is the whole point - the old tier check called Game
+# driving the real buttons is the whole point - the old check called Game
 # directly and passed for ages without ever firing in a real run.
 func _drive_after_day(scene: Node) -> void:
 	# A claimed blueprint may open the calibration puzzle over this screen.

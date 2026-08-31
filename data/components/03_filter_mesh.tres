@@ -7,7 +7,7 @@
 [resource]
 script = ExtResource("1_script")
 id = &"filter_mesh"
-display_name = "Jaring Penyaring"
+display_name = "Filter Mesh"
 locked_texture = ExtResource("2_locked")
 done_texture = ExtResource("3_done")
 diagram_position = Vector2(0.24, 0.3)

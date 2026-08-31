@@ -8,24 +8,29 @@
 [resource]
 script = ExtResource("2_xyrvj")
 id = &"paper_cup"
-display_name = "Gelas Kertas"
+display_name = "Paper Cup"
 texture = ExtResource("3_j8u54")
 frames = ExtResource("1_0j8tn")
 hotspot_overlay = ExtResource("2_j8u54")
 weight = 0.5
-surface_properties = Array[String](["kaku", "permukaan licin", "ringan"])
-visible_material = "kertas"
-visible_label = "KERTAS"
+surface_properties = Array[String](["stiff", "slick surface", "light"])
+visible_material = "paper"
+visible_label = "PAPER"
 has_residue = true
-residue_type = "kopi"
-true_material = "kertas berlapis PE"
+residue_type = "coffee"
+true_material = "PE-lined paper"
 is_multilayer = true
-tag_text = "PAP 22 - lapisan PE"
+tag_text = "PAP 22 - PE liner"
 hotspots = Array[Dictionary]([{
 "pos": Vector2(0.5, 0.7),
 "radius": 0.14,
 "reveals": "has_residue",
 "tool": "rinse"
+}, {
+"pos": Vector2(0.38, 0.62),
+"radius": 0.14,
+"reveals": "residue_type",
+"tool": "swab"
 }, {
 "pos": Vector2(0.58, 0.32),
 "radius": 0.14,
@@ -38,4 +43,4 @@ hotspots = Array[Dictionary]([{
 "tool": "cutter"
 }])
 correct_category = 1
-source_batch = &"kedai_pantai"
+source_batch = &"beach_cafe"

@@ -8,13 +8,13 @@
 [resource]
 script = ExtResource("2_sc")
 id = &"baju_daur_ulang"
-display_name = "Baju Poliester"
+display_name = "Polyester Shirt"
 texture = ExtResource("3_tx")
 frames = ExtResource("1_fr")
 hotspot_overlay = ExtResource("2_a1ht4")
 weight = 0.6
-surface_properties = Array[String](["lembut", "serat sintetis", "cepat kering"])
-visible_material = "kain poliester"
-visible_label = "POLIESTER"
+surface_properties = Array[String](["soft", "synthetic fibre", "dries fast"])
+visible_material = "polyester fabric"
+visible_label = "POLYESTER"
 correct_category = 1
-source_batch = &"pabrik_tekstil"
+source_batch = &"textile_mill"

@@ -10,8 +10,8 @@
 [resource]
 script = ExtResource("9_script")
 id = &"penetral_b3"
-display_name = "Penetral Limbah B3"
-flavour_text = "Wadah tertutup untuk limbah berbahaya, supaya tidak ada yang bocor ke laut."
+display_name = "Hazardous Waste Neutraliser"
+flavour_text = "A sealed vessel for hazardous waste, so none of it escapes back into the sea."
 components = Array[ExtResource("1_comp")]([ExtResource("2_c0"), ExtResource("3_c1"), ExtResource("4_c2")])
 background = ExtResource("8_bg")
 unlocks_upgrade = &"lengan_ganda"

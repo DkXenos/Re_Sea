@@ -10,8 +10,8 @@
 [resource]
 script = ExtResource("9_script")
 id = &"penyaring_mikroplastik"
-display_name = "Penyaring Mikroplastik"
-flavour_text = "Menyaring serpihan plastik kecil dari air, lalu mengumpulkannya jadi satu wadah."
+display_name = "Microplastic Filter"
+flavour_text = "Strains the small plastic fragments out of the water and collects them in one tank."
 components = Array[ExtResource("1_comp")]([ExtResource("2_c0"), ExtResource("3_c1"), ExtResource("4_c2")])
 background = ExtResource("8_bg")
 unlocks_upgrade = &"cengkeraman_kuat"

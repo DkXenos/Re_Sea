@@ -7,7 +7,7 @@
 [resource]
 script = ExtResource("1_script")
 id = &"bio_core"
-display_name = "Inti Energi Hayati"
+display_name = "Bio Core"
 locked_texture = ExtResource("2_locked")
 done_texture = ExtResource("3_done")
 diagram_position = Vector2(0.62, 0.28)

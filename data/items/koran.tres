@@ -8,13 +8,13 @@
 [resource]
 script = ExtResource("2_sc")
 id = &"koran"
-display_name = "Tumpukan Koran"
+display_name = "Stack of Newspapers"
 texture = ExtResource("3_tx")
 frames = ExtResource("1_fr")
 hotspot_overlay = ExtResource("2_uhejs")
 weight = 0.9
-surface_properties = Array[String](["kaku", "kering", "bertumpuk"])
-visible_material = "kertas"
-visible_label = "KERTAS"
+surface_properties = Array[String](["stiff", "dry", "stacked"])
+visible_material = "paper"
+visible_label = "PAPER"
 correct_category = 1
-source_batch = &"rumah_tangga"
+source_batch = &"household"

@@ -5,5 +5,5 @@
 [resource]
 script = ExtResource("1_dmnmj")
 id = &"r_baseline"
-text = "Pilah dari bahannya: bahan alami masuk ORGANIK; plastik, logam, kaca dan kertas yang bersih masuk DAUR ULANG; bahan kimia masuk B3; sisanya masuk RESIDU."
-short_text = "Bahannya menentukan tempatnya"
+text = "Sort by material: natural matter goes in ORGANIC; clean plastic, metal, glass and paper go in RECYCLABLE; chemicals go in HAZARDOUS; everything else goes in LANDFILL."
+short_text = "What it is made of decides where it goes"

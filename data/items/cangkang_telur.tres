@@ -8,11 +8,11 @@
 [resource]
 script = ExtResource("2_sc")
 id = &"cangkang_telur"
-display_name = "Cangkang Telur"
+display_name = "Eggshells"
 texture = ExtResource("3_tx")
 frames = ExtResource("1_fr")
 hotspot_overlay = ExtResource("2_agvwq")
 weight = 0.2
-surface_properties = Array[String](["rapuh", "ringan", "berongga"])
-visible_material = "cangkang"
-source_batch = &"rumah_tangga"
+surface_properties = Array[String](["brittle", "light", "hollow"])
+visible_material = "shell"
+source_batch = &"household"

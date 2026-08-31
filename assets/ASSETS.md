@@ -107,45 +107,9 @@ current files come out of `tools/gen_placeholders.py` and `gen_sounds.py`.
 | `data/frames/item_banana_peel_frames.tres` | `idle` | `assets/items/item_banana_peel.png` | 2 |
 | `data/frames/item_banana_peel_frames.tres` | `wobble` | `assets/items/item_banana_peel.png` | 4 |
 | `data/frames/item_banana_peel_frames.tres` | `sinking` | `assets/items/item_banana_peel.png` | 6 |
-| `data/frames/item_fish_bone_frames.tres` | `idle` | `assets/items/item_fish_bone.png` | 2 |
-| `data/frames/item_fish_bone_frames.tres` | `wobble` | `assets/items/item_fish_bone.png` | 4 |
-| `data/frames/item_fish_bone_frames.tres` | `sinking` | `assets/items/item_fish_bone.png` | 6 |
-| `data/frames/item_pet_bottle_frames.tres` | `idle` | `assets/items/item_pet_bottle.png` | 2 |
-| `data/frames/item_pet_bottle_frames.tres` | `wobble` | `assets/items/item_pet_bottle.png` | 4 |
-| `data/frames/item_pet_bottle_frames.tres` | `sinking` | `assets/items/item_pet_bottle.png` | 6 |
-| `data/frames/item_alu_can_frames.tres` | `idle` | `assets/items/item_alu_can.png` | 2 |
-| `data/frames/item_alu_can_frames.tres` | `wobble` | `assets/items/item_alu_can.png` | 4 |
-| `data/frames/item_alu_can_frames.tres` | `sinking` | `assets/items/item_alu_can.png` | 6 |
-| `data/frames/item_styrofoam_tray_frames.tres` | `idle` | `assets/items/item_styrofoam_tray.png` | 2 |
-| `data/frames/item_styrofoam_tray_frames.tres` | `wobble` | `assets/items/item_styrofoam_tray.png` | 4 |
-| `data/frames/item_styrofoam_tray_frames.tres` | `sinking` | `assets/items/item_styrofoam_tray.png` | 6 |
-| `data/frames/item_car_battery_frames.tres` | `idle` | `assets/items/item_car_battery.png` | 2 |
-| `data/frames/item_car_battery_frames.tres` | `wobble` | `assets/items/item_car_battery.png` | 4 |
-| `data/frames/item_car_battery_frames.tres` | `sinking` | `assets/items/item_car_battery.png` | 6 |
-| `data/frames/item_oil_jerrycan_frames.tres` | `idle` | `assets/items/item_oil_jerrycan.png` | 2 |
-| `data/frames/item_oil_jerrycan_frames.tres` | `wobble` | `assets/items/item_oil_jerrycan.png` | 4 |
-| `data/frames/item_oil_jerrycan_frames.tres` | `sinking` | `assets/items/item_oil_jerrycan.png` | 6 |
-| `data/frames/item_paint_bottle_frames.tres` | `idle` | `assets/items/item_paint_bottle.png` | 2 |
-| `data/frames/item_paint_bottle_frames.tres` | `wobble` | `assets/items/item_paint_bottle.png` | 4 |
-| `data/frames/item_paint_bottle_frames.tres` | `sinking` | `assets/items/item_paint_bottle.png` | 6 |
-| `data/frames/item_juice_carton_frames.tres` | `idle` | `assets/items/item_juice_carton.png` | 2 |
-| `data/frames/item_juice_carton_frames.tres` | `wobble` | `assets/items/item_juice_carton.png` | 4 |
-| `data/frames/item_juice_carton_frames.tres` | `sinking` | `assets/items/item_juice_carton.png` | 6 |
-| `data/frames/item_eco_tote_frames.tres` | `idle` | `assets/items/item_eco_tote.png` | 2 |
-| `data/frames/item_eco_tote_frames.tres` | `wobble` | `assets/items/item_eco_tote.png` | 4 |
-| `data/frames/item_eco_tote_frames.tres` | `sinking` | `assets/items/item_eco_tote.png` | 6 |
 | `data/frames/item_paper_cup_frames.tres` | `idle` | `assets/items/item_paper_cup.png` | 2 |
 | `data/frames/item_paper_cup_frames.tres` | `wobble` | `assets/items/item_paper_cup.png` | 4 |
 | `data/frames/item_paper_cup_frames.tres` | `sinking` | `assets/items/item_paper_cup.png` | 6 |
-| `data/frames/item_spray_can_frames.tres` | `idle` | `assets/items/item_spray_can.png` | 2 |
-| `data/frames/item_spray_can_frames.tres` | `wobble` | `assets/items/item_spray_can.png` | 4 |
-| `data/frames/item_spray_can_frames.tres` | `sinking` | `assets/items/item_spray_can.png` | 6 |
-| `data/frames/item_glass_jar_frames.tres` | `idle` | `assets/items/item_glass_jar.png` | 2 |
-| `data/frames/item_glass_jar_frames.tres` | `wobble` | `assets/items/item_glass_jar.png` | 4 |
-| `data/frames/item_glass_jar_frames.tres` | `sinking` | `assets/items/item_glass_jar.png` | 6 |
-| `data/frames/item_fishing_net_frames.tres` | `idle` | `assets/items/item_fishing_net.png` | 2 |
-| `data/frames/item_fishing_net_frames.tres` | `wobble` | `assets/items/item_fishing_net.png` | 4 |
-| `data/frames/item_fishing_net_frames.tres` | `sinking` | `assets/items/item_fishing_net.png` | 6 |
 | `data/frames/item_baju_organik_frames.tres` | `idle` | `assets/items/item_baju_organik.png` | 2 |
 | `data/frames/item_baju_organik_frames.tres` | `wobble` | `assets/items/item_baju_organik.png` | 4 |
 | `data/frames/item_baju_organik_frames.tres` | `sinking` | `assets/items/item_baju_organik.png` | 6 |
@@ -231,19 +195,7 @@ for, and the frame count the real thing should have. `static` = shown as-is.
 | Path | Size | Animated | What it is |
 |------|------|----------|-----------|
 | `assets/items/item_banana_peel.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `banana_peel` |
-| `assets/items/item_fish_bone.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `fish_bone` |
-| `assets/items/item_pet_bottle.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `pet_bottle` |
-| `assets/items/item_alu_can.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `alu_can` |
-| `assets/items/item_styrofoam_tray.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `styrofoam_tray` |
-| `assets/items/item_car_battery.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `car_battery` |
-| `assets/items/item_oil_jerrycan.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `oil_jerrycan` |
-| `assets/items/item_paint_bottle.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `paint_bottle` |
-| `assets/items/item_juice_carton.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `juice_carton` |
-| `assets/items/item_eco_tote.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `eco_tote` |
 | `assets/items/item_paper_cup.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `paper_cup` |
-| `assets/items/item_spray_can.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `spray_can` |
-| `assets/items/item_glass_jar.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `glass_jar` |
-| `assets/items/item_fishing_net.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `fishing_net` |
 | `assets/items/item_baju_organik.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `baju_organik` |
 | `assets/items/item_baju_daur_ulang.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `baju_daur_ulang` |
 | `assets/items/item_baju_b3.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `baju_b3` |
@@ -337,7 +289,10 @@ for, and the frame count the real thing should have. `static` = shown as-is.
 | `assets/ui/icon_pause_pressed.png` | 48x48 | static | Pause button, pressed state. |
 | `assets/ui/arrow_left_pressed.png` | 96x96 | static | Console arrow button (left), pressed state. |
 | `assets/ui/arrow_right_pressed.png` | 96x96 | static | Console arrow button (right), pressed state. |
-| `assets/env/water_bg.png` | 1280x720 | static | Full-screen water background, layer 0 |
+| `assets/env/water_bg.png` | 1280x720 | static | Deep-water backdrop. The furthest parallax layer inside the tank window - scaled from its own size to cover the window, never stretched. |
+| `assets/env/hull_wall.png` | 128x128 | static | Submarine hull, tiled at native size over everything outside the window. Must tile seamlessly. |
+| `assets/env/coral_dead.png` | 174x140 | static | Far parallax scenery, planted along the back of the seabed. Cut-out; drawn at this size, so this row decides how big it reads. |
+| `assets/env/coral_healthy.png` | 157x190 | static | Mid parallax scenery, nearer than the dead coral. Cut-out, drawn at this size. |
 | `assets/env/seabed.png` | 1000x140 | static | Seabed floor inside the tank SubViewport, z_index -10 |
 | `assets/env/tank_frame.png` | 1040x460 | static | Machine frame around the tank. Centre is transparent. |
 | `assets/env/glass_overlay.png` | 1000x420 | static | Glass reflection and tint, layer 20 |
@@ -378,19 +333,7 @@ for, and the frame count the real thing should have. `static` = shown as-is.
 | `assets/ui/comp_safety_valve_done.png` | 128x128 | static | Blueprint component `safety_valve`, done. |
 | `assets/ui/comp_safety_valve_locked.png` | 128x128 | static | Blueprint component `safety_valve`, locked. |
 | `assets/items/hotspots_banana_peel.png` | 160x160 | static | Hotspot rings for `banana_peel`. **Generated from `data/items/banana_peel.tres`**, don't edit by hand. |
-| `assets/items/hotspots_fish_bone.png` | 160x160 | static | Hotspot rings for `fish_bone`. **Generated from `data/items/fish_bone.tres`**, don't edit by hand. |
-| `assets/items/hotspots_pet_bottle.png` | 160x160 | static | Hotspot rings for `pet_bottle`. **Generated from `data/items/pet_bottle.tres`**, don't edit by hand. |
-| `assets/items/hotspots_alu_can.png` | 160x160 | static | Hotspot rings for `alu_can`. **Generated from `data/items/alu_can.tres`**, don't edit by hand. |
-| `assets/items/hotspots_styrofoam_tray.png` | 160x160 | static | Hotspot rings for `styrofoam_tray`. **Generated from `data/items/styrofoam_tray.tres`**, don't edit by hand. |
-| `assets/items/hotspots_car_battery.png` | 160x160 | static | Hotspot rings for `car_battery`. **Generated from `data/items/car_battery.tres`**, don't edit by hand. |
-| `assets/items/hotspots_oil_jerrycan.png` | 160x160 | static | Hotspot rings for `oil_jerrycan`. **Generated from `data/items/oil_jerrycan.tres`**, don't edit by hand. |
-| `assets/items/hotspots_paint_bottle.png` | 160x160 | static | Hotspot rings for `paint_bottle`. **Generated from `data/items/paint_bottle.tres`**, don't edit by hand. |
-| `assets/items/hotspots_juice_carton.png` | 160x160 | static | Hotspot rings for `juice_carton`. **Generated from `data/items/juice_carton.tres`**, don't edit by hand. |
-| `assets/items/hotspots_eco_tote.png` | 160x160 | static | Hotspot rings for `eco_tote`. **Generated from `data/items/eco_tote.tres`**, don't edit by hand. |
 | `assets/items/hotspots_paper_cup.png` | 160x160 | static | Hotspot rings for `paper_cup`. **Generated from `data/items/paper_cup.tres`**, don't edit by hand. |
-| `assets/items/hotspots_spray_can.png` | 160x160 | static | Hotspot rings for `spray_can`. **Generated from `data/items/spray_can.tres`**, don't edit by hand. |
-| `assets/items/hotspots_glass_jar.png` | 160x160 | static | Hotspot rings for `glass_jar`. **Generated from `data/items/glass_jar.tres`**, don't edit by hand. |
-| `assets/items/hotspots_fishing_net.png` | 160x160 | static | Hotspot rings for `fishing_net`. **Generated from `data/items/fishing_net.tres`**, don't edit by hand. |
 | `assets/items/hotspots_baju_organik.png` | 160x160 | static | Hotspot rings for `baju_organik`. **Generated from `data/items/baju_organik.tres`**, don't edit by hand. |
 | `assets/items/hotspots_baju_daur_ulang.png` | 160x160 | static | Hotspot rings for `baju_daur_ulang`. **Generated from `data/items/baju_daur_ulang.tres`**, don't edit by hand. |
 | `assets/items/hotspots_baju_b3.png` | 160x160 | static | Hotspot rings for `baju_b3`. **Generated from `data/items/baju_b3.tres`**, don't edit by hand. |

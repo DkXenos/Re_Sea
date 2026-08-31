@@ -8,13 +8,13 @@
 [resource]
 script = ExtResource("2_sc")
 id = &"botol_kaca"
-display_name = "Botol Kaca"
+display_name = "Glass Bottle"
 texture = ExtResource("3_tx")
 frames = ExtResource("1_fr")
 hotspot_overlay = ExtResource("2_gh65k")
 weight = 2.0
-surface_properties = Array[String](["tembus pandang", "berat", "licin"])
-visible_material = "kaca"
+surface_properties = Array[String](["see-through", "heavy", "slippery"])
+visible_material = "glass"
 visible_label = "GL 71"
 correct_category = 1
-source_batch = &"pabrik_minuman"
+source_batch = &"drinks_plant"

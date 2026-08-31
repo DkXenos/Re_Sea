@@ -8,12 +8,12 @@
 [resource]
 script = ExtResource("2_sc")
 id = &"tisu_bekas"
-display_name = "Tisu Bekas"
+display_name = "Used Tissue"
 texture = ExtResource("3_tx")
 frames = ExtResource("1_fr")
 hotspot_overlay = ExtResource("2_bb6lp")
 weight = 0.2
-surface_properties = Array[String](["lembap", "mudah sobek", "ringan"])
-visible_material = "tisu bekas pakai"
+surface_properties = Array[String](["damp", "tears easily", "light"])
+visible_material = "used tissue"
 correct_category = 3
-source_batch = &"rumah_tangga"
+source_batch = &"household"

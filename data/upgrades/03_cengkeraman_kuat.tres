@@ -5,9 +5,9 @@
 [resource]
 script = ExtResource("1_script")
 id = &"cengkeraman_kuat"
-display_name = "Cengkeraman Kuat"
-benefit_text = "Peluang cengkeram naik 15 poin."
-cost_text = "Menurunkan cakar jadi butuh 8 waktu shift, bukan 6."
+display_name = "Strong Grip"
+benefit_text = "Grip chance goes up by 15 points."
+cost_text = "Dropping the claw costs 8 shift time instead of 6."
 drop_cost = 8
 tool_cost = -1
 grip_delta = 0.15
@@ -15,5 +15,5 @@ coarse_readings = false
 move_speed_multiplier = 1.0
 post_drop_lockout = 0.0
 unlock_after_blueprints = 2
-unlock_text = "Terbuka setelah Penyaring Mikroplastik selesai dibangun."
+unlock_text = "Unlocked once the Microplastic Filter is built."
 sort_order = 3

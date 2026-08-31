@@ -5,9 +5,9 @@
 [resource]
 script = ExtResource("1_script")
 id = &"cakar_ringan"
-display_name = "Cakar Ringan"
-benefit_text = "Menurunkan cakar hanya butuh 4 waktu shift, bukan 6."
-cost_text = "Cengkeramannya lebih lemah: peluang berhasil turun 15 poin."
+display_name = "Light Claw"
+benefit_text = "Dropping the claw costs 4 shift time instead of 6."
+cost_text = "Its grip is weaker: the chance of holding on drops by 15 points."
 drop_cost = 4
 tool_cost = -1
 grip_delta = -0.15

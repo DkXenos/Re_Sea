@@ -3,21 +3,19 @@
 [ext_resource type="Script" path="res://data/rule_data.gd" id="1_rule_data"]
 [ext_resource type="Resource" path="res://data/rules/r_baseline.tres" id="2_r_baseline"]
 [ext_resource type="Script" path="res://data/item_data.gd" id="3_item_data"]
-[ext_resource type="Resource" path="res://data/items/banana_peel.tres" id="4_banana_peel"]
-[ext_resource type="Resource" path="res://data/items/fish_bone.tres" id="5_fish_bone"]
-[ext_resource type="Resource" path="res://data/items/pet_bottle.tres" id="6_pet_bottle"]
-[ext_resource type="Resource" path="res://data/items/alu_can.tres" id="7_alu_can"]
-[ext_resource type="Resource" path="res://data/items/paper_cup.tres" id="8_paper_cup"]
-[ext_resource type="Resource" path="res://data/items/styrofoam_tray.tres" id="9_styrofoam_tray"]
-[ext_resource type="Resource" path="res://data/items/daun.tres" id="10_daun"]
-[ext_resource type="Resource" path="res://data/items/koran.tres" id="11_koran"]
-[ext_resource type="Script" path="res://data/day_data.gd" id="12_day_data"]
+[ext_resource type="Resource" path="res://data/items/koran.tres" id="4_koran"]
+[ext_resource type="Resource" path="res://data/items/botol_kaca.tres" id="5_botol_kaca"]
+[ext_resource type="Resource" path="res://data/items/gelas_kertas_bersih.tres" id="6_gelas_kertas_bersih"]
+[ext_resource type="Resource" path="res://data/items/pizza.tres" id="7_pizza"]
+[ext_resource type="Resource" path="res://data/items/baju_organik.tres" id="8_baju_organik"]
+[ext_resource type="Resource" path="res://data/items/baju_daur_ulang.tres" id="9_baju_daur_ulang"]
+[ext_resource type="Script" path="res://data/day_data.gd" id="10_day_data"]
 
 [resource]
-script = ExtResource("12_day_data")
+script = ExtResource("10_day_data")
 day_number = 1
 active_rules = Array[ExtResource("1_rule_data")]([ExtResource("2_r_baseline")])
-item_pool = Array[ExtResource("3_item_data")]([ExtResource("4_banana_peel"), ExtResource("5_fish_bone"), ExtResource("6_pet_bottle"), ExtResource("7_alu_can"), ExtResource("8_paper_cup"), ExtResource("9_styrofoam_tray"), ExtResource("10_daun"), ExtResource("11_koran")])
+item_pool = Array[ExtResource("3_item_data")]([ExtResource("4_koran"), ExtResource("5_botol_kaca"), ExtResource("6_gelas_kertas_bersih"), ExtResource("7_pizza"), ExtResource("8_baju_organik"), ExtResource("9_baju_daur_ulang")])
 quota = 5
 budget = 90
 available_tools = Array[StringName]([])
@@ -25,4 +23,4 @@ initial_seed_fraction = 0.5
 spawn_interval_min = 8.0
 spawn_interval_max = 14.0
 min_available_items = 2
-intro_text = "Hari pertama. Pilah dari yang terlihat saja - alat periksa belum ada. Setiap cakar, periksa dan buang memakai waktu shift; berpikir gratis."
+intro_text = "First day. Sort on what you can see - there are no inspection tools yet. Every drop, inspection and sort spends shift time; thinking is free."

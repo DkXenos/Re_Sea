@@ -82,7 +82,7 @@ custom_minimum_size = Vector2(628, 0)
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="BreakdownBg" type="NinePatchRect" parent="UiLayer/Root" unique_id=1653717643]
+[node name="RecoveredBg" type="NinePatchRect" parent="UiLayer/Root" unique_id=1653717643]
 layout_mode = 0
 offset_left = 720.0
 offset_top = 108.0
@@ -94,13 +94,21 @@ patch_margin_top = 24
 patch_margin_right = 24
 patch_margin_bottom = 24
 
-[node name="Breakdown" type="VBoxContainer" parent="UiLayer/Root" unique_id=818115256]
+[node name="RecoveredTitle" type="Label" parent="UiLayer/Root" unique_id=818115255]
 layout_mode = 0
 offset_left = 744.0
-offset_top = 130.0
+offset_top = 124.0
+offset_right = 1214.0
+offset_bottom = 152.0
+theme_override_font_sizes/font_size = 20
+
+[node name="Recovered" type="VBoxContainer" parent="UiLayer/Root" unique_id=818115256]
+layout_mode = 0
+offset_left = 744.0
+offset_top = 162.0
 offset_right = 1214.0
 offset_bottom = 400.0
-theme_override_constants/separation = 10
+theme_override_constants/separation = 8
 
 [node name="MeterBgRect" type="TextureRect" parent="UiLayer/Root" unique_id=1881560878]
 layout_mode = 0
@@ -134,15 +142,6 @@ offset_top = 456.0
 offset_right = 1224.0
 offset_bottom = 490.0
 theme_override_font_sizes/font_size = 22
-
-[node name="TierLine" type="Label" parent="UiLayer/Root" unique_id=2034239306]
-layout_mode = 0
-offset_left = 744.0
-offset_top = 540.0
-offset_right = 1246.0
-offset_bottom = 584.0
-theme_override_font_sizes/font_size = 16
-autowrap_mode = 3
 
 [node name="NextButton" type="Button" parent="UiLayer/Root" unique_id=453991622]
 layout_mode = 0

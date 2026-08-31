@@ -31,7 +31,7 @@ enum Tab { RESULT, TECH, GEAR }
 @onready var _mistakes: VBoxContainer = $UiLayer/Root/ResultPage/MistakesScroll/Mistakes
 @onready var _gear_rows: VBoxContainer = $UiLayer/Root/GearPage/Scroll/Rows
 
-# teknologi tab
+# technology tab
 @onready var _tech: Control = $UiLayer/Root/TechPage
 @onready var _diagram: Control = $UiLayer/Root/TechPage/Diagram
 @onready var _craft_button: Button = $UiLayer/Root/TechPage/CraftButton
@@ -101,7 +101,7 @@ func _finish() -> void:
 	Events.phase_finished.emit()
 
 
-# tab 1: hasil hari ini
+# tab 1: today's haul
 
 # the haul as actual art. a list of names says the same thing but feels like
 # a receipt.
@@ -120,15 +120,14 @@ func _build_result() -> void:
 		index += 1
 
 	var result := Game.last_breakdown
-	var tier := Game.current_tier()
 	var unsorted := Game.unsorted_items().size()
 	_result_summary.text = "\n".join([
 		Strings.tf("after_sorted", {"ok": int(result.get("correct", 0)),
 			"bad": int(result.get("wrong", 0)), "left": unsorted}),
 		Strings.tf("after_budget", {"spent": int(Game.stats.get("spent", 0)),
 			"left": Game.budget_left, "max": Game.budget_max}),
-		Strings.tf("after_sea", {"tier": tier.display_name if tier != null else "?",
-			"have": Game.unlocked_blueprints.size(), "need": Game.blueprints.size()}),
+		Strings.tf("after_sea", {"have": Game.unlocked_blueprints.size(),
+			"need": Game.blueprints.size()}),
 	])
 
 	_clear(_mistakes)
@@ -166,7 +165,7 @@ func _make_table_item(entry: CarriedItem, origin: Vector2, size: Vector2) -> Nod
 	return holder
 
 
-# tab 2: teknologi
+# tab 2: technology
 
 # fixed recipes. everything is authored in a .tres and on screen before you
 # commit - no combining, nothing to discover, no failure state. a craft you
@@ -302,7 +301,7 @@ func _refresh_craft_button(bp: BlueprintData) -> void:
 		_craft_button.disabled = true
 
 
-# "6 organik, 2 residu"
+# "6 organic, 2 landfill"
 func _requirement_text(component: ComponentData) -> String:
 	var parts: Array[String] = []
 	for category: int in component.requirements:
@@ -379,7 +378,7 @@ func _on_craft_blueprint() -> void:
 	# --- end ---
 
 
-# tab 3: peralatan
+# tab 3: gear
 
 # all four always listed. fitting one is free and reversible, there's no
 # currency anywhere in this game.

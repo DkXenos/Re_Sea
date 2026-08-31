@@ -5,10 +5,10 @@
 [resource]
 script = ExtResource("1_aglgl")
 id = &"r_chem_residue"
-text = "Sisa oli, cat pelarut atau obat kadaluarsa membuat wadahnya menjadi limbah B3. Aturan ini mengalahkan aturan sisa kotoran."
-short_text = "Sisa oli / cat / obat  ->  B3"
+text = "Engine oil, solvent paint or expired medicine turns whatever held it into hazardous waste. This rule beats the residue rule."
+short_text = "Oil / paint / medicine residue  ->  HAZARDOUS"
 applies_when = {
-"residue_type": ["oli mesin", "cat berbasis pelarut", "sisa obat kadaluarsa"]
+"residue_type": ["engine oil", "solvent-based paint", "expired medicine"]
 }
 forces_category = 2
 priority = 40

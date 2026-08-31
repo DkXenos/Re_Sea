@@ -6,29 +6,30 @@
 [ext_resource type="Resource" path="res://data/rules/r_chem_residue.tres" id="4_r_chem_residue"]
 [ext_resource type="Resource" path="res://data/rules/r_multilayer.tres" id="5_r_multilayer"]
 [ext_resource type="Script" path="res://data/item_data.gd" id="6_item_data"]
-[ext_resource type="Resource" path="res://data/items/banana_peel.tres" id="7_banana_peel"]
-[ext_resource type="Resource" path="res://data/items/fish_bone.tres" id="8_fish_bone"]
-[ext_resource type="Resource" path="res://data/items/pet_bottle.tres" id="9_pet_bottle"]
-[ext_resource type="Resource" path="res://data/items/spray_can.tres" id="10_spray_can"]
-[ext_resource type="Resource" path="res://data/items/car_battery.tres" id="11_car_battery"]
-[ext_resource type="Resource" path="res://data/items/oil_jerrycan.tres" id="12_oil_jerrycan"]
-[ext_resource type="Resource" path="res://data/items/glass_jar.tres" id="13_glass_jar"]
-[ext_resource type="Resource" path="res://data/items/styrofoam_tray.tres" id="14_styrofoam_tray"]
-[ext_resource type="Resource" path="res://data/items/juice_carton.tres" id="15_juice_carton"]
-[ext_resource type="Resource" path="res://data/items/eco_tote.tres" id="16_eco_tote"]
-[ext_resource type="Resource" path="res://data/items/fishing_net.tres" id="17_fishing_net"]
-[ext_resource type="Resource" path="res://data/items/pizza.tres" id="18_pizza"]
-[ext_resource type="Resource" path="res://data/items/baju_organik.tres" id="19_baju_organik"]
-[ext_resource type="Resource" path="res://data/items/baju_daur_ulang.tres" id="20_baju_daur_ulang"]
-[ext_resource type="Resource" path="res://data/items/mystery_box.tres" id="21_mystery_box"]
-[ext_resource type="Script" path="res://data/day_data.gd" id="22_day_data"]
+[ext_resource type="Resource" path="res://data/items/apel.tres" id="7_apel"]
+[ext_resource type="Resource" path="res://data/items/baju_organik.tres" id="8_baju_organik"]
+[ext_resource type="Resource" path="res://data/items/banana_peel.tres" id="9_banana_peel"]
+[ext_resource type="Resource" path="res://data/items/cangkang_telur.tres" id="10_cangkang_telur"]
+[ext_resource type="Resource" path="res://data/items/daun.tres" id="11_daun"]
+[ext_resource type="Resource" path="res://data/items/pizza.tres" id="12_pizza"]
+[ext_resource type="Resource" path="res://data/items/baju_daur_ulang.tres" id="13_baju_daur_ulang"]
+[ext_resource type="Resource" path="res://data/items/botol_kaca.tres" id="14_botol_kaca"]
+[ext_resource type="Resource" path="res://data/items/gelas_kertas_bersih.tres" id="15_gelas_kertas_bersih"]
+[ext_resource type="Resource" path="res://data/items/kantong_plastik.tres" id="16_kantong_plastik"]
+[ext_resource type="Resource" path="res://data/items/koran.tres" id="17_koran"]
+[ext_resource type="Resource" path="res://data/items/baju_b3.tres" id="18_baju_b3"]
+[ext_resource type="Resource" path="res://data/items/tisu_b3.tres" id="19_tisu_b3"]
+[ext_resource type="Resource" path="res://data/items/paper_cup.tres" id="20_paper_cup"]
+[ext_resource type="Resource" path="res://data/items/tisu_bekas.tres" id="21_tisu_bekas"]
+[ext_resource type="Resource" path="res://data/items/mystery_box.tres" id="22_mystery_box"]
+[ext_resource type="Script" path="res://data/day_data.gd" id="23_day_data"]
 
 [resource]
-script = ExtResource("22_day_data")
+script = ExtResource("23_day_data")
 day_number = 4
 active_rules = Array[ExtResource("1_rule_data")]([ExtResource("2_r_baseline"), ExtResource("3_r_residue"), ExtResource("4_r_chem_residue"), ExtResource("5_r_multilayer")])
-item_pool = Array[ExtResource("6_item_data")]([ExtResource("7_banana_peel"), ExtResource("8_fish_bone"), ExtResource("8_fish_bone"), ExtResource("9_pet_bottle"), ExtResource("10_spray_can"), ExtResource("11_car_battery"), ExtResource("12_oil_jerrycan"), ExtResource("13_glass_jar"), ExtResource("14_styrofoam_tray"), ExtResource("15_juice_carton"), ExtResource("16_eco_tote"), ExtResource("17_fishing_net"), ExtResource("18_pizza"), ExtResource("19_baju_organik"), ExtResource("20_baju_daur_ulang")])
-box_item = ExtResource("21_mystery_box")
+item_pool = Array[ExtResource("6_item_data")]([ExtResource("7_apel"), ExtResource("8_baju_organik"), ExtResource("9_banana_peel"), ExtResource("10_cangkang_telur"), ExtResource("11_daun"), ExtResource("12_pizza"), ExtResource("13_baju_daur_ulang"), ExtResource("14_botol_kaca"), ExtResource("15_gelas_kertas_bersih"), ExtResource("16_kantong_plastik"), ExtResource("17_koran"), ExtResource("18_baju_b3"), ExtResource("19_tisu_b3"), ExtResource("18_baju_b3"), ExtResource("19_tisu_b3"), ExtResource("20_paper_cup"), ExtResource("21_tisu_bekas"), ExtResource("20_paper_cup")])
+box_item = ExtResource("22_mystery_box")
 box_spawn_count = 2
 box_contents_min = 2
 box_contents_max = 3
@@ -39,4 +40,4 @@ initial_seed_fraction = 0.4
 spawn_interval_min = 8.0
 spawn_interval_max = 14.0
 min_available_items = 2
-intro_text = "Pemotong tersedia. Yang terlihat seperti kertas belum tentu kertas - tapi setiap pemeriksaan mengurangi jatah cakar."
+intro_text = "The cutter is available. What looks like paper is not always paper - but every inspection eats into your drops."

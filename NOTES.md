@@ -52,7 +52,7 @@ go in tools/migrations/ as one-offs.
 ## layers
 
 ```
-0    water bg, far seabed
+0    submarine hull (claw phase) / bg plate (everywhere else)
 10   tank SubViewportContainer, desk content
 20   glass overlay
 30   machine frame + console
@@ -63,13 +63,27 @@ go in tools/migrations/ as one-offs.
 
 Inventory + inspect panels are 10, not modals. Only the rulebook is modal.
 
-z_index inside the tank: seabed -10, fish -5, items 0, claw/cable 20.
+z_index inside the tank: parallax -20 and down, seabed -10, fish -5, items 0,
+claw/cable 20.
+
+The sea only exists inside the tank SubViewport, so the frame really is a
+window - outside it is hull. Depth layers are rows in ClawPhase's
+PARALLAX_LAYERS; each is sized off its own texture and never stretched. Add a
+row to add a layer.
 
 ## text
 
-Player-facing text is Indonesian, lives in data/strings.gd. Item names and rule
-text are in the .tres. No string literals in scenes. Code/comments/filenames
-stay english.
+Player-facing text is English, lives in data/strings.gd. Item names and rule
+text are in the .tres. No string literals in scenes. Internal ids and the
+data/ filenames are still the old Indonesian ones - nothing shows them, and
+renaming them means touching every day .tres and every asset path.
+
+## scoring
+
+There isn't any. No day score, no points, no penalty arithmetic. A day pays out
+exactly the items that went in the RIGHT bin - those become blueprint material,
+a wrong bin loses the item outright. Game.day_recovered() is the only door into
+the material store; don't add a second one.
 
 ## the shift
 

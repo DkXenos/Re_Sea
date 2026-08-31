@@ -8,12 +8,25 @@
 [resource]
 script = ExtResource("2_sc")
 id = &"tisu_b3"
-display_name = "Tisu Kena Zat Kimia"
+display_name = "Chemical-Soaked Tissue"
 texture = ExtResource("3_tx")
 frames = ExtResource("1_fr")
 hotspot_overlay = ExtResource("2_lsyu6")
 weight = 0.2
-surface_properties = Array[String](["bernoda hijau", "bau tajam", "lembap"])
-visible_material = "tisu terkena zat kimia"
+surface_properties = Array[String](["green stains", "acrid smell", "damp"])
+visible_material = "tissue"
+has_residue = true
+residue_type = "solvent-based paint"
+hotspots = Array[Dictionary]([{
+"pos": Vector2(0.5, 0.7),
+"radius": 0.16,
+"reveals": "has_residue",
+"tool": "rinse"
+}, {
+"pos": Vector2(0.62, 0.6),
+"radius": 0.16,
+"reveals": "residue_type",
+"tool": "swab"
+}])
 correct_category = 2
-source_batch = &"bengkel_pesisir"
+source_batch = &"coastal_workshop"

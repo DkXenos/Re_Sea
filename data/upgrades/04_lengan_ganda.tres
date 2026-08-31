@@ -5,9 +5,9 @@
 [resource]
 script = ExtResource("1_script")
 id = &"lengan_ganda"
-display_name = "Lengan Ganda"
-benefit_text = "Memakai alat hanya butuh 3 waktu shift, bukan 4."
-cost_text = "Lengan tambahan memberatkan rel: cakar bergeser 25% lebih lambat."
+display_name = "Twin Arms"
+benefit_text = "Using a tool costs 3 shift time instead of 4."
+cost_text = "The extra arm weighs the rail down: the claw travels 25% slower."
 drop_cost = -1
 tool_cost = 3
 grip_delta = 0.0
@@ -15,5 +15,5 @@ coarse_readings = false
 move_speed_multiplier = 0.75
 post_drop_lockout = 0.0
 unlock_after_blueprints = 3
-unlock_text = "Terbuka setelah Penetral Limbah B3 selesai dibangun."
+unlock_text = "Unlocked once the Hazardous Waste Neutraliser is built."
 sort_order = 4

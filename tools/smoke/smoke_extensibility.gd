@@ -22,10 +22,10 @@ func _run() -> void:
 	var item: ItemData = ItemData.new()
 	item.id = &"test_coated_jar"
 	item.display_name = "Toples Uji Berlapis"
-	item.texture = load("res://assets/items/item_glass_jar.png")
-	item.frames = load("res://data/frames/item_glass_jar_frames.tres")
+	item.texture = load("res://assets/items/item_botol_kaca.png")
+	item.frames = load("res://data/frames/item_botol_kaca_frames.tres")
 	item.weight = 1.8
-	item.visible_material = "kaca"
+	item.visible_material = "glass"
 	item.visible_label = "UJI"
 	item.true_material = "kaca berlapis plastik"
 	item.is_multilayer = true

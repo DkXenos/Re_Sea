@@ -8,13 +8,13 @@
 [resource]
 script = ExtResource("2_script")
 id = &"mystery_box"
-display_name = "Kotak Tersegel"
+display_name = "Sealed Crate"
 texture = ExtResource("3_closed")
 frames = ExtResource("1_box")
 hotspot_overlay = ExtResource("2_5ko2g")
 weight = 1.5
 is_container = true
-surface_properties = Array[String](["kotak tertutup", "tersegel", "berat sedang"])
-visible_material = "kotak tersegel"
+surface_properties = Array[String](["closed crate", "sealed", "medium weight"])
+visible_material = "sealed crate"
 correct_category = 3
-source_batch = &"kiriman_arus"
+source_batch = &"current_delivery"
