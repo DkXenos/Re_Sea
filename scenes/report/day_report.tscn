@@ -18,6 +18,7 @@ offset_right = 1280.0
 offset_bottom = 720.0
 mouse_filter = 2
 texture = ExtResource("2_bg")
+stretch_mode = 6
 expand_mode = 1
 
 [node name="UiLayer" type="CanvasLayer" parent="." unique_id=1690282511]
@@ -28,6 +29,8 @@ layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
 theme = ExtResource("6_theme")
 

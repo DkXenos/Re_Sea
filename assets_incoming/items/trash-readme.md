@@ -1,0 +1,2 @@
+theres more to come.
+theres folders thats titled with the name of an item which means it has variations, like baju (bahan natural [organik], normal [daur ulang], pestisida [kimia]) and other items like used cup, tissue. theres also a trashes folder that contain trash that only have 1 variation which means it can only be sorted into that category for now but it can change later. please take a look at the naming and fix it (example: baju/bahan natural.PNG to baju-organik.png) and all the other trash items in that directory
