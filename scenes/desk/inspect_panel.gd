@@ -4,6 +4,8 @@
 extends Control
 
 signal reveal_happened(field: String, hit: bool)
+# the inventory list has to rebuild around the contents that just appeared
+signal crate_opened()
 # bin the revealed evidence points at, -1 for none
 signal bin_hint_changed(category: int)
 
@@ -21,10 +23,7 @@ const TOOL_ICON_SCALE := 0.62
 @onready var _view: SubViewport = $ViewportBox/ItemViewport
 @onready var _item_root: Node2D = $ViewportBox/ItemViewport/ItemRoot
 @onready var _item_sprite: Sprite2D = $ViewportBox/ItemViewport/ItemRoot/Sprite
-@onready var _hotspot_sprite: Sprite2D = $ViewportBox/ItemViewport/ItemRoot/Hotspots
 @onready var _surface: Control = $Surface
-# properties until the name is earned, then the name. before this existed the
-# desk showed nothing at all and it just read like a missing label.
 @onready var _name: Label = $NameLabel
 @onready var _question: Label = $Question
 @onready var _zoom_hint: Label = $ZoomHint
@@ -55,8 +54,6 @@ func _ready() -> void:
 	_feedback.text = ""
 	_surface.gui_input.connect(_on_surface_input)
 	Events.budget_changed.connect(func(_r: int, _m: int) -> void: _refresh_rack())
-	Events.hotspots_visible_changed.connect(_set_hotspots_visible)
-	_set_hotspots_visible(Game.show_hotspots)
 	_build_rack()
 	_rebuild_rules()
 
@@ -91,7 +88,8 @@ func _make_tool_entry(tool_data: ToolData) -> Control:
 	row.add_child(name_label)
 
 	var cost_label := Label.new()
-	cost_label.text = Strings.tf("tools_cost_label", {"n": Game.cost_of(&"tool")})
+	cost_label.text = Strings.t("tools_cost_free") if tool_data.opens_containers \
+		else Strings.tf("tools_cost_label", {"n": Game.cost_of(&"tool")})
 	cost_label.position = Vector2(66, 32)
 	cost_label.add_theme_font_size_override("font_size", 13)
 	cost_label.add_theme_color_override("font_color", Color(0.72, 0.78, 0.85))
@@ -114,7 +112,9 @@ func _refresh_rack() -> void:
 	for tool_id: StringName in _tool_nodes:
 		var parts: Dictionary = _tool_nodes[tool_id]
 		var unlocked: bool = Game.tool_unlocked(tool_id)
-		var affordable: bool = Game.can_afford(&"tool")
+		# an opener spends nothing, so an empty budget never locks it out
+		var free: bool = Game.get_tool(tool_id).opens_containers
+		var affordable: bool = free or Game.can_afford(&"tool")
 		var usable := unlocked and affordable
 		var button: Button = parts["button"]
 		button.disabled = not usable
@@ -122,6 +122,8 @@ func _refresh_rack() -> void:
 			button.tooltip_text = Strings.t("tools_locked")
 		elif not affordable:
 			button.tooltip_text = Strings.t("budget_too_low")
+		elif free:
+			button.tooltip_text = Strings.t("tools_cost_free")
 		else:
 			button.tooltip_text = Strings.tf("tools_cost_label", {"n": Game.cost_of(&"tool")})
 		# locked is a different PNG, not a dim. the labels beside it are UI
@@ -162,8 +164,7 @@ func show_entry(new_entry: CarriedItem) -> void:
 	_zoom = 1.0
 	_pan = Vector2.ZERO
 	_feedback.text = ""
-	_item_sprite.texture = entry.data.texture if entry != null else null
-	_hotspot_sprite.texture = entry.data.hotspot_overlay if entry != null else null
+	_item_sprite.texture = entry.display_texture() if entry != null else null
 	_question.text = _question_for(entry)
 	_set_identity(entry)
 	_apply_transform()
@@ -175,7 +176,6 @@ func show_entry(new_entry: CarriedItem) -> void:
 func clear() -> void:
 	entry = null
 	_item_sprite.texture = null
-	_hotspot_sprite.texture = null
 	_question.text = Strings.t("inspect_pick_first")
 	_name.text = ""
 	_feedback.text = ""
@@ -184,25 +184,16 @@ func clear() -> void:
 	bin_hint_changed.emit(-1)
 
 
-# different colours so the flip from properties to name is obvious
 func _set_identity(target: CarriedItem) -> void:
-	if target == null:
-		_name.text = ""
-		return
-	_name.text = target.label()
-	_name.add_theme_color_override("font_color",
-		Color(1, 1, 1) if target.name_known() else Color(0.78, 0.86, 0.94))
-
-
-func _set_hotspots_visible(value: bool) -> void:
-	if _hotspot_sprite != null:
-		_hotspot_sprite.visible = value
+	_name.text = "" if target == null else target.label()
 
 
 # the question isn't "which bin", it's "do i believe this"
 func _question_for(target: CarriedItem) -> String:
 	if target == null:
 		return Strings.t("inspect_pick_first")
+	if target.is_container() and not target.opened:
+		return Strings.t("box_question")
 	if target.data.visible_label != "":
 		return Strings.tf("inspect_question_labeled",
 			{"label": target.data.visible_label, "mat": target.data.visible_material})
@@ -240,7 +231,7 @@ func _on_surface_input(event: InputEvent) -> void:
 			MOUSE_BUTTON_LEFT:
 				if mb.pressed:
 					if _armed != &"":
-						_use_tool_at(mb.position)
+						_use_tool()
 					else:
 						_dragging = true
 				else:
@@ -250,24 +241,28 @@ func _on_surface_input(event: InputEvent) -> void:
 		_apply_transform()
 
 
-# screen point -> normalized texture coords, which is what hotspots use. this
-# is why zooming never shifts a hotspot off the art.
-func _to_normalized(point: Vector2) -> Vector2:
-	var span := _item_span() * BASE_SCALE * _zoom
-	if span <= 0.0:
-		return Vector2(-1.0, -1.0)
-	var origin := Vector2(_view.size) * 0.5 + _pan
-	return (point - origin) / span + Vector2(0.5, 0.5)
-
-
-func _use_tool_at(point: Vector2) -> void:
+func _use_tool() -> void:
 	if entry == null:
 		return
 	var tool_id := _armed
 	if not Game.tool_unlocked(tool_id):
 		Events.toast_requested.emit(Strings.t("tools_locked"))
 		return
-	var field := _hotspot_field(_to_normalized(point), tool_id)
+	var tool_data := Game.get_tool(tool_id)
+	var sealed_crate: bool = entry.is_container() and not entry.opened
+	# neither of these charges anything - refusing to do the job is not a use
+	if tool_data.opens_containers:
+		if sealed_crate:
+			_open_crate()
+		else:
+			Events.toast_requested.emit(Strings.tf("tool_only_opens",
+				{"tool": tool_data.display_name}))
+		return
+	if sealed_crate:
+		Events.toast_requested.emit(Strings.tf("tool_wrong_for_box",
+			{"tool": tool_data.display_name}))
+		return
+	var field := _reveal_for_tool(tool_id)
 	# coarse scanner probes cheap and needs a 2nd use at full price to read
 	# properly. working out which click this is costs nothing.
 	var second_reading: bool = Game.coarse_readings() and field != "" \
@@ -287,8 +282,8 @@ func _use_tool_at(point: Vector2) -> void:
 		_refresh_rack()
 		return
 	if field.is_empty():
-		# missed. charge is gone anyway, that's the risk. but say something -
-		# a dead click reads as a bug.
+		# nothing here for this tool. the charge is gone anyway, that's the
+		# risk in picking one - but say so, a dead click reads as a bug.
 		Events.sfx_requested.emit(&"reveal_nothing")
 		_set_feedback(Strings.tf("inspect_nothing", {"n": cost}), Color(0.95, 0.72, 0.55))
 		Events.toast_requested.emit(Strings.t("reveal_nothing"))
@@ -306,16 +301,32 @@ func _use_tool_at(point: Vector2) -> void:
 	_refresh_rack()
 
 
+# opening is free, so the whole cost of a crate is having brought the cutter.
+# the crate itself stays in the list - it is rubbish too.
+func _open_crate() -> void:
+	var contents := Game.open_container(entry)
+	Events.sfx_requested.emit(&"bin_accept")
+	if not contents.is_empty():
+		Events.toast_requested.emit(
+			Strings.tf("box_opened_toast", {"n": contents.size()}))
+	crate_opened.emit()
+	_question.text = _question_for(entry)
+	_item_sprite.texture = entry.display_texture()
+	_refresh_rack()
+
+
 func _set_feedback(text: String, color: Color) -> void:
 	_feedback.text = text
 	_feedback.add_theme_color_override("font_color", color)
 
 
-func _hotspot_field(normalized: Vector2, tool_id: StringName) -> String:
+# The whole item is the target. There is no aiming any more: the question a
+# tool answers is "does this thing have anything you can find", not "can you
+# click a 22px circle", and hunting for the circle was never the interesting
+# part of the decision.
+func _reveal_for_tool(tool_id: StringName) -> String:
 	for spot: Dictionary in entry.data.hotspots:
-		if StringName(spot["tool"]) != tool_id:
-			continue
-		if normalized.distance_to(spot["pos"]) <= float(spot["radius"]):
+		if StringName(spot["tool"]) == tool_id:
 			return String(spot["reveals"])
 	return ""
 

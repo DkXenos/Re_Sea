@@ -7,12 +7,6 @@ const SLOT_BG := preload("res://assets/ui/panel_slot.png")
 # selected is a separate png, not a tint
 const SLOT_BG_SELECTED := preload("res://assets/ui/panel_slot_selected.png")
 
-# 160x160 art at 64x64 on the card
-const BOX_CARD_SCALE := 0.4
-# how long the opened crate is shown before the list rebuilds.
-const OPEN_HOLD := 0.5
-# TODO opening 2 boxes fast makes both cards fade at once and it looks like a
-# bug. should probably queue them.
 
 @onready var _grid: GridContainer = $Scroll/Grid
 @onready var _title: Label = $Title
@@ -31,8 +25,7 @@ func refresh() -> void:
 	var entries := Game.unsorted_items()
 	_empty.visible = entries.is_empty()
 	for entry: CarriedItem in entries:
-		_grid.add_child(_make_box_card(entry)
-			if entry.is_container() and not entry.opened else _make_card(entry))
+		_grid.add_child(_make_card(entry))
 
 
 func _make_card(entry: CarriedItem) -> Control:
@@ -68,18 +61,31 @@ func _make_card(entry: CarriedItem) -> Control:
 	icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	columns.add_child(icon)
 
-	# name only shows once it's earned, properties until then
-	var known := entry.name_known()
+	var lines := VBoxContainer.new()
+	lines.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	lines.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	lines.add_theme_constant_override("separation", 2)
+	lines.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	columns.add_child(lines)
+
 	var label := Label.new()
-	label.text = entry.label()
-	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	label.text = entry.data.display_name
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	label.add_theme_font_size_override("font_size", 14 if known else 12)
-	if not known:
-		label.add_theme_color_override("font_color", Color(0.78, 0.84, 0.9))
-	columns.add_child(label)
+	label.add_theme_font_size_override("font_size", 14)
+	lines.add_child(label)
+
+	# a sealed crate has no bin and no evidence - the only thing you can do to
+	# it is cut it, so the card says which tool does that
+	if entry.is_container() and not entry.opened:
+		var opener := Game.container_opener()
+		var hint := Label.new()
+		hint.text = Strings.t("box_no_tool") if opener == null \
+			else Strings.tf("box_needs_tool", {"tool": opener.display_name})
+		hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		hint.add_theme_font_size_override("font_size", 12)
+		hint.add_theme_color_override("font_color",
+			Color(0.72, 0.78, 0.85) if opener != null else Color(0.95, 0.72, 0.6))
+		lines.add_child(hint)
 
 	# invisible hit area over the card
 	var button := Button.new()
@@ -93,72 +99,10 @@ func _make_card(entry: CarriedItem) -> Control:
 	return card
 
 
-# sealed box. same card, but no bins and no tools - only Open.
-func _make_box_card(entry: CarriedItem) -> Control:
-	var card := Control.new()
-	card.custom_minimum_size = Vector2(250, 84)
-
-	var bg := NinePatchRect.new()
-	bg.texture = SLOT_BG
-	for side: String in ["left", "top", "right", "bottom"]:
-		bg.set("patch_margin_" + side, 24)
-	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
-	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	card.add_child(bg)
-
-	var crate := AnimatedSprite2D.new()
-	crate.sprite_frames = entry.data.frames
-	crate.play(&"closed")
-	crate.scale = Vector2.ONE * BOX_CARD_SCALE
-	crate.position = Vector2(42, 42)
-	card.add_child(crate)
-
-	var label := Label.new()
-	label.text = entry.data.display_name
-	label.position = Vector2(80, 10)
-	label.size = Vector2(84, 64)
-	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	label.add_theme_font_size_override("font_size", 13)
-	card.add_child(label)
-
-	var button := Button.new()
-	button.text = Strings.t("box_open")
-	button.tooltip_text = Strings.t("box_sealed")
-	button.position = Vector2(170, 22)
-	button.size = Vector2(70, 40)
-	button.pressed.connect(_on_open_pressed.bind(entry, card, crate, button))
-	card.add_child(button)
-	return card
-
-
-# scene tree timer, NOT a tween. the panel rebuilds itself when you switch back
-# to the desk, and a tween on a freed node leaves the box open on screen but
-# still unopened in the inventory. the crate is not removed any more - it stays
-# in the list and turns into an ordinary sortable card on the rebuild.
-func _on_open_pressed(entry: CarriedItem, _card: Control, crate: AnimatedSprite2D,
-		button: Button) -> void:
-	if entry.opened:
-		return
-	button.disabled = true
-	crate.play(&"opened")
-	Events.sfx_requested.emit(&"bin_accept")
-	get_tree().create_timer(OPEN_HOLD).timeout.connect(_finish_open.bind(entry))
-
-
-func _finish_open(entry: CarriedItem) -> void:
-	var contents := Game.open_container(entry)
-	if not contents.is_empty():
-		Events.toast_requested.emit(
-			Strings.tf("box_opened_toast", {"n": contents.size()}))
-	refresh()
-	if _selected == null:
-		select_first()
-
-
-# first thing a bin would take, so the desk never opens on a sealed box
+# whatever is next to deal with. a sealed crate counts: it is not sortable,
+# but cutting it open is the work.
 func select_first() -> void:
-	var entries := Game.sortable_items()
+	var entries := Game.unsorted_items()
 	_selected = entries[0] if not entries.is_empty() else null
 	refresh()
 	item_selected.emit(_selected)

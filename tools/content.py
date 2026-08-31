@@ -1,13 +1,9 @@
 """Drawing parameters for the placeholder art. No game content in here.
 
 The .tres files in data/ are the only source of truth for anything the game
-reads - item properties, hotspots, rules, tools, days. This is just what a
+reads - item properties, rules, tools, days. This is just what a
 placeholder drawing needs (shape, colour, a 2-3 letter code) and it's dead
 the moment real art shows up.
-
-Hotspot rings are no longer drawn here at all. They are a separate overlay PNG
-per item, generated from the `.tres` by `tools/gen_hotspot_overlays.gd`, so the
-rings can never disagree with the coordinates the game checks against.
 """
 
 # id -> how to draw its placeholder. Ids must match data/items/<id>.tres.

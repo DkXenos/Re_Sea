@@ -1,5 +1,5 @@
-# desk phase: fill the inventory, use every tool on a real hotspot and on
-# empty space, then sort everything.
+# desk phase: fill the inventory, use every tool on items that have something
+# for it and on items that do not, cut open any crate, then sort everything.
 #   godot --headless --script tools/smoke/smoke_desk.gd -- [day]
 extends SceneTree
 
@@ -9,12 +9,6 @@ var deliberate_wrong := 0
 
 func _init() -> void:
 	_run()
-
-
-# normalized texture coord -> point in the inspect surface. mirrors
-# inspect_panel._to_normalized().
-func _point_for(n: Vector2) -> Vector2:
-	return Vector2(180, 180) + (n - Vector2(0.5, 0.5)) * 320.0
 
 
 func _run() -> void:
@@ -40,6 +34,7 @@ func _run() -> void:
 	await process_frame
 
 	var inspect: Control = phase.get_node("UiLayer/Root/InspectPanel")
+	var inventory: Control = phase.get_node("UiLayer/Root/InventoryPanel")
 	var bins: Control = phase.get_node("UiLayer/Root/BinRow")
 	var rulebook: Control = phase.get_node("RulebookLayer/RulebookPanel")
 
@@ -61,23 +56,45 @@ func _run() -> void:
 		var entry = inspect.entry
 		if entry == null:
 			break
-		# Spend one charge on a real hotspot, and one on empty space, for each
-		# tool this item actually has a hotspot for.
-		for spot: Dictionary in entry.data.hotspots:
-			var tool_id := StringName(spot["tool"])
-			if not game.can_afford(&"tool") or not game.tool_unlocked(tool_id):
+		# A sealed crate is cut open, not inspected and not binned.
+		if entry.is_container() and not entry.opened:
+			var opener: ToolData = game.container_opener()
+			assert(opener != null, "day %d has a crate and nothing to open it with"
+				% day.day_number)
+			inspect._armed = opener.id
+			inspect._use_tool()
+			inspect._armed = &""
+			assert(entry.opened, "the opener did not open the crate")
+			inventory.refresh()
+			inventory.select_first()
+			continue
+		# Every tool that has something to find here, then ONE that does not.
+		# Spending the whole rack on every item just runs the shift dry before
+		# it reaches the items worth inspecting.
+		var idle_tool: StringName = &""
+		for tool_data: ToolData in game.tools:
+			var tool_id: StringName = tool_data.id
+			if tool_data.opens_containers or not game.tool_unlocked(tool_id):
 				continue
-			inspect._armed = tool_id
+			if not entry.data.tool_can_reveal(tool_id):
+				idle_tool = tool_id
+				continue
+			if not game.can_afford(&"tool"):
+				continue
 			var before: int = entry.revealed.size()
-			inspect._use_tool_at(_point_for(spot["pos"]))
-			if entry.revealed.size() > before:
-				hits += 1
-			if game.can_afford(&"tool"):
-				var budget_before: int = game.budget_left
-				inspect._armed = tool_id
-				inspect._use_tool_at(_point_for(Vector2(0.03, 0.03)))
-				if game.budget_left == budget_before - game.cost_of(&"tool"):
-					misses += 1
+			inspect._armed = tool_id
+			inspect._use_tool()
+			assert(entry.revealed.size() > before,
+				"%s has something for %s but clicking the item revealed nothing"
+				% [entry.data.id, tool_id])
+			hits += 1
+		if idle_tool != &"" and game.can_afford(&"tool"):
+			var budget_before: int = game.budget_left
+			inspect._armed = idle_tool
+			inspect._use_tool()
+			assert(game.budget_left == budget_before - game.cost_of(&"tool"),
+				"a tool that found nothing did not charge for the attempt")
+			misses += 1
 		inspect._armed = &""
 		var chips: int = inspect.get_node("EvidenceScroll/EvidenceLog").get_child_count()
 		print("  %-16s revealed=%d chips=%d" % [entry.data.id, entry.revealed.size(), chips])
@@ -93,7 +110,9 @@ func _run() -> void:
 			deliberate_wrong += 1
 		await process_frame
 
-	print("hotspot hits=%d  budget-burning misses=%d%s" % [hits, misses,
+	assert(hits > 0, "no tool ever revealed anything - the click never landed")
+	assert(misses > 0, "a tool that finds nothing was never exercised")
+	print("tool hits=%d  budget-burning misses=%d%s" % [hits, misses,
 		"  (shift ran out of budget mid-desk)" if stopped_broke else ""])
 	print("sorted=%d correct=%d wrong=%d (deliberate mistakes %d) | budget left %d" %
 		[game.stats["sorted"], game.stats["correct"], game.stats["wrong"], deliberate_wrong,

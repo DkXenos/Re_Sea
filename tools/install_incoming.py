@@ -94,8 +94,6 @@ def targets():
     out = {}
     for m in re.finditer(r"\|\s*`assets/([^/]+)/([^`]+)`", table):
         group, name = m.group(1), m.group(2)
-        if name.startswith("hotspots_"):
-            continue
         path = os.path.join(ASSETS, group, name)
         if not os.path.isfile(path):
             continue

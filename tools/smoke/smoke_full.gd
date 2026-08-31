@@ -237,15 +237,15 @@ func _drive_claw(scene: Node) -> void:
 func _drive_desk(scene: Node) -> void:
 	var inspect: Control = scene.get_node("UiLayer/Root/InspectPanel")
 	var bins: Control = scene.get_node("UiLayer/Root/BinRow")
-	# boxes aren't sortable, so open them first. free, so no reason not to.
-	var inventory: Control = scene.get_node("UiLayer/Root/InventoryPanel")
-	for card: Node in inventory.get_node("Scroll/Grid").get_children():
-		for child: Node in card.get_children():
-			if child is Button and (child as Button).text == Strings.t("box_open") \
-					and not (child as Button).disabled:
-				(child as Button).pressed.emit()
-				return
+	# a crate isn't sortable, so cut it open first. free, so no reason not to.
 	var entry = inspect.entry
+	if entry != null and entry.is_container() and not entry.opened:
+		var opener: ToolData = game.container_opener()
+		if opener != null:
+			inspect._armed = opener.id
+			inspect._use_tool()
+			inspect._armed = &""
+			return
 	if entry == null or not game.can_afford(&"sort"):
 		return
 	var day = game.current_day()

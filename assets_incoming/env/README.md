@@ -1,4 +1,4 @@
-# Backgrounds and scenery — 17 files
+# Backgrounds and scenery — 20 files
 
 **Two different jobs in one folder, so check the Background column on every row.** Five of these are full-frame scenes (`water_bg`, `machine_console`, the three `cutscene_*`) - search `underwater background`, `ocean floor`. The rest are cut-outs that sit on top of the water: coral, bubbles, the seabed strips, the logo, the tank frame.
 
@@ -28,7 +28,10 @@
 
 | Save it as | Size | Background | What it is |
 |------------|------|------------|------------|
-| `water_bg.png` | 1280x720 | **solid** | Full-screen water background, layer 0 |
+| `water_bg.png` | 1280x720 | **solid** | Deep-water backdrop. The furthest parallax layer inside the tank window - scaled from its own size to cover the window, never stretched. |
+| `hull_wall.png` | 128x128 | **solid** | Submarine hull, tiled at native size over everything outside the window. Must tile seamlessly. |
+| `coral_dead.png` | 174x140 | cut-out | Far parallax scenery, planted along the back of the seabed. Cut-out; drawn at this size, so this row decides how big it reads. |
+| `coral_healthy.png` | 157x190 | cut-out | Mid parallax scenery, nearer than the dead coral. Cut-out, drawn at this size. |
 | `seabed.png` | 1000x140 | cut-out | Seabed floor inside the tank SubViewport, z_index -10 |
 | `tank_frame.png` | 1040x460 | cut-out | Machine frame around the tank. Centre is transparent. |
 | `glass_overlay.png` | 1000x420 | cut-out | Glass reflection and tint, layer 20 |

@@ -28,16 +28,16 @@ Buttons, panels, icons, sliders, scrollbars. **This is the folder where random p
 
 | Save it as | Size | Background | What it is |
 |------------|------|------------|------------|
-| `panel_main.png` | 96x96 | cut-out | Main UI panel. NinePatchRect, 24px margins. |
-| `panel_dark.png` | 96x96 | cut-out | Modal / overlay panel: the rulebook, the calibration puzzle, and the blueprint component popup. NinePatchRect, 24px margins. |
-| `panel_slot.png` | 96x96 | cut-out | Inventory slot background. NinePatchRect, 24px margins. |
-| `panel_slot_selected.png` | 96x96 | cut-out | Inventory slot, selected. A different PNG rather than a tint. NinePatchRect, 24px margins. |
+| `panel_main.png` | 96x96 | **solid** | Main UI panel. NinePatchRect, 24px margins. |
+| `panel_dark.png` | 96x96 | **solid** | Modal / overlay panel: the rulebook, the calibration puzzle, and the blueprint component popup. NinePatchRect, 24px margins. |
+| `panel_slot.png` | 96x96 | **solid** | Inventory slot background. NinePatchRect, 24px margins. |
+| `panel_slot_selected.png` | 96x96 | **solid** | Inventory slot, selected. A different PNG rather than a tint. NinePatchRect, 24px margins. |
 | `chip_surface.png` | 64x40 | cut-out | Evidence chip, free surface info (grey). NinePatchRect, 24px margins. |
 | `chip_reveal.png` | 64x40 | cut-out | Evidence chip, tool reveal (gold). NinePatchRect, 24px margins. |
-| `button_normal.png` | 64x64 | cut-out | Button normal state. NinePatch, 20px margins. |
-| `button_hover.png` | 64x64 | cut-out | Button hover state. NinePatch, 20px margins. |
-| `button_pressed.png` | 64x64 | cut-out | Button pressed state. NinePatch, 20px margins. |
-| `button_disabled.png` | 64x64 | cut-out | Button disabled state. NinePatch, 20px margins. |
+| `button_normal.png` | 64x64 | **solid** | Button normal state. NinePatch, 20px margins. |
+| `button_hover.png` | 64x64 | **solid** | Button hover state. NinePatch, 20px margins. |
+| `button_pressed.png` | 64x64 | **solid** | Button pressed state. NinePatch, 20px margins. |
+| `button_disabled.png` | 64x64 | **solid** | Button disabled state. NinePatch, 20px margins. |
 | `icon_day.png` | 48x48 | cut-out | HUD icon (H) |
 | `icon_quota.png` | 48x48 | cut-out | HUD icon (T) |
 | `icon_grab.png` | 48x48 | cut-out | HUD icon (C) |
@@ -48,7 +48,7 @@ Buttons, panels, icons, sliders, scrollbars. **This is the folder where random p
 | `icon_cross.png` | 48x48 | cut-out | HUD icon (X) |
 | `icon_pause.png` | 48x48 | cut-out | HUD icon (II) |
 | `chip_match.png` | 64x40 | cut-out | Evidence chip that satisfies an active rule (green). NinePatchRect, 24px margins. |
-| `minimap_bg.png` | 960x28 | cut-out | Minimap strip background. Stretched to width. |
+| `minimap_bg.png` | 960x28 | **solid** | Minimap strip background. Stretched to width. |
 | `minimap_view.png` | 64x28 | cut-out | Minimap window showing the visible slice. Stretched. |
 | `minimap_item.png` | 10x10 | cut-out | Minimap dot for one item on the seabed |
 | `minimap_claw.png` | 12x20 | cut-out | Minimap marker for the claw |

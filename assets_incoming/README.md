@@ -1,6 +1,6 @@
 # Replacement art — drop-in folders
 
-134 pictures replace every visual in the game. Each folder below has its
+138 pictures replace every visual in the game. Each folder below has its
 own README listing the exact filenames it wants, the size, and what kind of
 picture fits.
 
@@ -8,9 +8,9 @@ picture fits.
 |--------|------|-------|------------|
 | [`bins/`](bins/README.md) | Sorting bins | 16 | transparent cut-out |
 | [`claw/`](claw/README.md) | The claw | 5 | transparent cut-out |
-| [`env/`](env/README.md) | Backgrounds and scenery | 17 | **mixed — check each row** |
+| [`env/`](env/README.md) | Backgrounds and scenery | 20 | **mixed — check each row** |
 | [`fish/`](fish/README.md) | Background fish | 3 | transparent cut-out |
-| [`items/`](items/README.md) | Trash items | 16 | transparent cut-out |
+| [`items/`](items/README.md) | Trash items | 17 | transparent cut-out |
 | [`tools/`](tools/README.md) | Inspection tools | 12 | transparent cut-out |
 | [`ui/`](ui/README.md) | Interface chrome | 65 | **mixed — check each row** |
 

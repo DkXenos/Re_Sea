@@ -74,8 +74,6 @@ only reveals its property if you click the right one. Positions are in
 `data/items/*.tres`.
 
 The rings are NOT part of the item art. They're a separate overlay,
-`assets/items/hotspots_<id>.png`, generated from the .tres by
-`tools/gen_hotspot_overlays.gd`. Don't edit those by hand - move the coords in
 the .tres and re-run it.
 
 In the final art the hotspot should be an actual drawn feature at the same
@@ -332,21 +330,6 @@ for, and the frame count the real thing should have. `static` = shown as-is.
 | `assets/ui/comp_neutralizer_cell_locked.png` | 128x128 | static | Blueprint component `neutralizer_cell`, locked. |
 | `assets/ui/comp_safety_valve_done.png` | 128x128 | static | Blueprint component `safety_valve`, done. |
 | `assets/ui/comp_safety_valve_locked.png` | 128x128 | static | Blueprint component `safety_valve`, locked. |
-| `assets/items/hotspots_banana_peel.png` | 160x160 | static | Hotspot rings for `banana_peel`. **Generated from `data/items/banana_peel.tres`**, don't edit by hand. |
-| `assets/items/hotspots_paper_cup.png` | 160x160 | static | Hotspot rings for `paper_cup`. **Generated from `data/items/paper_cup.tres`**, don't edit by hand. |
-| `assets/items/hotspots_baju_organik.png` | 160x160 | static | Hotspot rings for `baju_organik`. **Generated from `data/items/baju_organik.tres`**, don't edit by hand. |
-| `assets/items/hotspots_baju_daur_ulang.png` | 160x160 | static | Hotspot rings for `baju_daur_ulang`. **Generated from `data/items/baju_daur_ulang.tres`**, don't edit by hand. |
-| `assets/items/hotspots_baju_b3.png` | 160x160 | static | Hotspot rings for `baju_b3`. **Generated from `data/items/baju_b3.tres`**, don't edit by hand. |
-| `assets/items/hotspots_gelas_kertas_bersih.png` | 160x160 | static | Hotspot rings for `gelas_kertas_bersih`. **Generated from `data/items/gelas_kertas_bersih.tres`**, don't edit by hand. |
-| `assets/items/hotspots_tisu_bekas.png` | 160x160 | static | Hotspot rings for `tisu_bekas`. **Generated from `data/items/tisu_bekas.tres`**, don't edit by hand. |
-| `assets/items/hotspots_tisu_b3.png` | 160x160 | static | Hotspot rings for `tisu_b3`. **Generated from `data/items/tisu_b3.tres`**, don't edit by hand. |
-| `assets/items/hotspots_apel.png` | 160x160 | static | Hotspot rings for `apel`. **Generated from `data/items/apel.tres`**, don't edit by hand. |
-| `assets/items/hotspots_botol_kaca.png` | 160x160 | static | Hotspot rings for `botol_kaca`. **Generated from `data/items/botol_kaca.tres`**, don't edit by hand. |
-| `assets/items/hotspots_cangkang_telur.png` | 160x160 | static | Hotspot rings for `cangkang_telur`. **Generated from `data/items/cangkang_telur.tres`**, don't edit by hand. |
-| `assets/items/hotspots_daun.png` | 160x160 | static | Hotspot rings for `daun`. **Generated from `data/items/daun.tres`**, don't edit by hand. |
-| `assets/items/hotspots_kantong_plastik.png` | 160x160 | static | Hotspot rings for `kantong_plastik`. **Generated from `data/items/kantong_plastik.tres`**, don't edit by hand. |
-| `assets/items/hotspots_koran.png` | 160x160 | static | Hotspot rings for `koran`. **Generated from `data/items/koran.tres`**, don't edit by hand. |
-| `assets/items/hotspots_pizza.png` | 160x160 | static | Hotspot rings for `pizza`. **Generated from `data/items/pizza.tres`**, don't edit by hand. |
 
 ## The font — the one thing that is not a PNG yet
 

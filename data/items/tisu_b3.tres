@@ -1,7 +1,6 @@
 [gd_resource type="Resource" script_class="ItemData" format=3]
 
 [ext_resource type="SpriteFrames" path="res://data/frames/item_tisu_b3_frames.tres" id="1_fr"]
-[ext_resource type="Texture2D" path="res://assets/items/hotspots_tisu_b3.png" id="2_lsyu6"]
 [ext_resource type="Script" path="res://data/item_data.gd" id="2_sc"]
 [ext_resource type="Texture2D" path="res://assets/items/item_tisu_b3.png" id="3_tx"]
 
@@ -11,20 +10,15 @@ id = &"tisu_b3"
 display_name = "Chemical-Soaked Tissue"
 texture = ExtResource("3_tx")
 frames = ExtResource("1_fr")
-hotspot_overlay = ExtResource("2_lsyu6")
 weight = 0.2
 surface_properties = Array[String](["green stains", "acrid smell", "damp"])
 visible_material = "tissue"
 has_residue = true
 residue_type = "solvent-based paint"
 hotspots = Array[Dictionary]([{
-"pos": Vector2(0.5, 0.7),
-"radius": 0.16,
 "reveals": "has_residue",
 "tool": "rinse"
 }, {
-"pos": Vector2(0.62, 0.6),
-"radius": 0.16,
 "reveals": "residue_type",
 "tool": "swab"
 }])

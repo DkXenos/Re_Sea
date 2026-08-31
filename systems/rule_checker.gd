@@ -5,12 +5,13 @@ extends RefCounted
 
 
 # rule key -> the field the player has to reveal to know it. not always the
-# same name: is_multilayer comes from cutting the thing open.
+# same name: is_multilayer is proved by the printed code, which is the one
+# thing on a laminated cup that admits to the liner.
 const RULE_KEY_TO_REVEAL: Dictionary = {
 	"has_residue": "has_residue",
 	"residue_type": "residue_type",
 	"true_material": "true_material",
-	"is_multilayer": "true_material",
+	"is_multilayer": "tag_text",
 	"tag_text": "tag_text",
 }
 

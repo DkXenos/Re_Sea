@@ -19,7 +19,6 @@ const TABLE: Dictionary = {
 	"settings_music": "Music",
 	"settings_sfx": "Sound Effects",
 	"settings_vfx": "Visual Effect Intensity",
-	"settings_hotspots": "Show inspection markers",
 	"settings_back": "Back",
 
 	# --- cutscene ---
@@ -65,12 +64,12 @@ const TABLE: Dictionary = {
 	"desk_rulebook_button": "Rulebook (R)",
 	"inspect_zoom_hint": "Scroll to zoom, drag to pan",
 	"tools_locked": "No tools available today",
-	"tools_armed": "{tool} ready - click on the item",
+	"tools_armed": "{tool} ready - click the item",
 	"evidence_title": "EVIDENCE LOG",
-	"reveal_nothing": "Clean at this spot - nothing to read here.",
+	"reveal_nothing": "Nothing on this one for that tool.",
 	"inspect_found": "Found: {v}   (shift time -{n})",
-	"inspect_coarse": "Something is here, but it did not read clearly. Use the tool once more to read it. (shift time -{n})",
-	"inspect_nothing": "Clean at this spot. Nothing found, and the shift time is spent anyway -{n}.",
+	"inspect_coarse": "There is something, but it did not read clearly. Use the tool once more to read it. (shift time -{n})",
+	"inspect_nothing": "Nothing on this one for that tool. The shift time is spent anyway -{n}.",
 	"inspect_rules_title": "RULES IN FORCE TODAY",
 	"inspect_question": "Looks like {mat}. Do you believe it?",
 	"inspect_question_labeled": "Marked {label}, looks like {mat}. Do you believe it?",
@@ -93,9 +92,15 @@ const TABLE: Dictionary = {
 	"field_multilayer_suffix": " (multilayer)",
 
 	# --- mystery box ---
-	"box_open": "Open",
 	"box_sealed": "Sealed crate - no telling what is inside",
 	"box_opened_toast": "Crate opened: {n} items added to the list",
+	"box_needs_tool": "{tool} opens this",
+	"box_no_tool": "Nothing here can cut it open yet",
+	"box_question": "Sealed shut. Cut it open to find out.",
+	"box_not_sortable": "Cut the crate open before binning it",
+	"tool_wrong_for_box": "{tool} is no use on a sealed crate",
+	"tool_only_opens": "{tool} only opens sealed crates",
+	"tools_cost_free": "free",
 
 	# --- bins ---
 	"bin_organic": "ORGANIC",
@@ -138,7 +143,6 @@ const TABLE: Dictionary = {
 	"after_last_day": "Finish the Last Shift",
 	"after_sorted": "Correct {ok}  ·  wrong {bad}  ·  unsorted {left}",
 	"after_budget": "Shift time used {spent} of {max}, {left} left",
-	"after_sea": "Machines built {have} / {need}",
 
 	# --- blueprints ---
 	"blueprint_requires": "Needs: {v}",

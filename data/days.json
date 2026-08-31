@@ -78,7 +78,8 @@
       ],
       "tools": [
         "rinse",
-        "magnifier"
+        "magnifier",
+        "cutter"
       ],
       "box": {
         "item": "mystery_box",
@@ -93,7 +94,7 @@
         "min_available_items": 2
       },
       "modifier": "",
-      "intro_text": "The inspection tools arrive. Rinse to find residue, magnifier to read codes. Both spend shift time.",
+      "intro_text": "The kit arrives. Rinse finds residue, the magnifier reads codes - both spend shift time. The cutter does one thing only: it opens sealed crates, and that is free.",
       "mix": {
         "organic": 5,
         "recyclable": 4,
@@ -112,7 +113,8 @@
       "tools": [
         "rinse",
         "magnifier",
-        "swab"
+        "swab",
+        "cutter"
       ],
       "box": {
         "item": "mystery_box",
@@ -164,7 +166,7 @@
         "min_available_items": 2
       },
       "modifier": "",
-      "intro_text": "The cutter is available. What looks like paper is not always paper - but every inspection eats into your drops.",
+      "intro_text": "New rule: laminated packaging. Nothing about a lined cup shows on the surface - the code printed on it is the only thing that admits to the liner.",
       "mix": {
         "organic": 6,
         "recyclable": 5,

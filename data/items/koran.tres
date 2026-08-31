@@ -2,7 +2,6 @@
 
 [ext_resource type="SpriteFrames" path="res://data/frames/item_koran_frames.tres" id="1_fr"]
 [ext_resource type="Script" path="res://data/item_data.gd" id="2_sc"]
-[ext_resource type="Texture2D" path="res://assets/items/hotspots_koran.png" id="2_uhejs"]
 [ext_resource type="Texture2D" path="res://assets/items/item_koran.png" id="3_tx"]
 
 [resource]
@@ -11,7 +10,6 @@ id = &"koran"
 display_name = "Stack of Newspapers"
 texture = ExtResource("3_tx")
 frames = ExtResource("1_fr")
-hotspot_overlay = ExtResource("2_uhejs")
 weight = 0.9
 surface_properties = Array[String](["stiff", "dry", "stacked"])
 visible_material = "paper"

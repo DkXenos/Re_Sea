@@ -81,7 +81,7 @@ static_check "no modulate expressing state on a game object" \
 # working, not a hardcoded size sneaking past it.
 static_check "sprites are scaled only by a named display constant" \
   "$(grep -rnE '\.scale *= *' --include='*.gd' scenes/ autoload/ systems/ 2>/dev/null \
-      | grep -vE 'BASE_SCALE|TOOL_ICON_SCALE|BIN_DISPLAY_SCALE|BOX_CARD_SCALE|_fit_scale')"
+      | grep -vE 'BASE_SCALE|TOOL_ICON_SCALE|BIN_DISPLAY_SCALE|_fit_scale')"
 # Anything that differs between items lives in that item's .tres.
 static_check "no per-asset special cases in code" \
   "$(grep -rnE '\.id *== *&?"' --include='*.gd' $ASSET_SRC 2>/dev/null)"

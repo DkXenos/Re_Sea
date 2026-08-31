@@ -185,10 +185,11 @@ custom_minimum_size = Vector2(936, 0)
 theme_override_constants/separation = 10
 
 [node name="NextButton" type="Button" parent="UiLayer/Root"]
-offset_left = 990.0
-offset_top = 648.0
+offset_left = 840.0
+offset_top = 642.0
 offset_right = 1260.0
-offset_bottom = 702.0
+offset_bottom = 706.0
+theme_override_font_sizes/font_size = 22
 
 [node name="PopupLayer" type="CanvasLayer" parent="."]
 layer = 100

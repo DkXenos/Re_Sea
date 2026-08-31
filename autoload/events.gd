@@ -18,7 +18,6 @@ signal rulebook_toggled(open: bool)
 
 signal sfx_requested(sfx_name: StringName)
 signal vfx_intensity_changed(value: float)
-signal hotspots_visible_changed(value: bool)
 signal blueprints_changed()
 signal component_crafted(component: ComponentData)
 signal upgrade_equipped(upgrade_id: StringName)

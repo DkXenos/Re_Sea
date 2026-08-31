@@ -9,13 +9,6 @@ func _init() -> void:
 	_run()
 
 
-## Normalized texture coordinate -> point inside the inspect surface, mirroring
-## inspect_panel._to_normalized().
-func _point_for(n: Vector2) -> Vector2:
-	var span := 160.0 * 1.8
-	return Vector2(160, 160) + (n - Vector2(0.5, 0.5)) * span
-
-
 func _find(entries: Array, id: StringName):
 	for e in entries:
 		if e.data.id == id:
@@ -48,21 +41,18 @@ func _run() -> void:
 	print("7.1 rules checklist: %d of %d active rules listed beside the item"
 		% [rules_shown, day.active_rules.size()])
 
-	# --- 7.5 hotspot overlay is a separate, switchable sprite ---
+	# --- 7.5 the whole item is the target, wherever you click ---
 	var cup = _find(game.inventory, &"tisu_b3")
 	inspect.show_entry(cup)
 	await process_frame
-	var overlay: Sprite2D = inspect.get_node(
-		"ViewportBox/ItemViewport/ItemRoot/Hotspots")
-	assert(overlay.texture != null, "hotspot overlay texture missing")
-	assert(overlay.texture == cup.data.hotspot_overlay,
-		"overlay is not the one the item's data points at")
-	assert(overlay.visible, "hotspot rings should be on by default")
-	game.apply_toggle("hotspots", false)
-	await process_frame
-	assert(not overlay.visible, "hotspot rings did not switch off")
-	game.apply_toggle("hotspots", true)
-	print("7.5 hotspot overlay: separate sprite, toggles off and on")
+	assert(not inspect.has_node("ViewportBox/ItemViewport/ItemRoot/Hotspots"),
+		"the hotspot ring overlay is still in the scene")
+	# the far corner of the art is as good as the centre now
+	inspect._armed = &"rinse"
+	inspect._use_tool()
+	assert(cup.is_revealed("has_residue"),
+		"a click anywhere on the item did not use the tool")
+	print("7.5 no aiming: the item is one target, and the rings are gone")
 
 	# --- 7.3 the question line frames the decision from surface info ---
 	var question: String = inspect.get_node("Question").text
@@ -73,15 +63,11 @@ func _run() -> void:
 	# --- 7.2 evidence lights up and points at a bin ---
 	var hinted: Array[int] = []
 	inspect.bin_hint_changed.connect(func(c: int) -> void: hinted.append(c))
-	assert(inspect._evidence_state()["bin"] == -1,
-		"a bin was hinted before any evidence was revealed")
 
-	# Rinse the grimy patch: residue found -> the residue rule fires -> RESIDU.
-	inspect._armed = &"rinse"
-	inspect._use_tool_at(_point_for(Vector2(0.38, 0.70)))
-	assert(cup.is_revealed("has_residue"), "rinse hotspot did not reveal")
+	# The residue is already found, so re-showing it fires the rule -> LANDFILL.
+	inspect.show_entry(cup)
 	assert(hinted[-1] == ItemData.Category.LANDFILL,
-		"residue evidence should point at RESIDU")
+		"residue evidence should point at LANDFILL")
 	var lit_chips := 0
 	for chip in inspect.get_node("EvidenceScroll/EvidenceLog").get_children():
 		if chip.texture == CHIP_MATCH:
@@ -93,8 +79,8 @@ func _run() -> void:
 	# Swab it: the residue is solvent paint, so the chemical rule outranks the
 	# residue rule and the hint moves to B3.
 	inspect._armed = &"swab"
-	inspect._use_tool_at(_point_for(Vector2(0.62, 0.60)))
-	assert(cup.is_revealed("residue_type"), "swab hotspot did not reveal")
+	inspect._use_tool()
+	assert(cup.is_revealed("residue_type"), "the swab revealed nothing")
 	assert(hinted[-1] == ItemData.Category.HAZARD,
 		"a higher-priority rule should move the hint to B3")
 	print("7.2 after swab: bin hint -> %s (higher-priority rule took over)"
@@ -103,9 +89,12 @@ func _run() -> void:
 		"the hint disagrees with the answer the game will actually judge")
 
 	# --- 7.4 a tool that finds nothing says so, and says what it cost ---
+	# the peel has nothing for any tool, so any inspection tool misses on it
+	var peel = _find(game.inventory, &"banana_peel")
+	inspect.show_entry(peel)
 	var budget_before: int = game.budget_left
-	inspect._armed = &"cutter"
-	inspect._use_tool_at(_point_for(Vector2(0.04, 0.04))) # empty corner
+	inspect._armed = &"magnifier"
+	inspect._use_tool()
 	var feedback: String = inspect.get_node("Feedback").text
 	assert(game.budget_left == budget_before - game.cost_of(&"tool"),
 		"a miss must still cost the shift")
@@ -115,8 +104,6 @@ func _run() -> void:
 	print("7.4 miss feedback: \"%s\"" % feedback)
 
 	# An item with nothing to find must not light anything up.
-	var peel = _find(game.inventory, &"banana_peel")
-	inspect.show_entry(peel)
 	assert(inspect._evidence_state()["bin"] == -1,
 		"an item with no revealed evidence should hint at no bin")
 	print("obvious item hints at nothing, as it should")

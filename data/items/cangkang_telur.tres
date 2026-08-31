@@ -1,7 +1,6 @@
 [gd_resource type="Resource" script_class="ItemData" format=3]
 
 [ext_resource type="SpriteFrames" path="res://data/frames/item_cangkang_telur_frames.tres" id="1_fr"]
-[ext_resource type="Texture2D" path="res://assets/items/hotspots_cangkang_telur.png" id="2_agvwq"]
 [ext_resource type="Script" path="res://data/item_data.gd" id="2_sc"]
 [ext_resource type="Texture2D" path="res://assets/items/item_cangkang_telur.png" id="3_tx"]
 
@@ -11,7 +10,6 @@ id = &"cangkang_telur"
 display_name = "Eggshells"
 texture = ExtResource("3_tx")
 frames = ExtResource("1_fr")
-hotspot_overlay = ExtResource("2_agvwq")
 weight = 0.2
 surface_properties = Array[String](["brittle", "light", "hollow"])
 visible_material = "shell"

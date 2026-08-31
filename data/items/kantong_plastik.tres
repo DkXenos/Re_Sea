@@ -2,7 +2,6 @@
 
 [ext_resource type="SpriteFrames" path="res://data/frames/item_kantong_plastik_frames.tres" id="1_fr"]
 [ext_resource type="Script" path="res://data/item_data.gd" id="2_sc"]
-[ext_resource type="Texture2D" path="res://assets/items/hotspots_kantong_plastik.png" id="2_utg0i"]
 [ext_resource type="Texture2D" path="res://assets/items/item_kantong_plastik.png" id="3_tx"]
 
 [resource]
@@ -11,7 +10,6 @@ id = &"kantong_plastik"
 display_name = "Plastic Bag"
 texture = ExtResource("3_tx")
 frames = ExtResource("1_fr")
-hotspot_overlay = ExtResource("2_utg0i")
 weight = 0.2
 surface_properties = Array[String](["flexible", "light", "crinkly"])
 visible_material = "plastic"

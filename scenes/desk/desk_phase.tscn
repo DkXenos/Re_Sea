@@ -154,8 +154,6 @@ position = Vector2(160, 160)
 
 [node name="Sprite" type="Sprite2D" parent="UiLayer/Root/InspectPanel/ViewportBox/ItemViewport/ItemRoot"]
 
-[node name="Hotspots" type="Sprite2D" parent="UiLayer/Root/InspectPanel/ViewportBox/ItemViewport/ItemRoot"]
-
 [node name="Surface" type="Control" parent="UiLayer/Root/InspectPanel"]
 offset_left = 16.0
 offset_top = 60.0

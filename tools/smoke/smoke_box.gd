@@ -84,7 +84,8 @@ func _check_tank_spawns() -> void:
 	await process_frame
 
 
-## The desk offers it Buka and nothing else, and pressing it spends nothing.
+## The desk gives it no bin and no Open button - the crate opens by cutting it,
+## and cutting spends nothing.
 func _check_open_through_the_desk() -> void:
 	var day: DayData = game.current_day()
 	game.add_to_inventory(day.item_pool[0])
@@ -98,26 +99,45 @@ func _check_open_through_the_desk() -> void:
 	var inspect: Control = desk.get_node("UiLayer/Root/InspectPanel")
 	var bins: Control = desk.get_node("UiLayer/Root/BinRow")
 
-	# A box is never what the desk opens on, and a bin never takes one.
-	assert(inspect.entry != null and not inspect.entry.is_container(),
-		"the desk selected a sealed box for inspection")
+	assert(_open_button(inventory) == null,
+		"the crate card still offers an Open button")
 	assert(game.sortable_items().size() == 1,
 		"a sealed box counted as something a bin would take")
 
-	var button: Button = _open_button(inventory)
-	assert(button != null, "the box card has no Buka button")
+	# whatever today's kit is, exactly one tool in it opens crates
+	var opener: ToolData = game.container_opener()
+	assert(opener != null, "day %d has a crate and no tool that opens one"
+		% day.day_number)
+	assert(opener.display_name in _card_text(inventory),
+		"the crate card does not say %s is what opens it" % opener.display_name)
+
+	# a bin refuses a sealed crate, and the refusal costs nothing
+	inspect.show_entry(box)
 	var budget_before: int = game.budget_left
+	bins.bin_chosen.emit(ItemData.Category.LANDFILL)
+	await process_frame
+	assert(box.sorted_to == -1, "a bin took a sealed crate")
+	assert(game.budget_left == budget_before, "refusing a sealed crate cost budget")
+
+	# so does an inspection tool that is not the opener
+	for other: ToolData in game.tools:
+		if other.opens_containers or not game.tool_unlocked(other.id):
+			continue
+		inspect._armed = other.id
+		inspect._use_tool()
+		assert(not box.opened, "%s opened a crate it has no business opening"
+			% other.display_name)
+		assert(game.budget_left == budget_before,
+			"%s charged for bouncing off a sealed crate" % other.display_name)
+
 	var inventory_before: int = game.inventory.size()
-	button.pressed.emit()
-	# The card holds the opened crate on screen briefly, so the swap lands on a
-	# timer rather than on the next frame.
-	var waited: int = 0
-	while not box.opened and waited < 400:
-		waited += 1
-		await process_frame
-	assert(box.opened, "Buka did not open the box within %d frames" % waited)
+	inspect._armed = opener.id
+	inspect._use_tool()
+	inspect._armed = &""
+	await process_frame
+	assert(box.opened, "%s did not open the crate" % opener.display_name)
 	assert(game.budget_left == budget_before,
-		"opening a box spent %d budget" % [budget_before - game.budget_left])
+		"opening a crate spent %d budget" % [budget_before - game.budget_left])
 	# the empty crate is rubbish too - it stays, and a bin will now take it
 	assert(game.inventory.has(box), "the opened crate was thrown away instead of kept")
 	assert(box in game.sortable_items(), "the opened crate cannot be sorted")
@@ -128,9 +148,23 @@ func _check_open_through_the_desk() -> void:
 	assert(gained >= day.box_contents_min and gained <= day.box_contents_max,
 		"a box yielded %d items, outside %d-%d"
 		% [gained, day.box_contents_min, day.box_contents_max])
-	assert(_open_button(inventory) == null, "the opened crate still offers Buka")
-	print("  Buka: %d items out, empty crate kept and sortable, budget still %d"
-		% [gained, game.budget_left])
+	print("  %s: %d items out, empty crate kept and sortable, budget still %d"
+		% [opener.display_name, gained, game.budget_left])
+
+	# A crate you can open for free must not count as work once there is no
+	# budget left to sort what comes out of it - that is a shift that never
+	# ends.
+	var spare: CarriedItem = game.add_to_inventory(day.box_item)
+	assert(spare.is_container() and not spare.opened, "fixture is not a sealed crate")
+	game.budget_left = 0
+	assert(not game.can_still_act(),
+		"a sealed crate kept the shift alive with nothing left to spend")
+	game.budget_left = game.cost_of(&"sort")
+	assert(game.can_still_act(),
+		"a sealed crate stopped counting as work while a sort was still affordable")
+	game.inventory.erase(spare)
+	game.budget_left = budget_before
+	print("  a sealed crate is only work while a sort is still affordable")
 
 	# What came out is an ordinary grabbed item from here on: it inspects, it
 	# sorts, and it spends the sort cost like anything else.
@@ -206,9 +240,19 @@ func _first_box_day() -> int:
 	return 0
 
 
+# any button on a card that carries its own label, i.e. not the invisible
+# full-card hit area
 func _open_button(inventory: Control) -> Button:
 	for card: Node in inventory.get_node("Scroll/Grid").get_children():
 		for child: Node in card.get_children():
-			if child is Button and (child as Button).text == Strings.t("box_open"):
+			if child is Button and (child as Button).text != "":
 				return child as Button
 	return null
+
+
+func _card_text(inventory: Control) -> String:
+	var out := ""
+	for card: Node in inventory.get_node("Scroll/Grid").get_children():
+		for label: Node in card.find_children("*", "Label", true, false):
+			out += (label as Label).text + "\n"
+	return out

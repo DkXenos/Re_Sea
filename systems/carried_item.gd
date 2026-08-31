@@ -32,14 +32,11 @@ func display_texture() -> Texture2D:
 		return data.frames.get_frame_texture(&"opened", 0)
 	return data.texture
 
-# the name is a conclusion - you get it once you've learned something or
-# committed it to a bin. before that the panel shows properties instead.
-func name_known() -> bool:
-	return sorted_to != -1 or not revealed.is_empty()
-
-
+# the item is named from the moment it is on the desk. hiding the name behind a
+# reveal made the list unreadable - you cannot plan a shift against seven cards
+# that all say "soft, damp".
 func label() -> String:
-	return data.display_name if name_known() else data.surface_label()
+	return data.display_name
 
 
 func is_probed(field: String) -> bool:

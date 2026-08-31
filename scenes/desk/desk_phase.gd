@@ -20,6 +20,7 @@ func _ready() -> void:
 	_inventory.item_selected.connect(_on_item_selected)
 	_bins.bin_chosen.connect(_on_bin_chosen)
 	_inspect.bin_hint_changed.connect(_bins.highlight)
+	_inspect.crate_opened.connect(_on_crate_opened)
 	_rulebook_button.pressed.connect(func() -> void: _rulebook.toggle(not _rulebook.visible))
 	Events.toast_requested.connect(_show_toast)
 	Events.debug_command.connect(_on_debug_command)
@@ -75,12 +76,23 @@ func _on_item_selected(entry: CarriedItem) -> void:
 		_inspect.show_entry(entry)
 
 
+# the contents land in the list under the crate, and the crate stays put as an
+# ordinary sortable item
+func _on_crate_opened() -> void:
+	_inventory.refresh()
+
+
 func _on_bin_chosen(category: int) -> void:
 	var entry: CarriedItem = _inspect.entry
 	if entry == null or entry.sorted_to != -1:
 		_bins.flash(category, false)
 		Events.sfx_requested.emit(&"bin_reject")
 		_show_toast(Strings.t("desk_no_selection"))
+		return
+	if entry.is_container() and not entry.opened:
+		_bins.flash(category, false)
+		Events.sfx_requested.emit(&"bin_reject")
+		_show_toast(Strings.t("box_not_sortable"))
 		return
 	if not Game.spend(&"sort"):
 		_bins.flash(category, false)

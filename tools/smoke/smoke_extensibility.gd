@@ -26,21 +26,20 @@ func _run() -> void:
 	item.frames = load("res://data/frames/item_botol_kaca_frames.tres")
 	item.weight = 1.8
 	item.visible_material = "glass"
-	item.visible_label = "UJI"
-	item.true_material = "kaca berlapis plastik"
+	item.visible_label = "TEST"
+	item.true_material = "plastic-coated glass"
 	item.is_multilayer = true
 	item.correct_category = ItemData.Category.RECYCLABLE
 	item.source_batch = &"uji_coba"
 	var spots: Array[Dictionary] = [{
-		"pos": Vector2(0.5, 0.5), "radius": 0.2,
-		"tool": "cutter", "reveals": "true_material"}]
+		"tool": "magnifier", "reveals": "true_material"}]
 	item.hotspots = spots
 	assert(ResourceSaver.save(item, ITEM_PATH) == OK)
 
 	# --- rule #7: a new override, higher priority than anything shipped ---
 	var rule: RuleData = RuleData.new()
 	rule.id = &"r_test_coating"
-	rule.text = "Aturan uji: barang berlapis plastik masuk B3."
+	rule.text = "Test rule: anything plastic-coated is hazardous."
 	rule.applies_when = {"is_multilayer": true}
 	rule.forces_category = ItemData.Category.HAZARD
 	rule.priority = 999
@@ -51,11 +50,11 @@ func _run() -> void:
 	day.day_number = 6
 	day.quota = 1
 	day.budget = 40
-	var day_tools: Array[StringName] = [&"cutter"]
+	var day_tools: Array[StringName] = [&"magnifier", &"cutter"]
 	day.available_tools = day_tools
 	day.initial_seed_fraction = 1.0
 	day.min_available_items = 1
-	day.intro_text = "Hari uji."
+	day.intro_text = "Test day."
 	var rules: Array[RuleData] = [load(RULE_PATH)]
 	day.active_rules = rules
 	var pool: Array[ItemData] = [load(ITEM_PATH)]
@@ -89,16 +88,16 @@ func _run() -> void:
 	claw_phase.queue_free()
 	await process_frame
 
-	# Desk phase inspects it, and its brand new hotspot reveals.
+	# Desk phase inspects it, and its brand new tool mapping reveals.
 	game.add_to_inventory(loaded_item)
 	var desk: Node = load("res://scenes/desk/desk_phase.tscn").instantiate()
 	root.add_child(desk)
 	await process_frame
 	var inspect: Control = desk.get_node("UiLayer/Root/InspectPanel")
-	inspect._armed = &"cutter"
-	inspect._use_tool_at(Vector2(180, 180)) # centre = the new hotspot
-	assert(inspect.entry.is_revealed("true_material"), "new hotspot did not reveal")
-	print("desk phase revealed its hotspot: %s" % loaded_item.get_field_text("true_material"))
+	inspect._armed = &"magnifier"
+	inspect._use_tool()
+	assert(inspect.entry.is_revealed("true_material"), "the new mapping did not reveal")
+	print("desk phase revealed it: %s" % loaded_item.get_field_text("true_material"))
 
 	# Clean up so the repo is left exactly as it was. Drop every reference to
 	# the temporary resources first, or they outlive the files they came from.

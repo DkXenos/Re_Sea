@@ -41,7 +41,6 @@ var budget_left: int = 0
 
 var settings: Dictionary = {}
 var vfx_intensity: float = 1.0
-var show_hotspots: bool = true
 
 var force_grip: int = 0  # 1 always, -1 never, 0 roll
 
@@ -58,10 +57,7 @@ func _ready() -> void:
 	_build_sfx_pool()
 	settings = SaveSettings.load_all()
 	for key: String in settings:
-		if SaveSettings.TOGGLES.has(key):
-			apply_toggle(key, bool(settings[key]), false)
-		else:
-			apply_setting(key, float(settings[key]), false)
+		apply_setting(key, float(settings[key]), false)
 	_load_days()
 	_load_tools()
 	_load_blueprints()
@@ -174,7 +170,8 @@ func add_to_inventory(item: ItemData) -> CarriedItem:
 
 
 # the box stays - it is rubbish too, so opening it adds the contents and leaves
-# the empty crate behind to be sorted like anything else. costs nothing.
+# the empty crate behind to be sorted like anything else. costs nothing: the
+# cost of a crate is the cutter charge you had to still have, not shift time.
 func open_container(entry: CarriedItem) -> Array[CarriedItem]:
 	var out: Array[CarriedItem] = []
 	var day := current_day()
@@ -273,9 +270,12 @@ func spend_amount(cost: int) -> bool:
 func can_still_act() -> bool:
 	if can_afford(&"drop"):
 		return true
-	# opening is free, so a sealed box always counts as something left to do.
-	# still not sure opening should be free tbh
-	if not sealed_containers().is_empty() and can_afford(&"sort"):
+	# A sealed crate is only work you can still do if today's kit can open it -
+	# AND there is budget left to sort what falls out. Cutting is free, so
+	# without that second half an unopened crate keeps the shift alive forever
+	# on an empty budget and the day never ends.
+	if not sealed_containers().is_empty() and container_opener() != null \
+			and can_afford(&"sort"):
 		return true
 	return not sortable_items().is_empty() and can_afford(&"sort")
 
@@ -283,6 +283,16 @@ func can_still_act() -> bool:
 func tool_unlocked(tool_id: StringName) -> bool:
 	var day := current_day()
 	return day != null and tool_id in day.available_tools
+
+
+# Today's crate opener, or null if the kit can't open one. Nothing names the
+# cutter: a tool declares itself the opener in its own .tres, so swapping which
+# tool does the job is a data change.
+func container_opener() -> ToolData:
+	for t: ToolData in tools:
+		if t.opens_containers and tool_unlocked(t.id):
+			return t
+	return null
 
 
 func refill_budget() -> void:
@@ -461,17 +471,6 @@ func apply_setting(key: String, value: float, persist: bool = true) -> void:
 		SaveSettings.save_all(settings)
 
 
-# separate from apply_setting so a bool never gets clamped into a float
-func apply_toggle(key: String, value: bool, persist: bool = true) -> void:
-	settings[key] = value
-	match key:
-		"hotspots":
-			show_hotspots = value
-			Events.hotspots_visible_changed.emit(show_hotspots)
-	if persist:
-		SaveSettings.save_all(settings)
-
-
 func _set_bus(bus_name: String, value: float) -> void:
 	var idx := AudioServer.get_bus_index(bus_name)
 	if idx < 0:
@@ -525,4 +524,3 @@ func _on_debug_command(command: StringName, arg: Variant) -> void:
 		&"set_seed":
 			run_seed = int(arg)
 			rng.seed = run_seed
-		&"toggle_hotspots": apply_toggle("hotspots", not show_hotspots)

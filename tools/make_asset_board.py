@@ -65,8 +65,6 @@ def thumb(path, cap=320):
 def build():
     rows = []
     for e in manifest():
-        if e["name"].startswith("hotspots_"):
-            continue
         path = os.path.join(ASSETS, e["group"], e["name"])
         if not os.path.isfile(path):
             continue

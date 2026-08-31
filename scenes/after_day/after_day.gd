@@ -121,13 +121,13 @@ func _build_result() -> void:
 
 	var result := Game.last_breakdown
 	var unsorted := Game.unsorted_items().size()
+	# machines built is the Technology tab's whole job - repeating the count
+	# here just put a second progress read-out on a page about today
 	_result_summary.text = "\n".join([
 		Strings.tf("after_sorted", {"ok": int(result.get("correct", 0)),
 			"bad": int(result.get("wrong", 0)), "left": unsorted}),
 		Strings.tf("after_budget", {"spent": int(Game.stats.get("spent", 0)),
 			"left": Game.budget_left, "max": Game.budget_max}),
-		Strings.tf("after_sea", {"have": Game.unlocked_blueprints.size(),
-			"need": Game.blueprints.size()}),
 	])
 
 	_clear(_mistakes)

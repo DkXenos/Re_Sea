@@ -103,11 +103,11 @@ func _check_coarse_scanner() -> void:
 
 	var entry: CarriedItem = null
 	for item: ItemData in game.current_day().item_pool:
-		if item.hotspots.is_empty():
+		if item.hotspots.is_empty() or item.is_container:
 			continue
 		entry = game.add_to_inventory(item)
 		break
-	assert(entry != null, "no item with a hotspot to probe")
+	assert(entry != null, "no item with anything to probe")
 	var spot: Dictionary = entry.data.hotspots[0]
 	var tool_id := StringName(spot["tool"])
 
@@ -123,12 +123,9 @@ func _check_coarse_scanner() -> void:
 	game.budget_left = game.budget_max
 	if not game.tool_unlocked(tool_id):
 		game.current_day().available_tools.append(tool_id)
-	var point: Vector2 = Vector2(inspect._view.size) * 0.5 \
-		+ (Vector2(spot["pos"]) - Vector2(0.5, 0.5)) * inspect._item_span() * inspect.BASE_SCALE
-
 	var before: int = game.budget_left
 	inspect._armed = tool_id
-	inspect._use_tool_at(point)
+	inspect._use_tool()
 	var first_cost: int = before - game.budget_left
 	assert(first_cost == 2, "the coarse probe should cost 2, cost %d" % first_cost)
 	assert(not entry.is_revealed(String(spot["reveals"])),
@@ -137,11 +134,11 @@ func _check_coarse_scanner() -> void:
 
 	before = game.budget_left
 	inspect._armed = tool_id
-	inspect._use_tool_at(point)
+	inspect._use_tool()
 	var second_cost: int = before - game.budget_left
 	assert(second_cost == 4, "the full reading should cost the base 4, cost %d" % second_cost)
 	assert(entry.is_revealed(String(spot["reveals"])), "the second use must read the value")
-	print("  pemindai kasar : probe cost %d and read nothing, second cost %d and read it"
+	print("  coarse scanner: probe cost %d and read nothing, second cost %d and read it"
 		% [first_cost, second_cost])
 
 	root.remove_child(shift)

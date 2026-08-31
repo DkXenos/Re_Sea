@@ -122,9 +122,7 @@ def gen_items():
     That was removed: the whole inspect phase is about judging what an item is
     from what you can observe, and a label reading PET answers the question for
     free - and does it in art the designers were never going to reproduce.
-
-    Hotspot rings are a separate overlay generated from the .tres by
-    tools/gen_hotspot_overlays.gd - never baked in here."""
+"""
     W = H = 160
     for it in C.ITEM_ART:
         img, d = canvas(W, H)
@@ -667,9 +665,8 @@ contract. Everything below expands on it.
    `SubViewport` as a whole. Art that already has a light direction painted in
    will fight it.
 5. **One PNG is one whole thing.** The game shows one texture per node — a
-   bottle is one file, not a body plus a cap plus a label. The only thing ever
-   layered on top of an item is the hotspot ring overlay, which is a debug aid
-   (see below).
+   bottle is one file, not a body plus a cap plus a label. Nothing is ever
+   layered on top of an item.
 6. **State is a different drawing, never a tint.** A locked tool, a highlighted
    bin, a selected slot — each is its own PNG or its own named animation. The
    code never recolours your art to mean something, because that breaks the
@@ -705,25 +702,16 @@ Do not add nodes, rename animations, or replace the `SpriteFrames` — the game
 looks animations up by name. The **target frames** column is what we are
 designing for; fewer works, the animation just plays shorter.
 
-## Hotspots — read this before drawing any item
+## What a tool finds — read this before drawing any item
 
-Items carry 2–3 invisible hotspots — a seam, a label corner, a stained patch —
-and a tool only reveals its property when clicked on the matching one.
+An item carries a list of which tools can find something on it, in
+`data/items/*.tres`. There is no aiming: the whole item is the target, so a
+tool either has something to find on that item or it does not.
 
-Hotspot positions live in `data/items/*.tres`. The rings you see are **not part
-of the item art**: they are a separate overlay, `assets/items/hotspots_<id>.png`,
-generated from that data by `tools/gen_hotspot_overlays.gd`, and the player can
-switch them off.
-
-**In the final art the hotspot must become a real drawn feature of the item at
-the same coordinates** — draw the stain where the rinse ring is, the printed
-code where the magnifier ring is, the cut seam where the cutter ring is. The
-overlay then survives only as an accessibility aid, not as the way the puzzle is
-solved. Never edit `hotspots_<id>.png` by hand; move the coordinates in the
-`.tres` and re-run the generator.
-
-Ring colours match the tool: rinse blue, swab pink, magnifier yellow, cutter
-red. Those come from `ToolData.color` in `data/tools/*.tres`.
+**Draw the evidence into the item anyway.** The stain the rinse finds, the
+printed code the magnifier reads — those should be visible features of the art,
+because that is what makes an item worth looking at before you spend a charge
+on it. They are just not clickable regions any more.
 
 ## No AI generation
 
@@ -757,17 +745,6 @@ def animation_note(rel_path):
     parts = ["`%s` %d fr" % (anim, target)
              for _res, anim, src, target in ANIMS if src == rel_path]
     return ", ".join(parts) if parts else "static"
-
-
-def note_generated_elsewhere():
-    """Files this script does not draw, but which belong in the manifest so the
-    designers see the full picture."""
-    for it in C.ITEM_ART:
-        MANIFEST.append(("items/hotspots_%s.png" % it["id"], "160x160",
-                         "Hotspot rings for `%s`. **Generated from "
-                         "`data/items/%s.tres`** by `tools/gen_hotspot_overlays.gd` - "
-                         "never edit by hand, and do not draw it into the item art."
-                         % (it["id"], it["id"])))
 
 
 ## Groups a --only run can ask for, so adding one asset never means redrawing
@@ -821,7 +798,6 @@ def main():
     gen_boxes()
     gen_blueprints()
     gen_frames()
-    note_generated_elsewhere()
     anims = "\n".join("| `%s` | `%s` | `assets/%s` | %d |" % a for a in ANIMS)
     rows = "\n".join("| `assets/%s` | %s | %s | %s |"
                      % (r[0], r[1], animation_note(r[0]), r[2]) for r in MANIFEST)

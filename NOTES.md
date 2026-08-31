@@ -40,6 +40,24 @@ run_all.sh greps for the tween case.
 - hotspot rings are NEVER in the item art, they're a separate overlay
   generated from the .tres
 
+## tools
+
+Four tools, and they split into two jobs that never overlap:
+
+- **rinse / magnifier / swab** inspect. Arm one and click the item - anywhere on
+  it. There is no aiming: `hotspots` in the item's `.tres` says which tool finds
+  which field, and that is the whole mechanic. The positional rings are gone.
+- **the cutter** opens sealed crates and does nothing else. It is the only way
+  to open one, it is free, and it says so in the rack. `opens_containers` on the
+  tool's `.tres` is what makes a tool the opener - nothing names the cutter.
+
+A tool that finds nothing still charges. A tool refusing a job it can't do
+(cutter on an ordinary item, rinse on a sealed crate) charges nothing, because
+that is a mis-click, not an attempt.
+
+Because the cutter is the only opener, **every day with a crate must list the
+cutter in its tools** or the crate is unopenable and the shift can deadlock.
+
 ## content is data
 
 Items/rules/days/tools are Resources with one .tres each. Adding item #40

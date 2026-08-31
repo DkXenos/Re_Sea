@@ -40,4 +40,4 @@ initial_seed_fraction = 0.4
 spawn_interval_min = 8.0
 spawn_interval_max = 14.0
 min_available_items = 2
-intro_text = "The cutter is available. What looks like paper is not always paper - but every inspection eats into your drops."
+intro_text = "New rule: laminated packaging. Nothing about a lined cup shows on the surface - the code printed on it is the only thing that admits to the liner."

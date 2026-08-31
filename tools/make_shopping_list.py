@@ -90,10 +90,9 @@ GROUPS = {
                  "different from each other."]),
 }
 
-# Files the designers must NOT touch, and why.
-FROZEN = {
-    "hotspots_": "generated from data/items/*.tres by tools/gen_hotspot_overlays.gd",
-}
+# Files the designers must NOT touch, and why. Nothing is frozen right now -
+# the hotspot overlays were, and they are gone.
+FROZEN = {}
 
 NINEPATCH = re.compile(r"NinePatch|(\d+)px margins")
 

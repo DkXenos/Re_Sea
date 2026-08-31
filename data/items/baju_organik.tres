@@ -1,7 +1,6 @@
 [gd_resource type="Resource" script_class="ItemData" format=3]
 
 [ext_resource type="SpriteFrames" path="res://data/frames/item_baju_organik_frames.tres" id="1_fr"]
-[ext_resource type="Texture2D" path="res://assets/items/hotspots_baju_organik.png" id="2_nmldh"]
 [ext_resource type="Script" path="res://data/item_data.gd" id="2_sc"]
 [ext_resource type="Texture2D" path="res://assets/items/item_baju_organik.png" id="3_tx"]
 
@@ -11,7 +10,6 @@ id = &"baju_organik"
 display_name = "Natural Fibre Shirt"
 texture = ExtResource("3_tx")
 frames = ExtResource("1_fr")
-hotspot_overlay = ExtResource("2_nmldh")
 weight = 0.6
 surface_properties = Array[String](["soft", "natural fibre", "soaks up water"])
 visible_material = "cotton fabric"

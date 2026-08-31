@@ -72,9 +72,9 @@ func _run() -> void:
 			if e.data.id == &"tisu_b3":
 				inspect.show_entry(e)
 				inspect._armed = &"rinse"
-				inspect._use_tool_at(Vector2(160, 160) + (Vector2(0.38, 0.70) - Vector2(0.5, 0.5)) * 288.0)
+				inspect._use_tool()
 				inspect._armed = &"swab"
-				inspect._use_tool_at(Vector2(160, 160) + (Vector2(0.62, 0.60) - Vector2(0.5, 0.5)) * 288.0)
+				inspect._use_tool()
 				inspect._armed = &""
 		for i in 5:
 			await process_frame

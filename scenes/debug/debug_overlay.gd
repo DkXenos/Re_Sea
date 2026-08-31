@@ -31,8 +31,6 @@ func _build() -> void:
 		func() -> void: Events.debug_command.emit(&"force_grip", 1))
 	_button(list, "Grip: always fail",
 		func() -> void: Events.debug_command.emit(&"force_grip", -1))
-	_button(list, "Toggle hotspot rings",
-		func() -> void: Events.debug_command.emit(&"toggle_hotspots", null))
 	_button(list, "Grip: roll normally",
 		func() -> void: Events.debug_command.emit(&"force_grip", 0))
 

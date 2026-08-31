@@ -1,7 +1,6 @@
 [gd_resource type="Resource" script_class="ItemData" format=3]
 
 [ext_resource type="SpriteFrames" path="res://data/frames/item_botol_kaca_frames.tres" id="1_fr"]
-[ext_resource type="Texture2D" path="res://assets/items/hotspots_botol_kaca.png" id="2_gh65k"]
 [ext_resource type="Script" path="res://data/item_data.gd" id="2_sc"]
 [ext_resource type="Texture2D" path="res://assets/items/item_botol_kaca.png" id="3_tx"]
 
@@ -11,7 +10,6 @@ id = &"botol_kaca"
 display_name = "Glass Bottle"
 texture = ExtResource("3_tx")
 frames = ExtResource("1_fr")
-hotspot_overlay = ExtResource("2_gh65k")
 weight = 2.0
 surface_properties = Array[String](["see-through", "heavy", "slippery"])
 visible_material = "glass"
