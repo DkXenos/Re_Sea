@@ -263,16 +263,16 @@ for, and the frame count the real thing should have. `static` = shown as-is.
 | `assets/ui/icon_cross.png` | 48x48 | static | HUD icon (X) |
 | `assets/ui/icon_pause.png` | 48x48 | static | HUD icon (II) |
 | `assets/ui/chip_match.png` | 64x40 | static | Evidence chip that satisfies an active rule (green). NinePatchRect, 24px margins. |
-| `assets/ui/minimap_bg.png` | 960x28 | static | Minimap strip background. Stretched to width. |
-| `assets/ui/minimap_view.png` | 64x28 | static | Minimap window showing the visible slice. Stretched. |
+| `assets/ui/minimap_bg.png` | 960x28 | static | **SUPERSEDED** by `assets/ui/machine_frame.png` and the machine_* buttons - nothing loads this any more. Do not redraw it. |
+| `assets/ui/minimap_view.png` | 64x28 | static | **SUPERSEDED** by `assets/ui/machine_frame.png` and the machine_* buttons - nothing loads this any more. Do not redraw it. |
 | `assets/ui/minimap_item.png` | 10x10 | static | Minimap dot for one item on the seabed |
-| `assets/ui/minimap_claw.png` | 12x20 | static | Minimap marker for the claw |
+| `assets/ui/minimap_claw.png` | 12x20 | static | **SUPERSEDED** by `assets/ui/machine_frame.png` and the machine_* buttons - nothing loads this any more. Do not redraw it. |
 | `assets/ui/meter_bg.png` | 320x32 | static | Ocean health meter bg. Fill is clipped by width. |
 | `assets/ui/meter_fill.png` | 320x32 | static | Ocean health meter fill. Fill is clipped by width. |
-| `assets/ui/arrow_left.png` | 96x96 | static | Console arrow button (left) |
-| `assets/ui/arrow_right.png` | 96x96 | static | Console arrow button (right) |
-| `assets/ui/joystick_base.png` | 128x128 | static | Console joystick base |
-| `assets/ui/joystick_knob.png` | 72x72 | static | Console joystick knob, offsets with claw |
+| `assets/ui/arrow_left.png` | 96x96 | static | **SUPERSEDED** by `assets/ui/machine_frame.png` and the machine_* buttons - nothing loads this any more. Do not redraw it. |
+| `assets/ui/arrow_right.png` | 96x96 | static | **SUPERSEDED** by `assets/ui/machine_frame.png` and the machine_* buttons - nothing loads this any more. Do not redraw it. |
+| `assets/ui/joystick_base.png` | 128x128 | static | **SUPERSEDED** by `assets/ui/machine_frame.png` and the machine_* buttons - nothing loads this any more. Do not redraw it. |
+| `assets/ui/joystick_knob.png` | 72x72 | static | **SUPERSEDED** by `assets/ui/machine_frame.png` and the machine_* buttons - nothing loads this any more. Do not redraw it. |
 | `assets/ui/slider_track.png` | 64x16 | static | Volume slider track. NinePatch, 8px margins, stretched to width. |
 | `assets/ui/slider_fill.png` | 64x16 | static | Volume slider fill, the part left of the knob. NinePatch, 8px margins. |
 | `assets/ui/slider_grabber.png` | 32x32 | static | Volume slider knob. |
@@ -285,16 +285,28 @@ for, and the frame count the real thing should have. `static` = shown as-is.
 | `assets/ui/textfield_normal.png` | 64x40 | static | Text field. NinePatch, 12px margins, stretched. |
 | `assets/ui/textfield_focus.png` | 64x40 | static | Text field, focused. NinePatch, 12px margins. |
 | `assets/ui/icon_pause_pressed.png` | 48x48 | static | Pause button, pressed state. |
-| `assets/ui/arrow_left_pressed.png` | 96x96 | static | Console arrow button (left), pressed state. |
-| `assets/ui/arrow_right_pressed.png` | 96x96 | static | Console arrow button (right), pressed state. |
+| `assets/ui/arrow_left_pressed.png` | 96x96 | static | **SUPERSEDED** by `assets/ui/machine_frame.png` and the machine_* buttons - nothing loads this any more. Do not redraw it. |
+| `assets/ui/arrow_right_pressed.png` | 96x96 | static | **SUPERSEDED** by `assets/ui/machine_frame.png` and the machine_* buttons - nothing loads this any more. Do not redraw it. |
 | `assets/env/water_bg.png` | 1280x720 | static | Deep-water backdrop. The furthest parallax layer inside the tank window - scaled from its own size to cover the window, never stretched. |
 | `assets/env/hull_wall.png` | 128x128 | static | Submarine hull, tiled at native size over everything outside the window. Must tile seamlessly. |
+| `assets/ui/machine_frame.png` | 1280x720 | static | The whole cockpit: hull, window surround, glass streaks, panels. Drawn over the tank; the window opening is the transparent rect at (216,122) 848x408. |
+| `assets/ui/machine_grab.png` | 128x122 | static | GRAB button, resting. Drops the claw. |
+| `assets/ui/machine_grab_pressed.png` | 128x122 | static | GRAB button, pushed. Same crop as the resting state so it does not jump. |
+| `assets/ui/machine_left.png` | 142x116 | static | Left arrow button, resting. |
+| `assets/ui/machine_left_pressed.png` | 142x116 | static | Left arrow button, pushed. |
+| `assets/ui/machine_right.png` | 140x116 | static | Right arrow button, resting. |
+| `assets/ui/machine_right_pressed.png` | 140x116 | static | Right arrow button, pushed. |
+| `assets/ui/machine_sorting.png` | 216x135 | static | SORTING folder button, resting. Switches to the desk. |
+| `assets/ui/machine_sorting_hover.png` | 216x135 | static | SORTING folder button, hovered. |
+| `assets/ui/machine_settings.png` | 44x46 | static | Settings cog, resting. Opens the pause menu. |
+| `assets/ui/machine_settings_hover.png` | 44x46 | static | Settings cog, hovered. |
+| `assets/ui/machine_slider.png` | 322x64 | static | The marker that slides along the top rail, showing which slice of the seabed the window is on. Moves in code; the rail behind it is part of machine_frame. |
 | `assets/env/coral_dead.png` | 174x140 | static | Far parallax scenery, planted along the back of the seabed. Cut-out; drawn at this size, so this row decides how big it reads. |
 | `assets/env/coral_healthy.png` | 157x190 | static | Mid parallax scenery, nearer than the dead coral. Cut-out, drawn at this size. |
 | `assets/env/seabed.png` | 1000x140 | static | Seabed floor inside the tank SubViewport, z_index -10 |
-| `assets/env/tank_frame.png` | 1040x460 | static | Machine frame around the tank. Centre is transparent. |
-| `assets/env/glass_overlay.png` | 1000x420 | static | Glass reflection and tint, layer 20 |
-| `assets/env/machine_console.png` | 1280x220 | static | Console backing plate under the tank, layer 30 |
+| `assets/env/tank_frame.png` | 1040x460 | static | **SUPERSEDED** by `assets/ui/machine_frame.png` and the machine_* buttons - nothing loads this any more. Do not redraw it. |
+| `assets/env/glass_overlay.png` | 1000x420 | static | **SUPERSEDED** by `assets/ui/machine_frame.png` and the machine_* buttons - nothing loads this any more. Do not redraw it. |
+| `assets/env/machine_console.png` | 1280x220 | static | **SUPERSEDED** by `assets/ui/machine_frame.png` and the machine_* buttons - nothing loads this any more. Do not redraw it. |
 | `assets/env/bubble.png` | 24x24 | `rise` 6 fr | Bubble, count scales with the VFX slider |
 | `assets/env/cutscene_01.png` | 960x540 | static | Cutscene still 1 (placeholder) |
 | `assets/env/cutscene_02.png` | 960x540 | static | Cutscene still 2 (placeholder) |

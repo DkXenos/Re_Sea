@@ -15,6 +15,9 @@ signal tool_used(tool_id: StringName, revealed_field: String)
 signal item_sorted(entry: CarriedItem, chosen: int, correct: bool)
 signal container_opened(box: CarriedItem, contents: Array)
 signal rulebook_toggled(open: bool)
+# the machine's own console asks for these; the shift and main own the answers
+signal view_switch_requested()
+signal pause_requested()
 
 signal sfx_requested(sfx_name: StringName)
 signal vfx_intensity_changed(value: float)

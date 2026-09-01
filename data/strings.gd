@@ -32,6 +32,7 @@ const TABLE: Dictionary = {
 	"day_label": "DAY {n}",
 	"day_rules_today": "Today's rules",
 	"day_quota": "Sorting target",
+	"machines_title": "Machines",
 	"day_budget": "Shift time",
 	"day_tools": "Tools available",
 	"day_tools_locked": "Not available yet",

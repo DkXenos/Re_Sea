@@ -29,6 +29,8 @@ func _ready() -> void:
 	Events.scene_change_requested.connect(_on_scene_change_requested)
 	Events.phase_finished.connect(_on_phase_finished)
 	Events.debug_command.connect(_on_debug_command)
+	# the machine cockpit draws its own cog, and asks for the same overlay
+	Events.pause_requested.connect(func() -> void: _pause.toggle(not _pause.visible))
 	# needs to be clickable, people won't read a control list
 	_pause_button.pressed.connect(func() -> void: _pause.toggle(not _pause.visible))
 	_on_scene_change_requested(&"main_menu")

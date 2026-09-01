@@ -18,6 +18,7 @@ const END_DELAY_MESSAGE := 3.0
 @onready var _upgrade_label: Label = $BarLayer/Root/UpgradeLabel
 @onready var _switch_button: Button = $BarLayer/Root/SwitchButton
 @onready var _end_button: Button = $BarLayer/Root/EndButton
+@onready var _bar: CanvasLayer = $BarLayer
 
 var _day: DayData
 var _view: View = View.CLAW
@@ -30,6 +31,8 @@ func _ready() -> void:
 	_status.text = ""
 	_switch_button.pressed.connect(_toggle_view)
 	_end_button.pressed.connect(_end_shift)
+	# the machine has its own SORTING folder for this
+	Events.view_switch_requested.connect(_toggle_view)
 	_apply_view()
 
 
@@ -55,10 +58,14 @@ func _toggle_view() -> void:
 func _apply_view() -> void:
 	_claw_view.set_view_active(_view == View.CLAW)
 	_desk_view.set_view_active(_view == View.DESK)
+	# The cockpit is a whole screen with its own readouts and its own buttons,
+	# so the bar would just be a second copy of everything laid over the art.
+	# The desk has no frame of its own yet, so it keeps the bar.
+	_bar.visible = _view == View.DESK
 
 
 func _refresh_bar() -> void:
-	if _day == null:
+	if _day == null or not _bar.visible:
 		return
 	_day_label.text = Strings.tf("day_label", {"n": _day.day_number})
 	_quota_label.text = "%s %d / %d" % [Strings.t("day_quota"),

@@ -56,12 +56,27 @@ FIT = {
     # a nine-patch plate has to fill its patch exactly - letterboxing one
     # leaves transparent gutters that show up as holes in every button
     "ui/button_normal.png": "stretch",
+    "ui/machine_frame.png": "stretch",  # the full canvas, scaled 1:1 to the viewport
 }
 
 # a source filed under another name, or in a subfolder of the group
 ALIAS = {
     "items/box_closed.png": "boxes/Close",
     "items/box_opened.png": "boxes/Open",
+    # the machine cockpit, delivered in assets_incoming/ui/ui/ under the
+    # designer's own names
+    "ui/machine_frame.png": "ui/main-ui",
+    "ui/machine_grab.png": "ui/grab-button",
+    "ui/machine_grab_pressed.png": "ui/grab-button-pressed",
+    "ui/machine_left.png": "ui/left-button",
+    "ui/machine_left_pressed.png": "ui/left-button-pressed",
+    "ui/machine_right.png": "ui/right-button",
+    "ui/machine_right_pressed.png": "ui/right-button-pressed",
+    "ui/machine_sorting.png": "ui/sorting-button",
+    "ui/machine_sorting_hover.png": "ui/sorting-button-hovered",
+    "ui/machine_settings.png": "ui/settings",
+    "ui/machine_settings_hover.png": "ui/settings-hovered",
+    "ui/machine_slider.png": "ui/slider",
 }
 
 # slots trimmed to ONE shared alpha box instead of each to its own. the open
@@ -69,6 +84,15 @@ ALIAS = {
 # sideways the moment the lid opens.
 TRIM_TOGETHER = [
     ["items/box_closed.png", "items/box_opened.png"],
+    # Every cockpit part arrives on the full 2560x1440 canvas, in place. The
+    # shared crop is what turns that into a sprite plus a position - and a
+    # button and its pressed state MUST crop together or it jumps when pushed.
+    ["ui/machine_grab.png", "ui/machine_grab_pressed.png"],
+    ["ui/machine_left.png", "ui/machine_left_pressed.png"],
+    ["ui/machine_right.png", "ui/machine_right_pressed.png"],
+    ["ui/machine_sorting.png", "ui/machine_sorting_hover.png"],
+    ["ui/machine_settings.png", "ui/machine_settings_hover.png"],
+    ["ui/machine_slider.png"],
     # a group of one is just "trim this to its own subject", which is what a
     # scenery cut-out wants: the manifest size should be the coral, not the
     # coral plus whatever margin the canvas happened to have

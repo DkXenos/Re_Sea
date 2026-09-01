@@ -1,24 +1,24 @@
-[gd_scene load_steps=21 format=3]
+[gd_scene load_steps=22 format=3]
 
 [ext_resource type="Script" path="res://scenes/claw/claw_phase.gd" id="1_phase"]
 [ext_resource type="Script" path="res://scenes/claw/claw.gd" id="2_claw"]
 [ext_resource type="Texture2D" path="res://assets/env/hull_wall.png" id="3_hull"]
 [ext_resource type="Texture2D" path="res://assets/env/seabed.png" id="4_seabed"]
-[ext_resource type="Texture2D" path="res://assets/env/glass_overlay.png" id="5_glass"]
-[ext_resource type="Texture2D" path="res://assets/env/tank_frame.png" id="6_frame"]
-[ext_resource type="Texture2D" path="res://assets/env/machine_console.png" id="7_console"]
+[ext_resource type="Texture2D" path="res://assets/ui/machine_frame.png" id="5_frame"]
 [ext_resource type="SpriteFrames" path="res://data/frames/claw_frames.tres" id="8_clawfr"]
 [ext_resource type="Texture2D" path="res://assets/claw/claw_cable.png" id="9_cable"]
-[ext_resource type="Texture2D" path="res://assets/ui/arrow_left.png" id="10_al"]
-[ext_resource type="Texture2D" path="res://assets/ui/arrow_right.png" id="11_ar"]
-[ext_resource type="Texture2D" path="res://assets/ui/arrow_left_pressed.png" id="11_alp"]
-[ext_resource type="Texture2D" path="res://assets/ui/arrow_right_pressed.png" id="11_arp"]
-[ext_resource type="Texture2D" path="res://assets/ui/joystick_base.png" id="12_jb"]
-[ext_resource type="Texture2D" path="res://assets/ui/joystick_knob.png" id="13_jk"]
+[ext_resource type="Texture2D" path="res://assets/ui/machine_left.png" id="10_al"]
+[ext_resource type="Texture2D" path="res://assets/ui/machine_left_pressed.png" id="11_alp"]
+[ext_resource type="Texture2D" path="res://assets/ui/machine_right.png" id="11_ar"]
+[ext_resource type="Texture2D" path="res://assets/ui/machine_right_pressed.png" id="11_arp"]
+[ext_resource type="Texture2D" path="res://assets/ui/machine_grab.png" id="12_grab"]
+[ext_resource type="Texture2D" path="res://assets/ui/machine_grab_pressed.png" id="13_grabp"]
+[ext_resource type="Texture2D" path="res://assets/ui/machine_sorting.png" id="14_sort"]
+[ext_resource type="Texture2D" path="res://assets/ui/machine_sorting_hover.png" id="15_sorth"]
+[ext_resource type="Texture2D" path="res://assets/ui/machine_settings.png" id="16_set"]
+[ext_resource type="Texture2D" path="res://assets/ui/machine_settings_hover.png" id="17_seth"]
+[ext_resource type="Texture2D" path="res://assets/ui/machine_slider.png" id="18_slider"]
 [ext_resource type="Theme" path="res://assets/ui/ui_theme.tres" id="14_theme"]
-[ext_resource type="Texture2D" path="res://assets/ui/minimap_bg.png" id="15_mmbg"]
-[ext_resource type="Texture2D" path="res://assets/ui/minimap_view.png" id="16_mmview"]
-[ext_resource type="Texture2D" path="res://assets/ui/minimap_claw.png" id="17_mmclaw"]
 
 [sub_resource type="CircleShape2D" id="Circle_grab"]
 radius = 46.0
@@ -40,17 +40,17 @@ stretch_mode = 1
 layer = 10
 
 [node name="TankContainer" type="SubViewportContainer" parent="TankLayer"]
-offset_left = 140.0
-offset_top = 68.0
-offset_right = 1140.0
-offset_bottom = 436.0
+offset_left = 216.0
+offset_top = 122.0
+offset_right = 1064.0
+offset_bottom = 530.0
 mouse_filter = 2
 
 [node name="TankViewport" type="SubViewport" parent="TankLayer/TankContainer"]
 transparent_bg = true
 handle_input_locally = false
 gui_disable_input = true
-size = Vector2i(1000, 368)
+size = Vector2i(848, 408)
 render_target_update_mode = 4
 
 [node name="TankWorld" type="Node2D" parent="TankLayer/TankContainer/TankViewport"]
@@ -77,7 +77,7 @@ y_sort_enabled = true
 [node name="Claw" type="Node2D" parent="TankLayer/TankContainer/TankViewport/TankWorld"]
 z_index = 20
 script = ExtResource("2_claw")
-max_depth = 170.0
+max_depth = 190.0
 
 [node name="Cable" type="Sprite2D" parent="TankLayer/TankContainer/TankViewport/TankWorld/Claw"]
 texture = ExtResource("9_cable")
@@ -98,75 +98,72 @@ shape = SubResource("Circle_grab")
 [node name="GlassLayer" type="CanvasLayer" parent="."]
 layer = 20
 
-[node name="Glass" type="TextureRect" parent="GlassLayer"]
-offset_left = 140.0
-offset_top = 68.0
-offset_right = 1140.0
-offset_bottom = 436.0
-mouse_filter = 2
-texture = ExtResource("5_glass")
-expand_mode = 1
-
 [node name="Bubbles" type="Node2D" parent="GlassLayer"]
 
 [node name="FrameLayer" type="CanvasLayer" parent="."]
 layer = 30
 
-[node name="TankFrame" type="TextureRect" parent="FrameLayer"]
-offset_left = 120.0
-offset_top = 52.0
-offset_right = 1160.0
-offset_bottom = 452.0
-mouse_filter = 2
-texture = ExtResource("6_frame")
-expand_mode = 1
-
-[node name="Console" type="TextureRect" parent="FrameLayer"]
-offset_top = 470.0
+[node name="MachineFrame" type="TextureRect" parent="FrameLayer"]
 offset_right = 1280.0
 offset_bottom = 720.0
 mouse_filter = 2
-texture = ExtResource("7_console")
-expand_mode = 1
+texture = ExtResource("5_frame")
 
-[node name="ArrowLeft" type="TextureButton" parent="FrameLayer"]
-offset_left = 120.0
-offset_top = 584.0
-offset_right = 216.0
+[node name="ConsoleLayer" type="CanvasLayer" parent="."]
+layer = 40
+
+[node name="Slider" type="TextureRect" parent="ConsoleLayer"]
+offset_left = 479.0
+offset_top = 34.0
+offset_right = 801.0
+offset_bottom = 98.0
+mouse_filter = 2
+texture = ExtResource("18_slider")
+
+[node name="MapDots" type="Control" parent="ConsoleLayer"]
+offset_right = 1280.0
+offset_bottom = 130.0
+mouse_filter = 2
+
+[node name="ArrowLeft" type="TextureButton" parent="ConsoleLayer"]
+offset_left = 401.0
+offset_top = 564.0
+offset_right = 543.0
 offset_bottom = 680.0
 texture_normal = ExtResource("10_al")
 texture_pressed = ExtResource("11_alp")
 
-[node name="ArrowRight" type="TextureButton" parent="FrameLayer"]
-offset_left = 250.0
-offset_top = 584.0
-offset_right = 346.0
+[node name="ArrowRight" type="TextureButton" parent="ConsoleLayer"]
+offset_left = 744.0
+offset_top = 564.0
+offset_right = 884.0
 offset_bottom = 680.0
 texture_normal = ExtResource("11_ar")
 texture_pressed = ExtResource("11_arp")
 
-[node name="DropButton" type="Button" parent="FrameLayer"]
-offset_left = 500.0
-offset_top = 596.0
-offset_right = 780.0
-offset_bottom = 664.0
-theme = ExtResource("14_theme")
+[node name="GrabButton" type="TextureButton" parent="ConsoleLayer"]
+offset_left = 579.0
+offset_top = 552.0
+offset_right = 707.0
+offset_bottom = 674.0
+texture_normal = ExtResource("12_grab")
+texture_pressed = ExtResource("13_grabp")
 
-[node name="JoystickBase" type="TextureRect" parent="FrameLayer"]
-offset_left = 1040.0
-offset_top = 576.0
-offset_right = 1168.0
-offset_bottom = 704.0
-mouse_filter = 2
-texture = ExtResource("12_jb")
+[node name="SortingButton" type="TextureButton" parent="ConsoleLayer"]
+offset_left = 899.0
+offset_top = 563.0
+offset_right = 1115.0
+offset_bottom = 698.0
+texture_normal = ExtResource("14_sort")
+texture_hover = ExtResource("15_sorth")
 
-[node name="JoystickKnob" type="TextureRect" parent="FrameLayer"]
-offset_left = 1068.0
-offset_top = 604.0
-offset_right = 1140.0
-offset_bottom = 676.0
-mouse_filter = 2
-texture = ExtResource("13_jk")
+[node name="SettingsButton" type="TextureButton" parent="ConsoleLayer"]
+offset_left = 1187.0
+offset_top = 30.0
+offset_right = 1231.0
+offset_bottom = 76.0
+texture_normal = ExtResource("16_set")
+texture_hover = ExtResource("17_seth")
 
 [node name="HudLayer" type="CanvasLayer" parent="."]
 layer = 50
@@ -177,58 +174,87 @@ anchor_bottom = 1.0
 mouse_filter = 2
 theme = ExtResource("14_theme")
 
-[node name="Minimap" type="Control" parent="HudLayer/HudRoot"]
-offset_left = 160.0
-offset_top = 486.0
-offset_right = 1120.0
-offset_bottom = 514.0
-mouse_filter = 2
+[node name="DayLabel" type="Label" parent="HudLayer/HudRoot"]
+offset_left = 40.0
+offset_top = 208.0
+offset_right = 156.0
+offset_bottom = 260.0
+theme_override_font_sizes/font_size = 34
+theme_override_colors/font_color = Color(0.24, 0.2, 0.18, 1)
+horizontal_alignment = 1
+vertical_alignment = 1
 
-[node name="Bg" type="TextureRect" parent="HudLayer/HudRoot/Minimap"]
-anchor_right = 1.0
-anchor_bottom = 1.0
-mouse_filter = 2
-texture = ExtResource("15_mmbg")
-expand_mode = 1
-
-[node name="View" type="TextureRect" parent="HudLayer/HudRoot/Minimap"]
-offset_right = 200.0
-offset_bottom = 28.0
-mouse_filter = 2
-texture = ExtResource("16_mmview")
-expand_mode = 1
-
-[node name="Dots" type="Control" parent="HudLayer/HudRoot/Minimap"]
-anchor_right = 1.0
-anchor_bottom = 1.0
-mouse_filter = 2
-
-[node name="ClawMark" type="TextureRect" parent="HudLayer/HudRoot/Minimap"]
-offset_top = 4.0
-offset_right = 12.0
-offset_bottom = 24.0
-mouse_filter = 2
-texture = ExtResource("17_mmclaw")
-
-[node name="GripLabel" type="Label" parent="HudLayer/HudRoot"]
-offset_left = 320.0
-offset_top = 522.0
-offset_right = 960.0
-offset_bottom = 552.0
-theme_override_font_sizes/font_size = 21
+[node name="BudgetTitle" type="Label" parent="HudLayer/HudRoot"]
+offset_left = 47.0
+offset_top = 452.0
+offset_right = 157.0
+offset_bottom = 472.0
+theme_override_font_sizes/font_size = 12
 horizontal_alignment = 1
 
-[node name="Toast" type="Label" parent="HudLayer/HudRoot"]
-offset_left = 320.0
-offset_top = 392.0
-offset_right = 960.0
-offset_bottom = 430.0
+[node name="BudgetLabel" type="Label" parent="HudLayer/HudRoot"]
+offset_left = 47.0
+offset_top = 470.0
+offset_right = 157.0
+offset_bottom = 520.0
+theme_override_font_sizes/font_size = 30
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="QuotaTitle" type="Label" parent="HudLayer/HudRoot"]
+offset_left = 1126.0
+offset_top = 234.0
+offset_right = 1238.0
+offset_bottom = 254.0
+theme_override_font_sizes/font_size = 12
+horizontal_alignment = 1
+
+[node name="QuotaLabel" type="Label" parent="HudLayer/HudRoot"]
+offset_left = 1126.0
+offset_top = 254.0
+offset_right = 1238.0
+offset_bottom = 302.0
 theme_override_font_sizes/font_size = 26
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="OceanTitle" type="Label" parent="HudLayer/HudRoot"]
+offset_left = 1134.0
+offset_top = 438.0
+offset_right = 1234.0
+offset_bottom = 458.0
+theme_override_font_sizes/font_size = 12
+horizontal_alignment = 1
+
+[node name="OceanLabel" type="Label" parent="HudLayer/HudRoot"]
+offset_left = 1134.0
+offset_top = 458.0
+offset_right = 1234.0
+offset_bottom = 506.0
+theme_override_font_sizes/font_size = 26
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Toast" type="Label" parent="HudLayer/HudRoot"]
+offset_left = 240.0
+offset_top = 416.0
+offset_right = 1040.0
+offset_bottom = 454.0
+theme_override_font_sizes/font_size = 24
+horizontal_alignment = 1
+
+[node name="GripLabel" type="Label" parent="HudLayer/HudRoot"]
+offset_left = 240.0
+offset_top = 486.0
+offset_right = 1040.0
+offset_bottom = 516.0
+theme_override_font_sizes/font_size = 19
 horizontal_alignment = 1
 
 [node name="Hint" type="Label" parent="HudLayer/HudRoot"]
-offset_left = 380.0
-offset_top = 686.0
-offset_right = 1240.0
-offset_bottom = 712.0
-theme_override_font_sizes/font_size = 15
+offset_left = 300.0
+offset_top = 692.0
+offset_right = 1000.0
+offset_bottom = 714.0
+theme_override_font_sizes/font_size = 13
+horizontal_alignment = 1

@@ -89,6 +89,27 @@ window - outside it is hull. Depth layers are rows in ClawPhase's
 PARALLAX_LAYERS; each is sized off its own texture and never stretched. Add a
 row to add a layer.
 
+## the machine cockpit
+
+`assets/ui/machine_frame.png` is the whole claw screen - hull, window surround,
+glass streaks, the calendar and the panels. The window is the transparent
+rect in it, (216,122) 848x408, and TankContainer + ClawPhase.TANK_VIEW are set
+to exactly that. Redraw the frame with a different opening and those three
+numbers move together.
+
+Everything the designer sends arrives on the full 2560x1440 canvas with each
+piece already in place, so install_incoming crops each to its alpha box (a
+button and its pressed state share one crop) and the crop origin is where the
+node goes. That is why every console node has plain offsets and can just be
+dragged in the editor.
+
+The keys and the buttons are the same control: A/D/Space swap the button's
+texture_normal for its pressed art, held briefly so a tap still reads.
+
+The claw screen hides the shift bar - it has its own readouts and its own
+SORTING and cog buttons, which ask for what they need through
+Events.view_switch_requested / pause_requested. The desk still has the bar.
+
 ## text
 
 Player-facing text is English, lives in data/strings.gd. Item names and rule

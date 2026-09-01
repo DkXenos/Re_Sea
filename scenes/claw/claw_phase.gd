@@ -14,11 +14,36 @@ const FISH_FRAMES: Array[String] = [
 	"res://data/frames/fish_bg_large_frames.tres",
 ]
 const MINIMAP_DOT := preload("res://assets/ui/minimap_item.png")
-# visible slice of the tank, in tank world units
-const TANK_VIEW := Vector2(1000.0, 368.0)
+# The window in machine_frame.png, measured off its own transparency. If the
+# cockpit art is redrawn, this and TankContainer follow the new opening.
+const TANK_VIEW := Vector2(848.0, 408.0)
 # where items rest, and the depths fish drift at
-const ITEM_REST_Y := Vector2(246.0, 278.0)
-const FISH_DEPTH_Y := Vector2(72.0, 208.0)
+const ITEM_REST_Y := Vector2(273.0, 308.0)
+const FISH_DEPTH_Y := Vector2(80.0, 231.0)
+# bubbles drift inside the glass, so they live in the window's screen rect
+const WINDOW_RECT := Rect2(216.0, 122.0, 848.0, 408.0)
+# The rail the slider runs along at the top of the cockpit, in screen pixels -
+# the rail itself is painted into machine_frame.png, so these are read off the
+# art rather than derived from anything.
+const RAIL := Vector2(232.0, 1050.0)
+# The keys do the same job as the console buttons, so the console has to look
+# the same either way. A TextureButton only draws its pressed art for its own
+# mouse press, so a held key swaps texture_normal instead.
+const KEY_BUTTONS: Array[Dictionary] = [
+	{"action": &"claw_left", "node": "ArrowLeft",
+		"up": preload("res://assets/ui/machine_left.png"),
+		"down": preload("res://assets/ui/machine_left_pressed.png")},
+	{"action": &"claw_right", "node": "ArrowRight",
+		"up": preload("res://assets/ui/machine_right.png"),
+		"down": preload("res://assets/ui/machine_right_pressed.png")},
+	{"action": &"claw_drop", "node": "GrabButton",
+		"up": preload("res://assets/ui/machine_grab.png"),
+		"down": preload("res://assets/ui/machine_grab_pressed.png")},
+]
+# A tap of the drop key is over in two frames, which reads as the button not
+# working. Hold it down long enough to see.
+const KEY_PRESS_HOLD := 0.12
+
 # mouse parallax, nearest layer. keep it small.
 const PARALLAX := [2.0, 4.0, 6.0]
 
@@ -70,22 +95,22 @@ const PARALLAX_OVERSCAN := 8.0
 @onready var _claw: Node2D = $TankLayer/TankContainer/TankViewport/TankWorld/Claw
 @onready var _camera: Camera2D = $TankLayer/TankContainer/TankViewport/TankWorld/Camera
 @onready var _bubbles: Node2D = $GlassLayer/Bubbles
-@onready var _knob: TextureRect = $FrameLayer/JoystickKnob
+@onready var _slider: TextureRect = $ConsoleLayer/Slider
+@onready var _map_dots: Control = $ConsoleLayer/MapDots
 
 @onready var _grip_label: Label = $HudLayer/HudRoot/GripLabel
 @onready var _toast: Label = $HudLayer/HudRoot/Toast
 @onready var _hint: Label = $HudLayer/HudRoot/Hint
-@onready var _map: Control = $HudLayer/HudRoot/Minimap
-@onready var _map_view: TextureRect = $HudLayer/HudRoot/Minimap/View
-@onready var _map_dots: Control = $HudLayer/HudRoot/Minimap/Dots
-@onready var _map_claw: TextureRect = $HudLayer/HudRoot/Minimap/ClawMark
+@onready var _day_label: Label = $HudLayer/HudRoot/DayLabel
+@onready var _budget_label: Label = $HudLayer/HudRoot/BudgetLabel
+@onready var _quota_label: Label = $HudLayer/HudRoot/QuotaLabel
+@onready var _ocean_label: Label = $HudLayer/HudRoot/OceanLabel
 
 var _day: DayData
 var _active: bool = true
 # not drifted in yet
 var _pending: Array[ItemData] = []
 var _spawn_timer: float = 0.0
-var _knob_home: Vector2
 var _bubble_speeds: Array[float] = []
 var _dots: Array[TextureRect] = []
 var _layers: Array[Sprite2D] = []
@@ -93,6 +118,8 @@ var _layers: Array[Sprite2D] = []
 # sits when the camera is at its leftmost
 var _layer_scroll: Array[float] = []
 var _layer_base: Array[float] = []
+# per KEY_BUTTONS row: how long its art still has to stay down
+var _key_hold: Array[float] = []
 
 
 func _ready() -> void:
@@ -100,23 +127,39 @@ func _ready() -> void:
 	if _day == null:
 		push_warning("Claw phase started with no day loaded")
 		return
-	_knob_home = _knob.position
 	_setup_tank()
 	_setup_parallax()
 	_claw.cycle_finished.connect(_on_cycle_finished)
 	_claw.drop_started.connect(_on_drop_started)
-	$FrameLayer/ArrowLeft.button_down.connect(func() -> void: _claw.button_axis = -1.0)
-	$FrameLayer/ArrowLeft.button_up.connect(func() -> void: _claw.button_axis = 0.0)
-	$FrameLayer/ArrowRight.button_down.connect(func() -> void: _claw.button_axis = 1.0)
-	$FrameLayer/ArrowRight.button_up.connect(func() -> void: _claw.button_axis = 0.0)
-	$FrameLayer/DropButton.pressed.connect(_claw.start_drop)
-	$FrameLayer/DropButton.text = Strings.tf("claw_drop_button",
+	var console := $ConsoleLayer
+	console.get_node("ArrowLeft").button_down.connect(
+		func() -> void: _claw.button_axis = -1.0)
+	console.get_node("ArrowLeft").button_up.connect(
+		func() -> void: _claw.button_axis = 0.0)
+	console.get_node("ArrowRight").button_down.connect(
+		func() -> void: _claw.button_axis = 1.0)
+	console.get_node("ArrowRight").button_up.connect(
+		func() -> void: _claw.button_axis = 0.0)
+	console.get_node("GrabButton").pressed.connect(_claw.start_drop)
+	console.get_node("GrabButton").tooltip_text = Strings.tf("claw_drop_button",
 		{"n": Game.cost_of(&"drop")})
-	$FrameLayer/DropButton.tooltip_text = Strings.tf("budget_cost",
-		{"n": Game.cost_of(&"drop")})
+	# the folder and the cog are the machine's own controls for what used to be
+	# buttons on the shift bar
+	console.get_node("SortingButton").pressed.connect(
+		func() -> void: Events.view_switch_requested.emit())
+	console.get_node("SortingButton").tooltip_text = Strings.t("shift_to_desk")
+	console.get_node("SettingsButton").pressed.connect(
+		func() -> void: Events.pause_requested.emit())
+	console.get_node("SettingsButton").tooltip_text = Strings.t("menu_settings")
+	_key_hold.resize(KEY_BUTTONS.size())
+	_key_hold.fill(0.0)
 	Events.vfx_intensity_changed.connect(_rebuild_bubbles)
 	_hint.text = Strings.t("claw_hint")
 	_toast.text = ""
+	$HudLayer/HudRoot/BudgetTitle.text = Strings.t("budget_label")
+	$HudLayer/HudRoot/QuotaTitle.text = Strings.t("day_quota")
+	$HudLayer/HudRoot/OceanTitle.text = Strings.t("machines_title")
+	_update_readouts()
 	_spawn_items()
 	_spawn_fish()
 	_rebuild_bubbles(Game.vfx_intensity)
@@ -286,11 +329,25 @@ func _reset_spawn_timer() -> void:
 
 # on a timer, or right away if we've dropped below the day's floor
 func _update_spawning(delta: float) -> void:
+	_top_up()
 	if _pending.is_empty():
 		return
 	_spawn_timer -= delta
-	if _spawn_timer > 0.0 and _items.get_child_count() >= _day.min_available_items:
+	if _spawn_timer > 0.0:
 		return
+	_drift_one_in()
+
+
+# Back up to the day's floor in one go. One per frame is not enough: the floor
+# is what guarantees there is always something to aim at, and trickling leaves
+# the tank visibly short for a frame or two after every grab.
+func _top_up() -> void:
+	while not _pending.is_empty() \
+			and _items.get_child_count() < _day.min_available_items:
+		_drift_one_in()
+
+
+func _drift_one_in() -> void:
 	var node := _make_item(_pending.pop_front())
 	node.drift_in(Game.rng.randf_range(_reach_min(), _reach_max()),
 		Game.rng.randf_range(ITEM_REST_Y.x, ITEM_REST_Y.y))
@@ -323,7 +380,9 @@ func _rebuild_bubbles(intensity: float) -> void:
 		var bubble := AnimatedSprite2D.new()
 		bubble.sprite_frames = frames
 		bubble.play(&"rise")
-		bubble.position = Vector2(randf_range(160.0, 1120.0), randf_range(80.0, 428.0))
+		bubble.position = Vector2(
+			randf_range(WINDOW_RECT.position.x + 30.0, WINDOW_RECT.end.x - 30.0),
+			randf_range(WINDOW_RECT.position.y + 20.0, WINDOW_RECT.end.y))
 		_bubbles.add_child(bubble)
 		_bubble_speeds.append(randf_range(18.0, 46.0))
 
@@ -331,17 +390,14 @@ func _rebuild_bubbles(intensity: float) -> void:
 func _process(delta: float) -> void:
 	_update_spawning(delta)
 	_claw.can_drop = _active and Game.can_afford(&"drop")
-	$FrameLayer/DropButton.disabled = not _claw.can_drop
+	$ConsoleLayer/GrabButton.disabled = not _claw.can_drop
 	_camera.position.x = _claw.position.x
 	_update_parallax()
 	_update_bubbles(delta)
 	_update_grip_preview()
-	_update_minimap()
-	_knob.position = _knob_home + Vector2(_claw_progress() * 22.0 - 11.0, 0.0)
-
-
-func _claw_progress() -> float:
-	return inverse_lerp(_claw.min_x, _claw.max_x, _claw.position.x)
+	_update_console_keys(delta)
+	_update_rail()
+	_update_readouts()
 
 
 # the tank and the glass are nudged by the mouse, the hull is not - we are
@@ -370,9 +426,22 @@ func _update_bubbles(delta: float) -> void:
 	for i in children.size():
 		var bubble: AnimatedSprite2D = children[i]
 		bubble.position.y -= _bubble_speeds[i] * delta
-		if bubble.position.y < 76.0:
-			bubble.position.y = 430.0
-			bubble.position.x = randf_range(160.0, 1120.0)
+		if bubble.position.y < WINDOW_RECT.position.y:
+			bubble.position.y = WINDOW_RECT.end.y
+			bubble.position.x = randf_range(
+				WINDOW_RECT.position.x + 30.0, WINDOW_RECT.end.x - 30.0)
+
+
+func _update_console_keys(delta: float) -> void:
+	for i in KEY_BUTTONS.size():
+		var row: Dictionary = KEY_BUTTONS[i]
+		var button: TextureButton = $ConsoleLayer.get_node(String(row["node"]))
+		var held: bool = _active and Input.is_action_pressed(StringName(row["action"]))
+		if held:
+			_key_hold[i] = KEY_PRESS_HOLD
+		else:
+			_key_hold[i] = maxf(0.0, _key_hold[i] - delta)
+		button.texture_normal = row["down"] if held or _key_hold[i] > 0.0 else row["up"]
 
 
 # odds on screen before the drop, and for the exact item the drop will reach
@@ -392,13 +461,14 @@ func _update_grip_preview() -> void:
 			Strings.tf("claw_grip_chance", {"n": int(round(target.grip_chance() * 100.0))})]
 
 
-# without this "where was that heavy one" is just tedious
-func _update_minimap() -> void:
-	var width := _map.size.x
-	var scale_x := width / seabed_width
-	_map_view.size.x = TANK_VIEW.x * scale_x
-	_map_view.position.x = (_camera.get_screen_center_position().x - TANK_VIEW.x * 0.5) * scale_x
-	_map_claw.position.x = _claw.position.x * scale_x - _map_claw.size.x * 0.5
+# The marker on the top rail is the window: where it sits on the rail is which
+# slice of the seabed you are looking at. The dots are the items still down
+# there - without them "where was that heavy one" is just tedious.
+func _update_rail() -> void:
+	var travel := RAIL.y - RAIL.x - _slider.size.x
+	var centre := _camera.get_screen_center_position().x
+	var progress := inverse_lerp(_camera_min(), _camera_max(), centre)
+	_slider.position.x = RAIL.x + travel * clampf(progress, 0.0, 1.0)
 
 	var children := _items.get_children()
 	while _dots.size() < children.size():
@@ -407,12 +477,27 @@ func _update_minimap() -> void:
 		dot.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		_map_dots.add_child(dot)
 		_dots.append(dot)
+	var span := RAIL.y - RAIL.x
 	for i in _dots.size():
 		var visible_dot := i < children.size()
 		_dots[i].visible = visible_dot
 		if visible_dot:
 			var item: Node2D = children[i]
-			_dots[i].position = Vector2(item.position.x * scale_x - 5.0, 9.0)
+			_dots[i].position = Vector2(
+				RAIL.x + span * (item.position.x / seabed_width) - 5.0,
+				_slider.position.y + _slider.size.y * 0.5 - 5.0)
+
+
+# the readouts painted into the cockpit - the day on the calendar, the shift
+# time and the target on the two panels, the machines on the gold one
+func _update_readouts() -> void:
+	if _day == null:
+		return
+	_day_label.text = str(_day.day_number)
+	_budget_label.text = str(Game.budget_left)
+	_quota_label.text = "%d/%d" % [int(Game.stats.get("sorted", 0)), _day.quota]
+	_ocean_label.text = "%d/%d" % [Game.unlocked_blueprints.size(),
+		Game.blueprints.size()]
 
 
 # claw doesn't know what a drop costs, we charge it here
@@ -427,7 +512,13 @@ func _on_cycle_finished(result: Dictionary) -> void:
 		Game.add_to_inventory(item)
 		Events.item_grabbed.emit(item)
 		_show_toast(item.surface_label())
-		result["node"].queue_free()
+		# out of the tree NOW, not at the end of the frame - queue_free leaves
+		# it counted, so the top-up below would think the tank is still full
+		# and the floor would be broken until the frame after next
+		var taken: Node = result["node"]
+		taken.get_parent().remove_child(taken)
+		taken.queue_free()
+		_top_up()
 	else:
 		_show_toast(Strings.t("claw_slipped"))
 
