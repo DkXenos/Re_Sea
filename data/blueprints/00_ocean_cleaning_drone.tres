@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="BlueprintData" format=3]
+
+[ext_resource type="Script" path="res://data/component_data.gd" id="1_comp"]
+[ext_resource type="Resource" path="res://data/components/00_drone_shell.tres" id="2_c0"]
+[ext_resource type="Resource" path="res://data/components/01_rotor_skid.tres" id="3_c1"]
+[ext_resource type="Texture2D" path="res://assets/ui/blueprint_ocean_cleaning_drone.png" id="8_bg"]
+[ext_resource type="Texture2D" path="res://assets/ui/blueprint_ocean_cleaning_drone_done.png" id="8_bgd"]
+[ext_resource type="Script" path="res://data/blueprint_data.gd" id="9_script"]
+
+[resource]
+script = ExtResource("9_script")
+id = &"ocean_cleaning_drone"
+display_name = "Ocean Cleaning Drone"
+flavour_text = "A small drone that crawls the seabed and sucks up the fragments too fine for the claw to reach."
+components = Array[ExtResource("1_comp")]([ExtResource("2_c0"), ExtResource("3_c1")])
+background = ExtResource("8_bg")
+background_done = ExtResource("8_bgd")
+unlocks_upgrade = &"rel_cepat"
+sort_order = 0

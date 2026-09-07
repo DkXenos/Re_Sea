@@ -446,14 +446,23 @@ func post_drop_lockout() -> float:
 	return up.post_drop_lockout if up != null else 0.0
 
 
-## Which of the three endings this run earned. Every blueprint built is the good
-## one, none at all is the bad one, anything between is the regular one - so it
-## scales if a fourth blueprint is ever authored.
-func ending_kind() -> StringName:
-	var built: int = unlocked_blueprints.size()
-	if built <= 0:
-		return &"bad"
-	return &"good" if built >= blueprints.size() else &"regular"
+## Which ending this run earned: one tier per machine actually built, so 0 is
+## the bay left as it was and blueprints.size() is the full recovery. Authoring
+## a fourth blueprint adds a fourth tier without touching this - only the
+## end_N_* strings have to follow.
+func ending_tier() -> int:
+	return clampi(unlocked_blueprints.size(), 0, blueprints.size())
+
+
+## Only the two extremes have their own painting so far; the tiers between fall
+## back to a neutral still until that art arrives.
+func ending_still() -> String:
+	var tier := ending_tier()
+	if tier <= 0:
+		return "res://assets/env/ending_bad.png"
+	if tier >= blueprints.size():
+		return "res://assets/env/ending_good.png"
+	return "res://assets/env/cutscene_04.png"
 
 
 func apply_setting(key: String, value: float, persist: bool = true) -> void:

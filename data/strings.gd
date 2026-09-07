@@ -21,12 +21,23 @@ const TABLE: Dictionary = {
 	"settings_vfx": "Visual Effect Intensity",
 	"settings_back": "Back",
 
-	# --- cutscene ---
+	# --- opening cutscene ---
+	# eleven beats over five stills. the arc: what the bay was, the first thing
+	# that did not belong, the delivery that followed, us going down to look, and
+	# the three sheets that are the answer.
 	"cutscene_skip": "Skip (Esc)",
-	"cutscene_advance": "Click or press Enter to continue",
-	"cutscene_line_1": "This bay used to be full of fish. Now it is full of what the land throws away.",
-	"cutscene_line_2": "Every day the current brings a new delivery. Some of it is obvious. Some of it is in disguise.",
-	"cutscene_line_3": "You run the claw. Lift it, inspect it, sort it. The sea counts every decision you make.",
+	"cutscene_advance": "Click or press Enter",
+	"open_1": "The bay used to be loud. Gulls arguing, waves turning over, a crab picking a fight with the tide.",
+	"open_2": "You could stand in the shallows and count the fish going past your ankles.",
+	"open_3": "Then one afternoon something came down through the light that did not belong to any of it.",
+	"open_4": "One cup. Nobody watching it fall thought it was worth a second look.",
+	"open_5": "One became a hundred. A hundred became the delivery the current brings every single day.",
+	"open_6": "And none of it arrives labelled. A clean cup and a lined one sink in exactly the same way.",
+	"open_7": "So we went down to look at it properly.",
+	"open_8": "The turtle cannot tell which of these it is safe to swallow. Neither could we, at first.",
+	"open_9": "Three machines. Every part of them built out of what the bay hands back to us.",
+	"open_10": "But a machine is only as good as what we feed it, and the sea does not sort itself.",
+	"open_11": "Lower the claw. Look before you decide.",
 
 	# --- day start ---
 	"day_label": "DAY {n}",
@@ -65,6 +76,7 @@ const TABLE: Dictionary = {
 	"desk_empty": "Everything has been sorted",
 	"desk_no_selection": "Pick an item before choosing a bin",
 	"desk_rulebook_button": "Rulebook (R)",
+	"desk_rulebook_short": "i",
 	"inspect_zoom_hint": "Scroll to zoom, drag to pan",
 	"tools_locked": "No tools available today",
 	"tools_armed": "{tool} ready - click the item",
@@ -78,6 +90,7 @@ const TABLE: Dictionary = {
 	"inspect_question_labeled": "Marked {label}, looks like {mat}. Do you believe it?",
 	"inspect_pick_first": "Pick an item from the list on the left.",
 	"tools_cost_label": "costs {n}",
+	"tools_not_today": "not today",
 
 	# --- evidence chips ---
 	"chip_material": "LOOKS LIKE: {v}",
@@ -183,13 +196,17 @@ const TABLE: Dictionary = {
 	"upgrade_cost": "- {v}",
 
 	# --- endings ---
-	# three endings, decided by how many machines were actually built
-	"end_bad_title": "THE SEA WAS LEFT BEHIND",
-	"end_bad_body": "Five days went by and not one machine was ever built. The rubbish keeps arriving, and there is nothing here to stop it.",
-	"end_regular_title": "A START",
-	"end_regular_body": "{have} of {need} machines are running. The bay is starting to breathe again, but the work is not finished.",
-	"end_good_title": "THE BAY RECOVERED",
-	"end_good_body": "All three machines are running. The coral is growing back and the fish have come home. You finished it.",
+	# four tiers, one per machine built. the sheet in NEW-ASSETS/Cutscene/Endings
+	# is the spec these follow.
+	"end_0_title": "THE BAY WAS LEFT AS IT WAS",
+	"end_0_body": "Five shifts, and not one machine ever left the workshop. The current will bring another delivery tomorrow, and there is still nothing here to meet it.",
+	"end_1_title": "A FIRST MACHINE",
+	"end_1_body": "One machine is running. Small stretches of the bay are beginning to clear, but most of it is still under the same water it was.",
+	"end_2_title": "THE WATER IS TURNING",
+	"end_2_body": "Two machines are running. Large parts of the bay are recovering and the wildlife is coming back to them. There is one more to build.",
+	"end_3_title": "THE BAY CAME BACK",
+	"end_3_body": "All three machines are running together. What the sea used to swallow goes back out as something usable, and the water is clear enough to count the fish again - and this time that is not a memory, it is the view.",
+	"end_built": "Machines built: {have} / {need}",
 	"over_retry": "Try Again",
 	"over_menu": "Main Menu",
 

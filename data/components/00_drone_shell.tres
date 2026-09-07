@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ComponentData" format=3]
+
+[ext_resource type="Script" path="res://data/component_data.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/ui/comp_drone_shell.png" id="2_done"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"drone_shell"
+display_name = "Drone Shell"
+done_texture = ExtResource("2_done")
+diagram_position = Vector2(0.505, 0.478)
+requirements = { 0: 1, 1: 2 }

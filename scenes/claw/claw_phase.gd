@@ -8,10 +8,20 @@ extends Node2D
 
 const ITEM_SCENE := preload("res://scenes/claw/tank_item.tscn")
 const FISH_SCENE := preload("res://scenes/claw/fish.tscn")
+# eleven drawings, not three sizes - the bay should not read as the same fish
+# repeated three times. which one a slot gets is rolled per day.
 const FISH_FRAMES: Array[String] = [
-	"res://data/frames/fish_bg_small_frames.tres",
-	"res://data/frames/fish_bg_medium_frames.tres",
-	"res://data/frames/fish_bg_large_frames.tres",
+	"res://data/frames/fish_small_1_frames.tres",
+	"res://data/frames/fish_small_2_frames.tres",
+	"res://data/frames/fish_small_3_frames.tres",
+	"res://data/frames/fish_cute_1_frames.tres",
+	"res://data/frames/fish_cute_2_frames.tres",
+	"res://data/frames/fish_cute_3_frames.tres",
+	"res://data/frames/fish_medium_1_frames.tres",
+	"res://data/frames/fish_medium_2_frames.tres",
+	"res://data/frames/jellyfish_1_frames.tres",
+	"res://data/frames/jellyfish_2_frames.tres",
+	"res://data/frames/fish_large_1_frames.tres",
 ]
 const MINIMAP_DOT := preload("res://assets/ui/minimap_item.png")
 # The window in machine_frame.png, measured off its own transparency. If the
@@ -82,7 +92,7 @@ const PARALLAX_OVERSCAN := 8.0
 @export var seabed_width: float = 2600.0
 
 # atmosphere only, fish can't be grabbed.
-@export var fish_count: int = 9
+@export var fish_count: int = 12
 @export var fish_speed_min: float = 25.0
 @export var fish_speed_max: float = 65.0
 
@@ -359,7 +369,7 @@ func _spawn_fish() -> void:
 	for i in count:
 		var node: Node2D = FISH_SCENE.instantiate()
 		_fish.add_child(node)
-		var frames: SpriteFrames = load(FISH_FRAMES[i % FISH_FRAMES.size()])
+		var frames: SpriteFrames = load(FISH_FRAMES[Game.rng.randi() % FISH_FRAMES.size()])
 		var depth: float = float(i) / maxf(1.0, float(count - 1))
 		node.setup(frames,
 			Game.rng.randf_range(FISH_DEPTH_Y.x, FISH_DEPTH_Y.y),

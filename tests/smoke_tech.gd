@@ -49,7 +49,9 @@ func _check_content() -> void:
 	var total: int = 0
 	for bp: BlueprintData in game.blueprints:
 		assert(bp.background != null, "%s has no schematic sheet" % bp.id)
-		assert(bp.components.size() >= 3, "%s has only %d components"
+		# a blueprint needs at least two parts or "craft the parts, then build the
+		# machine" collapses into one button
+		assert(bp.components.size() >= 2, "%s has only %d components"
 			% [bp.id, bp.components.size()])
 		for component: ComponentData in bp.components:
 			total += 1
@@ -57,8 +59,11 @@ func _check_content() -> void:
 				"component id %s is used twice - Game.crafted is keyed by it"
 				% component.id)
 			ids[component.id] = true
-			assert(component.locked_texture != null and component.done_texture != null,
-				"%s is missing one of its two drawings" % component.id)
+			# Only the finished drawing is required. An uncrafted part draws nothing
+			# and lets the sheet's own lineart show through, so locked_texture is
+			# optional - but the part still has to know what it looks like built.
+			assert(component.done_texture != null,
+				"%s has no finished drawing" % component.id)
 			assert(component.locked_texture != component.done_texture,
 				("%s uses one texture for both states - locked and done must "
 				+ "be two PNGs, never one tinted") % component.id)
@@ -66,7 +71,9 @@ func _check_content() -> void:
 			assert(at.x >= 0.0 and at.x <= 1.0 and at.y >= 0.0 and at.y <= 1.0,
 				"%s sits at %s, outside the normalized sheet" % [component.id, at])
 			assert(component.total_required() > 0, "%s costs nothing" % component.id)
-	assert(total == 9, "expected nine components, got %d" % total)
+	# 2 + 3 + 2 across the three sheets. the count is only here to catch a .tres
+	# that silently stopped loading, not to pin the design.
+	assert(total == 7, "expected seven components, got %d" % total)
 	print("  %d sheets, %d components, every one with two drawings" %
 		[game.blueprints.size(), total])
 
@@ -217,8 +224,7 @@ func _check_fourth_component_needs_no_code() -> void:
 	var extra: ComponentData = ComponentData.new()
 	extra.id = &"_tmp_fourth_part"
 	extra.display_name = "Bagian Uji Keempat"
-	extra.locked_texture = load("res://assets/ui/comp_drone_body_locked.png")
-	extra.done_texture = load("res://assets/ui/comp_drone_body_done.png")
+	extra.done_texture = load("res://assets/ui/comp_drone_shell.png")
 	extra.diagram_position = Vector2(0.8, 0.5)
 	extra.requirements = {ItemData.Category.RECYCLABLE: 2}
 	assert(ResourceSaver.save(extra, EXTRA_PATH) == OK)

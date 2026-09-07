@@ -15,5 +15,5 @@ coarse_readings = false
 move_speed_multiplier = 0.75
 post_drop_lockout = 0.0
 unlock_after_blueprints = 3
-unlock_text = "Unlocked once the Hazardous Waste Neutraliser is built."
+unlock_text = "Unlocked once the Reef Restoration Pod is built."
 sort_order = 4

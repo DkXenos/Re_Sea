@@ -9,16 +9,20 @@ signal crate_opened()
 # bin the revealed evidence points at, -1 for none
 signal bin_hint_changed(category: int)
 
-# 160 * 1.8 = 288px. also written down in ASSETS.md, keep them in sync.
-const BASE_SCALE := 1.8
+# 160 * 1.5 = 240px, inside the 260px viewport the desk art leaves for it.
+# also written down in ASSETS.md, keep them in sync.
+const BASE_SCALE := 1.5
 const MIN_ZOOM := 1.0
 const MAX_ZOOM := 3.0  # 4 looked awful on the 160px placeholders
 const CHIP_SURFACE := preload("res://assets/ui/chip_surface.png")
 const CHIP_REVEAL := preload("res://assets/ui/chip_reveal.png")
 const CHIP_MATCH := preload("res://assets/ui/chip_match.png")
-const TOOL_ROW_HEIGHT := 64
-# 96x96 art shown at 60x60 in the rack
-const TOOL_ICON_SCALE := 0.62
+const TOOL_ROW_HEIGHT := 70
+# four rows have to fit the rack frame, so the delivered art comes down a notch
+const TOOL_ICON_SCALE := 0.85
+# the rack has one drawing per tool and no locked/using variants, so "armed" is
+# a separate plate slid in behind the row rather than a second drawing
+const TOOL_ROW_SELECTED := preload("res://assets/ui/tool_row_selected.png")
 
 @onready var _view: SubViewport = $ViewportBox/ItemViewport
 @onready var _item_root: Node2D = $ViewportBox/ItemViewport/ItemRoot
@@ -72,25 +76,35 @@ func _make_tool_entry(tool_data: ToolData) -> Control:
 	var row := Control.new()
 	row.custom_minimum_size = Vector2(0, TOOL_ROW_HEIGHT)
 
+	# behind everything, shown only while this tool is the armed one
+	var selected := TextureRect.new()
+	selected.texture = TOOL_ROW_SELECTED
+	selected.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	selected.stretch_mode = TextureRect.STRETCH_SCALE
+	selected.set_anchors_preset(Control.PRESET_FULL_RECT)
+	selected.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	selected.visible = false
+	row.add_child(selected)
+
 	# AnimatedSprite2D from the start so adding frames later doesn't mean
 	# swapping the node out
 	var sprite := AnimatedSprite2D.new()
 	sprite.sprite_frames = tool_data.frames
 	sprite.play(&"idle")
 	sprite.scale = Vector2.ONE * TOOL_ICON_SCALE
-	sprite.position = Vector2(30, 32)
+	sprite.position = Vector2(40, 35)
 	row.add_child(sprite)
 
 	var name_label := Label.new()
 	name_label.text = tool_data.display_name
-	name_label.position = Vector2(66, 6)
-	name_label.add_theme_font_size_override("font_size", 17)
+	name_label.position = Vector2(78, 10)
+	name_label.add_theme_font_size_override("font_size", 15)
 	row.add_child(name_label)
 
 	var cost_label := Label.new()
 	cost_label.text = Strings.t("tools_cost_free") if tool_data.opens_containers \
 		else Strings.tf("tools_cost_label", {"n": Game.cost_of(&"tool")})
-	cost_label.position = Vector2(66, 32)
+	cost_label.position = Vector2(78, 38)
 	cost_label.add_theme_font_size_override("font_size", 13)
 	cost_label.add_theme_color_override("font_color", Color(0.72, 0.78, 0.85))
 	row.add_child(cost_label)
@@ -103,7 +117,7 @@ func _make_tool_entry(tool_data: ToolData) -> Control:
 	row.add_child(button)
 
 	_tool_nodes[tool_data.id] = {"sprite": sprite, "cost": cost_label,
-		"button": button, "label": name_label}
+		"button": button, "label": name_label, "selected": selected}
 	return row
 
 
@@ -126,15 +140,19 @@ func _refresh_rack() -> void:
 			button.tooltip_text = Strings.t("tools_cost_free")
 		else:
 			button.tooltip_text = Strings.tf("tools_cost_label", {"n": Game.cost_of(&"tool")})
-		# locked is a different PNG, not a dim. the labels beside it are UI
-		# text so those can fade.
-		var sprite: AnimatedSprite2D = parts["sprite"]
-		if not usable:
-			sprite.play(&"locked")
-		else:
-			sprite.play(&"using" if _armed == tool_id else &"idle")
+		# one drawing per tool, so the art never changes. what changes is the
+		# plate behind it, and the UI text beside it - which is ours to fade.
+		parts["selected"].visible = _armed == tool_id and usable
 		parts["label"].modulate.a = 1.0 if unlocked else 0.35
 		parts["cost"].modulate.a = 1.0 if usable else 0.35
+		# a greyed row with no reason on it reads as broken art
+		var cost: Label = parts["cost"]
+		if not unlocked:
+			cost.text = Strings.t("tools_not_today")
+		elif free:
+			cost.text = Strings.t("tools_cost_free")
+		else:
+			cost.text = Strings.tf("tools_cost_label", {"n": Game.cost_of(&"tool")})
 
 
 func _on_tool_pressed(tool_id: StringName) -> void:

@@ -1,5 +1,9 @@
 # one shift, two views. tank and desk are tabs, not phases - same budget,
 # same inventory, switching costs nothing.
+#
+# both views are whole-screen drawings with their own readouts and buttons, so
+# this scene draws nothing of its own until the shift ends - then one plate in
+# the middle carries the closing line.
 extends Node2D
 
 enum View { CLAW, DESK }
@@ -10,14 +14,7 @@ const END_DELAY_MESSAGE := 3.0
 
 @onready var _claw_view: Node2D = $ClawView
 @onready var _desk_view: Node2D = $DeskView
-@onready var _day_label: Label = $BarLayer/Root/DayLabel
-@onready var _quota_label: Label = $BarLayer/Root/QuotaLabel
-@onready var _budget_label: Label = $BarLayer/Root/BudgetLabel
 @onready var _status: Label = $BarLayer/Root/Status
-@onready var _machines_label: Label = $BarLayer/Root/MachinesLabel
-@onready var _upgrade_label: Label = $BarLayer/Root/UpgradeLabel
-@onready var _switch_button: Button = $BarLayer/Root/SwitchButton
-@onready var _end_button: Button = $BarLayer/Root/EndButton
 @onready var _bar: CanvasLayer = $BarLayer
 
 var _day: DayData
@@ -27,12 +24,12 @@ var _finished: bool = false
 
 func _ready() -> void:
 	_day = Game.current_day()
-	_end_button.text = Strings.t("shift_end")
 	_status.text = ""
-	_switch_button.pressed.connect(_toggle_view)
-	_end_button.pressed.connect(_end_shift)
-	# the machine has its own SORTING folder for this
+	# Both screens are now whole cockpits with their own readouts and their own
+	# buttons, so the shift bar is only a status line. The buttons on each screen
+	# ask for what they need through Events.
 	Events.view_switch_requested.connect(_toggle_view)
+	Events.shift_end_requested.connect(_end_shift)
 	_apply_view()
 
 
@@ -43,7 +40,6 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _process(_delta: float) -> void:
-	_refresh_bar()
 	_check_shift_over()
 
 
@@ -58,41 +54,9 @@ func _toggle_view() -> void:
 func _apply_view() -> void:
 	_claw_view.set_view_active(_view == View.CLAW)
 	_desk_view.set_view_active(_view == View.DESK)
-	# The cockpit is a whole screen with its own readouts and its own buttons,
-	# so the bar would just be a second copy of everything laid over the art.
-	# The desk has no frame of its own yet, so it keeps the bar.
-	_bar.visible = _view == View.DESK
-
-
-func _refresh_bar() -> void:
-	if _day == null or not _bar.visible:
-		return
-	_day_label.text = Strings.tf("day_label", {"n": _day.day_number})
-	_quota_label.text = "%s %d / %d" % [Strings.t("day_quota"),
-		int(Game.stats.get("sorted", 0)), _day.quota]
-	_budget_label.text = "%s %d / %d" % [Strings.t("budget_label"),
-		Game.budget_left, Game.budget_max]
-	# tab button says where it goes, how much is waiting and which key. people
-	# demoing this won't read a control list.
-	_machines_label.text = Strings.tf("machines_label",
-		{"have": Game.unlocked_blueprints.size(), "need": Game.blueprints.size()})
-	# costs come from Game so the label can't disagree with what we charge
-	var costs := {"drop": Game.cost_of(&"drop"), "tool": Game.cost_of(&"tool"),
-		"sort": Game.cost_of(&"sort")}
-	var up := Game.upgrade()
-	if up == null:
-		_upgrade_label.text = Strings.tf("upgrade_none", costs)
-	else:
-		costs["v"] = up.display_name
-		_upgrade_label.text = Strings.tf("upgrade_active", costs)
-
-	var unsorted := Game.unsorted_items().size()
-	if _view == View.CLAW:
-		_switch_button.text = "%s (%d)  ·  TAB" % [Strings.t("shift_to_desk"), unsorted]
-		_switch_button.tooltip_text = Strings.tf("shift_unsorted", {"n": unsorted})
-	else:
-		_switch_button.text = "%s  ·  TAB" % Strings.t("shift_to_claw")
-		_switch_button.tooltip_text = ""
+	# Both screens carry their own frame now, so the bar only ever surfaces to
+	# announce that the shift is over.
+	_bar.visible = false
 
 
 # over when the budget can't buy anything useful. ending early once quota is
@@ -109,9 +73,9 @@ func _end_shift() -> void:
 	if _finished:
 		return
 	_finished = true
-	_switch_button.disabled = true
-	_end_button.disabled = true
 	Events.sfx_requested.emit(&"day_end")
+	# the closing line is the one thing the bar still exists for
+	_bar.visible = true
 	var closing := _closing_line()
 	_status.text = closing["text"]
 	if closing["sfx"] != &"":

@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene load_steps=11 format=3]
 
 [ext_resource type="Script" path="res://scenes/desk/desk_phase.gd" id="1_desk"]
 [ext_resource type="Script" path="res://scenes/desk/inventory_panel.gd" id="2_inv"]
@@ -6,8 +6,9 @@
 [ext_resource type="Script" path="res://scenes/desk/bin_row.gd" id="4_bins"]
 [ext_resource type="Script" path="res://scenes/desk/rulebook_panel.gd" id="5_rule"]
 [ext_resource type="Script" path="res://scenes/desk/blueprint_panel.gd" id="9_bp"]
-[ext_resource type="Texture2D" path="res://assets/env/water_bg.png" id="6_bg"]
+[ext_resource type="Texture2D" path="res://assets/ui/desk_bg.png" id="6_bg"]
 [ext_resource type="Texture2D" path="res://assets/ui/panel_dark.png" id="7_pdark"]
+[ext_resource type="Texture2D" path="res://assets/ui/tool_rack_frame.png" id="10_rack"]
 [ext_resource type="Theme" path="res://assets/ui/ui_theme.tres" id="8_theme"]
 
 [node name="DeskPhase" type="Node2D"]
@@ -33,202 +34,240 @@ anchor_bottom = 1.0
 mouse_filter = 2
 theme = ExtResource("8_theme")
 
-[node name="RulebookButton" type="Button" parent="UiLayer/Root"]
-offset_left = 1022.0
-offset_top = 80.0
-offset_right = 1264.0
-offset_bottom = 122.0
-theme_override_font_sizes/font_size = 16
+[node name="DayLabel" type="Label" parent="UiLayer/Root"]
+offset_left = 30.0
+offset_top = 40.0
+offset_right = 200.0
+offset_bottom = 82.0
+theme_override_font_sizes/font_size = 19
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="QuotaLabel" type="Label" parent="UiLayer/Root"]
+offset_left = 315.0
+offset_top = 40.0
+offset_right = 505.0
+offset_bottom = 82.0
+theme_override_font_sizes/font_size = 19
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BudgetLabel" type="Label" parent="UiLayer/Root"]
+offset_left = 587.0
+offset_top = 40.0
+offset_right = 786.0
+offset_bottom = 82.0
+theme_override_font_sizes/font_size = 19
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SwitchButton" type="Button" parent="UiLayer/Root"]
+offset_left = 805.0
+offset_top = 30.0
+offset_right = 973.0
+offset_bottom = 90.0
+flat = true
+theme_override_font_sizes/font_size = 15
+
+[node name="EndButton" type="Button" parent="UiLayer/Root"]
+offset_left = 984.0
+offset_top = 30.0
+offset_right = 1158.0
+offset_bottom = 90.0
+flat = true
+theme_override_font_sizes/font_size = 15
+
+[node name="SettingsButton" type="Button" parent="UiLayer/Root"]
+offset_left = 1180.0
+offset_top = 30.0
+offset_right = 1234.0
+offset_bottom = 90.0
+flat = true
 
 [node name="BlueprintPanel" type="Control" parent="UiLayer/Root"]
-offset_left = 308.0
-offset_top = 80.0
-offset_right = 1010.0
-offset_bottom = 118.0
+offset_left = 419.0
+offset_top = 152.0
+offset_right = 1058.0
+offset_bottom = 194.0
 mouse_filter = 2
 script = ExtResource("9_bp")
 
 [node name="Rows" type="HBoxContainer" parent="UiLayer/Root/BlueprintPanel"]
-offset_right = 702.0
-offset_bottom = 38.0
+offset_right = 639.0
+offset_bottom = 42.0
 theme_override_constants/separation = 8
 
-[node name="InventoryBg" type="NinePatchRect" parent="UiLayer/Root"]
-offset_left = 16.0
-offset_top = 80.0
-offset_right = 300.0
-offset_bottom = 700.0
-mouse_filter = 2
-texture = ExtResource("7_pdark")
-patch_margin_left = 24
-patch_margin_top = 24
-patch_margin_right = 24
-patch_margin_bottom = 24
+[node name="RulebookButton" type="Button" parent="UiLayer/Root"]
+offset_left = 1066.0
+offset_top = 152.0
+offset_right = 1116.0
+offset_bottom = 194.0
+flat = true
+theme_override_font_sizes/font_size = 15
 
 [node name="InventoryPanel" type="Control" parent="UiLayer/Root"]
-offset_left = 16.0
-offset_top = 80.0
-offset_right = 300.0
-offset_bottom = 700.0
+offset_left = 58.0
+offset_top = 192.0
+offset_right = 262.0
+offset_bottom = 640.0
 mouse_filter = 2
 script = ExtResource("2_inv")
 
 [node name="Title" type="Label" parent="UiLayer/Root/InventoryPanel"]
-offset_left = 14.0
-offset_top = 10.0
-offset_right = 270.0
-offset_bottom = 36.0
-theme_override_font_sizes/font_size = 17
+offset_left = 6.0
+offset_top = 4.0
+offset_right = 200.0
+offset_bottom = 28.0
+theme_override_font_sizes/font_size = 15
 
 [node name="Empty" type="Label" parent="UiLayer/Root/InventoryPanel"]
-offset_left = 14.0
-offset_top = 44.0
-offset_right = 270.0
-offset_bottom = 100.0
-theme_override_font_sizes/font_size = 15
+offset_left = 6.0
+offset_top = 34.0
+offset_right = 200.0
+offset_bottom = 90.0
+theme_override_font_sizes/font_size = 13
 autowrap_mode = 3
 
 [node name="Scroll" type="ScrollContainer" parent="UiLayer/Root/InventoryPanel"]
-offset_left = 12.0
-offset_top = 42.0
-offset_right = 272.0
-offset_bottom = 608.0
+offset_left = 4.0
+offset_top = 32.0
+offset_right = 202.0
+offset_bottom = 444.0
 
 [node name="Grid" type="GridContainer" parent="UiLayer/Root/InventoryPanel/Scroll"]
 columns = 1
-theme_override_constants/h_separation = 8
-theme_override_constants/v_separation = 8
-
-[node name="InspectBg" type="NinePatchRect" parent="UiLayer/Root"]
-offset_left = 308.0
-offset_top = 124.0
-offset_right = 1264.0
-offset_bottom = 494.0
-mouse_filter = 2
-texture = ExtResource("7_pdark")
-patch_margin_left = 24
-patch_margin_top = 24
-patch_margin_right = 24
-patch_margin_bottom = 24
+theme_override_constants/h_separation = 6
+theme_override_constants/v_separation = 6
 
 [node name="InspectPanel" type="Control" parent="UiLayer/Root"]
-offset_left = 308.0
-offset_top = 124.0
-offset_right = 1264.0
-offset_bottom = 494.0
+offset_left = 339.0
+offset_top = 198.0
+offset_right = 1222.0
+offset_bottom = 531.0
 mouse_filter = 2
 script = ExtResource("3_insp")
 
-[node name="NameLabel" type="Label" parent="UiLayer/Root/InspectPanel"]
-offset_bottom = 56.0
-offset_right = 316.0
-offset_top = 32.0
-offset_left = 16.0
-theme_override_font_sizes/font_size = 15
-clip_text = true
-
 [node name="Question" type="Label" parent="UiLayer/Root/InspectPanel"]
 clip_text = true
+offset_left = 288.0
+offset_top = 2.0
+offset_right = 870.0
+offset_bottom = 26.0
+theme_override_font_sizes/font_size = 15
+
+[node name="NameLabel" type="Label" parent="UiLayer/Root/InspectPanel"]
 offset_left = 14.0
-offset_top = 4.0
-offset_right = 940.0
-offset_bottom = 28.0
+offset_top = 2.0
+offset_right = 280.0
+offset_bottom = 26.0
 theme_override_font_sizes/font_size = 16
+clip_text = true
 
 [node name="ViewportBox" type="SubViewportContainer" parent="UiLayer/Root/InspectPanel"]
-offset_left = 16.0
-offset_top = 60.0
-offset_right = 304.0
-offset_bottom = 348.0
+offset_left = 14.0
+offset_top = 32.0
+offset_right = 274.0
+offset_bottom = 292.0
 mouse_filter = 2
 
 [node name="ItemViewport" type="SubViewport" parent="UiLayer/Root/InspectPanel/ViewportBox"]
 transparent_bg = true
 handle_input_locally = false
 gui_disable_input = true
-size = Vector2i(288, 288)
+size = Vector2i(260, 260)
 render_target_update_mode = 4
 
 [node name="ItemRoot" type="Node2D" parent="UiLayer/Root/InspectPanel/ViewportBox/ItemViewport"]
-position = Vector2(160, 160)
+position = Vector2(130, 130)
 
 [node name="Sprite" type="Sprite2D" parent="UiLayer/Root/InspectPanel/ViewportBox/ItemViewport/ItemRoot"]
 
 [node name="Surface" type="Control" parent="UiLayer/Root/InspectPanel"]
-offset_left = 16.0
-offset_top = 60.0
-offset_right = 304.0
-offset_bottom = 348.0
+offset_left = 14.0
+offset_top = 32.0
+offset_right = 274.0
+offset_bottom = 292.0
 
 [node name="ZoomHint" type="Label" parent="UiLayer/Root/InspectPanel"]
-offset_left = 16.0
-offset_top = 348.0
-offset_right = 304.0
-offset_bottom = 366.0
-theme_override_font_sizes/font_size = 12
+offset_left = 14.0
+offset_top = 292.0
+offset_right = 274.0
+offset_bottom = 308.0
+theme_override_font_sizes/font_size = 11
 horizontal_alignment = 1
 
-[node name="ToolRack" type="VBoxContainer" parent="UiLayer/Root/InspectPanel"]
-offset_left = 332.0
-offset_top = 58.0
-offset_right = 536.0
-offset_bottom = 314.0
-theme_override_constants/separation = 6
+[node name="RackFrame" type="TextureRect" parent="UiLayer/Root/InspectPanel"]
+offset_left = 288.0
+offset_top = 30.0
+offset_right = 475.0
+offset_bottom = 317.0
+mouse_filter = 2
+texture = ExtResource("10_rack")
+expand_mode = 1
+stretch_mode = 0
 
-[node name="Feedback" type="Label" parent="UiLayer/Root/InspectPanel"]
-offset_left = 332.0
-offset_top = 318.0
-offset_right = 540.0
-offset_bottom = 368.0
-theme_override_font_sizes/font_size = 13
-autowrap_mode = 3
+[node name="ToolRack" type="VBoxContainer" parent="UiLayer/Root/InspectPanel"]
+offset_left = 288.0
+offset_top = 34.0
+offset_right = 475.0
+offset_bottom = 316.0
+theme_override_constants/separation = 0
 
 [node name="RulesTitle" type="Label" parent="UiLayer/Root/InspectPanel"]
-offset_left = 556.0
-offset_top = 34.0
-offset_right = 940.0
-offset_bottom = 56.0
-theme_override_font_sizes/font_size = 15
+offset_left = 492.0
+offset_top = 30.0
+offset_right = 870.0
+offset_bottom = 50.0
+theme_override_font_sizes/font_size = 14
 
 [node name="RulesList" type="VBoxContainer" parent="UiLayer/Root/InspectPanel"]
-offset_left = 556.0
-offset_top = 60.0
-offset_right = 940.0
-offset_bottom = 172.0
-theme_override_constants/separation = 3
+offset_left = 492.0
+offset_top = 54.0
+offset_right = 870.0
+offset_bottom = 146.0
+theme_override_constants/separation = 2
 
 [node name="EvidenceTitle" type="Label" parent="UiLayer/Root/InspectPanel"]
-offset_left = 556.0
-offset_top = 176.0
-offset_right = 940.0
-offset_bottom = 198.0
-theme_override_font_sizes/font_size = 15
+offset_left = 492.0
+offset_top = 150.0
+offset_right = 870.0
+offset_bottom = 170.0
+theme_override_font_sizes/font_size = 14
 
 [node name="EvidenceScroll" type="ScrollContainer" parent="UiLayer/Root/InspectPanel"]
-offset_left = 556.0
-offset_top = 200.0
-offset_right = 940.0
-offset_bottom = 368.0
+offset_left = 492.0
+offset_top = 174.0
+offset_right = 870.0
+offset_bottom = 296.0
 
 [node name="EvidenceLog" type="VBoxContainer" parent="UiLayer/Root/InspectPanel/EvidenceScroll"]
-custom_minimum_size = Vector2(374, 0)
+custom_minimum_size = Vector2(368, 0)
 theme_override_constants/separation = 4
 
+[node name="Feedback" type="Label" parent="UiLayer/Root/InspectPanel"]
+offset_left = 492.0
+offset_top = 300.0
+offset_right = 870.0
+offset_bottom = 332.0
+theme_override_font_sizes/font_size = 12
+autowrap_mode = 3
+
 [node name="BinRow" type="Control" parent="UiLayer/Root"]
-offset_left = 308.0
-offset_top = 496.0
-offset_right = 1264.0
-offset_bottom = 702.0
+offset_left = 386.0
+offset_top = 501.0
+offset_right = 1160.0
+offset_bottom = 691.0
 mouse_filter = 2
 script = ExtResource("4_bins")
 
 [node name="Toast" type="Label" parent="UiLayer/Root"]
-offset_left = 308.0
-offset_top = 700.0
-offset_right = 1264.0
-offset_bottom = 720.0
-theme_override_font_sizes/font_size = 16
+offset_left = 20.0
+offset_top = 660.0
+offset_right = 340.0
+offset_bottom = 700.0
+theme_override_font_sizes/font_size = 14
 horizontal_alignment = 1
+autowrap_mode = 3
 
 [node name="RulebookLayer" type="CanvasLayer" parent="."]
 layer = 100

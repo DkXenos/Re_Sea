@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://scenes/shift/shift_phase.gd" id="1_shift"]
 [ext_resource type="PackedScene" path="res://scenes/claw/claw_phase.tscn" id="2_claw"]
 [ext_resource type="PackedScene" path="res://scenes/desk/desk_phase.tscn" id="3_desk"]
-[ext_resource type="Texture2D" path="res://assets/ui/panel_dark.png" id="4_pd"]
+[ext_resource type="Texture2D" path="res://assets/ui/chat_bubble.png" id="4_bubble"]
 [ext_resource type="Theme" path="res://assets/ui/ui_theme.tres" id="5_theme"]
 
 [node name="ShiftPhase" type="Node2D"]
@@ -22,70 +22,23 @@ anchor_bottom = 1.0
 mouse_filter = 2
 theme = ExtResource("5_theme")
 
-[node name="Panel" type="NinePatchRect" parent="BarLayer/Root"]
-offset_left = -8.0
-offset_top = -12.0
-offset_right = 1288.0
-offset_bottom = 74.0
+[node name="Bubble" type="TextureRect" parent="BarLayer/Root"]
+offset_left = 186.0
+offset_top = 271.0
+offset_right = 1093.0
+offset_bottom = 449.0
 mouse_filter = 2
-texture = ExtResource("4_pd")
-patch_margin_left = 24
-patch_margin_top = 24
-patch_margin_right = 24
-patch_margin_bottom = 24
-
-[node name="DayLabel" type="Label" parent="BarLayer/Root"]
-offset_left = 20.0
-offset_top = 6.0
-offset_right = 146.0
-offset_bottom = 40.0
-theme_override_font_sizes/font_size = 22
-
-[node name="QuotaLabel" type="Label" parent="BarLayer/Root"]
-offset_left = 150.0
-offset_top = 10.0
-offset_right = 344.0
-offset_bottom = 38.0
-theme_override_font_sizes/font_size = 17
-
-[node name="BudgetLabel" type="Label" parent="BarLayer/Root"]
-offset_left = 350.0
-offset_top = 10.0
-offset_right = 596.0
-offset_bottom = 38.0
-theme_override_font_sizes/font_size = 17
+texture = ExtResource("4_bubble")
+expand_mode = 1
+stretch_mode = 0
 
 [node name="Status" type="Label" parent="BarLayer/Root"]
-offset_left = 600.0
-offset_top = 12.0
-offset_right = 752.0
-offset_bottom = 36.0
-theme_override_font_sizes/font_size = 13
-
-[node name="MachinesLabel" type="Label" parent="BarLayer/Root"]
-offset_left = 20.0
-offset_top = 48.0
-offset_right = 420.0
-offset_bottom = 70.0
-theme_override_font_sizes/font_size = 14
-
-[node name="UpgradeLabel" type="Label" parent="BarLayer/Root"]
-offset_left = 430.0
-offset_top = 48.0
-offset_right = 1204.0
-offset_bottom = 70.0
-theme_override_font_sizes/font_size = 14
-
-[node name="SwitchButton" type="Button" parent="BarLayer/Root"]
-offset_left = 758.0
-offset_top = 3.0
-offset_right = 1044.0
-offset_bottom = 43.0
-theme_override_font_sizes/font_size = 16
-
-[node name="EndButton" type="Button" parent="BarLayer/Root"]
-offset_left = 1052.0
-offset_top = 3.0
-offset_right = 1204.0
-offset_bottom = 43.0
-theme_override_font_sizes/font_size = 16
+offset_left = 240.0
+offset_top = 291.0
+offset_right = 1040.0
+offset_bottom = 429.0
+theme_override_font_sizes/font_size = 22
+theme_override_colors/font_color = Color(0.09, 0.16, 0.26, 1)
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3

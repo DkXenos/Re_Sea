@@ -21,9 +21,8 @@ Short version: **same path, same pixel size, flat art, no baked lighting.**
 
    | What | Authored | Displayed | Constant |
    |------|----------|-----------|----------|
-   | Item in the inspect panel | 160×160 | 288×288 | `InspectPanel.BASE_SCALE` = 1.8 |
-   | Tool icon in the rack | 96×96 | 60×60 | `InspectPanel.TOOL_ICON_SCALE` = 0.62 |
-   | Bin on the desk | 200×240 | 144×173 | `BinRow.BIN_DISPLAY_SCALE` = 0.72 |
+   | Item in the inspect panel | 160×160 | 240×240 | `InspectPanel.BASE_SCALE` = 1.5 |
+   | Tool icon in the rack | ~72 tall | ~61 tall | `InspectPanel.TOOL_ICON_SCALE` = 0.85 |
 
    Everywhere else the size in the table is the size on screen.
 
@@ -37,7 +36,7 @@ follows — you never touch a scene.**
 | Part | Files |
 |------|-------|
 | Button | `button_normal` / `button_hover` / `button_pressed` / `button_disabled` |
-| Panels & boxes | `panel_main`, `panel_dark`, `panel_slot`, `panel_slot_selected` |
+| Panels & boxes | `panel_dark`, `panel_slot`, `panel_slot_selected` |
 | Volume slider | `slider_track`, `slider_fill`, `slider_grabber`, `slider_grabber_hover` |
 | On/off toggle | `toggle_off`, `toggle_on` |
 | Scrollbar | `scrollbar_track`, `scrollbar_grabber`, `scrollbar_grabber_hover` |
@@ -79,195 +78,156 @@ seam - and it reads as the reason the tool found something.
 ## no AI art
 
 No image or audio in this project is AI generated, and none may be. Every
-illustration is drawn by hand by the project's own artists. The remaining
-placeholder files are plain shapes and tones, and are being replaced as the
-real art arrives.
+illustration is drawn by hand by the project's own artists in Procreate. The
+sound effects are plain synthesised tones. The delivery folders of full-size
+masters live outside the project, so `assets/` only ever holds what ships.
 
----
+## how the delivered art is installed
+
+The artists work on a full 2560x1440 canvas with every piece already in place.
+That canvas is exactly 2x the game's 1280x720, so a piece's position on it
+divides straight into screen coordinates and each piece is cropped to its own
+alpha box before install. That is why the desk background can be dropped in
+whole and every node just sits in the slot painted for it.
+
+Two consequences worth knowing:
+
+- **The desk and the cockpit are whole screens.** `assets/ui/desk_bg.png` and
+  `assets/ui/machine_frame.png` each carry their own top bar, panel frames and
+  button plates. Redraw one and the node offsets in its scene follow the new
+  art; nothing is drawn by code.
+- **State is an overlay, not a second drawing.** The bins and the tools ship as
+  one drawing each, so "this bin is what the evidence points at" is
+  `bin_outline.png` moved behind the bin, and "this tool is armed" is
+  `tool_row_selected.png` slid behind the row. The art itself never changes and
+  is never recoloured.
 
 ## animations
 
-| SpriteFrames | Animation | Placeholder frame | Target frames |
-|--------------|-----------|-------------------|---------------|
-| `data/frames/claw_frames.tres` | `open` | `assets/claw/claw_open.png` | 4 |
-| `data/frames/claw_frames.tres` | `closing` | `assets/claw/claw_closing.png` | 6 |
-| `data/frames/claw_frames.tres` | `closed` | `assets/claw/claw_closed.png` | 2 |
-| `data/frames/claw_frames.tres` | `carrying` | `assets/claw/claw_carrying.png` | 6 |
-| `data/frames/fish_bg_small_frames.tres` | `swim` | `assets/fish/fish_bg_small.png` | 6 |
-| `data/frames/fish_bg_medium_frames.tres` | `swim` | `assets/fish/fish_bg_medium.png` | 6 |
-| `data/frames/fish_bg_large_frames.tres` | `swim` | `assets/fish/fish_bg_large.png` | 6 |
-| `data/frames/item_banana_peel_frames.tres` | `idle` | `assets/items/item_banana_peel.png` | 2 |
-| `data/frames/item_banana_peel_frames.tres` | `wobble` | `assets/items/item_banana_peel.png` | 4 |
-| `data/frames/item_banana_peel_frames.tres` | `sinking` | `assets/items/item_banana_peel.png` | 6 |
-| `data/frames/item_paper_cup_frames.tres` | `idle` | `assets/items/item_paper_cup.png` | 2 |
-| `data/frames/item_paper_cup_frames.tres` | `wobble` | `assets/items/item_paper_cup.png` | 4 |
-| `data/frames/item_paper_cup_frames.tres` | `sinking` | `assets/items/item_paper_cup.png` | 6 |
-| `data/frames/item_baju_organik_frames.tres` | `idle` | `assets/items/item_baju_organik.png` | 2 |
-| `data/frames/item_baju_organik_frames.tres` | `wobble` | `assets/items/item_baju_organik.png` | 4 |
-| `data/frames/item_baju_organik_frames.tres` | `sinking` | `assets/items/item_baju_organik.png` | 6 |
-| `data/frames/item_baju_daur_ulang_frames.tres` | `idle` | `assets/items/item_baju_daur_ulang.png` | 2 |
-| `data/frames/item_baju_daur_ulang_frames.tres` | `wobble` | `assets/items/item_baju_daur_ulang.png` | 4 |
-| `data/frames/item_baju_daur_ulang_frames.tres` | `sinking` | `assets/items/item_baju_daur_ulang.png` | 6 |
-| `data/frames/item_baju_b3_frames.tres` | `idle` | `assets/items/item_baju_b3.png` | 2 |
-| `data/frames/item_baju_b3_frames.tres` | `wobble` | `assets/items/item_baju_b3.png` | 4 |
-| `data/frames/item_baju_b3_frames.tres` | `sinking` | `assets/items/item_baju_b3.png` | 6 |
-| `data/frames/item_gelas_kertas_bersih_frames.tres` | `idle` | `assets/items/item_gelas_kertas_bersih.png` | 2 |
-| `data/frames/item_gelas_kertas_bersih_frames.tres` | `wobble` | `assets/items/item_gelas_kertas_bersih.png` | 4 |
-| `data/frames/item_gelas_kertas_bersih_frames.tres` | `sinking` | `assets/items/item_gelas_kertas_bersih.png` | 6 |
-| `data/frames/item_tisu_bekas_frames.tres` | `idle` | `assets/items/item_tisu_bekas.png` | 2 |
-| `data/frames/item_tisu_bekas_frames.tres` | `wobble` | `assets/items/item_tisu_bekas.png` | 4 |
-| `data/frames/item_tisu_bekas_frames.tres` | `sinking` | `assets/items/item_tisu_bekas.png` | 6 |
-| `data/frames/item_tisu_b3_frames.tres` | `idle` | `assets/items/item_tisu_b3.png` | 2 |
-| `data/frames/item_tisu_b3_frames.tres` | `wobble` | `assets/items/item_tisu_b3.png` | 4 |
-| `data/frames/item_tisu_b3_frames.tres` | `sinking` | `assets/items/item_tisu_b3.png` | 6 |
-| `data/frames/item_apel_frames.tres` | `idle` | `assets/items/item_apel.png` | 2 |
-| `data/frames/item_apel_frames.tres` | `wobble` | `assets/items/item_apel.png` | 4 |
-| `data/frames/item_apel_frames.tres` | `sinking` | `assets/items/item_apel.png` | 6 |
-| `data/frames/item_botol_kaca_frames.tres` | `idle` | `assets/items/item_botol_kaca.png` | 2 |
-| `data/frames/item_botol_kaca_frames.tres` | `wobble` | `assets/items/item_botol_kaca.png` | 4 |
-| `data/frames/item_botol_kaca_frames.tres` | `sinking` | `assets/items/item_botol_kaca.png` | 6 |
-| `data/frames/item_cangkang_telur_frames.tres` | `idle` | `assets/items/item_cangkang_telur.png` | 2 |
-| `data/frames/item_cangkang_telur_frames.tres` | `wobble` | `assets/items/item_cangkang_telur.png` | 4 |
-| `data/frames/item_cangkang_telur_frames.tres` | `sinking` | `assets/items/item_cangkang_telur.png` | 6 |
-| `data/frames/item_daun_frames.tres` | `idle` | `assets/items/item_daun.png` | 2 |
-| `data/frames/item_daun_frames.tres` | `wobble` | `assets/items/item_daun.png` | 4 |
-| `data/frames/item_daun_frames.tres` | `sinking` | `assets/items/item_daun.png` | 6 |
-| `data/frames/item_kantong_plastik_frames.tres` | `idle` | `assets/items/item_kantong_plastik.png` | 2 |
-| `data/frames/item_kantong_plastik_frames.tres` | `wobble` | `assets/items/item_kantong_plastik.png` | 4 |
-| `data/frames/item_kantong_plastik_frames.tres` | `sinking` | `assets/items/item_kantong_plastik.png` | 6 |
-| `data/frames/item_koran_frames.tres` | `idle` | `assets/items/item_koran.png` | 2 |
-| `data/frames/item_koran_frames.tres` | `wobble` | `assets/items/item_koran.png` | 4 |
-| `data/frames/item_koran_frames.tres` | `sinking` | `assets/items/item_koran.png` | 6 |
-| `data/frames/item_pizza_frames.tres` | `idle` | `assets/items/item_pizza.png` | 2 |
-| `data/frames/item_pizza_frames.tres` | `wobble` | `assets/items/item_pizza.png` | 4 |
-| `data/frames/item_pizza_frames.tres` | `sinking` | `assets/items/item_pizza.png` | 6 |
-| `data/frames/bin_organic_frames.tres` | `idle` | `assets/bins/bin_organic.png` | 2 |
-| `data/frames/bin_organic_frames.tres` | `accept` | `assets/bins/bin_organic_accept.png` | 6 |
-| `data/frames/bin_organic_frames.tres` | `reject` | `assets/bins/bin_organic_reject.png` | 6 |
-| `data/frames/bin_organic_frames.tres` | `highlight` | `assets/bins/bin_organic_highlight.png` | 4 |
-| `data/frames/bin_recyclable_frames.tres` | `idle` | `assets/bins/bin_recyclable.png` | 2 |
-| `data/frames/bin_recyclable_frames.tres` | `accept` | `assets/bins/bin_recyclable_accept.png` | 6 |
-| `data/frames/bin_recyclable_frames.tres` | `reject` | `assets/bins/bin_recyclable_reject.png` | 6 |
-| `data/frames/bin_recyclable_frames.tres` | `highlight` | `assets/bins/bin_recyclable_highlight.png` | 4 |
-| `data/frames/bin_hazard_frames.tres` | `idle` | `assets/bins/bin_hazard.png` | 2 |
-| `data/frames/bin_hazard_frames.tres` | `accept` | `assets/bins/bin_hazard_accept.png` | 6 |
-| `data/frames/bin_hazard_frames.tres` | `reject` | `assets/bins/bin_hazard_reject.png` | 6 |
-| `data/frames/bin_hazard_frames.tres` | `highlight` | `assets/bins/bin_hazard_highlight.png` | 4 |
-| `data/frames/bin_landfill_frames.tres` | `idle` | `assets/bins/bin_landfill.png` | 2 |
-| `data/frames/bin_landfill_frames.tres` | `accept` | `assets/bins/bin_landfill_accept.png` | 6 |
-| `data/frames/bin_landfill_frames.tres` | `reject` | `assets/bins/bin_landfill_reject.png` | 6 |
-| `data/frames/bin_landfill_frames.tres` | `highlight` | `assets/bins/bin_landfill_highlight.png` | 4 |
-| `data/frames/tool_rinse_frames.tres` | `idle` | `assets/tools/tool_rinse.png` | 2 |
-| `data/frames/tool_rinse_frames.tres` | `using` | `assets/tools/tool_rinse_using.png` | 4 |
-| `data/frames/tool_rinse_frames.tres` | `locked` | `assets/tools/tool_rinse_locked.png` | 1 |
-| `data/frames/tool_swab_frames.tres` | `idle` | `assets/tools/tool_swab.png` | 2 |
-| `data/frames/tool_swab_frames.tres` | `using` | `assets/tools/tool_swab_using.png` | 4 |
-| `data/frames/tool_swab_frames.tres` | `locked` | `assets/tools/tool_swab_locked.png` | 1 |
-| `data/frames/tool_magnifier_frames.tres` | `idle` | `assets/tools/tool_magnifier.png` | 2 |
-| `data/frames/tool_magnifier_frames.tres` | `using` | `assets/tools/tool_magnifier_using.png` | 4 |
-| `data/frames/tool_magnifier_frames.tres` | `locked` | `assets/tools/tool_magnifier_locked.png` | 1 |
-| `data/frames/tool_cutter_frames.tres` | `idle` | `assets/tools/tool_cutter.png` | 2 |
-| `data/frames/tool_cutter_frames.tres` | `using` | `assets/tools/tool_cutter_using.png` | 4 |
-| `data/frames/tool_cutter_frames.tres` | `locked` | `assets/tools/tool_cutter_locked.png` | 1 |
-| `data/frames/bubble_frames.tres` | `rise` | `assets/env/bubble.png` | 6 |
-| `data/frames/box.tres` | `closed` | `assets/items/box_closed.png` | 2 |
-| `data/frames/box.tres` | `opened` | `assets/items/box_opened.png` | 2 |
-| `data/frames/box.tres` | `idle` | `assets/items/box_closed.png` | 2 |
-| `data/frames/box.tres` | `wobble` | `assets/items/box_closed.png` | 4 |
-| `data/frames/box.tres` | `sinking` | `assets/items/box_closed.png` | 6 |
-| `data/frames/coral_healthy_frames.tres` | `idle` | `assets/env/coral_healthy.png` | 6 |
-| `data/frames/coral_dead_frames.tres` | `idle` | `assets/env/coral_dead.png` | 6 |
-| `data/frames/debris_overlay_frames.tres` | `idle` | `assets/env/debris_overlay.png` | 6 |
+Every SpriteFrames in `data/frames/` and the PNG behind it. Frame counts are one
+for now - drop numbered frames beside a file and add them to the `.tres` to fill
+an animation in without touching code.
 
-## every PNG
+## the files
 
-`Animated` = which SpriteFrames animations this PNG is the placeholder frame
-for, and the frame count the real thing should have. `static` = shown as-is.
+### Trash items
 
-| Path | Size | Animated | What it is |
-|------|------|----------|-----------|
-| `assets/items/item_banana_peel.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `banana_peel` |
-| `assets/items/item_paper_cup.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `paper_cup` |
-| `assets/items/item_baju_organik.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `baju_organik` |
-| `assets/items/item_baju_daur_ulang.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `baju_daur_ulang` |
-| `assets/items/item_baju_b3.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `baju_b3` |
-| `assets/items/item_gelas_kertas_bersih.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `gelas_kertas_bersih` |
-| `assets/items/item_tisu_bekas.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `tisu_bekas` |
-| `assets/items/item_tisu_b3.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `tisu_b3` |
+| File | Size | Animation | What it is |
+|------|------|-----------|------------|
+| `assets/items/box_closed.png` | 160x160 | `closed` 2 fr, `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Mystery box, sealed. State `closed`. |
+| `assets/items/box_opened.png` | 160x160 | `opened` 2 fr | Mystery box, lid open. State `opened`. |
 | `assets/items/item_apel.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `apel` |
+| `assets/items/item_baju_b3.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `baju_b3` |
+| `assets/items/item_baju_daur_ulang.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `baju_daur_ulang` |
+| `assets/items/item_baju_organik.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `baju_organik` |
+| `assets/items/item_banana_peel.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `banana_peel` |
 | `assets/items/item_botol_kaca.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `botol_kaca` |
 | `assets/items/item_cangkang_telur.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `cangkang_telur` |
 | `assets/items/item_daun.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `daun` |
+| `assets/items/item_gelas_kertas_bersih.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `gelas_kertas_bersih` |
 | `assets/items/item_kantong_plastik.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `kantong_plastik` |
 | `assets/items/item_koran.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `koran` |
+| `assets/items/item_paper_cup.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `paper_cup` |
 | `assets/items/item_pizza.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `pizza` |
-| `assets/claw/claw_open.png` | 160x160 | `open` 4 fr | Claw arm, open pose |
-| `assets/claw/claw_closing.png` | 160x160 | `closing` 6 fr | Claw arm, closing pose |
-| `assets/claw/claw_closed.png` | 160x160 | `closed` 2 fr | Claw arm, closed pose |
-| `assets/claw/claw_carrying.png` | 160x160 | `carrying` 6 fr | Claw arm, carrying pose |
-| `assets/claw/claw_cable.png` | 8x64 | static | Cable, stretched vertically from rail to claw |
-| `assets/fish/fish_bg_small.png` | 96x48 | `swim` 6 fr | Background fish. Not grabbable - atmosphere only |
-| `assets/fish/fish_bg_medium.png` | 128x64 | `swim` 6 fr | Background fish. Not grabbable - atmosphere only |
-| `assets/fish/fish_bg_large.png` | 176x88 | `swim` 6 fr | Background fish. Not grabbable - atmosphere only |
-| `assets/bins/bin_organic.png` | 200x240 | `idle` 2 fr | organic bin, idle state |
-| `assets/bins/bin_organic_accept.png` | 200x240 | `accept` 6 fr | organic bin, accept state |
-| `assets/bins/bin_organic_reject.png` | 200x240 | `reject` 6 fr | organic bin, reject state |
-| `assets/bins/bin_organic_highlight.png` | 200x240 | `highlight` 4 fr | organic bin, highlight state |
-| `assets/bins/bin_recyclable.png` | 200x240 | `idle` 2 fr | recyclable bin, idle state |
-| `assets/bins/bin_recyclable_accept.png` | 200x240 | `accept` 6 fr | recyclable bin, accept state |
-| `assets/bins/bin_recyclable_reject.png` | 200x240 | `reject` 6 fr | recyclable bin, reject state |
-| `assets/bins/bin_recyclable_highlight.png` | 200x240 | `highlight` 4 fr | recyclable bin, highlight state |
-| `assets/bins/bin_hazard.png` | 200x240 | `idle` 2 fr | hazard bin, idle state |
-| `assets/bins/bin_hazard_accept.png` | 200x240 | `accept` 6 fr | hazard bin, accept state |
-| `assets/bins/bin_hazard_reject.png` | 200x240 | `reject` 6 fr | hazard bin, reject state |
-| `assets/bins/bin_hazard_highlight.png` | 200x240 | `highlight` 4 fr | hazard bin, highlight state |
-| `assets/bins/bin_landfill.png` | 200x240 | `idle` 2 fr | landfill bin, idle state |
-| `assets/bins/bin_landfill_accept.png` | 200x240 | `accept` 6 fr | landfill bin, accept state |
-| `assets/bins/bin_landfill_reject.png` | 200x240 | `reject` 6 fr | landfill bin, reject state |
-| `assets/bins/bin_landfill_highlight.png` | 200x240 | `highlight` 4 fr | landfill bin, highlight state |
-| `assets/tools/tool_rinse.png` | 96x96 | `idle` 2 fr | Bilas tool, idle |
-| `assets/tools/tool_rinse_using.png` | 96x96 | `using` 4 fr | Bilas tool, using |
-| `assets/tools/tool_rinse_locked.png` | 96x96 | `locked` 1 fr | Bilas tool, locked |
-| `assets/tools/tool_swab.png` | 96x96 | `idle` 2 fr | Usap Kimia tool, idle |
-| `assets/tools/tool_swab_using.png` | 96x96 | `using` 4 fr | Usap Kimia tool, using |
-| `assets/tools/tool_swab_locked.png` | 96x96 | `locked` 1 fr | Usap Kimia tool, locked |
-| `assets/tools/tool_magnifier.png` | 96x96 | `idle` 2 fr | Kaca Pembesar tool, idle |
-| `assets/tools/tool_magnifier_using.png` | 96x96 | `using` 4 fr | Kaca Pembesar tool, using |
-| `assets/tools/tool_magnifier_locked.png` | 96x96 | `locked` 1 fr | Kaca Pembesar tool, locked |
-| `assets/tools/tool_cutter.png` | 96x96 | `idle` 2 fr | Pemotong tool, idle |
-| `assets/tools/tool_cutter_using.png` | 96x96 | `using` 4 fr | Pemotong tool, using |
-| `assets/tools/tool_cutter_locked.png` | 96x96 | `locked` 1 fr | Pemotong tool, locked |
-| `assets/ui/panel_main.png` | 96x96 | static | Main UI panel. NinePatchRect, 24px margins. |
-| `assets/ui/panel_dark.png` | 96x96 | static | Modal / overlay panel: the rulebook and the blueprint component popup. NinePatchRect, 24px margins. |
-| `assets/ui/panel_slot.png` | 96x96 | static | Inventory slot background. NinePatchRect, 24px margins. |
-| `assets/ui/panel_slot_selected.png` | 96x96 | static | Inventory slot, selected. A different PNG rather than a tint. NinePatchRect, 24px margins. |
-| `assets/ui/chip_surface.png` | 64x40 | static | Evidence chip, free surface info (grey). NinePatchRect, 24px margins. |
-| `assets/ui/chip_reveal.png` | 64x40 | static | Evidence chip, tool reveal (gold). NinePatchRect, 24px margins. |
-| `assets/ui/button_normal.png` | 64x64 | static | Button normal state. NinePatch, 20px margins. |
-| `assets/ui/button_hover.png` | 64x64 | static | Button hover state. NinePatch, 20px margins. |
-| `assets/ui/button_pressed.png` | 64x64 | static | Button pressed state. NinePatch, 20px margins. |
+| `assets/items/item_tisu_b3.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `tisu_b3` |
+| `assets/items/item_tisu_bekas.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `tisu_bekas` |
+
+### Sorting bins
+
+| File | Size | Animation | What it is |
+|------|------|-----------|------------|
+| `assets/bins/bin_hazard.png` | 119x136 | `idle` 2 fr | hazard bin, idle state |
+| `assets/bins/bin_landfill.png` | 119x135 | `idle` 2 fr | landfill bin, idle state |
+| `assets/bins/bin_organic.png` | 119x136 | `idle` 2 fr | organic bin, idle state |
+| `assets/bins/bin_outline.png` | 140x156 | static | Highlight ring shown behind whichever bin the revealed evidence points at. One drawing, moved between the four slots. |
+| `assets/bins/bin_recyclable.png` | 119x136 | `idle` 2 fr | recyclable bin, idle state |
+
+### The claw
+
+| File | Size | Animation | What it is |
+|------|------|-----------|------------|
+| `assets/claw/claw_cable.png` | 21x64 | static | Cable, stretched vertically from rail to claw |
+| `assets/claw/claw_carrying.png` | 240x198 | `carrying` 6 fr | Claw arm, carrying pose |
+| `assets/claw/claw_closed.png` | 240x198 | `closed` 2 fr | Claw arm, closed pose |
+| `assets/claw/claw_closing.png` | 240x198 | `closing` 6 fr | Claw arm, closing pose |
+| `assets/claw/claw_open.png` | 240x198 | `open` 4 fr | Claw arm, open pose |
+
+### Backgrounds, cutscene stills and scenery
+
+| File | Size | Animation | What it is |
+|------|------|-----------|------------|
+| `assets/env/bubble.png` | 24x24 | `rise` 6 fr | Bubble, count scales with the VFX slider |
+| `assets/env/coral_dead.png` | 174x140 | `idle` 6 fr | Coral overlay, bleached. Sways in place; count is per ocean tier. |
+| `assets/env/coral_healthy.png` | 157x190 | `idle` 6 fr | Coral overlay, in colour. Sways in place; count is per ocean tier. |
+| `assets/env/cutscene_01.png` | 1280x720 | static | Cutscene still 1 (placeholder) |
+| `assets/env/cutscene_02.png` | 1280x720 | static | Cutscene still 2 (placeholder) |
+| `assets/env/cutscene_03.png` | 1280x720 | static | Cutscene still 3 (placeholder) |
+| `assets/env/cutscene_04.png` | 1280x720 | static | Opening beat 4: the diver, face to face with what lives in the bay. |
+| `assets/env/cutscene_05.png` | 1280x720 | static | Opening beat 5: the three schematics on the workshop desk. |
+| `assets/env/ending_bad.png` | 1280x720 | static | Ending still, 0 machines built. |
+| `assets/env/ending_good.png` | 1280x720 | static | Ending still, all machines built. |
+| `assets/env/hull_wall.png` | 128x128 | static | Submarine hull, tiled at native size over everything outside the window. Must tile seamlessly. |
+| `assets/env/logo.png` | 541x276 | static | Title logo |
+| `assets/env/menu_bg.png` | 1280x720 | static | Main menu backdrop. Full-frame, opaque. |
+| `assets/env/seabed.png` | 1000x140 | static | Seabed floor inside the tank SubViewport, z_index -10 |
+| `assets/env/water_bg.png` | 1280x720 | static | Deep-water backdrop. The furthest parallax layer inside the tank window - scaled from its own size to cover the window, never stretched. |
+
+### Background sea life
+
+| File | Size | Animation | What it is |
+|------|------|-----------|------------|
+| `assets/fish/fish_cute_1.png` | 59x52 | `swim` 1 fr | Background fish, round variant 1. Not grabbable. |
+| `assets/fish/fish_cute_2.png` | 59x52 | `swim` 1 fr | Background fish, round variant 2. Not grabbable. |
+| `assets/fish/fish_cute_3.png` | 59x52 | `swim` 1 fr | Background fish, round variant 3. Not grabbable. |
+| `assets/fish/fish_large_1.png` | 167x88 | `swim` 1 fr | Background fish, large. Not grabbable. |
+| `assets/fish/fish_medium_1.png` | 187x64 | `swim` 1 fr | Background fish, long variant 1. Not grabbable. |
+| `assets/fish/fish_medium_2.png` | 187x64 | `swim` 1 fr | Background fish, long variant 2. Not grabbable. |
+| `assets/fish/fish_small_1.png` | 66x48 | `swim` 1 fr | Background fish, small variant 1. Not grabbable. |
+| `assets/fish/fish_small_2.png` | 66x48 | `swim` 1 fr | Background fish, small variant 2. Not grabbable. |
+| `assets/fish/fish_small_3.png` | 66x48 | `swim` 1 fr | Background fish, small variant 3. Not grabbable. |
+| `assets/fish/jellyfish_1.png` | 70x70 | `swim` 1 fr | Background jellyfish 1. Not grabbable. |
+| `assets/fish/jellyfish_2.png` | 70x70 | `swim` 1 fr | Background jellyfish 2. Not grabbable. |
+
+### Inspection tools
+
+| File | Size | Animation | What it is |
+|------|------|-----------|------------|
+| `assets/tools/tool_cutter.png` | 59x72 | `idle` 1 fr | Cutter. Opens a sealed crate, and does nothing else. One drawing per tool - "armed" is a plate behind the row, not a second drawing. |
+| `assets/tools/tool_magnifier.png` | 56x72 | `idle` 1 fr | Magnifier. Reveals the printed code or label. One drawing per tool - "armed" is a plate behind the row, not a second drawing. |
+| `assets/tools/tool_rinse.png` | 64x72 | `idle` 1 fr | Rinse. Reveals whether residue is still on the item. One drawing per tool - "armed" is a plate behind the row, not a second drawing. |
+| `assets/tools/tool_swab.png` | 46x72 | `idle` 1 fr | Chem Swab. Reveals what kind of residue it is. One drawing per tool - "armed" is a plate behind the row, not a second drawing. |
+
+### Interface chrome, schematics and parts
+
+| File | Size | Animation | What it is |
+|------|------|-----------|------------|
+| `assets/ui/blueprint_ocean_cleaning_drone.png` | 810x590 | static | Ocean Cleaning Drone schematic, unbuilt: the sheet plus the faint lineart of every part. |
+| `assets/ui/blueprint_ocean_cleaning_drone_done.png` | 810x590 | static | Ocean Cleaning Drone schematic, fully inked. Shown once the machine is built. |
+| `assets/ui/blueprint_recycling_station.png` | 810x590 | static | Recycling Station schematic, unbuilt: the sheet plus the faint lineart of every part. |
+| `assets/ui/blueprint_recycling_station_done.png` | 810x590 | static | Recycling Station schematic, fully inked. Shown once the machine is built. |
+| `assets/ui/blueprint_reef_restoration_pod.png` | 810x590 | static | Reef Restoration Pod schematic, unbuilt: the sheet plus the faint lineart of every part. |
+| `assets/ui/blueprint_reef_restoration_pod_done.png` | 810x590 | static | Reef Restoration Pod schematic, fully inked. Shown once the machine is built. |
 | `assets/ui/button_disabled.png` | 64x64 | static | Button disabled state. NinePatch, 20px margins. |
+| `assets/ui/button_hover.png` | 64x64 | static | Button hover state. NinePatch, 20px margins. |
+| `assets/ui/button_normal.png` | 64x64 | static | Button normal state. NinePatch, 20px margins. |
+| `assets/ui/button_pressed.png` | 64x64 | static | Button pressed state. NinePatch, 20px margins. |
+| `assets/ui/chat_bubble.png` | 907x178 | static | Dialogue plate for the cutscene and the ending screen. White inside, so text on it is dark. |
+| `assets/ui/chip_match.png` | 64x40 | static | Evidence chip that satisfies an active rule (green). NinePatchRect, 24px margins. |
+| `assets/ui/chip_reveal.png` | 64x40 | static | Evidence chip, tool reveal (gold). NinePatchRect, 24px margins. |
+| `assets/ui/chip_surface.png` | 64x40 | static | Evidence chip, free surface info (grey). NinePatchRect, 24px margins. |
+| `assets/ui/comp_drone_shell.png` | 393x360 | static | Ocean Cleaning Drone part `drone_shell`, inked. Drawn over the sheet once crafted; before that the sheet's own lineart shows through, so there is no locked variant. |
+| `assets/ui/comp_intake_arm.png` | 151x121 | static | Recycling Station part `intake_arm`, inked. Drawn over the sheet once crafted; before that the sheet's own lineart shows through, so there is no locked variant. |
+| `assets/ui/comp_pod_shell.png` | 398x370 | static | Reef Restoration Pod part `pod_shell`, inked. Drawn over the sheet once crafted; before that the sheet's own lineart shows through, so there is no locked variant. |
+| `assets/ui/comp_press_housing.png` | 381x351 | static | Recycling Station part `press_housing`, inked. Drawn over the sheet once crafted; before that the sheet's own lineart shows through, so there is no locked variant. |
+| `assets/ui/comp_rotor_skid.png` | 460x186 | static | Ocean Cleaning Drone part `rotor_skid`, inked. Drawn over the sheet once crafted; before that the sheet's own lineart shows through, so there is no locked variant. |
+| `assets/ui/comp_seeding_arm.png` | 90x189 | static | Reef Restoration Pod part `seeding_arm`, inked. Drawn over the sheet once crafted; before that the sheet's own lineart shows through, so there is no locked variant. |
+| `assets/ui/comp_sorting_belt.png` | 206x132 | static | Recycling Station part `sorting_belt`, inked. Drawn over the sheet once crafted; before that the sheet's own lineart shows through, so there is no locked variant. |
+| `assets/ui/desk_bg.png` | 1280x720 | static | The whole sorting desk - top bar, panel frames, bin slots. Full-frame, opaque. Every desk node is positioned into a slot painted in here. |
+| `assets/ui/desk_meter_frame.png` | 703x48 | static | Frame around the blueprint progress strip at the top of the desk. |
 | `assets/ui/icon_check.png` | 48x48 | static | HUD icon (V) |
 | `assets/ui/icon_cross.png` | 48x48 | static | HUD icon (X) |
 | `assets/ui/icon_pause.png` | 48x48 | static | HUD icon (II) |
-| `assets/ui/chip_match.png` | 64x40 | static | Evidence chip that satisfies an active rule (green). NinePatchRect, 24px margins. |
-| `assets/ui/minimap_item.png` | 10x10 | static | Minimap dot for one item on the seabed |
-| `assets/ui/meter_bg.png` | 320x32 | static | Ocean health meter bg. Fill is clipped by width. |
-| `assets/ui/meter_fill.png` | 320x32 | static | Ocean health meter fill. Fill is clipped by width. |
-| `assets/ui/slider_track.png` | 64x16 | static | Volume slider track. NinePatch, 8px margins, stretched to width. |
-| `assets/ui/slider_fill.png` | 64x16 | static | Volume slider fill, the part left of the knob. NinePatch, 8px margins. |
-| `assets/ui/slider_grabber.png` | 32x32 | static | Volume slider knob. |
-| `assets/ui/slider_grabber_hover.png` | 32x32 | static | Volume slider knob, hovered/held. |
-| `assets/ui/toggle_off.png` | 64x32 | static | Settings toggle, off state. Own drawing, not a tint of the on state. |
-| `assets/ui/toggle_on.png` | 64x32 | static | Settings toggle, on state. |
-| `assets/ui/scrollbar_track.png` | 16x64 | static | Scrollbar track. NinePatch, 8px margins, stretched to length. |
-| `assets/ui/scrollbar_grabber.png` | 16x64 | static | Scrollbar grabber. NinePatch, 8px margins, stretched to length. |
-| `assets/ui/scrollbar_grabber_hover.png` | 16x64 | static | Scrollbar grabber, hovered/dragged. |
-| `assets/ui/textfield_normal.png` | 64x40 | static | Text field. NinePatch, 12px margins, stretched. |
-| `assets/ui/textfield_focus.png` | 64x40 | static | Text field, focused. NinePatch, 12px margins. |
 | `assets/ui/icon_pause_pressed.png` | 48x48 | static | Pause button, pressed state. |
-| `assets/env/water_bg.png` | 1280x720 | static | Deep-water backdrop. The furthest parallax layer inside the tank window - scaled from its own size to cover the window, never stretched. |
-| `assets/env/hull_wall.png` | 128x128 | static | Submarine hull, tiled at native size over everything outside the window. Must tile seamlessly. |
 | `assets/ui/machine_frame.png` | 1280x720 | static | The whole cockpit: hull, window surround, glass streaks, panels. Drawn over the tank; the window opening is the transparent rect at (216,122) 848x408. |
 | `assets/ui/machine_grab.png` | 128x122 | static | GRAB button, resting. Drops the claw. |
 | `assets/ui/machine_grab_pressed.png` | 128x122 | static | GRAB button, pushed. Same crop as the resting state so it does not jump. |
@@ -275,60 +235,31 @@ for, and the frame count the real thing should have. `static` = shown as-is.
 | `assets/ui/machine_left_pressed.png` | 142x116 | static | Left arrow button, pushed. |
 | `assets/ui/machine_right.png` | 140x116 | static | Right arrow button, resting. |
 | `assets/ui/machine_right_pressed.png` | 140x116 | static | Right arrow button, pushed. |
-| `assets/ui/machine_sorting.png` | 216x135 | static | SORTING folder button, resting. Switches to the desk. |
-| `assets/ui/machine_sorting_hover.png` | 216x135 | static | SORTING folder button, hovered. |
 | `assets/ui/machine_settings.png` | 44x46 | static | Settings cog, resting. Opens the pause menu. |
 | `assets/ui/machine_settings_hover.png` | 44x46 | static | Settings cog, hovered. |
 | `assets/ui/machine_slider.png` | 322x64 | static | The marker that slides along the top rail, showing which slice of the seabed the window is on. Moves in code; the rail behind it is part of machine_frame. |
-| `assets/env/coral_dead.png` | 174x140 | static | Far parallax scenery, planted along the back of the seabed. Cut-out; drawn at this size, so this row decides how big it reads. |
-| `assets/env/coral_healthy.png` | 157x190 | static | Mid parallax scenery, nearer than the dead coral. Cut-out, drawn at this size. |
-| `assets/env/seabed.png` | 1000x140 | static | Seabed floor inside the tank SubViewport, z_index -10 |
-| `assets/env/bubble.png` | 24x24 | `rise` 6 fr | Bubble, count scales with the VFX slider |
-| `assets/env/cutscene_01.png` | 960x540 | static | Cutscene still 1 (placeholder) |
-| `assets/env/cutscene_02.png` | 960x540 | static | Cutscene still 2 (placeholder) |
-| `assets/env/cutscene_03.png` | 960x540 | static | Cutscene still 3 (placeholder) |
-| `assets/env/logo.png` | 640x200 | static | Title logo |
-| `assets/env/coral_healthy.png` | 120x140 | `idle` 6 fr | Coral overlay, in colour. Sways in place; count is per ocean tier. |
-| `assets/env/coral_dead.png` | 120x140 | `idle` 6 fr | Coral overlay, bleached. Sways in place; count is per ocean tier. |
-| `assets/items/box_closed.png` | 160x160 | `closed` 2 fr, `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Mystery box, sealed. State `closed`. |
-| `assets/items/box_opened.png` | 160x160 | `opened` 2 fr | Mystery box, lid open. State `opened`. |
-| `assets/ui/blueprint_bg_cleaner_drone.png` | 960x540 | static | Blueprint schematic sheet for `cleaner_drone`. Parts sit on top from normalized coords in the .tres. |
-| `assets/ui/blueprint_bg_cleaner_drone_ready.png` | 628x396 | static | Cleaner Drone blueprint sheet, every part crafted and ready to build. |
-| `assets/ui/blueprint_bg_cleaner_drone_done.png` | 628x396 | static | Cleaner Drone blueprint sheet, stamped built. |
-| `assets/ui/blueprint_bg_penyaring_mikroplastik.png` | 960x540 | static | Blueprint schematic sheet for `penyaring_mikroplastik`. Parts sit on top from normalized coords in the .tres. |
-| `assets/ui/blueprint_bg_penetral_b3.png` | 960x540 | static | Blueprint schematic sheet for `penetral_b3`. Parts sit on top from normalized coords in the .tres. |
-| `assets/ui/comp_drone_body_done.png` | 128x128 | static | Blueprint component `drone_body`, done. |
-| `assets/ui/comp_drone_body_locked.png` | 128x128 | static | Blueprint component `drone_body`, locked. |
-| `assets/ui/comp_bio_core_done.png` | 128x128 | static | Blueprint component `bio_core`, done. |
-| `assets/ui/comp_bio_core_locked.png` | 128x128 | static | Blueprint component `bio_core`, locked. |
-| `assets/ui/comp_intake_fin_done.png` | 128x128 | static | Blueprint component `intake_fin`, done. |
-| `assets/ui/comp_intake_fin_locked.png` | 128x128 | static | Blueprint component `intake_fin`, locked. |
-| `assets/ui/comp_filter_mesh_done.png` | 128x128 | static | Blueprint component `filter_mesh`, done. |
-| `assets/ui/comp_filter_mesh_locked.png` | 128x128 | static | Blueprint component `filter_mesh`, locked. |
-| `assets/ui/comp_pump_housing_done.png` | 128x128 | static | Blueprint component `pump_housing`, done. |
-| `assets/ui/comp_pump_housing_locked.png` | 128x128 | static | Blueprint component `pump_housing`, locked. |
-| `assets/ui/comp_collection_tank_done.png` | 128x128 | static | Blueprint component `collection_tank`, done. |
-| `assets/ui/comp_collection_tank_locked.png` | 128x128 | static | Blueprint component `collection_tank`, locked. |
-| `assets/ui/comp_sealed_chamber_done.png` | 128x128 | static | Blueprint component `sealed_chamber`, done. |
-| `assets/ui/comp_sealed_chamber_locked.png` | 128x128 | static | Blueprint component `sealed_chamber`, locked. |
-| `assets/ui/comp_neutralizer_cell_done.png` | 128x128 | static | Blueprint component `neutralizer_cell`, done. |
-| `assets/ui/comp_neutralizer_cell_locked.png` | 128x128 | static | Blueprint component `neutralizer_cell`, locked. |
-| `assets/ui/comp_safety_valve_done.png` | 128x128 | static | Blueprint component `safety_valve`, done. |
-| `assets/ui/comp_safety_valve_locked.png` | 128x128 | static | Blueprint component `safety_valve`, locked. |
-
-## The font — the one thing that is not a PNG yet
-
-Every visual in the table above is a file you can replace. Text is not: the game
-currently renders with **Godot's built-in font**, because no typeface has been
-chosen. That is the only pixel on screen that is not yours yet.
-
-To claim it, drop a `.ttf` or `.otf` at `assets/ui/fonts/ui_font.ttf`, then add
-one line to `assets/ui/ui_theme.tres` under `[resource]`:
-
-    default_font = ExtResource("<the font's id>")
-
-Sizes stay where they are (`default_font_size = 18`, buttons 20) so nothing
-re-lays out. Pick something that reads at 18px — this is a text-heavy game.
+| `assets/ui/machine_sorting.png` | 216x135 | static | SORTING folder button, resting. Switches to the desk. |
+| `assets/ui/machine_sorting_hover.png` | 216x135 | static | SORTING folder button, hovered. |
+| `assets/ui/meter_bg.png` | 320x32 | static | Ocean health meter bg. Fill is clipped by width. |
+| `assets/ui/meter_fill.png` | 320x32 | static | Ocean health meter fill. Fill is clipped by width. |
+| `assets/ui/minimap_item.png` | 10x10 | static | Minimap dot for one item on the seabed |
+| `assets/ui/panel_dark.png` | 96x96 | static | Modal / overlay panel: the rulebook and the blueprint component popup. NinePatchRect, 24px margins. |
+| `assets/ui/panel_main.png` | 96x96 | static | Main UI panel. NinePatchRect, 24px margins. |
+| `assets/ui/panel_slot.png` | 173x83 | static | Inventory slot background. NinePatchRect, 24px margins. |
+| `assets/ui/panel_slot_selected.png` | 173x83 | static | Inventory slot, selected. A different PNG rather than a tint. NinePatchRect, 24px margins. |
+| `assets/ui/scrollbar_grabber.png` | 16x64 | static | Scrollbar grabber. NinePatch, 8px margins, stretched to length. |
+| `assets/ui/scrollbar_grabber_hover.png` | 16x64 | static | Scrollbar grabber, hovered/dragged. |
+| `assets/ui/scrollbar_track.png` | 16x64 | static | Scrollbar track. NinePatch, 8px margins, stretched to length. |
+| `assets/ui/slider_fill.png` | 64x16 | static | Volume slider fill, the part left of the knob. NinePatch, 8px margins. |
+| `assets/ui/slider_grabber.png` | 32x32 | static | Volume slider knob. |
+| `assets/ui/slider_grabber_hover.png` | 32x32 | static | Volume slider knob, hovered/held. |
+| `assets/ui/slider_track.png` | 64x16 | static | Volume slider track. NinePatch, 8px margins, stretched to width. |
+| `assets/ui/textfield_focus.png` | 64x40 | static | Text field, focused. NinePatch, 12px margins. |
+| `assets/ui/textfield_normal.png` | 64x40 | static | Text field. NinePatch, 12px margins, stretched. |
+| `assets/ui/toggle_off.png` | 64x32 | static | Settings toggle, off state. Own drawing, not a tint of the on state. |
+| `assets/ui/toggle_on.png` | 64x32 | static | Settings toggle, on state. |
+| `assets/ui/tool_rack_frame.png` | 187x287 | static | Frame around the four-tool rack in the inspect panel. |
+| `assets/ui/tool_row_selected.png` | 187x67 | static | Plate slid in behind the armed tool. The tool art itself never changes. |
 
 ---
 

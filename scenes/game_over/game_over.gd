@@ -1,12 +1,14 @@
-# three endings, decided by how many machines were built - nothing else.
+# four endings, one per machine built - nothing else feeds into it.
 extends Node2D
 
 
 func _ready() -> void:
-	var kind := Game.ending_kind()
+	var tier := Game.ending_tier()
 	var root := $UiLayer/Root
-	root.get_node("TitleLabel").text = Strings.t("end_%s_title" % kind)
-	root.get_node("BodyLabel").text = Strings.tf("end_%s_body" % kind,
+	$StillLayer/Still.texture = load(Game.ending_still())
+	root.get_node("TitleLabel").text = Strings.t("end_%d_title" % tier)
+	root.get_node("BodyLabel").text = Strings.t("end_%d_body" % tier)
+	root.get_node("BuiltLabel").text = Strings.tf("end_built",
 		{"have": Game.unlocked_blueprints.size(), "need": Game.blueprints.size()})
 	var retry: Button = root.get_node("Buttons/RetryButton")
 	var menu: Button = root.get_node("Buttons/MenuButton")

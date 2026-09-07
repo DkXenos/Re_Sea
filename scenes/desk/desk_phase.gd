@@ -1,5 +1,9 @@
 # inventory, inspect, pick a bin. bins are always clickable and nothing here
 # ever says whether you got it right.
+#
+# the desk art is a whole screen with its own readouts and its own buttons, the
+# same way the claw cockpit is, so the shift bar stays hidden and these labels
+# sit in the slots painted into the background.
 extends Node2D
 
 @onready var _inventory: Control = $UiLayer/Root/InventoryPanel
@@ -8,6 +12,12 @@ extends Node2D
 @onready var _rulebook: Control = $RulebookLayer/RulebookPanel
 @onready var _toast: Label = $UiLayer/Root/Toast
 @onready var _rulebook_button: Button = $UiLayer/Root/RulebookButton
+@onready var _day_label: Label = $UiLayer/Root/DayLabel
+@onready var _quota_label: Label = $UiLayer/Root/QuotaLabel
+@onready var _budget_label: Label = $UiLayer/Root/BudgetLabel
+@onready var _switch_button: Button = $UiLayer/Root/SwitchButton
+@onready var _end_button: Button = $UiLayer/Root/EndButton
+@onready var _settings_button: Button = $UiLayer/Root/SettingsButton
 
 var _day: DayData
 var _active: bool = true
@@ -15,7 +25,14 @@ var _active: bool = true
 
 func _ready() -> void:
 	_day = Game.current_day()
-	_rulebook_button.text = Strings.t("desk_rulebook_button")
+	_rulebook_button.text = Strings.t("desk_rulebook_short")
+	_rulebook_button.tooltip_text = Strings.t("desk_rulebook_button")
+	_switch_button.text = Strings.t("shift_to_claw")
+	_end_button.text = Strings.t("shift_end")
+	_settings_button.tooltip_text = Strings.t("menu_settings")
+	_switch_button.pressed.connect(func() -> void: Events.view_switch_requested.emit())
+	_end_button.pressed.connect(func() -> void: Events.shift_end_requested.emit())
+	_settings_button.pressed.connect(func() -> void: Events.pause_requested.emit())
 	_toast.text = ""
 	_inventory.item_selected.connect(_on_item_selected)
 	_bins.bin_chosen.connect(_on_bin_chosen)
@@ -27,6 +44,21 @@ func _ready() -> void:
 
 	_inventory.refresh()
 	_inventory.select_first()
+	_refresh_readouts()
+
+
+func _process(_delta: float) -> void:
+	if _active:
+		_refresh_readouts()
+
+
+# the readouts painted into the desk: the day, the target, the shift time left
+func _refresh_readouts() -> void:
+	if _day == null:
+		return
+	_day_label.text = Strings.tf("day_label", {"n": _day.day_number})
+	_quota_label.text = "%d / %d" % [int(Game.stats.get("sorted", 0)), _day.quota]
+	_budget_label.text = "%d" % Game.budget_left
 
 
 # only the debug command that needs the inspected item

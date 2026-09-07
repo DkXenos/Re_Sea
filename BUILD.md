@@ -84,8 +84,12 @@ Batas lomba 300 MB. Kondisi saat ini jauh di bawahnya:
 
 | Build | Ukuran |
 |---|---|
-| Web (zip) | ±15 MB |
-| Windows (zip) | perkiraan ±30 MB |
+| Web (zip) | ±20 MB |
+| Windows (zip) | perkiraan ±35 MB |
+
+Master ilustrasi berukuran penuh (2560×1440) **tidak** disimpan di dalam
+project — letaknya di `/Users/jaysn/Re-Sea-art-masters/`. Jangan memindahkannya
+kembali ke `assets/`, karena seluruh isinya akan ikut terpaket ke build.
 
 ---
 

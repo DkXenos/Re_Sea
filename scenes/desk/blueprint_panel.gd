@@ -11,9 +11,9 @@ extends Control
 const ROW_BG := preload("res://assets/ui/panel_slot.png")
 const BAR_BG := preload("res://assets/ui/meter_bg.png")
 const BAR_FILL := preload("res://assets/ui/meter_fill.png")
-# 3 rows + 2 separators have to fit in 702px. they didn't, and the overflow
-# ran under the rulebook button.
-const ROW_WIDTH := 228.0
+# 3 rows + 2 separators of 8 have to fit the strip painted into the desk art,
+# which is 639px wide. they didn't, and the overflow ran under the info button.
+const ROW_WIDTH := 207.0
 const BAR_WIDTH := 88.0
 
 @onready var _rows: HBoxContainer = $Rows

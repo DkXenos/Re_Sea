@@ -25,22 +25,28 @@ func _run() -> void:
 	quit()
 
 
-## Every machine is the good ending, none at all is the bad one.
+## One tier per machine built: 0 is the bay left as it was, every machine is the
+## full recovery, and each step between has its own screen.
 func _check_endings() -> void:
 	var total: int = game.blueprints.size()
 	game.start_run()
-	assert(game.ending_kind() == &"bad",
-		"no blueprints must be the bad ending, got %s" % game.ending_kind())
+	assert(game.ending_tier() == 0,
+		"no blueprints must be tier 0, got %d" % game.ending_tier())
 	for i in total:
 		game.unlocked_blueprints.append(game.blueprints[i].id)
-		var got: StringName = game.ending_kind()
-		var want: StringName = &"good" if i + 1 >= total else &"regular"
-		assert(got == want, "%d/%d blueprints should be %s, got %s"
-			% [i + 1, total, want, got])
-	print("  0 -> bad, 1..%d -> regular, %d -> good" % [total - 1, total])
-	# every ending must have text, or the screen renders blank
-	for kind: String in ["bad", "regular", "good"]:
+		assert(game.ending_tier() == i + 1, "%d blueprints should be tier %d, got %d"
+			% [i + 1, i + 1, game.ending_tier()])
+	print("  %d machines -> %d tiers, one per machine" % [total, total + 1])
+	# every tier must have text and a still, or the screen renders blank
+	for tier in total + 1:
 		for part: String in ["title", "body"]:
-			var key := "end_%s_%s" % [kind, part]
+			var key := "end_%d_%s" % [tier, part]
 			assert(Strings.t(key) != key, "missing string: %s" % key)
-	print("  all three endings have a title and a body")
+	game.start_run()
+	for tier in total + 1:
+		if tier > 0:
+			game.unlocked_blueprints.append(game.blueprints[tier - 1].id)
+		var still: String = game.ending_still()
+		assert(ResourceLoader.exists(still),
+			"tier %d points at a still that is not there: %s" % [tier, still])
+	print("  every tier has a title, a body and a still")

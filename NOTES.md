@@ -36,6 +36,10 @@ tests/run_all.sh greps for the tween case.
 - one png, one thing. no atlases.
 - paths and sizes are in assets/ASSETS.md, designers drop replacements at the
   same path/size and nothing else changes
+- delivered art arrives on a 2560x1440 canvas, exactly 2x the game. crop each
+  piece to its alpha box, halve it, done. masters live OUTSIDE the project.
+- bins and tools ship as one drawing each. state is an overlay png moved behind
+  them (bin_outline, tool_row_selected), never a tint and never a second draw.
 
 ## tools
 
@@ -85,6 +89,14 @@ The sea only exists inside the tank SubViewport, so the frame really is a
 window - outside it is hull. Depth layers are rows in ClawPhase's
 PARALLAX_LAYERS; each is sized off its own texture and never stretched. Add a
 row to add a layer.
+
+## the two cockpits
+
+Both the claw screen and the sorting desk are whole-screen drawings that carry
+their own readouts and buttons, so `shift_phase`'s bar stays hidden and only
+surfaces to announce the shift is over. Each screen's buttons ask for what they
+need through Events (view_switch_requested, shift_end_requested,
+pause_requested) rather than reaching for shift_phase.
 
 ## the machine cockpit
 

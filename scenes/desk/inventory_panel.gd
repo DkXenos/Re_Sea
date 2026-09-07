@@ -30,13 +30,15 @@ func refresh() -> void:
 
 func _make_card(entry: CarriedItem) -> Control:
 	var card := Control.new()
-	card.custom_minimum_size = Vector2(250, 84)
+	# the desk art gives the list a 204px column, so the card has to fit inside
+	# it with room for the scrollbar - 250 ran off the edge and clipped every name
+	card.custom_minimum_size = Vector2(186, 76)
 
 	var bg := NinePatchRect.new()
 	# different png again, not a tint
 	bg.texture = SLOT_BG_SELECTED if entry == _selected else SLOT_BG
 	for side: String in ["left", "top", "right", "bottom"]:
-		bg.set("patch_margin_" + side, 24)
+		bg.set("patch_margin_" + side, 18)
 	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
 	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	card.add_child(bg)
@@ -55,7 +57,7 @@ func _make_card(entry: CarriedItem) -> Control:
 
 	var icon := TextureRect.new()
 	icon.texture = entry.display_texture()
-	icon.custom_minimum_size = Vector2(64, 64)
+	icon.custom_minimum_size = Vector2(52, 52)
 	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
@@ -71,7 +73,7 @@ func _make_card(entry: CarriedItem) -> Control:
 	var label := Label.new()
 	label.text = entry.data.display_name
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	label.add_theme_font_size_override("font_size", 14)
+	label.add_theme_font_size_override("font_size", 13)
 	lines.add_child(label)
 
 	# a sealed crate has no bin and no evidence - the only thing you can do to

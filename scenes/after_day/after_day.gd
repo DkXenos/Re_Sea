@@ -314,11 +314,16 @@ func _build_diagram(bp: BlueprintData) -> void:
 func _make_component(component: ComponentData, origin: Vector2, drawn: Vector2,
 		scale_factor: float) -> Control:
 	var done := Game.component_crafted(component)
+	# The sheet already carries the faint lineart of every part, so an uncrafted
+	# component draws nothing and lets that show through. Its box still comes
+	# from the finished drawing, or the click target would move once it is built.
 	var texture: Texture2D = component.done_texture if done else component.locked_texture
+	var sized: Texture2D = component.done_texture if component.done_texture != null \
+		else component.locked_texture
 	# whole pixels. the fitted scale is never exact and the layout check counts
 	# a part 0.000001px wider than its box as escaping it.
-	var display: Vector2 = (texture.get_size() * scale_factor).round() \
-		if texture != null else Vector2(96, 96)
+	var display: Vector2 = (sized.get_size() * scale_factor).round() \
+		if sized != null else Vector2(96, 96)
 
 	var holder := Control.new()
 	holder.position = (origin + component.diagram_position * drawn

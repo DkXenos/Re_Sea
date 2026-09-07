@@ -83,13 +83,17 @@ tugas pemain adalah mengangkatnya, memeriksanya, lalu memilahnya.
 
 Naskah pembuka permainan terdiri atas tiga baris yang tampil di layar `cutscene`:
 
-> *"This bay used to be full of fish. Now it is full of what the land throws away."*
+> *"The bay used to be loud. Gulls arguing, waves turning over, a crab picking a fight with the tide."*
 >
-> *"Every day the current brings a new delivery. Some of it is obvious. Some of it is in disguise."*
+> *"One became a hundred. A hundred became the delivery the current brings every single day."*
 >
-> *"You run the claw. Lift it, inspect it, sort it. The sea counts every decision you make."*
+> *"And none of it arrives labelled. A clean cup and a lined one sink in exactly the same way."*
+>
+> *"But a machine is only as good as what we feed it, and the sea does not sort itself."*
+>
+> *"Lower the claw. Look before you decide."*
 
-Baris ketiga adalah tesis permainannya. Yang dihitung bukan berapa banyak sampah
+Baris terakhir adalah tesis permainannya. Yang dihitung bukan berapa banyak sampah
 yang diangkat, melainkan **keputusan** yang diambil atas setiap benda. Material
 yang dipilah dengan benar dikirim ke bengkel dan menjadi bahan untuk membangun
 tiga mesin pembersih laut. Material yang salah pilah tidak sampai ke mana-mana.
@@ -198,7 +202,7 @@ sesedikit mungkin, sedangkan biaya peluang mendorong pemain **belajar memeriksa*
 dan kemampuan memeriksa itulah perilaku yang ingin dibawa keluar dari permainan.
 
 Tiga mesin yang dibangun pemain memberikan kerangka harapan yang proporsional:
-`Cleaner Drone`, `Microplastic Filter`, dan `Hazardous Waste Neutraliser`. Ketiganya
+`Ocean Cleaning Drone`, `Recycling Station`, dan `Reef Restoration Pod`. Ketiganya
 mewakili tiga pendekatan nyata terhadap pencemaran laut — pengumpulan,
 penyaringan, dan penetralan limbah berbahaya. Akhir permainan ditentukan murni
 oleh berapa banyak dari ketiganya yang berhasil dibangun, dan permainan tidak
@@ -333,7 +337,7 @@ memutuskan tujuan berikutnya.
 
 ```
 main_menu
-   └─> cutscene            tiga gambar diam + tiga baris narasi, dapat dilewati
+   └─> cutscene            lima gambar diam, sebelas baris narasi, dapat dilewati
         └─> day_start      aturan hari ini, target, jatah waktu, alat
              └─> shift     ┌── Claw Machine  ─┐  dua tampilan,
                            └── Sorting Desk  ─┘  satu anggaran, Tab
@@ -349,11 +353,13 @@ anggaran yang sama dan daftar benda yang sama, dan berpindah di antara keduanya
 tidak memakan biaya apa pun. Benda-benda baru tetap berdatangan ke dasar laut
 meskipun pemain sedang berada di meja pemilahan.
 
-Perbedaan tampilan keduanya juga disengaja. Layar mesin capit adalah satu gambar
-kokpit utuh yang sudah memuat kalender, panel waktu shift, panel target, dan panel
-mesin di dalam ilustrasinya sendiri, sehingga bilah antarmuka tambahan
-disembunyikan. Layar meja pemilahan belum memiliki bingkai sendiri, sehingga masih
-menampilkan bilah tersebut.
+Keduanya kini sama-sama merupakan gambar layar penuh dengan bacaan dan tombolnya
+sendiri. Layar mesin capit memuat kalender, panel waktu shift, panel target dan
+panel mesin di dalam ilustrasi kokpitnya; layar meja pemilahan memuat bilah atas
+berisi hari, target, sisa waktu, tombol pindah tampilan, tombol akhiri shift dan
+roda gigi pengaturan. Tidak ada bilah antarmuka tambahan yang dilapiskan di atas
+gambar mana pun — satu-satunya yang muncul di luar keduanya adalah plat kalimat
+penutup ketika shift berakhir.
 
 ### 2.1.3 Progresi Kesulitan
 
@@ -390,7 +396,7 @@ ke `HAZARDOUS` pada hari ke-3 ketika aturan residu kimia berprioritas 40 mulai
 aktif. Hafalan dari hari sebelumnya justru menyesatkan.
 
 **Keempat, ketersediaan material `HAZARDOUS`.** Benda berkategori `HAZARDOUS` baru
-muncul mulai hari ke-3. Karena `Hazardous Waste Neutraliser` membutuhkan 5 material
+muncul mulai hari ke-3. Karena `Reef Restoration Pod` membutuhkan 5 material
 `HAZARDOUS`, mesin ketiga secara alamiah terkunci hingga paruh kedua permainan
 tanpa memerlukan penguncian buatan.
 
@@ -420,14 +426,15 @@ bahwa target dihitung dari **jumlah benda yang dipilah**, benar maupun salah —
 sehingga pemain dapat mencapai target sambil pulang dengan gudang kosong.
 
 **Akhir permainan.** Setelah hari kelima, permainan berpindah ke `game_over` dan
-menampilkan satu dari tiga akhir, ditentukan **semata-mata** oleh jumlah mesin yang
-berhasil dibangun:
+menampilkan satu dari **empat** akhir — satu tingkat untuk setiap mesin —
+ditentukan **semata-mata** oleh jumlah mesin yang berhasil dibangun:
 
-| Mesin dibangun | Akhir | Judul di layar |
-|---|---|---|
-| 0 | buruk | `THE SEA WAS LEFT BEHIND` |
-| 1 – 2 | biasa | `A START` |
-| 3 | baik | `THE BAY RECOVERED` |
+| Mesin dibangun | Judul di layar |
+|---|---|
+| 0 | `THE BAY WAS LEFT AS IT WAS` |
+| 1 | `A FIRST MACHINE` |
+| 2 | `THE WATER IS TURNING` |
+| 3 | `THE BAY CAME BACK` |
 
 Tidak ada kondisi kalah yang menghentikan permainan di tengah jalan. Pemain selalu
 menyelesaikan kelima hari; yang berbeda hanyalah apa yang tersisa di akhir. Logika
@@ -561,6 +568,11 @@ Sebaliknya, alat yang **menolak melakukan pekerjaan yang bukan bagiannya** —
 tersegel — tidak menghabiskan apa pun, karena itu adalah salah klik, bukan
 percobaan.
 
+Alat yang sedang dipilih ditandai oleh plat yang muncul di belakang barisnya di
+rak; gambar alatnya sendiri tidak pernah berubah. Alat yang tidak tersedia hari
+itu tetap tampil utuh, tetapi barisnya diberi keterangan `not today` dan tidak
+dapat diklik.
+
 Setiap temuan ditambahkan sebagai kartu ke `EVIDENCE LOG`. Kartu yang **memenuhi**
 salah satu aturan hari itu berubah menjadi tekstur berbeda, dan pada saat yang
 sama bin yang bersangkutan menyala di baris bin. Penalaran dan kesimpulan menyala
@@ -597,11 +609,14 @@ sekali.
 | 2 | `HAZARDOUS` |
 | 3 | `LANDFILL` |
 
-Ketika pemain memilih bin, bin tersebut memainkan animasi `accept`. **Animasi ini
-tidak berarti jawabannya benar** — ia hanya berarti bin menerima benda tersebut.
-Animasi `reject` hanya muncul untuk tiga hal yang secara mekanis mustahil:
-tidak ada benda yang dipilih, benda tersebut adalah `Sealed Crate` yang belum
-dibuka, atau `Shift time` tidak mencukupi.
+Satu-satunya isyarat visual pada baris bin adalah cincin sorot yang berpindah ke
+bin yang **ditunjuk oleh bukti yang sudah terkumpul** — dan cincin itu hanya
+muncul apabila pemain benar-benar sudah membuka properti yang menjadi kunci
+aturannya. Bin tidak pernah memberi tanda benar atau salah pada saat pemilahan.
+Penolakan hanya terjadi untuk tiga hal yang secara mekanis mustahil — tidak ada
+benda yang dipilih, benda tersebut `Sealed Crate` yang belum dibuka, atau
+`Shift time` tidak mencukupi — dan ketiganya dijelaskan lewat pesan singkat
+beserta bunyi penolakan, bukan lewat perubahan gambar.
 
 **Konsekuensi kesalahan.** Ini adalah aturan paling penting dalam permainan:
 
@@ -771,18 +786,16 @@ Setelah ketiga komponen terakit, tombol `BUILD {nama mesin}` menjadi aktif.
 
 | Mesin | Komponen | Kebutuhan material |
 |---|---|---|
-| **`Cleaner Drone`** | Drone Body | 2 `RECYCLABLE` |
-| | Bio Core | 2 `ORGANIC` + 1 `LANDFILL` |
-| | Intake Fin | 1 `ORGANIC` + 1 `RECYCLABLE` |
-| **`Microplastic Filter`** | Filter Mesh | 2 `RECYCLABLE` |
-| | Pump Housing | 3 `LANDFILL` |
-| | Collection Tank | 2 `ORGANIC` + 1 `RECYCLABLE` |
-| **`Hazardous Waste Neutraliser`** | Sealed Chamber | 3 `LANDFILL` |
-| | Neutraliser Cell | 2 `ORGANIC` + 3 `HAZARDOUS` |
-| | Safety Valve | 2 `HAZARDOUS` + 1 `LANDFILL` |
+| **`Ocean Cleaning Drone`** | Drone Shell | 1 `ORGANIC` + 2 `RECYCLABLE` |
+| | Rotor Skid | 2 `ORGANIC` + 1 `LANDFILL` |
+| **`Recycling Station`** | Intake Arm | 2 `RECYCLABLE` |
+| | Sorting Belt | 3 `LANDFILL` |
+| | Press Housing | 2 `ORGANIC` + 2 `RECYCLABLE` |
+| **`Reef Restoration Pod`** | Pod Shell | 2 `ORGANIC` + 3 `LANDFILL` |
+| | Seeding Arm | 5 `HAZARDOUS` |
 
 Total untuk menyelesaikan ketiganya: **7 `ORGANIC`, 6 `RECYCLABLE`, 5 `HAZARDOUS`,
-dan 8 `LANDFILL`** — atau **26 benda yang dipilah dengan benar** dari akumulasi
+dan 7 `LANDFILL`** — atau **25 benda yang dipilah dengan benar** dari akumulasi
 target lima hari sebesar 41 pemilahan.
 
 Material dikreditkan **hanya sekali, pada layar `report`**, tidak pada saat
@@ -822,9 +835,9 @@ menekan tombol pada perlengkapan yang sedang terpasang akan melepasnya.
 |---|---|---|---|
 | `Light Claw` | penjatuhan seharga 4, bukan 6 | peluang cengkeram turun 15 poin | sejak awal |
 | `Coarse Scanner` | alat seharga 2, bukan 4 | pembacaan kabur; membaca sesungguhnya butuh satu pemakaian lagi seharga 4 | sejak awal |
-| `Fast Rail` | capit bergerak 60 % lebih cepat | rel terkunci 2 detik setiap selesai menjatuhkan | setelah `Cleaner Drone` dibangun |
-| `Strong Grip` | peluang cengkeram naik 15 poin | penjatuhan seharga 8, bukan 6 | setelah `Microplastic Filter` dibangun |
-| `Twin Arms` | alat seharga 3, bukan 4 | capit bergerak 25 % lebih lambat | setelah `Hazardous Waste Neutraliser` dibangun |
+| `Fast Rail` | capit bergerak 60 % lebih cepat | rel terkunci 2 detik setiap selesai menjatuhkan | setelah `Ocean Cleaning Drone` dibangun |
+| `Strong Grip` | peluang cengkeram naik 15 poin | penjatuhan seharga 8, bukan 6 | setelah `Recycling Station` dibangun |
+| `Twin Arms` | alat seharga 3, bukan 4 | capit bergerak 25 % lebih lambat | setelah `Reef Restoration Pod` dibangun |
 
 Keuntungan dan kerugian **selalu ditampilkan bersamaan**, dengan tanda `+` hijau
 dan `-` oranye. Bilah antarmuka pada layar shift juga selalu menampilkan biaya
@@ -903,7 +916,7 @@ pemeriksaan otomatis yang gagal apabila menemukan `_draw()`, `ColorRect`,
 
 | Jenis | Jumlah | Keterangan |
 |---|---|---|
-| Aset visual (PNG) | **127** | seluruhnya di `assets/` |
+| Aset visual (PNG) | **116** | seluruhnya di `assets/` |
 | Aset audio (WAV) | **11** | efek suara, `assets/audio/` |
 | Berkas font | **0** | permainan memakai font bawaan Godot |
 | Definisi animasi (`SpriteFrames`) | **29** | `data/frames/*.tres` |
@@ -913,12 +926,12 @@ pemeriksaan otomatis yang gagal apabila menemukan `_draw()`, `ColorRect`,
 | Folder | Jumlah | Isi |
 |---|---|---|
 | `assets/items/` | 17 | 15 gambar sampah pada 160 × 160, ditambah peti tertutup dan terbuka |
-| `assets/bins/` | 16 | 4 bin × 4 keadaan (`idle`, `highlight`, `accept`, `reject`) pada 200 × 240 |
-| `assets/claw/` | 5 | capit terbuka, menutup, tertutup, membawa, dan kabel |
-| `assets/env/` | 10 | latar air, dasar laut, karang sehat, karang mati, gelembung, dinding lambung, tiga gambar cutscene, dan logo menu |
-| `assets/fish/` | 3 | ikan latar ukuran kecil, sedang, besar |
-| `assets/tools/` | 12 | 4 alat × 3 keadaan (`idle`, `using`, `locked`) pada 96 × 96 |
-| `assets/ui/` | 64 | tombol, panel, bingkai kokpit, tombol konsol, ikon, kartu bukti, penggeser, bilah gulir, kotak isian, sakelar, pelat komponen, dan tiga lembar rancang bangun |
+| `assets/bins/` | 5 | 4 bin pemilahan, ditambah satu cincin sorot yang dipindah-pindah ke bin yang ditunjuk bukti |
+| `assets/claw/` | 5 | capit terbuka, menutup, tertutup, membawa, dan batang penggantungnya |
+| `assets/env/` | 15 | latar air, dasar laut, karang, gelembung, dinding lambung, latar menu, logo, lima gambar cutscene pembuka, dan dua gambar akhir |
+| `assets/fish/` | 11 | sebelas makhluk latar: ikan kecil, sedang, besar, bulat, dan ubur-ubur |
+| `assets/tools/` | 4 | empat alat inspeksi, satu gambar per alat |
+| `assets/ui/` | 59 | latar meja pemilahan, bingkai kokpit, tombol konsol, rak alat, kartu bukti, panel, penggeser, bilah gulir, balon dialog, tiga lembar rancang bangun beserta versi jadinya, dan tujuh gambar komponen |
 
 ### Aset audio
 
@@ -1229,11 +1242,10 @@ secara prosedural oleh skrip Python milik tim yang menyusun gelombang sinus dan
 kotak menggunakan pustaka standar Python — sebuah proses sintesis matematis, bukan
 generative AI.
 
-`[BUTUH INPUT JASON: pernyataan di atas BARU MENJADI BENAR setelah empat berkas
-placeholder diganti — assets/env/cutscene_01.png, cutscene_02.png, cutscene_03.png,
-dan assets/env/logo.png. Keempatnya saat ini masih berisi gambar dari luar (logo
-menu adalah logo organisasi "Call of the Sea"). Ganti dulu keempatnya, baru hapus
-catatan ini dan kirim proposalnya.]`
+Seluruh gambar cutscene, logo menu, ilustrasi alat, bin, capit, ikan, meja
+pemilahan dan lembar rancang bangun berasal dari kiriman ilustrator tim dan
+digambar manual di Procreate. Tidak ada satu pun aset dari sumber luar yang
+tersisa di dalam project.
 
 ### Aset dari sumber lain
 
@@ -1370,41 +1382,24 @@ teruji, demi menghapus satu field yang tidak merugikan siapa pun.
 
 ## 3. Hal-hal yang berpotensi jadi masalah untuk lomba
 
-**A. TIGA CUTSCENE DAN LOGO MENU BUKAN KARYA TIM. Ini risiko nomor satu.**
+**A. Empat berkas bermasalah sudah diganti — risiko ini SELESAI.**
 
-Saya membuka setiap aset satu per satu. Sebagian besar jelas karya tim dan bagus
-— `machine_frame.png` penuh coretan tangan ("SAVE THE OCEAN", "Careful with the
-fish!"), `water_bg.png` dan `seabed.png` bergaya cat rata yang konsisten, dan 17
-ilustrasi benda seragam. Tapi empat berkas ini tidak cocok:
+Pada pemeriksaan sebelumnya, tiga gambar cutscene dan logo menu bukan karya tim:
+logo menu adalah logo organisasi "Call of the Sea" yang diambil dari Pinterest,
+dan ketiga cutscene punya tiga gaya berbeda yang tidak cocok satu sama lain.
 
-| Berkas | Dipakai di | Masalah |
-|---|---|---|
-| `assets/env/logo.png` | Main menu | Logo organisasi **"Call of the Sea"**. Kamu sudah konfirmasi ini diambil dari Pinterest. |
-| `assets/env/cutscene_01.png` | Cutscene 1 | Ilustrasi anime kafe pantai. Tulisan papan tulis tidak terbaca, isi rak jadi gumpalan tak berbentuk. |
-| `assets/env/cutscene_02.png` | Cutscene 2 | Foto realistik sampah plastik bawah laut. Bentuk botol dan kantong saling melebur. |
-| `assets/env/cutscene_03.png` | Cutscene 3 | Concept art interior kapal selam, gaya lukisan digital profesional. |
+Keempatnya kini **ditimpa oleh aset asli tim** dari kiriman `NEW-ASSETS`:
 
-Bukti terkuatnya bukan detail per gambar, melainkan bahwa **tiga cutscene punya
-tiga gaya yang sama sekali berbeda** — anime, fotorealistik, dan lukisan konsep.
-Tidak ada satu ilustrator pun yang menghasilkan ketiganya, dan tidak satu pun
-menyerupai gaya rata yang dipakai seluruh isi game.
+| Berkas | Diganti oleh |
+|---|---|
+| `assets/env/logo.png` | Wordmark **RE:SEA** milik tim, 541 × 276 |
+| `assets/env/cutscene_01.png` | `beach-1` — teluk sebelum tercemar |
+| `assets/env/cutscene_02.png` | `trash-in-sea-2` — satu gelas tenggelam |
+| `assets/env/cutscene_03.png` | `more-trash-in-sea-3` — kiriman harian |
 
-Dua aturan lomba tersentuh sekaligus: hak cipta pihak ketiga (logo organisasi
-nyata) dan larangan generative AI untuk aset gambar. Sesuai instruksimu, keempat
-berkas **dibiarkan di tempatnya sebagai placeholder** supaya kamu tinggal menimpa
-PNG-nya. Jangan mengunggah build apa pun sebelum keempatnya diganti.
-
-Ukuran dan jalur yang harus dipakai penggantinya:
-
-| Ganti berkas ini | Ukuran wajib | Catatan |
-|---|---|---|
-| `assets/env/logo.png` | **640 × 200** | Satu-satunya logo yang dimuat game. `assets/ui/logo.png` yang lama sudah saya hapus — nol referensi, dan kamu konfirmasi tidak dipakai. Kotak di `main_menu.tscn` persis 640 × 200, jadi ukuran ini pas tanpa distorsi. |
-| `assets/env/cutscene_01.png` | **960 × 540** | Latar penuh, tidak transparan. |
-| `assets/env/cutscene_02.png` | **960 × 540** | Latar penuh, tidak transparan. |
-| `assets/env/cutscene_03.png` | **960 × 540** | Latar penuh, tidak transparan. |
-
-Setelah menimpa keempatnya, jalankan `godot --headless --import` lalu build ulang.
-Tidak ada perubahan kode atau scene yang diperlukan.
+Ditambah dua gambar baru (`cutscene_04` penyelam, `cutscene_05` meja rancang
+bangun) dan dua gambar akhir. Tidak ada lagi aset dari sumber luar di dalam
+project. Pernyataan anti-AI dan anti-pihak-ketiga di 3.3 kini benar.
 
 **B. Build Windows terhalang export template.**
 
@@ -1420,10 +1415,10 @@ SmartScreen.
 
 **C. Kredit dan lisensi aset.**
 
-Sesuai jawabanmu, seluruh ilustrasi tim digambar manual di Procreate, dan itu
-sudah saya tulis tegas di 3.3 beserta pernyataan bahwa tidak ada aset gambar
-maupun audio yang dihasilkan generative AI. Pernyataan itu **baru menjadi benar
-setelah keempat berkas di poin A diganti.** Jangan kirim proposalnya sebelum itu.
+Seluruh ilustrasi tim digambar manual di Procreate, dan itu sudah saya tulis
+tegas di 3.3 beserta pernyataan bahwa tidak ada aset gambar maupun audio yang
+dihasilkan generative AI. Dengan keempat berkas di poin A sudah diganti,
+pernyataan itu kini benar apa adanya.
 
 **D. Artefak AI sudah dihapus dari working tree, tetapi masih ada di git history.**
 
@@ -1457,19 +1452,14 @@ penggeser volumenya berfungsi, tetapi tidak ada yang diputar. Kalau tidak sempat
 diganti, biarkan — 2.6 sudah menyebutnya sebagai rencana lanjutan, sehingga tidak
 ada klaim berlebihan yang bisa dibantah juri.
 
-**G. Ilustrasi alat masih placeholder.**
+**G. Dua ending belum punya gambar sendiri.**
 
-Dua belas PNG di `assets/tools/` masih berukuran 400–700 byte. Rak alat tampil
-terus-menerus sejak hari kedua, jadi ini kelihatan. Kalau masih ada waktu untuk
-satu kelompok aset lagi setelah cutscene, inilah yang paling berdampak.
+Lembar spesifikasi di `NEW-ASSETS/Cutscene/Endings` menetapkan empat ending,
+tetapi hanya ending 1 (0 mesin) dan ending 4 (3 mesin) yang sudah ada
+gambarnya. Ending 2 dan 3 saat ini memakai gambar penyelam dari cutscene
+pembuka sebagai penahan sementara — netral secara nada, dan tidak mengklaim
+sesuatu yang salah, tetapi jelas bukan gambar yang dimaksud.
 
-## 4. Perkiraan panjang
+Begitu gambarnya datang, timpa saja jalurnya dan `Game.ending_still()` di
+`autoload/game.gd` tinggal diarahkan ke berkas baru — satu baris per ending.
 
-Isi Bab 1 sampai Bab 3 (tanpa bagian catatan ini) diperkirakan setara **18–21
-halaman** setelah ditempel ke Google Docs dengan format standar — di bawah batas
-25 halaman. Bab 2.2 adalah bagian terpanjang, sekitar 5 halaman, sesuai
-permintaanmu dan sesuai bobot "Gameplay" 25 %.
-
-Kalau ternyata melebihi batas, bagian yang paling aman dipangkas adalah tabel
-daftar benda di 2.2.5 (bisa diringkas menjadi contoh pasangan-jebakan saja) dan
-rincian struktur folder di 2.4.2.

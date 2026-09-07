@@ -101,7 +101,7 @@ func _run() -> void:
 						_pool_line()])
 				_drive_after_day(scene)
 			"GameOver":
-				print("reached ending: %s built=%d title=%s" % [game.ending_kind(),
+				print("reached ending: tier %d built=%d title=%s" % [game.ending_tier(),
 					game.unlocked_blueprints.size(),
 					scene.get_node("UiLayer/Root/TitleLabel").text])
 				break
@@ -110,9 +110,9 @@ func _run() -> void:
 		% [claimed, first_claim_day])
 	assert(String(_current().name) == "GameOver", "run did not reach an ending")
 	if bad_mode:
-		assert(game.ending_kind() == &"bad",
-			"sorting everything wrong should never build a machine, got the %s ending"
-			% game.ending_kind())
+		assert(game.ending_tier() == 0,
+			"sorting everything wrong should never build a machine, got tier %d"
+			% game.ending_tier())
 	elif no_craft:
 		print("supply run: nothing was crafted, the pool above is five days' worth")
 	else:
