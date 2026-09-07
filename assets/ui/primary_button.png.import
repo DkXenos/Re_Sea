@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c8v6huiqucflf"
-path="res://.godot/imported/before-day-briefing-bg.png-514fbe0070b0b79e9727718af43240f4.ctex"
+uid="uid://cjer4ar68ltf"
+path="res://.godot/imported/primary_button.png-a0201cb2ae80af84d7f723116bca4103.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/after-day/before-day-briefing-bg.png"
-dest_files=["res://.godot/imported/before-day-briefing-bg.png-514fbe0070b0b79e9727718af43240f4.ctex"]
+source_file="res://assets/ui/primary_button.png"
+dest_files=["res://.godot/imported/primary_button.png-a0201cb2ae80af84d7f723116bca4103.ctex"]
 
 [params]
 

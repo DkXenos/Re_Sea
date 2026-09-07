@@ -76,7 +76,7 @@ func _run() -> void:
 			print("-> %-10s day_index=%d built=%d" % [kind, game.day_index, game.unlocked_blueprints.size()])
 		match String(kind):
 			"MainMenu":
-				scene.get_node("UiLayer/Root/Buttons/PlayButton").pressed.emit()
+				scene._start()
 				if fixed_seed != 0:
 					game.start_run(fixed_seed)
 			"Cutscene":
@@ -85,13 +85,6 @@ func _run() -> void:
 				scene.get_node("UiLayer/Root/BeginButton").pressed.emit()
 			"ShiftPhase":
 				_drive_shift(scene)
-			"DayReport":
-				if verbose:
-					var b: Dictionary = scene._result
-					print("     quota %d, sorted %d, correct %d, wrong %d, met %s"
-						% [b["quota"], b["sorted"], b["correct"], b["wrong"],
-						b["quota_met"]])
-				scene.get_node("UiLayer/Root/NextButton").pressed.emit()
 			"AfterDay":
 				# entered every day, so work it the way a player would - craft
 				# whatever the pool can pay for, keep an upgrade on, move on

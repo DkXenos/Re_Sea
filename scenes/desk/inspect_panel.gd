@@ -17,9 +17,10 @@ const MAX_ZOOM := 3.0  # 4 looked awful on the 160px placeholders
 const CHIP_SURFACE := preload("res://assets/ui/chip_surface.png")
 const CHIP_REVEAL := preload("res://assets/ui/chip_reveal.png")
 const CHIP_MATCH := preload("res://assets/ui/chip_match.png")
-const TOOL_ROW_HEIGHT := 70
-# four rows have to fit the rack frame, so the delivered art comes down a notch
-const TOOL_ICON_SCALE := 0.85
+const TOOL_ROW_HEIGHT := 71
+# the painted slot in the rack frame is ~61px tall. at 0.85 a 72px-tall tool
+# came out 61px and sat exactly on the slot's border, top and bottom.
+const TOOL_ICON_SCALE := 0.62
 # the rack has one drawing per tool and no locked/using variants, so "armed" is
 # a separate plate slid in behind the row rather than a second drawing
 const TOOL_ROW_SELECTED := preload("res://assets/ui/tool_row_selected.png")
@@ -53,7 +54,7 @@ func _ready() -> void:
 	_zoom_hint.text = Strings.t("inspect_zoom_hint")
 	_evidence_title.text = Strings.t("evidence_title")
 	_rules_title.text = Strings.t("inspect_rules_title")
-	_question.text = Strings.t("inspect_pick_first")
+	_question.text = ""
 	_name.text = ""
 	_feedback.text = ""
 	_surface.gui_input.connect(_on_surface_input)
@@ -92,19 +93,19 @@ func _make_tool_entry(tool_data: ToolData) -> Control:
 	sprite.sprite_frames = tool_data.frames
 	sprite.play(&"idle")
 	sprite.scale = Vector2.ONE * TOOL_ICON_SCALE
-	sprite.position = Vector2(40, 35)
+	sprite.position = Vector2(34, 31)
 	row.add_child(sprite)
 
 	var name_label := Label.new()
 	name_label.text = tool_data.display_name
-	name_label.position = Vector2(78, 10)
+	name_label.position = Vector2(74, 11)
 	name_label.add_theme_font_size_override("font_size", 15)
 	row.add_child(name_label)
 
 	var cost_label := Label.new()
 	cost_label.text = Strings.t("tools_cost_free") if tool_data.opens_containers \
 		else Strings.tf("tools_cost_label", {"n": Game.cost_of(&"tool")})
-	cost_label.position = Vector2(78, 38)
+	cost_label.position = Vector2(74, 37)
 	cost_label.add_theme_font_size_override("font_size", 13)
 	cost_label.add_theme_color_override("font_color", Color(0.72, 0.78, 0.85))
 	row.add_child(cost_label)
@@ -194,7 +195,7 @@ func show_entry(new_entry: CarriedItem) -> void:
 func clear() -> void:
 	entry = null
 	_item_sprite.texture = null
-	_question.text = Strings.t("inspect_pick_first")
+	_question.text = ""
 	_name.text = ""
 	_feedback.text = ""
 	_rebuild_log()
@@ -209,7 +210,7 @@ func _set_identity(target: CarriedItem) -> void:
 # the question isn't "which bin", it's "do i believe this"
 func _question_for(target: CarriedItem) -> String:
 	if target == null:
-		return Strings.t("inspect_pick_first")
+		return ""
 	if target.is_container() and not target.opened:
 		return Strings.t("box_question")
 	if target.data.visible_label != "":

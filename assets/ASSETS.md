@@ -36,6 +36,7 @@ follows — you never touch a scene.**
 | Part | Files |
 |------|-------|
 | Button | `button_normal` / `button_hover` / `button_pressed` / `button_disabled` |
+| Primary button | `primary_button` / `primary_button_hover`. Theme type variation `PrimaryButton`, not the default Button, so only the one call to action per screen wears it. |
 | Panels & boxes | `panel_dark`, `panel_slot`, `panel_slot_selected` |
 | Volume slider | `slider_track`, `slider_fill`, `slider_grabber`, `slider_grabber_hover` |
 | On/off toggle | `toggle_off`, `toggle_on` |
@@ -95,12 +96,29 @@ Two consequences worth knowing:
 - **The desk and the cockpit are whole screens.** `assets/ui/desk_bg.png` and
   `assets/ui/machine_frame.png` each carry their own top bar, panel frames and
   button plates. Redraw one and the node offsets in its scene follow the new
-  art; nothing is drawn by code.
+  art; nothing is drawn by code. `assets/ui/briefing_bg.png` and
+  `assets/ui/report_panels.png` work the same way for the two screens either
+  side of a shift, down to a painted socket for the button: the dark octagon at
+  the bottom of the briefing sheet is exactly where `primary_button.png` sits.
 - **State is an overlay, not a second drawing.** The bins and the tools ship as
   one drawing each, so "this bin is what the evidence points at" is
   `bin_outline.png` moved behind the bin, and "this tool is armed" is
   `tool_row_selected.png` slid behind the row. The art itself never changes and
   is never recoloured.
+
+## fonts
+
+`assets/ui/fonts/` holds **Fredoka**, the only third-party asset in the project,
+under the SIL Open Font License 1.1 (`OFL.txt` ships beside it). `Fredoka-Medium`
+is the theme's `default_font`; `Fredoka-SemiBold` is the Button and PrimaryButton
+font. The other 23 weights of the family are kept out of the build - see
+`assets/ui/fonts/README.md`.
+
+## which way a fish faces
+
+Every drawing in `assets/fish/` faces **left**. `fish.gd` flips the sprite when
+it swims right, so a fish drawn facing the other way will swim backwards. Draw
+new ones facing left and nothing has to change.
 
 ## animations
 
@@ -136,21 +154,21 @@ an animation in without touching code.
 
 | File | Size | Animation | What it is |
 |------|------|-----------|------------|
-| `assets/bins/bin_hazard.png` | 119x136 | `idle` 2 fr | hazard bin, idle state |
-| `assets/bins/bin_landfill.png` | 119x135 | `idle` 2 fr | landfill bin, idle state |
-| `assets/bins/bin_organic.png` | 119x136 | `idle` 2 fr | organic bin, idle state |
-| `assets/bins/bin_outline.png` | 140x156 | static | Highlight ring shown behind whichever bin the revealed evidence points at. One drawing, moved between the four slots. |
-| `assets/bins/bin_recyclable.png` | 119x136 | `idle` 2 fr | recyclable bin, idle state |
+| `assets/bins/bin_hazard.png` | 101x116 | `idle` 1 fr | hazard bin, idle state |
+| `assets/bins/bin_landfill.png` | 101x115 | `idle` 1 fr | landfill bin, idle state |
+| `assets/bins/bin_organic.png` | 101x116 | `idle` 1 fr | organic bin, idle state |
+| `assets/bins/bin_outline.png` | 119x133 | static | Highlight ring shown behind whichever bin the revealed evidence points at. One drawing, moved between the four slots. Sized to the bins - redraw both together. |
+| `assets/bins/bin_recyclable.png` | 101x116 | `idle` 1 fr | recyclable bin, idle state |
 
 ### The claw
 
 | File | Size | Animation | What it is |
 |------|------|-----------|------------|
 | `assets/claw/claw_cable.png` | 21x64 | static | Cable, stretched vertically from rail to claw |
-| `assets/claw/claw_carrying.png` | 240x198 | `carrying` 6 fr | Claw arm, carrying pose |
-| `assets/claw/claw_closed.png` | 240x198 | `closed` 2 fr | Claw arm, closed pose |
-| `assets/claw/claw_closing.png` | 240x198 | `closing` 6 fr | Claw arm, closing pose |
-| `assets/claw/claw_open.png` | 240x198 | `open` 4 fr | Claw arm, open pose |
+| `assets/claw/claw_carrying.png` | 144x101 | `carrying` 1 fr | Claw arm, carrying pose |
+| `assets/claw/claw_closed.png` | 144x101 | `closed` 1 fr | Claw arm, closed pose |
+| `assets/claw/claw_closing.png` | 144x101 | `closing` 1 fr | Claw arm, closing pose |
+| `assets/claw/claw_open.png` | 144x101 | `open` 1 fr | Claw arm, open pose. All four frames share one crop box, so they stay registered; the mouth sits where a carried item hangs. |
 
 ### Backgrounds, cutscene stills and scenery
 
@@ -207,6 +225,7 @@ an animation in without touching code.
 | `assets/ui/blueprint_recycling_station_done.png` | 810x590 | static | Recycling Station schematic, fully inked. Shown once the machine is built. |
 | `assets/ui/blueprint_reef_restoration_pod.png` | 810x590 | static | Reef Restoration Pod schematic, unbuilt: the sheet plus the faint lineart of every part. |
 | `assets/ui/blueprint_reef_restoration_pod_done.png` | 810x590 | static | Reef Restoration Pod schematic, fully inked. Shown once the machine is built. |
+| `assets/ui/briefing_bg.png` | 1280x720 | static | The before-shift briefing: desk, taped blueprint sheet, stickers, and the painted socket the Lower the Claw button drops into. Full-frame, opaque. |
 | `assets/ui/button_disabled.png` | 64x64 | static | Button disabled state. NinePatch, 20px margins. |
 | `assets/ui/button_hover.png` | 64x64 | static | Button hover state. NinePatch, 20px margins. |
 | `assets/ui/button_normal.png` | 64x64 | static | Button normal state. NinePatch, 20px margins. |
@@ -240,13 +259,16 @@ an animation in without touching code.
 | `assets/ui/machine_slider.png` | 322x64 | static | The marker that slides along the top rail, showing which slice of the seabed the window is on. Moves in code; the rail behind it is part of machine_frame. |
 | `assets/ui/machine_sorting.png` | 216x135 | static | SORTING folder button, resting. Switches to the desk. |
 | `assets/ui/machine_sorting_hover.png` | 216x135 | static | SORTING folder button, hovered. |
-| `assets/ui/meter_bg.png` | 320x32 | static | Ocean health meter bg. Fill is clipped by width. |
-| `assets/ui/meter_fill.png` | 320x32 | static | Ocean health meter fill. Fill is clipped by width. |
+| `assets/ui/meter_bg.png` | 320x32 | static | Track behind a blueprint's progress strip on the desk. Fill is clipped by width. |
+| `assets/ui/meter_fill.png` | 320x32 | static | Fill of a blueprint's progress strip on the desk. Clipped by width, never scaled. |
 | `assets/ui/minimap_item.png` | 10x10 | static | Minimap dot for one item on the seabed |
 | `assets/ui/panel_dark.png` | 96x96 | static | Modal / overlay panel: the rulebook and the blueprint component popup. NinePatchRect, 24px margins. |
 | `assets/ui/panel_main.png` | 96x96 | static | Main UI panel. NinePatchRect, 24px margins. |
 | `assets/ui/panel_slot.png` | 173x83 | static | Inventory slot background. NinePatchRect, 24px margins. |
 | `assets/ui/panel_slot_selected.png` | 173x83 | static | Inventory slot, selected. A different PNG rather than a tint. NinePatchRect, 24px margins. |
+| `assets/ui/primary_button.png` | 422x121 | static | The one call to action on a screen - Start, Lower the Claw, Start the Next Day. Plate drawn at 408x108 inside the box; the padding is the room the hover state grows into. |
+| `assets/ui/primary_button_hover.png` | 422x121 | static | Same plate, larger, same box, so hover reads as a pop and nothing reflows. Also the focus state. |
+| `assets/ui/report_panels.png` | 1280x720 | static | The two taped sheets of the end-of-day report - tall one for the haul, wide one for the mistakes. Transparent outside the paper, so it lays over the desk still. |
 | `assets/ui/scrollbar_grabber.png` | 16x64 | static | Scrollbar grabber. NinePatch, 8px margins, stretched to length. |
 | `assets/ui/scrollbar_grabber_hover.png` | 16x64 | static | Scrollbar grabber, hovered/dragged. |
 | `assets/ui/scrollbar_track.png` | 16x64 | static | Scrollbar track. NinePatch, 8px margins, stretched to length. |

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://btb7e5fcvniht"
-path="res://.godot/imported/after-day-result.png-781fd2f6420a7f10e63c963c60b8d798.ctex"
+uid="uid://dptbj8f77awqv"
+path="res://.godot/imported/report_panels.png-5b65e6206fa6963eee406c13b95ce251.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/after-day/after-day-result.png"
-dest_files=["res://.godot/imported/after-day-result.png-781fd2f6420a7f10e63c963c60b8d798.ctex"]
+source_file="res://assets/ui/report_panels.png"
+dest_files=["res://.godot/imported/report_panels.png-5b65e6206fa6963eee406c13b95ce251.ctex"]
 
 [params]
 

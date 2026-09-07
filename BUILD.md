@@ -53,7 +53,7 @@ Template-nya sudah terpasang, jadi ini bisa langsung dijalankan:
     godot --headless --export-release "Web"
     cd build/web && zip -r ../Re-Sea-web.zip . && cd ../..
 
-Menghasilkan `build/Re-Sea-web.zip` (±15 MB, berisi `index.html`).
+Menghasilkan `build/Re-Sea-web.zip` (±23 MB, berisi `index.html`).
 
 Untuk itch.io: unggah zip itu, centang **This file will be played in the
 browser**, lalu set ukuran viewport **1280 × 720**. Aktifkan juga
@@ -84,12 +84,14 @@ Batas lomba 300 MB. Kondisi saat ini jauh di bawahnya:
 
 | Build | Ukuran |
 |---|---|
-| Web (zip) | ±20 MB |
-| Windows (zip) | perkiraan ±35 MB |
+| Web (zip) | ±23 MB |
+| Windows (zip) | perkiraan ±38 MB |
 
 Master ilustrasi berukuran penuh (2560×1440) **tidak** disimpan di dalam
 project — letaknya di `/Users/jaysn/Re-Sea-art-masters/`. Jangan memindahkannya
-kembali ke `assets/`, karena seluruh isinya akan ikut terpaket ke build.
+kembali ke `assets/`, karena seluruh isinya akan ikut terpaket ke build. Hal yang
+sama berlaku untuk 23 bobot Fredoka yang tidak dipakai, di
+`~/Re-Sea-art-masters/fonts/`.
 
 ---
 

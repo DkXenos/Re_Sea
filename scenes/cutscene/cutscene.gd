@@ -20,13 +20,30 @@ const BEATS: Array = [
 	[4, "open_9"], [4, "open_10"], [4, "open_11"],
 ]
 
+## A still holds for several beats. Without any movement at all the opening
+## reads as a slideshow of static pictures, so the picture the reader is looking
+## at drifts very slowly in and out, and one still dissolves into the next
+## rather than cutting. Both are deliberately small - if you notice them
+## happening they are too strong.
+const FADE_TIME := 0.45
+const DRIFT_TIME := 14.0
+## The only display size this scene picks, and the size it returns to. Both
+## stills sit in one wrapper so the drift is one scale on one node - the
+## outgoing picture keeps drifting while it dissolves instead of snapping back.
+const DRIFT_HOME := Vector2.ONE
+const DRIFT_SCALE := 1.05
+
 var _beat: int = 0
-var _still: int = -1
+var _still_index: int = -1
+var _fade: Tween = null
+var _drift: Tween = null
+
+@onready var _stills: Control = $StillLayer/Stills
+@onready var _front: TextureRect = $StillLayer/Stills/Still
+@onready var _back: TextureRect = $StillLayer/Stills/StillPrev
 
 
 func _ready() -> void:
-	$UiLayer/Root/SkipButton.text = Strings.t("cutscene_skip")
-	$UiLayer/Root/SkipButton.pressed.connect(_finish)
 	$UiLayer/Root/AdvanceHint.text = Strings.t("cutscene_advance")
 	_show(0)
 
@@ -36,10 +53,37 @@ func _show(beat: int) -> void:
 	var row: Array = BEATS[beat]
 	var want: int = int(row[0])
 	# only reload when the picture actually changes
-	if want != _still:
-		_still = want
-		$StillLayer/Still.texture = load(STILLS[want])
+	if want != _still_index:
+		_still_index = want
+		_swap_still(want)
 	$UiLayer/Root/Line.text = Strings.t(String(row[1]))
+
+
+## The outgoing still is parked on the back layer at full opacity and the new
+## one fades in over it, so there is never a frame with nothing on screen.
+func _swap_still(index: int) -> void:
+	_back.texture = _front.texture
+	_back.modulate.a = 1.0 if _front.texture != null else 0.0
+	_front.texture = load(STILLS[index])
+	_front.modulate.a = 0.0 if _back.modulate.a > 0.0 else 1.0
+	if _fade != null and _fade.is_valid():
+		_fade.kill()
+	if _front.modulate.a < 1.0:
+		_fade = create_tween().set_parallel()
+		_fade.tween_property(_front, "modulate:a", 1.0, FADE_TIME)
+		_fade.tween_property(_back, "modulate:a", 0.0, FADE_TIME)
+	_start_drift()
+
+
+func _start_drift() -> void:
+	if _drift != null and _drift.is_valid():
+		_drift.kill()
+	_stills.scale = DRIFT_HOME
+	_drift = create_tween().set_loops()
+	_drift.tween_property(_stills, "scale", DRIFT_HOME * DRIFT_SCALE, DRIFT_TIME) \
+		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	_drift.tween_property(_stills, "scale", DRIFT_HOME, DRIFT_TIME) \
+		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 
 
 func _unhandled_input(event: InputEvent) -> void:

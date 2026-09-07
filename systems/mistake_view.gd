@@ -28,13 +28,12 @@ static func missed_properties(entry: CarriedItem) -> Array[String]:
 	return out
 
 
-# PanelContainer not a fixed-height row, otherwise 2-line rules get clipped
+# No plate behind the row: this is written on the end-of-day sheet, and a dark
+# panel per mistake would bury the paper. Height comes from the text, so a
+# two-line rule is never clipped.
 static func build_row(entry: CarriedItem, icon_size: int = 96) -> Control:
-	var row := PanelContainer.new()
-
 	var columns := HBoxContainer.new()
-	columns.add_theme_constant_override("separation", 14)
-	row.add_child(columns)
+	columns.add_theme_constant_override("separation", 12)
 
 	var icon := TextureRect.new()
 	icon.texture = entry.data.texture
@@ -49,17 +48,17 @@ static func build_row(entry: CarriedItem, icon_size: int = 96) -> Control:
 	lines.add_theme_constant_override("separation", 2)
 	columns.add_child(lines)
 
-	add_line(lines, entry.data.display_name, 19, Color(1, 1, 1))
+	add_line(lines, entry.data.display_name, 17, Color(1, 1, 1))
 	add_line(lines, Strings.tf("report_you_put",
-		{"v": Strings.category_name(entry.sorted_to)}), 15, Color(0.95, 0.55, 0.5))
+		{"v": Strings.category_name(entry.sorted_to)}), 14, Color(1, 0.76, 0.7))
 	add_line(lines, Strings.tf("report_should_be",
-		{"v": Strings.category_name(entry.expected_category)}), 15, Color(0.6, 0.9, 0.7))
+		{"v": Strings.category_name(entry.expected_category)}), 14, Color(0.75, 1, 0.82))
 	for missed: String in missed_properties(entry):
-		add_line(lines, Strings.tf("report_missed", {"v": missed}), 14, Color(0.95, 0.83, 0.42))
+		add_line(lines, Strings.tf("report_missed", {"v": missed}), 13, Color(1, 0.93, 0.6))
 	if entry.broken_rule != null:
 		add_line(lines, Strings.tf("report_rule", {"v": entry.broken_rule.text}), 13,
-			Color(0.72, 0.78, 0.85))
-	return row
+			Color(0.85, 0.92, 1))
+	return columns
 
 
 static func add_line(parent: Node, text: String, font_size: int, color: Color) -> void:

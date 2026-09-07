@@ -7,11 +7,7 @@ extends RefCounted
 
 const TABLE: Dictionary = {
 	# --- menu ---
-	"game_subtitle": "Sort the trash, save the sea",
-	"menu_play": "Start",
-	"menu_settings": "Settings",
-	"menu_quit": "Quit",
-	"menu_hint": "Click a button or press Enter",
+	"menu_hint": "Click anywhere to begin  \u00b7  Esc for settings",
 
 	# --- settings ---
 	"settings_title": "SETTINGS",
@@ -25,8 +21,7 @@ const TABLE: Dictionary = {
 	# eleven beats over five stills. the arc: what the bay was, the first thing
 	# that did not belong, the delivery that followed, us going down to look, and
 	# the three sheets that are the answer.
-	"cutscene_skip": "Skip (Esc)",
-	"cutscene_advance": "Click or press Enter",
+	"cutscene_advance": "Click or press Enter  \u00b7  Esc to skip",
 	"open_1": "The bay used to be loud. Gulls arguing, waves turning over, a crab picking a fight with the tide.",
 	"open_2": "You could stand in the shallows and count the fish going past your ankles.",
 	"open_3": "Then one afternoon something came down through the light that did not belong to any of it.",
@@ -42,16 +37,14 @@ const TABLE: Dictionary = {
 	# --- day start ---
 	"day_label": "DAY {n}",
 	"day_rules_today": "Today's rules",
-	"day_quota": "Sorting target",
-	"machines_title": "Machines",
+	"day_quota": "Quota",
+	"machines_title": "Cost per drop",
 	"day_budget": "Shift time",
-	"day_tools": "Tools available",
-	"day_tools_locked": "Not available yet",
+	"day_tools": "Tools",
+	"day_tools_locked": "none yet",
 	"day_begin": "Lower the Claw",
-	"day_seed": "Seed: {n}",
 
 	# --- claw phase ---
-	"budget_label": "Shift time left",
 	"budget_cost": "costs {n}",
 	"budget_too_low": "Not enough shift time for that",
 	"shift_end": "End Shift",
@@ -61,13 +54,9 @@ const TABLE: Dictionary = {
 	"shift_over": "Shift time is up",
 	"shift_nothing_sorted": "Shift over, and not one thing sorted. Nothing reaches the workshop today.",
 	"shift_sea_cleared": "Every last piece out of the water and into a bin. The seabed is clear.",
-	"machines_label": "Machines built: {have} / {need}",
 	"upgrade_active": "Gear fitted: {v}  -  drop {drop} · tool {tool} · sort {sort}",
 	"upgrade_none": "No gear fitted  -  drop {drop} · tool {tool} · sort {sort}",
-	"claw_grip_chance": "Grip chance: {n}%",
 	"claw_rail_locked": "Rail is resetting - it can be moved again in a moment",
-	"claw_grip_none": "Line the claw up with something",
-	"claw_hint": "A/D or the arrow keys to move, Space to drop. The console buttons work too.",
 	"claw_drop_button": "DROP  ({n})",
 	"claw_slipped": "Slipped! It fell back down.",
 
@@ -88,7 +77,6 @@ const TABLE: Dictionary = {
 	"inspect_rules_title": "RULES IN FORCE TODAY",
 	"inspect_question": "Looks like {mat}. Do you believe it?",
 	"inspect_question_labeled": "Marked {label}, looks like {mat}. Do you believe it?",
-	"inspect_pick_first": "Pick an item from the list on the left.",
 	"tools_cost_label": "costs {n}",
 	"tools_not_today": "not today",
 
@@ -135,7 +123,6 @@ const TABLE: Dictionary = {
 	"rulebook_general": "GENERAL",
 
 	# --- day report ---
-	"report_title": "DAY {n} REPORT",
 	"report_quota_met": "Target reached",
 	"report_quota_failed": "Target missed",
 	"report_recovered": "MATERIAL RECOVERED",
@@ -148,21 +135,17 @@ const TABLE: Dictionary = {
 	"report_rule": "Broke: {v}",
 	"report_should_be": "Should have been: {v}",
 	"report_you_put": "You put it in: {v}",
-	"report_next": "Next Day",
 	"report_perfect": "No mistakes. Nice work.",
 
 	# --- after-day screen ---
 	"after_title": "END OF DAY {n}",
-	"after_tab_result": "Today's Haul",
+	"after_tab_result": "The Day",
 	"after_tab_tech": "Technology",
 	"after_tab_gear": "Gear",
 	"after_next_day": "Start the Next Day",
 	"after_last_day": "Finish the Last Shift",
 	"after_sorted": "Correct {ok}  ·  wrong {bad}  ·  unsorted {left}",
 	"after_budget": "Shift time used {spent} of {max}, {left} left",
-	"after_haul_title": "TODAY'S HAUL",
-	"after_haul_empty": "Nothing was sorted today.",
-	"after_haul_belongs": "belongs in {v}",
 
 	# --- blueprints ---
 	"blueprint_requires": "Needs: {v}",

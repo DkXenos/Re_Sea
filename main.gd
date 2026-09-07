@@ -8,18 +8,16 @@ const SCENES: Dictionary = {
 	&"cutscene": "res://scenes/cutscene/cutscene.tscn",
 	&"day_start": "res://scenes/day_start/day_start.tscn",
 	&"shift": "res://scenes/shift/shift_phase.tscn",
-	&"report": "res://scenes/report/day_report.tscn",
 	&"after_day": "res://scenes/after_day/after_day.tscn",
 	&"game_over": "res://scenes/game_over/game_over.tscn",
 }
 
 # esc means something else on the menu / in the cutscene
-const PAUSABLE_KEYS: Array[StringName] = [&"day_start", &"shift", &"report", &"after_day"]
+const PAUSABLE_KEYS: Array[StringName] = [&"day_start", &"shift", &"after_day"]
 
 @onready var _holder: Node = $SceneHolder
 @onready var _pause: Control = $PauseLayer/PauseOverlay
 @onready var _debug: Control = $DebugLayer/DebugOverlay
-@onready var _pause_button: TextureButton = $PauseLayer/PauseButton
 
 var _current: Node = null
 var _current_key: StringName = &""
@@ -29,10 +27,10 @@ func _ready() -> void:
 	Events.scene_change_requested.connect(_on_scene_change_requested)
 	Events.phase_finished.connect(_on_phase_finished)
 	Events.debug_command.connect(_on_debug_command)
-	# the machine cockpit draws its own cog, and asks for the same overlay
+	# the cockpit and the desk each draw their own cog, and ask for this overlay.
+	# there is no floating pause button any more - it was a placeholder icon
+	# that landed on top of the desk's own cog.
 	Events.pause_requested.connect(func() -> void: _pause.toggle(not _pause.visible))
-	# needs to be clickable, people won't read a control list
-	_pause_button.pressed.connect(func() -> void: _pause.toggle(not _pause.visible))
 	_on_scene_change_requested(&"main_menu")
 
 
@@ -71,7 +69,6 @@ func _on_scene_change_requested(scene_key: StringName) -> void:
 		print("[Main] scene not built yet: %s" % path)
 		return
 	_current_key = scene_key
-	_pause_button.visible = scene_key in PAUSABLE_KEYS
 	#print("[Main] -> ", scene_key)
 	_swap.call_deferred(path)
 

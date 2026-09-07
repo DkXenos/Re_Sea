@@ -121,7 +121,6 @@ func _check_desk() -> void:
 
 
 func _check_after_day() -> void:
-	game.commit_day_result(game.end_day_breakdown())
 	var scene: Node = load("res://scenes/after_day/after_day.tscn").instantiate()
 	root.add_child(scene)
 	for i in 20:

@@ -41,4 +41,6 @@ func _process(delta: float) -> void:
 	elif position.x > bounds.y:
 		position.x = bounds.y
 		direction = -1
-	sprite.flip_h = direction < 0
+	# every fish in assets/fish/ is drawn facing LEFT, so the flip belongs on
+	# the rightward swim, not the leftward one.
+	sprite.flip_h = direction > 0

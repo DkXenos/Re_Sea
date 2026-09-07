@@ -36,6 +36,9 @@ var containers_grabbed: int = 0
 var tools: Array[ToolData] = []
 var stats: Dictionary = {}
 var last_breakdown: Dictionary = {}
+## `commit_day_result` credits the material store, and that is not idempotent.
+## The end-of-day screen can be rebuilt or re-entered, so it asks this first.
+var day_committed: bool = false
 var budget_max: int = 0
 var budget_left: int = 0
 
@@ -135,6 +138,7 @@ func current_day() -> DayData:
 func begin_day() -> void:
 	inventory.clear()
 	containers_grabbed = 0
+	day_committed = false
 	stats = {"correct": 0, "wrong": 0, "sorted": 0, "drops": 0, "tool_uses": 0, "spent": 0}
 	var day := current_day()
 	budget_max = day.budget if day != null else 0
@@ -314,6 +318,10 @@ func end_day_breakdown() -> Dictionary:
 
 
 func commit_day_result(breakdown: Dictionary) -> void:
+	if day_committed:
+		push_warning("the day was already committed - material would be paid twice")
+		return
+	day_committed = true
 	last_breakdown = breakdown
 	_credit_materials()
 

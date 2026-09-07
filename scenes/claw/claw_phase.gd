@@ -110,11 +110,10 @@ const PARALLAX_OVERSCAN := 8.0
 
 @onready var _grip_label: Label = $HudLayer/HudRoot/GripLabel
 @onready var _toast: Label = $HudLayer/HudRoot/Toast
-@onready var _hint: Label = $HudLayer/HudRoot/Hint
 @onready var _day_label: Label = $HudLayer/HudRoot/DayLabel
 @onready var _budget_label: Label = $HudLayer/HudRoot/BudgetLabel
 @onready var _quota_label: Label = $HudLayer/HudRoot/QuotaLabel
-@onready var _machines_label: Label = $HudLayer/HudRoot/MachinesLabel
+@onready var _drop_cost_label: Label = $HudLayer/HudRoot/MachinesLabel
 
 var _day: DayData
 var _active: bool = true
@@ -164,9 +163,7 @@ func _ready() -> void:
 	_key_hold.resize(KEY_BUTTONS.size())
 	_key_hold.fill(0.0)
 	Events.vfx_intensity_changed.connect(_rebuild_bubbles)
-	_hint.text = Strings.t("claw_hint")
 	_toast.text = ""
-	$HudLayer/HudRoot/BudgetTitle.text = Strings.t("budget_label")
 	$HudLayer/HudRoot/QuotaTitle.text = Strings.t("day_quota")
 	$HudLayer/HudRoot/MachinesTitle.text = Strings.t("machines_title")
 	_update_readouts()
@@ -464,11 +461,14 @@ func _update_grip_preview() -> void:
 	if _claw.is_rail_locked():
 		_grip_label.text = Strings.t("claw_rail_locked")
 	elif target == null:
-		_grip_label.text = Strings.t("claw_grip_none")
+		# that nothing is lined up is already visible in the window. a line of
+		# text saying so just sits there for most of the shift.
+		_grip_label.text = ""
 	else:
-		# nothing's identified yet, so describe it instead of naming it
-		_grip_label.text = "%s  -  %s" % [target.data.surface_label(),
-			Strings.tf("claw_grip_chance", {"n": int(round(target.grip_chance() * 100.0))})]
+		# nothing. the window shows the claw over the thing; that IS the
+		# feedback. the odds used to be printed here and were the last piece
+		# of furniture left on the glass.
+		_grip_label.text = ""
 
 
 # The marker on the top rail is the window: where it sits on the rail is which
@@ -509,8 +509,7 @@ func _update_readouts() -> void:
 	_day_label.text = str(_day.day_number)
 	_budget_label.text = str(Game.budget_left)
 	_quota_label.text = "%d/%d" % [int(Game.stats.get("sorted", 0)), _day.quota]
-	_machines_label.text = "%d/%d" % [Game.unlocked_blueprints.size(),
-		Game.blueprints.size()]
+	_drop_cost_label.text = str(Game.cost_of(&"drop"))
 
 
 # claw doesn't know what a drop costs, we charge it here
@@ -524,7 +523,6 @@ func _on_cycle_finished(result: Dictionary) -> void:
 		var item: ItemData = result["item"]
 		Game.add_to_inventory(item)
 		Events.item_grabbed.emit(item)
-		_show_toast(item.surface_label())
 		# out of the tree NOW, not at the end of the frame - queue_free leaves
 		# it counted, so the top-up below would think the tank is still full
 		# and the floor would be broken until the frame after next

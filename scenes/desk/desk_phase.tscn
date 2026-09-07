@@ -106,33 +106,33 @@ flat = true
 theme_override_font_sizes/font_size = 15
 
 [node name="InventoryPanel" type="Control" parent="UiLayer/Root"]
-offset_left = 58.0
-offset_top = 192.0
-offset_right = 262.0
-offset_bottom = 640.0
+offset_left = 54.0
+offset_top = 206.0
+offset_right = 261.0
+offset_bottom = 643.0
 mouse_filter = 2
 script = ExtResource("2_inv")
 
 [node name="Title" type="Label" parent="UiLayer/Root/InventoryPanel"]
-offset_left = 6.0
-offset_top = 4.0
-offset_right = 200.0
-offset_bottom = 28.0
+offset_left = 14.0
+offset_top = 10.0
+offset_right = 196.0
+offset_bottom = 34.0
 theme_override_font_sizes/font_size = 15
 
 [node name="Empty" type="Label" parent="UiLayer/Root/InventoryPanel"]
-offset_left = 6.0
-offset_top = 34.0
-offset_right = 200.0
-offset_bottom = 90.0
+offset_left = 14.0
+offset_top = 44.0
+offset_right = 196.0
+offset_bottom = 100.0
 theme_override_font_sizes/font_size = 13
 autowrap_mode = 3
 
 [node name="Scroll" type="ScrollContainer" parent="UiLayer/Root/InventoryPanel"]
 offset_left = 4.0
-offset_top = 32.0
-offset_right = 202.0
-offset_bottom = 444.0
+offset_top = 44.0
+offset_right = 204.0
+offset_bottom = 432.0
 
 [node name="Grid" type="GridContainer" parent="UiLayer/Root/InventoryPanel/Scroll"]
 columns = 1
@@ -210,7 +210,7 @@ stretch_mode = 0
 offset_left = 288.0
 offset_top = 34.0
 offset_right = 475.0
-offset_bottom = 316.0
+offset_bottom = 318.0
 theme_override_constants/separation = 0
 
 [node name="RulesTitle" type="Label" parent="UiLayer/Root/InspectPanel"]
@@ -253,10 +253,10 @@ theme_override_font_sizes/font_size = 12
 autowrap_mode = 3
 
 [node name="BinRow" type="Control" parent="UiLayer/Root"]
-offset_left = 386.0
+offset_left = 388.0
 offset_top = 501.0
-offset_right = 1160.0
-offset_bottom = 691.0
+offset_right = 1154.0
+offset_bottom = 695.0
 mouse_filter = 2
 script = ExtResource("4_bins")
 

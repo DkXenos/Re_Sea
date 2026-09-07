@@ -109,7 +109,7 @@ Satu hari permainan adalah satu **shift**, dan satu shift berjalan dalam siklus
 berikut:
 
 1. **`day_start`** — layar pembuka hari menampilkan aturan yang berlaku hari itu,
-   target pemilahan (`Sorting target`), jatah `Shift time`, dan alat apa saja yang
+   target pemilahan (`Quota`), jatah `Shift time`, dan alat apa saja yang
    tersedia. Pemain menekan `Lower the Claw`.
 2. **Mengangkat.** Pada tampilan mesin capit, pemain menggeser capit di sepanjang
    rel dan menjatuhkannya. Setiap penjatuhan menghabiskan **6** `Shift time`,
@@ -123,12 +123,13 @@ berikut:
    **1** `Shift time`. **Permainan tidak memberi tahu apakah pilihan itu benar.**
 5. Langkah 2–4 diulang, dalam urutan bebas, sampai `Shift time` habis atau tidak
    ada lagi tindakan bermakna yang bisa dibeli.
-6. **`report`** — barulah di sini seluruh jawaban dibuka sekaligus: apa yang salah,
-   ke mana seharusnya, properti apa yang tidak pernah diperiksa, aturan mana yang
-   dilanggar, dan berapa material yang benar-benar masuk ke bengkel.
-7. **`after_day`** — pemain membelanjakan material untuk merakit komponen mesin,
-   dan memilih perlengkapan (`Gear`) untuk hari berikutnya.
-8. Kembali ke langkah 1 untuk hari berikutnya, sampai hari kelima berakhir.
+6. **`after_day`** — barulah di sini seluruh jawaban dibuka sekaligus. Tab
+   `The Day` memuat apa yang salah, ke mana seharusnya, properti apa yang tidak
+   pernah diperiksa, aturan mana yang dilanggar, dan berapa material yang
+   benar-benar masuk ke bengkel. Pada layar yang sama, tab `Technology` dan
+   `Gear` membelanjakan material itu untuk merakit komponen mesin dan memilih
+   perlengkapan untuk hari berikutnya.
+7. Kembali ke langkah 1 untuk hari berikutnya, sampai hari kelima berakhir.
 
 Yang menahan loop ini tetap tegang adalah satu keputusan desain: **tidak ada
 timer waktu nyata.** `Shift time` hanya berkurang oleh tindakan. Berpikir,
@@ -162,7 +163,7 @@ bisa menghafal jawaban; ia harus membaca aturan.
 
 **Keempat, umpan balik yang tertunda dan bersifat mendidik.** Bin tidak pernah
 memberi tahu benar atau salah pada saat pemilahan — animasi `accept` hanya berarti
-"bin menerimanya". Seluruh evaluasi ditahan sampai `report`, dan di sana setiap
+"bin menerimanya". Seluruh evaluasi ditahan sampai `after_day`, dan di sana setiap
 kesalahan ditampilkan lengkap dengan baris `Never checked:` yang menyebutkan
 properti tersembunyi yang menentukan jawabannya. Pemain tidak sekadar diberi tahu
 bahwa ia salah, melainkan **diberi tahu di mana letak celah pemeriksaannya**.
@@ -183,7 +184,7 @@ memilah dengan salah menghancurkan nilai material sepenuhnya, bukan sebagian.**
 Pesan itu tidak disampaikan lewat teks, melainkan lewat aturan ekonominya. Di
 dalam kode, satu-satunya jalan material masuk ke gudang bengkel adalah fungsi yang
 **hanya** menghitung benda yang masuk bin yang benar. Benda yang salah pilah tidak
-menghasilkan nilai yang lebih kecil — ia menghasilkan **nol**. Layar `report`
+menghasilkan nilai yang lebih kecil — ia menghasilkan **nol**. Layar `after_day`
 menyatakannya dengan kalimat:
 
 > *"Only what goes in the right bin becomes blueprint material."*
@@ -287,7 +288,7 @@ Seluruh kontrol berikut diambil langsung dari peta masukan pada `project.godot`.
 | Membuka `Rulebook` | `R` | Gratis, tidak menjeda permainan |
 | Melompat ke benda berikutnya | `I` | Memilih benda pertama yang belum dipilah |
 | Menjeda permainan | `Esc` | Juga dapat ditekan lewat tombol roda gigi pada konsol mesin |
-| Melanjutkan layar naratif | `Enter` atau klik kiri | Pada layar cutscene, `day_start`, dan `report` |
+| Melanjutkan layar naratif | `Enter` atau klik kiri | Pada layar judul, cutscene, dan `day_start` |
 | Panel debug | `F1` | Hanya aktif pada build debug, tidak tersedia di build rilis |
 
 Setiap kontrol papan ketik memiliki padanan yang dapat diklik pada konsol mesin —
@@ -341,10 +342,9 @@ main_menu
         └─> day_start      aturan hari ini, target, jatah waktu, alat
              └─> shift     ┌── Claw Machine  ─┐  dua tampilan,
                            └── Sorting Desk  ─┘  satu anggaran, Tab
-                  └─> report        seluruh jawaban dibuka di sini
-                       └─> after_day   Today's Haul | Technology | Gear
-                            ├─> day_start    bila masih ada hari berikutnya
-                            └─> game_over    bila hari ke-5 telah selesai
+                  └─> after_day   The Day | Technology | Gear
+                       ├─> day_start    bila masih ada hari berikutnya
+                       └─> game_over    bila hari ke-5 telah selesai
 ```
 
 Perlu ditegaskan bahwa `shift` **bukan** dua fase berurutan. `Claw Machine` dan
@@ -417,7 +417,7 @@ mendapat kalimat penutupnya sendiri:
 - seluruh benda di air maupun di meja habis terpilah →
   *"Every last piece out of the water and into a bin. The seabed is clear."*
 
-**Target harian.** `report` menyatakan `Target reached` atau `Target missed`.
+**Target harian.** `after_day` menyatakan `Target reached` atau `Target missed`.
 Perlu dicatat bahwa **target tidak memiliki konsekuensi mekanis**: tidak ada
 hukuman atas target yang meleset dan tidak ada hadiah atas target yang tercapai.
 Target berfungsi sebagai penanda ritme kerja, sementara nilai sesungguhnya dari
@@ -637,13 +637,13 @@ hukuman:
 4. **Kemajuan mesin tertunda.** Karena material adalah satu-satunya bahan untuk
    merakit komponen, setiap kesalahan menunda pembangunan mesin, yang pada
    gilirannya menentukan akhir permainan.
-5. **Umpan balik terperinci di `report`.** Setiap kesalahan mendapat satu kartu
+5. **Umpan balik terperinci di `after_day`.** Setiap kesalahan mendapat satu kartu
    berisi gambar benda, `You put it in:`, `Should have been:`, baris
    `Never checked:` untuk setiap properti penentu yang tidak pernah dibuka, dan
    `Broke:` berisi teks lengkap aturan yang dilanggar.
 
 Yang **tidak** terjadi: tidak ada pengurangan nyawa, tidak ada denda, tidak ada
-game over, dan tidak ada indikator kesehatan apa pun. Layar `report` merangkumnya
+game over, dan tidak ada indikator kesehatan apa pun. Layar `after_day` merangkumnya
 dengan dua baris:
 
 > *"{n} sorted wrongly - lost, not stored."*
@@ -655,7 +655,7 @@ yang disengaja: pemain **harus** diperbolehkan menebak, sebab menebak adalah
 perilaku yang ingin permainan koreksi. Bila permainan mencegah pemilahan yang
 belum diperiksa, pemain tidak akan pernah merasakan biaya menebak.
 
-Menahan seluruh umpan balik sampai `report` menjaga agar setiap keputusan tetap
+Menahan seluruh umpan balik sampai `after_day` menjaga agar setiap keputusan tetap
 menjadi keputusan. Bila bin langsung memberi tahu benar atau salah, pemain akan
 belajar dengan cara mencoba-coba, dan `EVIDENCE LOG` beserta `Rulebook` akan
 menjadi hiasan.
@@ -798,7 +798,7 @@ Total untuk menyelesaikan ketiganya: **7 `ORGANIC`, 6 `RECYCLABLE`, 5 `HAZARDOUS
 dan 7 `LANDFILL`** — atau **25 benda yang dipilah dengan benar** dari akumulasi
 target lima hari sebesar 41 pemilahan.
 
-Material dikreditkan **hanya sekali, pada layar `report`**, tidak pada saat
+Material dikreditkan **hanya sekali, pada layar `after_day`**, tidak pada saat
 pemilahan. Setiap mesin yang dibangun membuka satu perlengkapan di tab `Gear`.
 
 **Alasan desain.** Sistem ini adalah satu-satunya penghubung antara kualitas
@@ -865,11 +865,12 @@ memilih pendekatan untuk hari berikutnya, dan dapat mengubahnya keesokan harinya
 Dua perlengkapan terbuka sejak hari pertama agar pemain dapat berkenalan dengan
 konsep pertukaran sebelum sistem mesin sempat memberikan apa pun.
 
-### 2.2.9 `Day Report` dan `Today's Haul`
+### 2.2.9 `The Day` — Laporan Akhir Hari
 
-**Cara kerja.** Layar `report` adalah satu-satunya tempat pemain mengetahui hasil
-kerjanya. Isinya empat bagian: status target, daftar kesalahan, daftar material
-yang berhasil diselamatkan per kategori, dan catatan penutup.
+**Cara kerja.** Tab `The Day` pada layar `after_day` adalah satu-satunya tempat
+pemain mengetahui hasil kerjanya. Layar itu digambar sebagai dua lembar kertas
+cetak biru berselotip di atas meja: lembar tinggi di kiri menjelaskan setiap
+kesalahan, lembar lebar di kanan mencatat material yang berhasil diselamatkan.
 
 Setiap kesalahan ditampilkan sebagai satu kartu berisi lima baris:
 
@@ -885,10 +886,10 @@ memeriksa aturan yang dilanggar, menemukan properti yang menjadi kuncinya, lalu
 menyaring properti yang sudah pernah dibuka pemain. Sisanya adalah celah
 pemeriksaan yang sesungguhnya.
 
-Layar berikutnya, tab `Today's Haul` pada `after_day`, menyajikan hasil yang sama
-dari sudut lain: satu baris per **jenis** benda, memuat gambar, nama, bin yang
-seharusnya beserta pelat binnya, jumlah yang benar, dan jumlah yang salah. Baris
-diurutkan sesuai urutan pengangkatan.
+Lembar kanan, `MATERIAL RECOVERED`, mencatat satu baris per kategori berisi
+jumlah benda yang benar-benar sampai ke bengkel, disusul catatan berapa benda
+yang hilang karena salah bin. Kedua lembar itu berpasangan secara langsung:
+yang kiri menerangkan mengapa sebuah benda tidak muncul di yang kanan.
 
 **Alasan desain.** Tidak ada skor di dalam permainan ini, dan ketiadaan itu
 disengaja. Sebuah angka skor akan mengalihkan perhatian pemain dari satu-satunya
@@ -902,8 +903,11 @@ berubah menjadi pelajaran yang dapat ditindaklanjuti, bukan sekadar vonis. Baris
 ini juga yang mengubah kesalahan menjadi umpan balik atas **proses**, bukan atas
 **hasil**.
 
-Kedua layar berbagi kode pembangun kartu yang sama, sehingga keduanya tidak mungkin
-memberikan keterangan yang berbeda untuk kesalahan yang sama.
+Sebelumnya laporan ini terpecah menjadi dua layar berurutan — sebuah layar
+`report` tersendiri, lalu tab `Today's Haul` yang mengulang daftar kesalahan
+yang sama dalam bentuk pendek. Dua layar berturut-turut yang mengatakan hal yang
+sama membuat akhir hari terasa diulang, sehingga keduanya disatukan menjadi satu
+layar ini.
 
 ## 2.3 Daftar Aset Game
 
@@ -916,9 +920,9 @@ pemeriksaan otomatis yang gagal apabila menemukan `_draw()`, `ColorRect`,
 
 | Jenis | Jumlah | Keterangan |
 |---|---|---|
-| Aset visual (PNG) | **116** | seluruhnya di `assets/` |
+| Aset visual (PNG) | **120** | seluruhnya di `assets/` |
 | Aset audio (WAV) | **11** | efek suara, `assets/audio/` |
-| Berkas font | **0** | permainan memakai font bawaan Godot |
+| Berkas font | **2** | `Fredoka-Medium` dan `Fredoka-SemiBold`, `assets/ui/fonts/` |
 | Definisi animasi (`SpriteFrames`) | **29** | `data/frames/*.tres` |
 
 ### Aset visual per kelompok
@@ -931,7 +935,7 @@ pemeriksaan otomatis yang gagal apabila menemukan `_draw()`, `ColorRect`,
 | `assets/env/` | 15 | latar air, dasar laut, karang, gelembung, dinding lambung, latar menu, logo, lima gambar cutscene pembuka, dan dua gambar akhir |
 | `assets/fish/` | 11 | sebelas makhluk latar: ikan kecil, sedang, besar, bulat, dan ubur-ubur |
 | `assets/tools/` | 4 | empat alat inspeksi, satu gambar per alat |
-| `assets/ui/` | 59 | latar meja pemilahan, bingkai kokpit, tombol konsol, rak alat, kartu bukti, panel, penggeser, bilah gulir, balon dialog, tiga lembar rancang bangun beserta versi jadinya, dan tujuh gambar komponen |
+| `assets/ui/` | 63 | latar meja pemilahan, latar briefing pra-shift, dua lembar laporan akhir hari, bingkai kokpit, tombol konsol, pelat tombol aksi utama, rak alat, kartu bukti, panel, penggeser, bilah gulir, balon dialog, tiga lembar rancang bangun beserta versi jadinya, dan tujuh gambar komponen |
 
 ### Aset audio
 
@@ -939,11 +943,20 @@ Sebelas efek suara: `claw_move`, `claw_drop`, `grab_success`, `grab_fail`,
 `tool_use`, `reveal_success`, `reveal_nothing`, `bin_accept`, `bin_reject`,
 `day_end`, dan `ui_click`. Seluruhnya WAV mono 16-bit, 22.050 Hz.
 
-`[BUTUH INPUT JASON: seluruh berkas audio saat ini masih berupa nada sinus dan kotak yang dibangkitkan oleh skrip Python internal tim (tools/gen_sounds.py, memakai modul wave dari pustaka standar — bukan generative AI). Tidak ada musik latar sama sekali, meskipun bus audio Music dan penggeser volumenya sudah tersedia. Putuskan apakah audio akan diganti sebelum pengumpulan, dan bila ya, cantumkan sumber serta lisensinya di 3.3.]`
+`[BUTUH INPUT JASON: seluruh berkas audio saat ini masih berupa nada sinus dan kotak yang dibangkitkan oleh skrip Python internal tim (memakai modul wave dari pustaka standar — bukan generative AI; skrip pembangkitnya sudah dikeluarkan dari repositori bersama folder tools/). Tidak ada musik latar sama sekali, meskipun bus audio Music dan penggeser volumenya sudah tersedia. Putuskan apakah audio akan diganti sebelum pengumpulan, dan bila ya, cantumkan sumber serta lisensinya di 3.3.]`
 
 ### Font
 
-`[BUTUH INPUT JASON: permainan masih memakai font bawaan Godot; folder assets/ui/fonts/ kosong. Untuk permainan yang sangat padat teks dan dengan bobot Estetika 15 %, memasang satu typeface adalah perbaikan termurah dengan dampak terbesar yang masih tersisa. Bila font dipasang, cantumkan nama dan lisensinya di 3.3.]`
+Permainan memakai **Fredoka**, typeface sans-serif membulat karya Milena Brandao
+dan Hafontia, berlisensi SIL Open Font License 1.1. Dua ketebalan ikut dalam
+build: `Fredoka-Medium` sebagai font bawaan seluruh label, dan `Fredoka-SemiBold`
+untuk tombol serta angka besar pada panel kokpit. Keduanya berada di
+`assets/ui/fonts/` bersama salinan lengkap lisensinya. Karena setiap ukuran huruf
+sudah ditetapkan pada berkas tema dan pada masing-masing simpul, pemasangan font
+tidak menuntut satu pun perubahan tata letak yang bersifat struktural.
+
+Fredoka adalah **satu-satunya aset pihak ketiga** dalam permainan ini, dan
+dikreditkan pada bagian 3.3.
 
 ### Catatan konsistensi aset
 
@@ -1033,13 +1046,13 @@ Re:Sea/
 │   ├── claw/              mesin capit, benda di tangki, ikan latar
 │   ├── desk/              meja pemilahan: inventaris, inspeksi, bin, rulebook
 │   ├── shift/             pembungkus yang menyatukan claw dan desk
-│   ├── report/  after_day/  game_over/  settings/  debug/
+│   ├── after_day/  game_over/  settings/  debug/
 │
 ├── systems/               logika murni tanpa scene
 │   ├── rule_checker.gd    benda + aturan hari ini → bin yang benar
 │   ├── day_manager.gd     graf alur antar layar
 │   ├── carried_item.gd    pembungkus runtime satu benda yang terangkat
-│   ├── mistake_view.gd    pembangun kartu kesalahan bersama
+│   ├── mistake_view.gd    pembangun kartu kesalahan
 │   ├── bin_icons.gd       pemetaan kategori ke pelat bin
 │   └── save_settings.gd   penyimpanan pengaturan volume
 │
@@ -1089,6 +1102,17 @@ dan menggantikan placeholder secara bertahap. Puncaknya adalah pembangunan ulang
 layar mesin capit menjadi kokpit utuh: satu ilustrasi 1280 × 720 yang memuat
 lambung kapal, bingkai jendela, kalender, panel bacaan, dan seluruh tombol konsol
 di dalam gambarnya sendiri.
+
+**Layar sekitar shift (7 September).** Kiriman terakhir melengkapi dua layar yang
+mengapit setiap shift: briefing sebelum hari dimulai dan laporan setelah hari
+berakhir. Keduanya digambar sebagai lembar kertas cetak biru berselotip di atas
+meja kerja, sehingga aturan harian dan hasil pemilahan dibaca seolah dari catatan
+kerja tokohnya sendiri, bukan dari kotak dialog. Kiriman yang sama membawa pelat
+tombol aksi utama, yang kini dipakai pada tiga tombol yang paling menentukan alur
+— `Start` di menu, `Lower the Claw` di briefing, dan `Start the Next Day` di
+laporan. Ilustrasi briefing bahkan sudah memuat soket gelap tempat tombol itu
+duduk, sehingga posisi tombol ditentukan oleh gambar, bukan oleh tebakan tata
+letak.
 
 ### 2.5.1 Playtest
 
@@ -1141,9 +1165,11 @@ suara bawah laut beserta musik yang berubah nuansanya seiring mesin yang dibangu
 typeface akan mengubah kesan visual seluruh layar tanpa perubahan tata letak,
 karena seluruh ukuran huruf sudah ditetapkan pada berkas tema.
 
-**Ilustrasi alat.** Dua belas gambar alat masih berupa placeholder dan merupakan
-kelompok aset terakhir yang belum digantikan ilustrasi asli. Karena rak alat
-tampil terus-menerus sejak hari kedua, penggantiannya berdampak besar.
+**Ilustrasi alat.** Empat ikon alat inspeksi digambar sebagai siluet datar satu
+warna, lebih sederhana daripada kelompok aset lain yang bervolume dan bertekstur.
+Karena rak alat tampil terus-menerus sejak hari kedua, menggambar ulang keempatnya
+dalam gaya yang sama dengan benda sampah adalah pekerjaan estetika yang tersisa
+dengan dampak paling terasa.
 
 **Perluasan konten.** Arsitektur berbasis data memungkinkan penambahan hari, benda,
 dan aturan tanpa perubahan kode. Rencana konkretnya adalah menambah aturan yang
@@ -1223,17 +1249,22 @@ arsitektur tersebut tidak pernah dilanggar.
 
 ### Aset yang dibuat sendiri oleh tim
 
-| Kelompok aset | Jumlah | Pembuat | Metode |
-|---|---|---|---|
-| Ilustrasi benda sampah | 17 | Yumiko Jeanette Japari, Nathanova Yvonne Fridany | Ilustrasi manual pada Procreate |
-| Ilustrasi bin pemilahan | 16 | Yumiko Jeanette Japari, Nathanova Yvonne Fridany | Ilustrasi manual pada Procreate |
-| Ilustrasi capit | 5 | Yumiko Jeanette Japari, Nathanova Yvonne Fridany | Ilustrasi manual pada Procreate |
-| Ilustrasi lingkungan | 6 | Yumiko Jeanette Japari, Nathanova Yvonne Fridany | Ilustrasi manual pada Procreate |
-| Gambar cutscene dan logo menu | 4 | Yumiko Jeanette Japari, Nathanova Yvonne Fridany | Ilustrasi manual pada Procreate |
-| Ilustrasi ikan latar | 3 | Yumiko Jeanette Japari, Nathanova Yvonne Fridany | Ilustrasi manual pada Procreate |
-| Antarmuka dan kokpit mesin | 64 | Yumiko Jeanette Japari, Nathanova Yvonne Fridany | Ilustrasi manual pada Procreate |
-| Efek suara | 11 | Jason Tio | Sintesis prosedural melalui skrip Python (`tools/gen_sounds.py`, memakai modul `wave` dari pustaka standar) |
-| Seluruh kode program | — | Jason Tio | GDScript |
+Jumlah pada tabel di bawah dihitung langsung dari isi direktori `assets/`, satu
+baris untuk setiap subdirektori, dan seluruhnya berjumlah 120 berkas PNG serta 11
+berkas WAV. Manifes lengkap berikut ukuran piksel dan keterangan tiap berkas
+tersedia pada `assets/ASSETS.md` di dalam repositori.
+
+| Kelompok aset | Direktori | Jumlah | Pembuat | Metode |
+|---|---|---|---|---|
+| Ilustrasi benda sampah | `assets/items/` | 17 | Yumiko Jeanette Japari, Nathanova Yvonne Fridany | Ilustrasi manual pada Procreate |
+| Ilustrasi bin pemilahan | `assets/bins/` | 5 | Yumiko Jeanette Japari, Nathanova Yvonne Fridany | Ilustrasi manual pada Procreate |
+| Ilustrasi capit | `assets/claw/` | 5 | Yumiko Jeanette Japari, Nathanova Yvonne Fridany | Ilustrasi manual pada Procreate |
+| Ilustrasi lingkungan, cutscene, logo | `assets/env/` | 15 | Yumiko Jeanette Japari, Nathanova Yvonne Fridany | Ilustrasi manual pada Procreate |
+| Ilustrasi ikan latar | `assets/fish/` | 11 | Yumiko Jeanette Japari, Nathanova Yvonne Fridany | Ilustrasi manual pada Procreate |
+| Ikon alat inspeksi | `assets/tools/` | 4 | Yumiko Jeanette Japari, Nathanova Yvonne Fridany | Ilustrasi manual pada Procreate |
+| Antarmuka, kokpit mesin, lembar rancang | `assets/ui/` | 63 | Yumiko Jeanette Japari, Nathanova Yvonne Fridany | Ilustrasi manual pada Procreate |
+| Efek suara | `assets/audio/` | 11 | Jason Tio | Sintesis prosedural melalui skrip Python (memakai modul `wave` dari pustaka standar) |
+| Seluruh kode program | — | — | Jason Tio | GDScript |
 
 **Pernyataan mengenai generative AI.** Tidak ada satu pun aset gambar maupun audio
 dalam permainan ini yang dihasilkan oleh generative AI. Seluruh ilustrasi digambar
@@ -1249,6 +1280,18 @@ tersisa di dalam project.
 
 ### Aset dari sumber lain
 
+| Aset | Pembuat | Lisensi | Dipakai untuk |
+|---|---|---|---|
+| Typeface **Fredoka** (`Fredoka-Medium`, `Fredoka-SemiBold`) | Milena Brandao, Hafontia | SIL Open Font License 1.1 | seluruh teks dalam permainan |
+
+Lisensi SIL OFL 1.1 mengizinkan penyertaan font di dalam sebuah karya digital,
+termasuk karya komersial, selama berkas lisensinya turut disertakan. Salinan utuh
+`OFL.txt` berada di `assets/ui/fonts/` di dalam repositori dan ikut terbungkus
+dalam build.
+
+Godot Engine 4.7.2 sendiri berlisensi MIT dan tidak mensyaratkan atribusi.
+
+
 `[BUTUH INPUT JASON: bagian ini WAJIB diisi atau dinyatakan kosong secara eksplisit.
 Hal-hal yang perlu dipastikan sebelum pengumpulan:
 
@@ -1258,10 +1301,8 @@ Hal-hal yang perlu dipastikan sebelum pengumpulan:
     untuk ilustrator di dalam project (assets_incoming/README.md) memang sempat
     mengizinkan gambar dari sumber-sumber tersebut untuk keperluan pengujian
     pipeline secara internal.
- 2. Font: bila sebuah typeface dipasang sebelum pengumpulan, cantumkan nama,
-    pembuat, dan lisensinya di sini.
- 3. Musik: bila musik ditambahkan, cantumkan judul, pembuat, dan lisensinya.
- 4. Godot Engine sendiri berlisensi MIT dan tidak menuntut atribusi, tetapi
+ 2. Musik: bila musik ditambahkan, cantumkan judul, pembuat, dan lisensinya.
+ 3. Godot Engine sendiri berlisensi MIT dan tidak menuntut atribusi, tetapi
     mencantumkannya adalah praktik yang baik.
 
 Bila memang tidak ada satu pun aset pihak ketiga, tulis kalimat eksplisit:

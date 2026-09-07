@@ -16,6 +16,10 @@
 [ext_resource type="Texture2D" uid="uid://il613d80lcd2" path="res://assets/ui/scrollbar_grabber_hover.png" id="14_sbgh"]
 [ext_resource type="Texture2D" uid="uid://bvl85i3tcl7u" path="res://assets/ui/textfield_normal.png" id="15_tfn"]
 [ext_resource type="Texture2D" uid="uid://c0xnbvty55w4m" path="res://assets/ui/textfield_focus.png" id="16_tff"]
+[ext_resource type="Texture2D" uid="uid://cjer4ar68ltf" path="res://assets/ui/primary_button.png" id="17_pbtn"]
+[ext_resource type="Texture2D" uid="uid://bmlftriw1vah1" path="res://assets/ui/primary_button_hover.png" id="18_pbth"]
+[ext_resource type="FontFile" uid="uid://ddrec1dpxd68f" path="res://assets/ui/fonts/Fredoka-Medium.ttf" id="19_font"]
+[ext_resource type="FontFile" uid="uid://5007keootb2p" path="res://assets/ui/fonts/Fredoka-SemiBold.ttf" id="20_fontb"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_e1g2j"]
 content_margin_left = 14.0
@@ -150,13 +154,33 @@ texture_margin_top = 24.0
 texture_margin_right = 24.0
 texture_margin_bottom = 24.0
 
+[sub_resource type="StyleBoxTexture" id="SBT_primary"]
+content_margin_left = 32.0
+content_margin_top = 26.0
+content_margin_right = 32.0
+content_margin_bottom = 15.0
+texture = ExtResource("17_pbtn")
+texture_margin_left = 48.0
+texture_margin_right = 48.0
+
+[sub_resource type="StyleBoxTexture" id="SBT_primary_hover"]
+content_margin_left = 32.0
+content_margin_top = 26.0
+content_margin_right = 32.0
+content_margin_bottom = 15.0
+texture = ExtResource("18_pbth")
+texture_margin_left = 48.0
+texture_margin_right = 48.0
+
 [resource]
+default_font = ExtResource("19_font")
 default_font_size = 18
 Button/colors/font_color = Color(0.11, 0.13, 0.15, 1)
 Button/colors/font_disabled_color = Color(0.42, 0.44, 0.46, 1)
 Button/colors/font_focus_color = Color(0.11, 0.13, 0.15, 1)
 Button/colors/font_hover_color = Color(0.02, 0.03, 0.04, 1)
 Button/colors/font_pressed_color = Color(0.08, 0.09, 0.1, 1)
+Button/fonts/font = ExtResource("20_fontb")
 Button/font_sizes/font_size = 20
 Button/styles/disabled = SubResource("StyleBoxTexture_e1g2j")
 Button/styles/focus = SubResource("StyleBoxTexture_45kcn")
@@ -194,3 +218,16 @@ VScrollBar/styles/grabber = SubResource("SBT_scroll_grab")
 VScrollBar/styles/grabber_highlight = SubResource("SBT_scroll_grab_hi")
 VScrollBar/styles/grabber_pressed = SubResource("SBT_scroll_grab_hi")
 VScrollBar/styles/scroll = SubResource("SBT_scroll_track")
+PrimaryButton/base_type = &"Button"
+PrimaryButton/colors/font_color = Color(0.97, 0.95, 0.9, 1)
+PrimaryButton/colors/font_disabled_color = Color(0.55, 0.56, 0.68, 1)
+PrimaryButton/colors/font_focus_color = Color(1, 1, 1, 1)
+PrimaryButton/colors/font_hover_color = Color(1, 1, 1, 1)
+PrimaryButton/colors/font_pressed_color = Color(0.88, 0.86, 0.82, 1)
+PrimaryButton/fonts/font = ExtResource("20_fontb")
+PrimaryButton/font_sizes/font_size = 24
+PrimaryButton/styles/disabled = SubResource("SBT_primary")
+PrimaryButton/styles/focus = SubResource("SBT_primary")
+PrimaryButton/styles/hover = SubResource("SBT_primary_hover")
+PrimaryButton/styles/normal = SubResource("SBT_primary")
+PrimaryButton/styles/pressed = SubResource("SBT_primary")

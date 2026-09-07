@@ -9,7 +9,6 @@ func _ready() -> void:
 	root.get_node("TitleLabel").text = Strings.tf("day_label", {"n": day.day_number})
 	root.get_node("IntroLabel").text = day.intro_text
 	root.get_node("RulesTitle").text = Strings.t("day_rules_today")
-	root.get_node("SeedLabel").text = Strings.tf("day_seed", {"n": Game.run_seed})
 	root.get_node("StatsLabel").text = "%s %d          %s %d          %s %s" % [
 		Strings.t("day_quota"), day.quota,
 		Strings.t("day_budget"), day.budget,
@@ -19,7 +18,7 @@ func _ready() -> void:
 		var label := Label.new()
 		label.text = "-  " + rule.text
 		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		label.add_theme_font_size_override("font_size", 17)
+		label.add_theme_font_size_override("font_size", 16)
 		list.add_child(label)
 	var begin: Button = root.get_node("BeginButton")
 	begin.text = Strings.t("day_begin")

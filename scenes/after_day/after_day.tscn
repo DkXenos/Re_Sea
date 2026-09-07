@@ -1,8 +1,9 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://scenes/after_day/after_day.gd" id="1_after"]
 [ext_resource type="Texture2D" path="res://assets/env/cutscene_05.png" id="2_bg"]
 [ext_resource type="Texture2D" path="res://assets/ui/panel_dark.png" id="3_pdark"]
+[ext_resource type="Texture2D" uid="uid://dptbj8f77awqv" path="res://assets/ui/report_panels.png" id="5_panels"]
 [ext_resource type="Theme" path="res://assets/ui/ui_theme.tres" id="4_theme"]
 
 [node name="AfterDay" type="Node2D"]
@@ -28,38 +29,49 @@ anchor_bottom = 1.0
 mouse_filter = 2
 theme = ExtResource("4_theme")
 
+[node name="ReportArt" type="TextureRect" parent="UiLayer/Root"]
+offset_right = 1280.0
+offset_bottom = 720.0
+mouse_filter = 2
+texture = ExtResource("5_panels")
+expand_mode = 1
+stretch_mode = 0
+
 [node name="TitleLabel" type="Label" parent="UiLayer/Root"]
 offset_left = 24.0
-offset_top = 14.0
-offset_right = 700.0
-offset_bottom = 52.0
-theme_override_font_sizes/font_size = 24
-theme_override_colors/font_color = Color(0.05, 0.17, 0.33, 1)
+offset_top = 6.0
+offset_right = 324.0
+offset_bottom = 48.0
+theme_override_font_sizes/font_size = 21
+theme_override_colors/font_color = Color(1, 0.99, 0.94, 1)
+theme_override_colors/font_outline_color = Color(0.04, 0.11, 0.25, 1)
+theme_override_constants/outline_size = 6
+vertical_alignment = 1
 
 [node name="Tabs" type="HBoxContainer" parent="UiLayer/Root"]
-offset_left = 24.0
-offset_top = 60.0
-offset_right = 1000.0
-offset_bottom = 104.0
-theme_override_constants/separation = 10
+offset_left = 336.0
+offset_top = 4.0
+offset_right = 1256.0
+offset_bottom = 48.0
+theme_override_constants/separation = 11
 
 [node name="ResultTab" type="Button" parent="UiLayer/Root/Tabs"]
-custom_minimum_size = Vector2(240, 44)
+custom_minimum_size = Vector2(299, 44)
 theme_override_font_sizes/font_size = 16
 
 [node name="TechTab" type="Button" parent="UiLayer/Root/Tabs"]
-custom_minimum_size = Vector2(240, 44)
+custom_minimum_size = Vector2(299, 44)
 theme_override_font_sizes/font_size = 16
 
 [node name="GearTab" type="Button" parent="UiLayer/Root/Tabs"]
-custom_minimum_size = Vector2(240, 44)
+custom_minimum_size = Vector2(299, 44)
 theme_override_font_sizes/font_size = 16
 
 [node name="PageBg" type="NinePatchRect" parent="UiLayer/Root"]
 offset_left = 20.0
-offset_top = 112.0
+offset_top = 58.0
 offset_right = 1260.0
-offset_bottom = 634.0
+offset_bottom = 580.0
 mouse_filter = 2
 texture = ExtResource("3_pdark")
 patch_margin_left = 24
@@ -68,132 +80,142 @@ patch_margin_right = 24
 patch_margin_bottom = 24
 
 [node name="ResultPage" type="Control" parent="UiLayer/Root"]
-offset_left = 20.0
-offset_top = 112.0
-offset_right = 1260.0
-offset_bottom = 634.0
+offset_right = 1280.0
+offset_bottom = 720.0
 mouse_filter = 2
 
-[node name="HaulTitle" type="Label" parent="UiLayer/Root/ResultPage"]
-offset_left = 36.0
-offset_top = 14.0
-offset_right = 616.0
-offset_bottom = 44.0
-theme_override_font_sizes/font_size = 18
-
-[node name="HaulScroll" type="ScrollContainer" parent="UiLayer/Root/ResultPage"]
-offset_left = 36.0
-offset_top = 50.0
-offset_right = 616.0
-offset_bottom = 390.0
-
-[node name="Haul" type="VBoxContainer" parent="UiLayer/Root/ResultPage/HaulScroll"]
-custom_minimum_size = Vector2(560, 0)
-theme_override_constants/separation = 6
-
-[node name="Summary" type="Label" parent="UiLayer/Root/ResultPage"]
-offset_left = 36.0
-offset_top = 400.0
-offset_right = 636.0
-offset_bottom = 496.0
-theme_override_font_sizes/font_size = 16
-
 [node name="MistakesTitle" type="Label" parent="UiLayer/Root/ResultPage"]
-offset_left = 660.0
-offset_top = 14.0
-offset_right = 1206.0
-offset_bottom = 44.0
-theme_override_font_sizes/font_size = 18
+offset_left = 165.0
+offset_top = 116.0
+offset_right = 600.0
+offset_bottom = 154.0
+theme_override_font_sizes/font_size = 19
+theme_override_colors/font_color = Color(1, 0.99, 0.94, 1)
+vertical_alignment = 1
 
 [node name="MistakesScroll" type="ScrollContainer" parent="UiLayer/Root/ResultPage"]
-offset_left = 660.0
-offset_top = 50.0
-offset_right = 1206.0
-offset_bottom = 500.0
+offset_left = 88.0
+offset_top = 160.0
+offset_right = 600.0
+offset_bottom = 512.0
 
 [node name="Mistakes" type="VBoxContainer" parent="UiLayer/Root/ResultPage/MistakesScroll"]
-custom_minimum_size = Vector2(526, 0)
-theme_override_constants/separation = 6
+custom_minimum_size = Vector2(492, 0)
+theme_override_constants/separation = 10
+
+[node name="Summary" type="Label" parent="UiLayer/Root/ResultPage"]
+offset_left = 92.0
+offset_top = 524.0
+offset_right = 520.0
+offset_bottom = 620.0
+theme_override_font_sizes/font_size = 15
+theme_override_colors/font_color = Color(0.94, 0.97, 1, 1)
+
+[node name="RecoveredTitle" type="Label" parent="UiLayer/Root/ResultPage"]
+offset_left = 690.0
+offset_top = 102.0
+offset_right = 1140.0
+offset_bottom = 140.0
+theme_override_font_sizes/font_size = 19
+theme_override_colors/font_color = Color(1, 0.99, 0.94, 1)
+vertical_alignment = 1
+
+[node name="Recovered" type="VBoxContainer" parent="UiLayer/Root/ResultPage"]
+offset_left = 692.0
+offset_top = 146.0
+offset_right = 1140.0
+offset_bottom = 326.0
+theme_override_constants/separation = 2
 
 [node name="TechPage" type="Control" parent="UiLayer/Root"]
 offset_left = 20.0
-offset_top = 112.0
+offset_top = 58.0
 offset_right = 1260.0
-offset_bottom = 634.0
+offset_bottom = 580.0
 mouse_filter = 2
 
 [node name="PrevButton" type="Button" parent="UiLayer/Root/TechPage"]
-offset_left = 300.0
+offset_left = 24.0
 offset_top = 8.0
-offset_right = 356.0
+offset_right = 80.0
 offset_bottom = 48.0
 theme_override_font_sizes/font_size = 20
 
 [node name="BlueprintName" type="Label" parent="UiLayer/Root/TechPage"]
-offset_left = 364.0
+offset_left = 88.0
 offset_top = 8.0
-offset_right = 876.0
+offset_right = 608.0
 offset_bottom = 48.0
 theme_override_font_sizes/font_size = 21
 horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="NextButton" type="Button" parent="UiLayer/Root/TechPage"]
-offset_left = 884.0
+offset_left = 616.0
 offset_top = 8.0
-offset_right = 940.0
+offset_right = 672.0
 offset_bottom = 48.0
 theme_override_font_sizes/font_size = 20
 
 [node name="PoolLabel" type="Label" parent="UiLayer/Root/TechPage"]
-offset_left = 300.0
-offset_top = 52.0
-offset_right = 940.0
-offset_bottom = 78.0
+offset_left = 24.0
+offset_top = 54.0
+offset_right = 672.0
+offset_bottom = 80.0
 theme_override_font_sizes/font_size = 15
 
 [node name="PartsLabel" type="Label" parent="UiLayer/Root/TechPage"]
-offset_left = 948.0
-offset_top = 52.0
-offset_right = 1210.0
-offset_bottom = 78.0
-theme_override_font_sizes/font_size = 15
+offset_left = 692.0
+offset_top = 10.0
+offset_right = 1216.0
+offset_bottom = 38.0
+theme_override_font_sizes/font_size = 16
 
 [node name="Flavour" type="Label" parent="UiLayer/Root/TechPage"]
-offset_left = 948.0
-offset_top = 84.0
-offset_right = 1210.0
-offset_bottom = 260.0
+offset_left = 692.0
+offset_top = 44.0
+offset_right = 1216.0
+offset_bottom = 116.0
 theme_override_font_sizes/font_size = 13
 autowrap_mode = 3
 
+[node name="PartsScroll" type="ScrollContainer" parent="UiLayer/Root/TechPage"]
+offset_left = 692.0
+offset_top = 124.0
+offset_right = 1216.0
+offset_bottom = 430.0
+
+[node name="PartsList" type="VBoxContainer" parent="UiLayer/Root/TechPage/PartsScroll"]
+custom_minimum_size = Vector2(506, 0)
+theme_override_constants/separation = 8
+
 [node name="Unlocks" type="Label" parent="UiLayer/Root/TechPage"]
-offset_left = 948.0
-offset_top = 268.0
-offset_right = 1210.0
-offset_bottom = 360.0
+offset_left = 692.0
+offset_top = 440.0
+offset_right = 1216.0
+offset_bottom = 498.0
 theme_override_font_sizes/font_size = 13
 autowrap_mode = 3
 
 [node name="Diagram" type="Control" parent="UiLayer/Root/TechPage"]
-offset_left = 300.0
-offset_top = 82.0
-offset_right = 940.0
-offset_bottom = 442.0
+offset_left = 24.0
+offset_top = 86.0
+offset_right = 672.0
+offset_bottom = 428.0
 mouse_filter = 2
 
 [node name="CraftButton" type="Button" parent="UiLayer/Root/TechPage"]
-offset_left = 300.0
-offset_top = 452.0
-offset_right = 940.0
-offset_bottom = 510.0
+offset_left = 24.0
+offset_top = 438.0
+offset_right = 672.0
+offset_bottom = 498.0
 theme_override_font_sizes/font_size = 20
 
 [node name="GearPage" type="Control" parent="UiLayer/Root"]
 offset_left = 20.0
-offset_top = 112.0
+offset_top = 58.0
 offset_right = 1260.0
-offset_bottom = 634.0
+offset_bottom = 580.0
 mouse_filter = 2
 
 [node name="Scroll" type="ScrollContainer" parent="UiLayer/Root/GearPage"]
@@ -207,11 +229,11 @@ custom_minimum_size = Vector2(936, 0)
 theme_override_constants/separation = 10
 
 [node name="NextButton" type="Button" parent="UiLayer/Root"]
-offset_left = 840.0
-offset_top = 642.0
-offset_right = 1260.0
-offset_bottom = 706.0
-theme_override_font_sizes/font_size = 22
+offset_left = 862.0
+offset_top = 596.0
+offset_right = 1242.0
+offset_bottom = 705.0
+theme_type_variation = &"PrimaryButton"
 
 [node name="PopupLayer" type="CanvasLayer" parent="."]
 layer = 100

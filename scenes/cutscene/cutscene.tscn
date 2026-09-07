@@ -10,7 +10,20 @@ script = ExtResource("1_cut")
 [node name="StillLayer" type="CanvasLayer" parent="."]
 layer = 0
 
-[node name="Still" type="TextureRect" parent="StillLayer"]
+[node name="Stills" type="Control" parent="StillLayer"]
+offset_right = 1280.0
+offset_bottom = 720.0
+pivot_offset = Vector2(640, 360)
+mouse_filter = 2
+
+[node name="StillPrev" type="TextureRect" parent="StillLayer/Stills"]
+offset_right = 1280.0
+offset_bottom = 720.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Still" type="TextureRect" parent="StillLayer/Stills"]
 offset_right = 1280.0
 offset_bottom = 720.0
 mouse_filter = 2
@@ -50,14 +63,9 @@ autowrap_mode = 3
 [node name="AdvanceHint" type="Label" parent="UiLayer/Root"]
 offset_left = 186.0
 offset_top = 690.0
-offset_right = 900.0
+offset_right = 1093.0
 offset_bottom = 714.0
 theme_override_font_sizes/font_size = 14
 theme_override_colors/font_color = Color(0.11, 0.28, 0.42, 1)
 horizontal_alignment = 0
 
-[node name="SkipButton" type="Button" parent="UiLayer/Root"]
-offset_left = 1064.0
-offset_top = 674.0
-offset_right = 1256.0
-offset_bottom = 710.0

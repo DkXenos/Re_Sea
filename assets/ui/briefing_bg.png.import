@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bfrd8krrbme73"
-path="res://.godot/imported/primary-button-hovered.png-2a410c29f46b209cfa505912e84351ca.ctex"
+uid="uid://du6cxdubc8yca"
+path="res://.godot/imported/briefing_bg.png-75fcf11f1f711fa823ba6b676e3b5a14.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/after-day/primary-button-hovered.png"
-dest_files=["res://.godot/imported/primary-button-hovered.png-2a410c29f46b209cfa505912e84351ca.ctex"]
+source_file="res://assets/ui/briefing_bg.png"
+dest_files=["res://.godot/imported/briefing_bg.png-75fcf11f1f711fa823ba6b676e3b5a14.ctex"]
 
 [params]
 

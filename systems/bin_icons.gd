@@ -12,8 +12,8 @@ const PATHS: Array[String] = [
 	"res://assets/bins/bin_landfill.png",
 ]
 
-# the art is 200x240, so a box that isn't taller than it is wide squashes it
-const ASPECT := 200.0 / 240.0
+# the art is 101x116, so a box that isn't taller than it is wide squashes it
+const ASPECT := 101.0 / 116.0
 
 
 static func texture(category: int) -> Texture2D:

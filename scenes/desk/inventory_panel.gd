@@ -13,6 +13,10 @@ const SLOT_BG_SELECTED := preload("res://assets/ui/panel_slot_selected.png")
 @onready var _empty: Label = $Empty
 
 var _selected: CarriedItem = null
+# the plate of every card on screen, so picking a different item can repaint
+# the two that changed instead of rebuilding the list. Rebuilding from inside
+# a card's own `pressed` would free the button that is still emitting.
+var _plates: Array[Dictionary] = []
 
 
 func _ready() -> void:
@@ -22,6 +26,7 @@ func _ready() -> void:
 
 func refresh() -> void:
 	_clear(_grid)
+	_plates.clear()
 	var entries := Game.unsorted_items()
 	_empty.visible = entries.is_empty()
 	for entry: CarriedItem in entries:
@@ -42,6 +47,7 @@ func _make_card(entry: CarriedItem) -> Control:
 	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
 	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	card.add_child(bg)
+	_plates.append({"entry": entry, "rect": bg})
 
 	# has to be a container. setting the label size by hand doesn't survive the
 	# layout pass and the property line runs off the card mid-word.
@@ -95,10 +101,19 @@ func _make_card(entry: CarriedItem) -> Control:
 	button.set_anchors_preset(Control.PRESET_FULL_RECT)
 	button.pressed.connect(func() -> void:
 		_selected = entry
+		# without this the plate stayed on whatever was picked first
+		_apply_selection()
 		Events.sfx_requested.emit(&"ui_click")
 		item_selected.emit(entry))
 	card.add_child(button)
 	return card
+
+
+## One drawing per state, so this swaps the png rather than tinting one.
+func _apply_selection() -> void:
+	for row: Dictionary in _plates:
+		var rect: NinePatchRect = row["rect"]
+		rect.texture = SLOT_BG_SELECTED if row["entry"] == _selected else SLOT_BG
 
 
 # whatever is next to deal with. a sealed crate counts: it is not sortable,

@@ -17,6 +17,14 @@ const OUTLINE := preload("res://assets/bins/bin_outline.png")
 const CATEGORY_ASSETS: Array[String] = ["organic", "recyclable", "hazard", "landfill"]
 const CATEGORY_KEYS: Array[String] = ["bin_organic", "bin_recyclable", "bin_hazard", "bin_landfill"]
 
+# the bin stands in a pedestal painted into desk_bg. these two put it in the
+# tray and put its name on the tray's front face, where the pale blue takes
+# dark text - white on that plate could not be read at all.
+const BIN_CENTRE_Y := 96.0
+const LABEL_WIDTH := 150.0
+const LABEL_Y := 162.0
+const LABEL_COLOUR := Color(0.05, 0.19, 0.36)
+
 # TODO the four bins are hardcoded to four here. adding a fifth category means
 # touching this + CATEGORY_KEYS + the enum. should read off the enum really.
 
@@ -35,7 +43,8 @@ func _ready() -> void:
 		outline.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		outline.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		outline.size = Vector2(OUTLINE.get_width(), OUTLINE.get_height())
-		outline.position = Vector2(centre - OUTLINE.get_width() * 0.5, 90 - OUTLINE.get_height() * 0.5)
+		outline.position = Vector2(centre - OUTLINE.get_width() * 0.5,
+			BIN_CENTRE_Y - OUTLINE.get_height() * 0.5)
 		outline.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		outline.visible = false
 		add_child(outline)
@@ -44,16 +53,19 @@ func _ready() -> void:
 		var sprite := AnimatedSprite2D.new()
 		sprite.sprite_frames = load("res://data/frames/bin_%s_frames.tres" % CATEGORY_ASSETS[i])
 		sprite.play(&"idle")
-		sprite.position = Vector2(centre, 90)
+		sprite.position = Vector2(centre, BIN_CENTRE_Y)
 		add_child(sprite)
 		_sprites.append(sprite)
 
 		var label := Label.new()
 		label.text = Strings.t(CATEGORY_KEYS[i])
-		label.position = Vector2(centre - slot * 0.5, 158)
-		label.size = Vector2(slot, 26)
+		# sized to the pedestal, not to the slot - a slot-wide label ran off
+		# both sides of the tray it is meant to be sitting on
+		label.position = Vector2(centre - LABEL_WIDTH * 0.5, LABEL_Y)
+		label.size = Vector2(LABEL_WIDTH, 26)
 		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		label.add_theme_font_size_override("font_size", 16)
+		label.add_theme_font_size_override("font_size", 15)
+		label.add_theme_color_override("font_color", LABEL_COLOUR)
 		add_child(label)
 
 		var button := Button.new()

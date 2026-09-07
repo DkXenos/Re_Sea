@@ -1,6 +1,7 @@
-# between the report and the next day. entered EVERY day - the old version
-# only fired when a blueprint happened to finish, which meant you could play
-# four days of five and never see any of the meta systems.
+# THE end of the day. there used to be a separate `report` scene in front of
+# this one showing the same mistakes over again in a different style, so every
+# day ended with two screens saying the same thing. that scene is gone and its
+# two jobs moved here: closing the day's books, and explaining what went wrong.
 #
 # three tabs, buttons swapping visibility. no transitions.
 extends Node2D
@@ -9,12 +10,14 @@ const SLOT_BG := preload("res://assets/ui/panel_slot.png")
 const MARK_CORRECT := preload("res://assets/ui/icon_check.png")
 const MARK_WRONG := preload("res://assets/ui/icon_cross.png")
 
-# one haul row per KIND of item, not per item picked up. a late day sorts ~13
-# kinds, so the row has to stay short enough that the list isn't all scrollbar.
-const HAUL_ROW_HEIGHT := 44.0
-const HAUL_ICON := 36.0
-const HAUL_BIN_ICON := 34.0
 const REQUIREMENT_ROW_HEIGHT := 30.0
+# one readable row per part of the blueprint. the sheet shows what the machine
+# will look like; this is what you can actually press.
+const PART_ROW_HEIGHT := 84
+const PART_ICON := 56.0
+# the mistake rows carry the whole explanation now, so the art can be small -
+# the reading is the point, not the picture.
+const MISTAKE_ICON := 56
 
 enum Tab { RESULT, TECH, GEAR }
 
@@ -23,20 +26,25 @@ enum Tab { RESULT, TECH, GEAR }
 @onready var _pages: Array[Control] = [
 	$UiLayer/Root/ResultPage, $UiLayer/Root/TechPage, $UiLayer/Root/GearPage]
 
+# the result page is drawn art, the other two are a plain dark plate
+@onready var _report_art: TextureRect = $UiLayer/Root/ReportArt
+@onready var _page_bg: NinePatchRect = $UiLayer/Root/PageBg
+
 @onready var _title: Label = $UiLayer/Root/TitleLabel
 @onready var _next: Button = $UiLayer/Root/NextButton
 
-@onready var _haul: VBoxContainer = $UiLayer/Root/ResultPage/HaulScroll/Haul
-@onready var _haul_title: Label = $UiLayer/Root/ResultPage/HaulTitle
 @onready var _mistakes_title: Label = $UiLayer/Root/ResultPage/MistakesTitle
-@onready var _result_summary: Label = $UiLayer/Root/ResultPage/Summary
 @onready var _mistakes: VBoxContainer = $UiLayer/Root/ResultPage/MistakesScroll/Mistakes
+@onready var _result_summary: Label = $UiLayer/Root/ResultPage/Summary
+@onready var _recovered_title: Label = $UiLayer/Root/ResultPage/RecoveredTitle
+@onready var _recovered: VBoxContainer = $UiLayer/Root/ResultPage/Recovered
 @onready var _gear_rows: VBoxContainer = $UiLayer/Root/GearPage/Scroll/Rows
 
 # technology tab
 @onready var _tech: Control = $UiLayer/Root/TechPage
 @onready var _diagram: Control = $UiLayer/Root/TechPage/Diagram
 @onready var _craft_button: Button = $UiLayer/Root/TechPage/CraftButton
+@onready var _parts_list: VBoxContainer = $UiLayer/Root/TechPage/PartsScroll/PartsList
 @onready var _popup_layer: CanvasLayer = $PopupLayer
 @onready var _popup: Control = $PopupLayer/Popup/Panel
 
@@ -50,6 +58,12 @@ var _popup_component: ComponentData = null
 
 func _ready() -> void:
 	var day := Game.current_day()
+	# closing the books is this screen's job now, and it has to happen before
+	# anything reads the numbers. `_credit_materials` is not idempotent - the
+	# day may be committed exactly once.
+	if not Game.day_committed:
+		Game.commit_day_result(Game.end_day_breakdown())
+		Events.sfx_requested.emit(&"day_end")
 	_title.text = Strings.tf("after_title", {"n": day.day_number if day != null else 0})
 	_next.text = Strings.t("after_last_day") if Game.is_last_day() \
 		else Strings.t("after_next_day")
@@ -96,6 +110,8 @@ func _show_tab(tab: Tab) -> void:
 	for i in _pages.size():
 		_pages[i].visible = i == int(tab)
 		_tab_buttons[i].disabled = i == int(tab)
+	_report_art.visible = tab == Tab.RESULT
+	_page_bg.visible = tab != Tab.RESULT
 	Events.sfx_requested.emit(&"ui_click")
 
 
@@ -103,34 +119,12 @@ func _finish() -> void:
 	Events.phase_finished.emit()
 
 
-# tab 1: today's haul
+# tab 1: how the day went
 
-# One row per kind of item, with its own art, how many went right, how many
-# went wrong and which bin it belonged in. The old version drew every single
-# item as a sprite in a 7-wide grid - with a 12-item quota that was a wall of
-# pictures you had to count, and it ran off its half of the page.
+# The left sheet explains every mis-sort: what it was, where it went, where it
+# belonged, the property that decided it and was never checked, and the rule
+# that decided it. The right sheet is what the day actually paid out.
 func _build_result() -> void:
-	_clear(_haul)
-	_haul_title.text = Strings.t("after_haul_title")
-	var kinds := _haul_by_kind()
-	if kinds.is_empty():
-		MistakeView.add_line(_haul, Strings.t("after_haul_empty"), 16,
-			Color(0.72, 0.78, 0.85))
-	else:
-		for id: StringName in kinds:
-			_haul.add_child(_make_haul_row(kinds[id]))
-
-	var result := Game.last_breakdown
-	var unsorted := Game.unsorted_items().size()
-	# machines built is the Technology tab's whole job - repeating the count
-	# here just put a second progress read-out on a page about today
-	_result_summary.text = "\n".join([
-		Strings.tf("after_sorted", {"ok": int(result.get("correct", 0)),
-			"bad": int(result.get("wrong", 0)), "left": unsorted}),
-		Strings.tf("after_budget", {"spent": int(Game.stats.get("spent", 0)),
-			"left": Game.budget_left, "max": Game.budget_max}),
-	])
-
 	_mistakes_title.text = Strings.t("report_mistakes")
 	_clear(_mistakes)
 	var any := false
@@ -138,93 +132,49 @@ func _build_result() -> void:
 		if entry.sorted_to == -1 or entry.was_correct:
 			continue
 		any = true
-		_mistakes.add_child(MistakeView.build_row(entry, 64))
+		_mistakes.add_child(MistakeView.build_row(entry, MISTAKE_ICON))
 	if not any:
-		MistakeView.add_line(_mistakes, Strings.t("report_perfect"), 17, Color(0.6, 0.9, 0.7))
+		MistakeView.add_line(_mistakes, Strings.t("report_perfect"), 17,
+			Color(0.75, 1, 0.82))
+
+	_build_recovered()
+
+	var result := Game.last_breakdown
+	var unsorted := Game.unsorted_items().size()
+	# machines built is the Technology tab's whole job - repeating the count
+	# here just put a second progress read-out on a page about today
+	_result_summary.text = "\n".join([
+		Strings.t("report_quota_met") if bool(result.get("quota_met", false)) \
+			else Strings.t("report_quota_failed"),
+		Strings.tf("after_sorted", {"ok": int(result.get("correct", 0)),
+			"bad": int(result.get("wrong", 0)), "left": unsorted}),
+		Strings.tf("after_budget", {"spent": int(Game.stats.get("spent", 0)),
+			"left": Game.budget_left, "max": Game.budget_max}),
+	])
 
 
-# item id -> {data, right, wrong, expected}. Insertion order is the order they
-# were picked up, which is the order the desk listed them in.
-#
-# `expected` is the bin the rules landed on today. It is per-item-kind, not per
-# item: RuleChecker reads only the ItemData and the day's rules, so two of the
-# same thing always resolve the same way.
-func _haul_by_kind() -> Dictionary:
-	var out: Dictionary = {}
-	for entry: CarriedItem in Game.inventory:
-		if entry.sorted_to == -1:
-			continue
-		var id: StringName = entry.data.id
-		if not out.has(id):
-			out[id] = {"data": entry.data, "right": 0, "wrong": 0,
-				"expected": entry.expected_category}
-		var bucket: Dictionary = out[id]
-		bucket["right" if entry.was_correct else "wrong"] += 1
-	return out
-
-
-# art, name, the two counts, and the bin it belonged in. right/wrong stays its
-# own png next to the count, never a tint on the item.
-func _make_haul_row(bucket: Dictionary) -> Control:
-	var data: ItemData = bucket["data"]
-	var row := PanelContainer.new()
-	row.custom_minimum_size = Vector2(0, HAUL_ROW_HEIGHT)
-
-	var columns := HBoxContainer.new()
-	columns.add_theme_constant_override("separation", 10)
-	row.add_child(columns)
-
-	var icon := TextureRect.new()
-	icon.texture = data.texture
-	icon.custom_minimum_size = Vector2.ONE * HAUL_ICON
-	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	columns.add_child(icon)
-
-	var text := VBoxContainer.new()
-	text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	text.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	text.add_theme_constant_override("separation", 0)
-	columns.add_child(text)
-	MistakeView.add_line(text, data.display_name, 16, Color(1, 1, 1))
-	MistakeView.add_line(text, Strings.tf("after_haul_belongs",
-		{"v": Strings.category_name(int(bucket["expected"]))}), 13,
-		Color(0.72, 0.78, 0.85))
-
-	# the bin it belonged in, as the plate you actually click
-	columns.add_child(BinIcons.make_icon(int(bucket["expected"]), HAUL_BIN_ICON))
-	columns.add_child(_tally(MARK_CORRECT, int(bucket["right"]), Color(0.6, 0.9, 0.7)))
-	columns.add_child(_tally(MARK_WRONG, int(bucket["wrong"]), Color(0.95, 0.55, 0.5)))
-	return row
-
-
-# "✓ 3". the number greys out at zero so the eye goes to the count that isn't.
-func _tally(mark: Texture2D, count: int, colour: Color) -> Control:
-	var box := HBoxContainer.new()
-	box.add_theme_constant_override("separation", 4)
-	box.custom_minimum_size = Vector2(56, 0)
-	box.alignment = BoxContainer.ALIGNMENT_END
-	box.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-
-	var icon := TextureRect.new()
-	icon.texture = mark
-	icon.custom_minimum_size = Vector2.ONE * 20.0
-	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	box.add_child(icon)
-
-	var label := Label.new()
-	label.text = str(count)
-	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	label.add_theme_font_size_override("font_size", 17)
-	label.add_theme_color_override("font_color",
-		colour if count > 0 else Color(0.45, 0.5, 0.55))
-	box.add_child(label)
-	return box
+# what the day actually paid out. a wrong bin is not a smaller payout, it is
+# no payout - the item is gone, so it never shows up here.
+func _build_recovered() -> void:
+	_recovered_title.text = Strings.t("report_recovered")
+	_clear(_recovered)
+	var recovered := Game.day_recovered()
+	if recovered.is_empty():
+		MistakeView.add_line(_recovered, Strings.t("report_recovered_none"), 16,
+			Color(1, 0.82, 0.72))
+	else:
+		for category in ItemData.Category.values():
+			if not recovered.has(category):
+				continue
+			MistakeView.add_line(_recovered, Strings.tf("report_recovered_line",
+				{"n": int(recovered[category]), "v": Strings.category_name(category)}),
+				19, Color(0.78, 1, 0.85))
+	var wrong: int = int(Game.last_breakdown.get("wrong", 0))
+	if wrong > 0:
+		MistakeView.add_line(_recovered, Strings.tf("report_wasted", {"n": wrong}), 15,
+			Color(1, 0.76, 0.7))
+	MistakeView.add_line(_recovered, Strings.t("report_recovered_note"), 13,
+		Color(0.85, 0.92, 1))
 
 
 # tab 2: technology
@@ -244,6 +194,7 @@ func _build_tech() -> void:
 	_tech.get_node("PartsLabel").text = "" if bp == null else Strings.tf("tech_parts",
 		{"have": bp.crafted_count(Game.crafted), "need": bp.components.size()})
 	_build_diagram(bp)
+	_build_parts_list(bp)
 	_refresh_craft_button(bp)
 
 
@@ -280,6 +231,62 @@ func _unlocks_text(bp: BlueprintData) -> String:
 		if up.id == bp.unlocks_upgrade:
 			return Strings.tf("tech_unlocks", {"v": up.display_name})
 	return ""
+
+
+# The sheet only ever showed a part once it was built, so an unbuilt blueprint
+# was a picture with nothing on it and no clue that any of it could be clicked.
+# The list says what the parts ARE, what each one costs, and carries the button.
+func _build_parts_list(bp: BlueprintData) -> void:
+	_clear(_parts_list)
+	if bp == null:
+		return
+	for component: ComponentData in bp.components:
+		_parts_list.add_child(_make_part_row(component))
+
+
+func _make_part_row(component: ComponentData) -> Control:
+	var done := Game.component_crafted(component)
+	var shortfall := Game.craft_shortfall(component)
+
+	var row := _panel_row(PART_ROW_HEIGHT)
+	row.custom_minimum_size = Vector2(506, PART_ROW_HEIGHT)
+
+	var icon := TextureRect.new()
+	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	icon.texture = component.done_texture
+	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	icon.position = Vector2(14, (PART_ROW_HEIGHT - PART_ICON) * 0.5)
+	icon.size = Vector2(PART_ICON, PART_ICON)
+	row.add_child(icon)
+
+	var lines := VBoxContainer.new()
+	lines.position = Vector2(84, 14)
+	lines.size = Vector2(238, 56)
+	lines.add_theme_constant_override("separation", 2)
+	lines.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	row.add_child(lines)
+	MistakeView.add_line(lines, component.display_name, 16, Color(1, 1, 1))
+	MistakeView.add_line(lines, _requirement_text(component), 13,
+		Color(0.6, 0.9, 0.7) if shortfall.is_empty() or done else Color(0.95, 0.72, 0.6))
+
+	var button := Button.new()
+	button.position = Vector2(334, 20)
+	button.size = Vector2(156, 44)
+	button.text = _craft_part_label(done, shortfall)
+	button.add_theme_font_size_override("font_size", 15)
+	button.disabled = done or not shortfall.is_empty()
+	if not button.disabled:
+		button.pressed.connect(_on_craft_part_row.bind(component))
+	row.add_child(button)
+	return row
+
+
+func _on_craft_part_row(component: ComponentData) -> void:
+	if not Game.craft_component(component):
+		return
+	Events.sfx_requested.emit(&"bin_accept")
+	_build_tech()
 
 
 # laid out from the rect the background is ACTUALLY drawn at, parts placed
