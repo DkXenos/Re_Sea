@@ -24,7 +24,7 @@ Art is coming from two designers later so none of it can be hardcoded.
 - exceptions: positional travel (claw descending, items drifting in, camera)
   and UI feedback (panel fades, the report counter). that's it.
 
-run_all.sh greps for the tween case.
+tests/run_all.sh greps for the tween case.
 
 ## assets
 
@@ -36,9 +36,6 @@ run_all.sh greps for the tween case.
 - one png, one thing. no atlases.
 - paths and sizes are in assets/ASSETS.md, designers drop replacements at the
   same path/size and nothing else changes
-- placeholders come from tools/gen_placeholders.py, sounds from gen_sounds.py
-- hotspot rings are NEVER in the item art, they're a separate overlay
-  generated from the .tres
 
 ## tools
 
@@ -64,8 +61,8 @@ Items/rules/days/tools are Resources with one .tres each. Adding item #40
 should be zero code. If something needs a new `if` per item I designed it
 wrong.
 
-Edit the .tres in the inspector. No generator writes to data/. Schema changes
-go in tools/migrations/ as one-offs.
+Edit the .tres in the inspector. Nothing generates data/ - the .tres files are
+the source.
 
 ## layers
 
@@ -75,7 +72,7 @@ go in tools/migrations/ as one-offs.
 20   glass overlay
 30   machine frame + console
 50   HUD + shift bar
-100  rulebook, calibration puzzle
+100  rulebook
 200  pause, settings, debug
 ```
 
@@ -97,11 +94,10 @@ rect in it, (216,122) 848x408, and TankContainer + ClawPhase.TANK_VIEW are set
 to exactly that. Redraw the frame with a different opening and those three
 numbers move together.
 
-Everything the designer sends arrives on the full 2560x1440 canvas with each
-piece already in place, so install_incoming crops each to its alpha box (a
-button and its pressed state share one crop) and the crop origin is where the
-node goes. That is why every console node has plain offsets and can just be
-dragged in the editor.
+The designer works on a full 2560x1440 canvas with each piece already in place;
+each console piece is cropped to its alpha box and installed at the path
+ASSETS.md gives, which is why every console node has plain offsets and can just
+be dragged in the editor.
 
 The keys and the buttons are the same control: A/D/Space swap the button's
 texture_normal for its pressed art, held briefly so a tap still reads.
@@ -150,7 +146,7 @@ godot --headless --quit-after 240
 
 Any SCRIPT ERROR / Parse Error / failed load / orphan node = broken. So is a
 hang: a failed assert kills the coroutine before quit() so it hangs instead of
-failing, which is why run_all.sh has its own timeout.
+failing, which is why tests/run_all.sh has its own timeout.
 
 ## not doing
 

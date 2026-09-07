@@ -112,6 +112,11 @@ texture = ExtResource("5_frame")
 [node name="ConsoleLayer" type="CanvasLayer" parent="."]
 layer = 40
 
+[node name="MapDots" type="Control" parent="ConsoleLayer"]
+offset_right = 1280.0
+offset_bottom = 130.0
+mouse_filter = 2
+
 [node name="Slider" type="TextureRect" parent="ConsoleLayer"]
 offset_left = 479.0
 offset_top = 34.0
@@ -119,11 +124,6 @@ offset_right = 801.0
 offset_bottom = 98.0
 mouse_filter = 2
 texture = ExtResource("18_slider")
-
-[node name="MapDots" type="Control" parent="ConsoleLayer"]
-offset_right = 1280.0
-offset_bottom = 130.0
-mouse_filter = 2
 
 [node name="ArrowLeft" type="TextureButton" parent="ConsoleLayer"]
 offset_left = 401.0
@@ -218,7 +218,7 @@ theme_override_font_sizes/font_size = 26
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="OceanTitle" type="Label" parent="HudLayer/HudRoot"]
+[node name="MachinesTitle" type="Label" parent="HudLayer/HudRoot"]
 offset_left = 1134.0
 offset_top = 438.0
 offset_right = 1234.0
@@ -226,7 +226,7 @@ offset_bottom = 458.0
 theme_override_font_sizes/font_size = 12
 horizontal_alignment = 1
 
-[node name="OceanLabel" type="Label" parent="HudLayer/HudRoot"]
+[node name="MachinesLabel" type="Label" parent="HudLayer/HudRoot"]
 offset_left = 1134.0
 offset_top = 458.0
 offset_right = 1234.0

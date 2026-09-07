@@ -104,7 +104,7 @@ const PARALLAX_OVERSCAN := 8.0
 @onready var _day_label: Label = $HudLayer/HudRoot/DayLabel
 @onready var _budget_label: Label = $HudLayer/HudRoot/BudgetLabel
 @onready var _quota_label: Label = $HudLayer/HudRoot/QuotaLabel
-@onready var _ocean_label: Label = $HudLayer/HudRoot/OceanLabel
+@onready var _machines_label: Label = $HudLayer/HudRoot/MachinesLabel
 
 var _day: DayData
 var _active: bool = true
@@ -158,7 +158,7 @@ func _ready() -> void:
 	_toast.text = ""
 	$HudLayer/HudRoot/BudgetTitle.text = Strings.t("budget_label")
 	$HudLayer/HudRoot/QuotaTitle.text = Strings.t("day_quota")
-	$HudLayer/HudRoot/OceanTitle.text = Strings.t("machines_title")
+	$HudLayer/HudRoot/MachinesTitle.text = Strings.t("machines_title")
 	_update_readouts()
 	_spawn_items()
 	_spawn_fish()
@@ -470,6 +470,9 @@ func _update_rail() -> void:
 	var progress := inverse_lerp(_camera_min(), _camera_max(), centre)
 	_slider.position.x = RAIL.x + travel * clampf(progress, 0.0, 1.0)
 
+	# the dots go UNDER the marker - MapDots is declared before Slider in the
+	# scene for exactly that reason. swap them back and the marker vanishes
+	# behind whatever happens to be sitting at that spot on the seabed.
 	var children := _items.get_children()
 	while _dots.size() < children.size():
 		var dot := TextureRect.new()
@@ -496,7 +499,7 @@ func _update_readouts() -> void:
 	_day_label.text = str(_day.day_number)
 	_budget_label.text = str(Game.budget_left)
 	_quota_label.text = "%d/%d" % [int(Game.stats.get("sorted", 0)), _day.quota]
-	_ocean_label.text = "%d/%d" % [Game.unlocked_blueprints.size(),
+	_machines_label.text = "%d/%d" % [Game.unlocked_blueprints.size(),
 		Game.blueprints.size()]
 
 

@@ -14,7 +14,7 @@ const END_DELAY_MESSAGE := 3.0
 @onready var _quota_label: Label = $BarLayer/Root/QuotaLabel
 @onready var _budget_label: Label = $BarLayer/Root/BudgetLabel
 @onready var _status: Label = $BarLayer/Root/Status
-@onready var _ocean_label: Label = $BarLayer/Root/OceanLabel
+@onready var _machines_label: Label = $BarLayer/Root/MachinesLabel
 @onready var _upgrade_label: Label = $BarLayer/Root/UpgradeLabel
 @onready var _switch_button: Button = $BarLayer/Root/SwitchButton
 @onready var _end_button: Button = $BarLayer/Root/EndButton
@@ -74,7 +74,7 @@ func _refresh_bar() -> void:
 		Game.budget_left, Game.budget_max]
 	# tab button says where it goes, how much is waiting and which key. people
 	# demoing this won't read a control list.
-	_ocean_label.text = Strings.tf("ocean_label",
+	_machines_label.text = Strings.tf("machines_label",
 		{"have": Game.unlocked_blueprints.size(), "need": Game.blueprints.size()})
 	# costs come from Game so the label can't disagree with what we charge
 	var costs := {"drop": Game.cost_of(&"drop"), "tool": Game.cost_of(&"tool"),

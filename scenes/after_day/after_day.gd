@@ -5,16 +5,16 @@
 # three tabs, buttons swapping visibility. no transitions.
 extends Node2D
 
-# experimental. to kill the puzzle: this line, the marked block in
-# _on_craft_blueprint(), and scenes/puzzle/.
-const CALIBRATION_PUZZLE := preload("res://scenes/puzzle/calibration_puzzle.tscn")
-
 const SLOT_BG := preload("res://assets/ui/panel_slot.png")
 const MARK_CORRECT := preload("res://assets/ui/icon_check.png")
 const MARK_WRONG := preload("res://assets/ui/icon_cross.png")
-# laid out in item-texture units, read off the texture so 256px art still works
-const TABLE_COLUMNS := 7
-const TABLE_GAP := Vector2(12.0, 30.0)
+
+# one haul row per KIND of item, not per item picked up. a late day sorts ~13
+# kinds, so the row has to stay short enough that the list isn't all scrollbar.
+const HAUL_ROW_HEIGHT := 44.0
+const HAUL_ICON := 36.0
+const HAUL_BIN_ICON := 34.0
+const REQUIREMENT_ROW_HEIGHT := 30.0
 
 enum Tab { RESULT, TECH, GEAR }
 
@@ -26,7 +26,9 @@ enum Tab { RESULT, TECH, GEAR }
 @onready var _title: Label = $UiLayer/Root/TitleLabel
 @onready var _next: Button = $UiLayer/Root/NextButton
 
-@onready var _table: Node2D = $UiLayer/Root/ResultPage/Table
+@onready var _haul: VBoxContainer = $UiLayer/Root/ResultPage/HaulScroll/Haul
+@onready var _haul_title: Label = $UiLayer/Root/ResultPage/HaulTitle
+@onready var _mistakes_title: Label = $UiLayer/Root/ResultPage/MistakesTitle
 @onready var _result_summary: Label = $UiLayer/Root/ResultPage/Summary
 @onready var _mistakes: VBoxContainer = $UiLayer/Root/ResultPage/MistakesScroll/Mistakes
 @onready var _gear_rows: VBoxContainer = $UiLayer/Root/GearPage/Scroll/Rows
@@ -103,21 +105,20 @@ func _finish() -> void:
 
 # tab 1: today's haul
 
-# the haul as actual art. a list of names says the same thing but feels like
-# a receipt.
+# One row per kind of item, with its own art, how many went right, how many
+# went wrong and which bin it belonged in. The old version drew every single
+# item as a sprite in a 7-wide grid - with a 12-item quota that was a wall of
+# pictures you had to count, and it ran off its half of the page.
 func _build_result() -> void:
-	_clear(_table)
-	var size := _item_size()
-	var step := size + TABLE_GAP
-	var index := 0
-	for entry: CarriedItem in Game.inventory:
-		if entry.sorted_to == -1:
-			continue
-		var column := index % TABLE_COLUMNS
-		var row := index / TABLE_COLUMNS
-		var origin := Vector2(step.x * column, step.y * row) + size * 0.5
-		_table.add_child(_make_table_item(entry, origin, size))
-		index += 1
+	_clear(_haul)
+	_haul_title.text = Strings.t("after_haul_title")
+	var kinds := _haul_by_kind()
+	if kinds.is_empty():
+		MistakeView.add_line(_haul, Strings.t("after_haul_empty"), 16,
+			Color(0.72, 0.78, 0.85))
+	else:
+		for id: StringName in kinds:
+			_haul.add_child(_make_haul_row(kinds[id]))
 
 	var result := Game.last_breakdown
 	var unsorted := Game.unsorted_items().size()
@@ -130,6 +131,7 @@ func _build_result() -> void:
 			"left": Game.budget_left, "max": Game.budget_max}),
 	])
 
+	_mistakes_title.text = Strings.t("report_mistakes")
 	_clear(_mistakes)
 	var any := false
 	for entry: CarriedItem in Game.inventory:
@@ -141,28 +143,88 @@ func _build_result() -> void:
 		MistakeView.add_line(_mistakes, Strings.t("report_perfect"), 17, Color(0.6, 0.9, 0.7))
 
 
-# read the size off the texture, don't assume 160
-func _item_size() -> Vector2:
+# item id -> {data, right, wrong, expected}. Insertion order is the order they
+# were picked up, which is the order the desk listed them in.
+#
+# `expected` is the bin the rules landed on today. It is per-item-kind, not per
+# item: RuleChecker reads only the ItemData and the day's rules, so two of the
+# same thing always resolve the same way.
+func _haul_by_kind() -> Dictionary:
+	var out: Dictionary = {}
 	for entry: CarriedItem in Game.inventory:
-		if entry.data.texture != null:
-			return entry.data.texture.get_size()
-	return Vector2(160.0, 160.0)
+		if entry.sorted_to == -1:
+			continue
+		var id: StringName = entry.data.id
+		if not out.has(id):
+			out[id] = {"data": entry.data, "right": 0, "wrong": 0,
+				"expected": entry.expected_category}
+		var bucket: Dictionary = out[id]
+		bucket["right" if entry.was_correct else "wrong"] += 1
+	return out
 
 
-func _make_table_item(entry: CarriedItem, origin: Vector2, size: Vector2) -> Node2D:
-	var holder := Node2D.new()
-	holder.position = origin
+# art, name, the two counts, and the bin it belonged in. right/wrong stays its
+# own png next to the count, never a tint on the item.
+func _make_haul_row(bucket: Dictionary) -> Control:
+	var data: ItemData = bucket["data"]
+	var row := PanelContainer.new()
+	row.custom_minimum_size = Vector2(0, HAUL_ROW_HEIGHT)
 
-	var sprite := Sprite2D.new()
-	sprite.texture = entry.data.texture
-	holder.add_child(sprite)
+	var columns := HBoxContainer.new()
+	columns.add_theme_constant_override("separation", 10)
+	row.add_child(columns)
 
-	# right/wrong is its own png on top, never a tint on the item
-	var mark := Sprite2D.new()
-	mark.texture = MARK_CORRECT if entry.was_correct else MARK_WRONG
-	mark.position = Vector2(size.x * 0.5 - 16.0, -size.y * 0.5 + 16.0)
-	holder.add_child(mark)
-	return holder
+	var icon := TextureRect.new()
+	icon.texture = data.texture
+	icon.custom_minimum_size = Vector2.ONE * HAUL_ICON
+	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	columns.add_child(icon)
+
+	var text := VBoxContainer.new()
+	text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	text.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	text.add_theme_constant_override("separation", 0)
+	columns.add_child(text)
+	MistakeView.add_line(text, data.display_name, 16, Color(1, 1, 1))
+	MistakeView.add_line(text, Strings.tf("after_haul_belongs",
+		{"v": Strings.category_name(int(bucket["expected"]))}), 13,
+		Color(0.72, 0.78, 0.85))
+
+	# the bin it belonged in, as the plate you actually click
+	columns.add_child(BinIcons.make_icon(int(bucket["expected"]), HAUL_BIN_ICON))
+	columns.add_child(_tally(MARK_CORRECT, int(bucket["right"]), Color(0.6, 0.9, 0.7)))
+	columns.add_child(_tally(MARK_WRONG, int(bucket["wrong"]), Color(0.95, 0.55, 0.5)))
+	return row
+
+
+# "✓ 3". the number greys out at zero so the eye goes to the count that isn't.
+func _tally(mark: Texture2D, count: int, colour: Color) -> Control:
+	var box := HBoxContainer.new()
+	box.add_theme_constant_override("separation", 4)
+	box.custom_minimum_size = Vector2(56, 0)
+	box.alignment = BoxContainer.ALIGNMENT_END
+	box.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+
+	var icon := TextureRect.new()
+	icon.texture = mark
+	icon.custom_minimum_size = Vector2.ONE * 20.0
+	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	box.add_child(icon)
+
+	var label := Label.new()
+	label.text = str(count)
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	label.add_theme_font_size_override("font_size", 17)
+	label.add_theme_color_override("font_color",
+		colour if count > 0 else Color(0.45, 0.5, 0.55))
+	box.add_child(label)
+	return box
 
 
 # tab 2: technology
@@ -312,8 +374,12 @@ func _requirement_text(component: ComponentData) -> String:
 
 # component popup
 
-# pool repeated here next to the requirement so you don't need a second screen.
-# button says what's short instead of just being dead.
+# ONE row per material: the bin it comes out of, how many you have, how many it
+# takes. The old version printed a "Needs 2 LANDFILL (have 0)" line and then a
+# second "Short 2 LANDFILL" line under it - two lines saying the same thing,
+# and neither said where LANDFILL comes from, which is the actual question a
+# player has. The shortfall now lives on the button, which is where it changes
+# what you can do.
 func _open_popup(component: ComponentData) -> void:
 	_popup_component = component
 	var done := Game.component_crafted(component)
@@ -328,22 +394,71 @@ func _open_popup(component: ComponentData) -> void:
 	var lines: VBoxContainer = _popup.get_node("Lines")
 	_clear(lines)
 	for category: int in component.requirements:
-		var need: int = int(component.requirements[category])
-		var held: int = Game.material_count(category)
-		MistakeView.add_line(lines, "%s   (%s)" % [
-			Strings.tf("tech_needs", {"n": need, "v": Strings.category_name(category)}),
-			Strings.tf("tech_have", {"n": held})],
-			15, Color(0.86, 0.9, 0.94) if held >= need else Color(0.95, 0.72, 0.6))
-	for category: int in shortfall:
-		MistakeView.add_line(lines, Strings.tf("tech_short",
-			{"n": int(shortfall[category]), "v": Strings.category_name(category)}),
-			14, Color(0.95, 0.72, 0.6))
+		lines.add_child(_requirement_row(category,
+			int(component.requirements[category])))
+	MistakeView.add_line(lines, "", 6, Color.WHITE)
+	# names the door the material comes through. without it a part that wants a
+	# category the day never spawns reads as a bug.
+	MistakeView.add_line(lines, Strings.t("tech_material_source"), 12,
+		Color(0.72, 0.78, 0.85))
 
 	var button: Button = _popup.get_node("CraftPartButton")
-	button.text = Strings.t("tech_rakit_done") if done else Strings.t("tech_rakit")
+	button.text = _craft_part_label(done, shortfall)
 	button.disabled = done or not shortfall.is_empty()
 	_popup_layer.visible = true
 	Events.sfx_requested.emit(&"ui_click")
+
+
+# bin plate, the bin's name, have / need, and a tick or a cross. green once the
+# store covers it, so the row is readable without doing the subtraction.
+func _requirement_row(category: int, need: int) -> Control:
+	var held: int = Game.material_count(category)
+	var enough: bool = held >= need
+	var colour := Color(0.6, 0.9, 0.7) if enough else Color(0.95, 0.72, 0.6)
+
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 10)
+	row.custom_minimum_size = Vector2(0, REQUIREMENT_ROW_HEIGHT)
+	row.add_child(BinIcons.make_icon(category, REQUIREMENT_ROW_HEIGHT))
+
+	var name_label := Label.new()
+	name_label.text = Strings.category_name(category)
+	name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	name_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	name_label.add_theme_font_size_override("font_size", 15)
+	row.add_child(name_label)
+
+	var count := Label.new()
+	count.text = Strings.tf("tech_progress", {"have": held, "need": need})
+	count.custom_minimum_size = Vector2(72, 0)
+	count.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	count.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	count.add_theme_font_size_override("font_size", 16)
+	count.add_theme_color_override("font_color", colour)
+	row.add_child(count)
+
+	var mark := TextureRect.new()
+	mark.texture = MARK_CORRECT if enough else MARK_WRONG
+	mark.custom_minimum_size = Vector2.ONE * 20.0
+	mark.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	mark.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	mark.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	mark.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	row.add_child(mark)
+	return row
+
+
+# a dead button that says nothing teaches nothing, so it carries the shortfall
+func _craft_part_label(done: bool, shortfall: Dictionary) -> String:
+	if done:
+		return Strings.t("tech_rakit_done")
+	if shortfall.is_empty():
+		return Strings.t("tech_rakit")
+	if shortfall.size() == 1:
+		var category: int = int(shortfall.keys()[0])
+		return Strings.tf("tech_short", {"n": int(shortfall[category]),
+			"v": Strings.category_name(category)})
+	return Strings.t("tech_short_any")
 
 
 func _on_craft_part() -> void:
@@ -368,14 +483,6 @@ func _on_craft_blueprint() -> void:
 	_build_tech()
 	_build_gear()
 	_build_result()
-	# --- experimental puzzle, only call site ---
-	if Game.feature_calibration_puzzle:
-		var puzzle: CanvasLayer = CALIBRATION_PUZZLE.instantiate()
-		if puzzle.setup(bp.id):
-			add_child(puzzle)
-			return
-		puzzle.free()
-	# --- end ---
 
 
 # tab 3: gear

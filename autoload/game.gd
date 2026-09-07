@@ -47,8 +47,6 @@ var force_grip: int = 0  # 1 always, -1 never, 0 roll
 # headless runs turn this off or godot yells about leaked streams
 var sfx_enabled: bool = true
 
-var feature_calibration_puzzle: bool = true
-
 var _sfx_players: Array[AudioStreamPlayer] = []
 var _sfx_cache: Dictionary = {}
 

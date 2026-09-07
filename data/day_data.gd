@@ -24,7 +24,6 @@ extends Resource
 @export var box_contents_min: int = 2
 @export var box_contents_max: int = 3
 
-@export var modifier: String = ""
 @export var intro_text: String = ""
 
 

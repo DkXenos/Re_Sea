@@ -1,4 +1,4 @@
-# Cakar Laut
+# Re:Sea
 
 Underwater claw machine + waste sorting. Godot 4.
 
@@ -26,7 +26,7 @@ data/       Resource classes and the .tres content
 scenes/     claw, desk, shift, report, after_day, menus
 systems/    rule checking, flow graph, settings
 assets/     all the art and sound (see ASSETS.md)
-tools/      placeholder generators + headless checks
+tests/      headless checks
 ```
 
 Content lives in `data/*.tres`, not in code. Adding an item or a rule shouldn't
@@ -38,5 +38,10 @@ See NOTES.md for the rules I keep breaking.
 
 ## state
 
-Prototype. Art is all placeholder - real sprites are coming from two designers,
-which is why everything is a PNG loaded from a fixed path.
+Playable start to finish. Most art is final; the tool icons are still
+placeholder. Everything is a PNG loaded from a fixed path, so replacing art is
+a file swap - see assets/ASSETS.md.
+
+## tests
+
+    ./tests/run_all.sh

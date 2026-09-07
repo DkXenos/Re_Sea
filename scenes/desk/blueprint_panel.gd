@@ -72,7 +72,7 @@ func _make_row(bp: BlueprintData) -> Control:
 		Color(0.6, 0.94, 0.72) if done else Color(0.86, 0.9, 0.94))
 	row.add_child(count)
 
-	# meter png clipped to width, same as the report's ocean meter
+	# meter png clipped to width, same as the report's meter
 	row.add_child(_meter(BAR_BG, Vector2(10, 26), Vector2(BAR_WIDTH, 5)))
 	var clip := Control.new()
 	clip.clip_contents = true

@@ -11,7 +11,6 @@ display_name = "Magnifier"
 frames = ExtResource("1_irk3m")
 icon = ExtResource("2_n1chp")
 reveals_field = "tag_text"
-default_charges = 5
 description = "Reads the recycling code or small printed label."
 sort_order = 2
 color = Color(0.9411765, 0.78431374, 0.32941177, 1)

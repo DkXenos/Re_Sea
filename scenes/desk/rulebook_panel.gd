@@ -1,7 +1,11 @@
 # open any time, pauses nothing. the challenge is hidden properties, not
-# remembering rules. also holds the PET/HDPE/PS glossary since nobody who
-# hasn't sorted waste before knows what those mean.
+# remembering rules. also holds the baseline "where does this go" guide and the
+# PET/HDPE/PS glossary, since nobody who hasn't sorted waste before knows
+# either one.
 extends Control
+
+# bin plate beside each group heading, big enough to read at a glance
+const GUIDE_ICON_HEIGHT := 44.0
 
 @onready var _title: Label = $Title
 @onready var _list: VBoxContainer = $Scroll/List
@@ -27,6 +31,7 @@ func _rebuild() -> void:
 	var day := Game.current_day()
 	if day == null or day.active_rules.is_empty():
 		_add_line(Strings.t("rulebook_empty"), 18, Color(0.7, 0.75, 0.8))
+		_add_guide()
 		_add_glossary()
 		return
 	# grouped by forced bin, rulebook-only ones go under UMUM
@@ -42,7 +47,44 @@ func _rebuild() -> void:
 		for rule: RuleData in groups[group_name]:
 			_add_line("-  " + rule.text, 17, Color(0.86, 0.91, 0.95))
 		_add_line("", 8, Color.WHITE)
+	_add_guide()
 	_add_glossary()
+
+
+# the baseline sorting guide, one block per bin, in enum order so it reads in
+# the same left-to-right order as the bins on the desk. driven off
+# Strings.GUIDANCE - adding a line there is the whole edit.
+func _add_guide() -> void:
+	_add_line(Strings.t("rulebook_where"), 21, Color(0.95, 0.83, 0.42))
+	_add_line(Strings.t("rulebook_where_note"), 15, Color(0.72, 0.78, 0.85))
+	for category in ItemData.Category.values():
+		var entries: Array = []
+		for entry: Array in Strings.GUIDANCE:
+			if int(entry[0]) == int(category):
+				entries.append(entry)
+		if entries.is_empty():
+			continue
+		_list.add_child(_guide_heading(category))
+		for entry: Array in entries:
+			_add_line("-  %s  -  %s" % [entry[1], entry[2]], 16,
+				Color(0.86, 0.91, 0.95))
+		_add_line("", 8, Color.WHITE)
+
+
+# bin plate + the bin's name, so the guide points at the thing you click
+func _guide_heading(category: int) -> Control:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 10)
+	row.add_child(BinIcons.make_icon(category, GUIDE_ICON_HEIGHT))
+
+	var label := Label.new()
+	label.text = Strings.category_name(category)
+	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	label.add_theme_font_size_override("font_size", 19)
+	label.add_theme_color_override("font_color", Color(0.95, 0.83, 0.42))
+	row.add_child(label)
+	return row
 
 
 # what the codes on the items mean

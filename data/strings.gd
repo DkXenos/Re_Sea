@@ -50,7 +50,7 @@ const TABLE: Dictionary = {
 	"shift_over": "Shift time is up",
 	"shift_nothing_sorted": "Shift over, and not one thing sorted. Nothing reaches the workshop today.",
 	"shift_sea_cleared": "Every last piece out of the water and into a bin. The seabed is clear.",
-	"ocean_label": "Machines built: {have} / {need}",
+	"machines_label": "Machines built: {have} / {need}",
 	"upgrade_active": "Gear fitted: {v}  -  drop {drop} · tool {tool} · sort {sort}",
 	"upgrade_none": "No gear fitted  -  drop {drop} · tool {tool} · sort {sort}",
 	"claw_grip_chance": "Grip chance: {n}%",
@@ -113,6 +113,8 @@ const TABLE: Dictionary = {
 
 	# --- rulebook ---
 	"rulebook_title": "RULEBOOK",
+	"rulebook_where": "WHERE THINGS GO",
+	"rulebook_where_note": "The baseline sorting guide. A special rule above always beats this - a recyclable with residue on it is no longer recyclable.",
 	"rulebook_codes": "WHAT THE RECYCLING CODES MEAN",
 	"rulebook_codes_note": "These codes are printed or stamped on the item itself. A code tells you what it is made of - not whether it is clean.",
 	"rulebook_close": "Close",
@@ -145,6 +147,9 @@ const TABLE: Dictionary = {
 	"after_last_day": "Finish the Last Shift",
 	"after_sorted": "Correct {ok}  ·  wrong {bad}  ·  unsorted {left}",
 	"after_budget": "Shift time used {spent} of {max}, {left} left",
+	"after_haul_title": "TODAY'S HAUL",
+	"after_haul_empty": "Nothing was sorted today.",
+	"after_haul_belongs": "belongs in {v}",
 
 	# --- blueprints ---
 	"blueprint_requires": "Needs: {v}",
@@ -163,6 +168,9 @@ const TABLE: Dictionary = {
 	"tech_needs": "Needs {n} {v}",
 	"tech_have": "have {n}",
 	"tech_short": "Short {n} {v}",
+	"tech_progress": "{have} / {need}",
+	"tech_short_any": "Not enough materials yet",
+	"tech_material_source": "Materials come from the bins. Only items you put in the RIGHT bin are stored - a wrong bin loses the item.",
 	"tech_rakit": "Build",
 	"tech_rakit_done": "Fitted",
 	"tech_close": "Close",
@@ -173,16 +181,6 @@ const TABLE: Dictionary = {
 	"upgrade_locked": "Locked",
 	"upgrade_benefit": "+ {v}",
 	"upgrade_cost": "- {v}",
-
-	# --- calibration puzzle (EXPERIMENTAL) ---
-	# delete this block with scenes/puzzle/
-	"puzzle_title": "PUT THE MACHINE'S STEPS IN ORDER",
-	"puzzle_hint": "Drag the steps into the right order, then run it. A wrong order costs nothing - try as many times as you like.",
-	"puzzle_run": "Run",
-	"puzzle_skip": "Skip",
-	"puzzle_continue": "Continue",
-	"puzzle_success": "The machine runs correctly. Shift time +{n}.",
-	"puzzle_wrong": "That order is not right yet.",
 
 	# --- endings ---
 	# three endings, decided by how many machines were actually built
@@ -200,6 +198,45 @@ const TABLE: Dictionary = {
 	"pause_resume": "Resume",
 	"pause_menu": "Main Menu",
 }
+
+# the baseline sorting guide, in the same shape as CODES: which bin a material
+# goes in and why. Fixed reference text, not per-item content - an item is
+# still judged by its own .tres plus the day's rules, this only explains the
+# reasoning so a new player isn't guessing.
+#
+# [category, what it is, why it goes there]
+const GUIDANCE: Array = [
+	[ItemData.Category.ORGANIC, "Food waste",
+		"fruit, peel, eggshell, leftovers. It rots down, so it belongs in ORGANIC."],
+	[ItemData.Category.ORGANIC, "Garden waste",
+		"leaves, twigs, cuttings. Natural matter, same bin as food."],
+	[ItemData.Category.ORGANIC, "Natural fibre",
+		"cotton, wool, jute - a COTTON 100% shirt is plant matter and rots down."],
+
+	[ItemData.Category.RECYCLABLE, "Paper and card",
+		"newspaper, plain card, a clean paper cup. Marked PAPER or PAP. Clean and unlined only."],
+	[ItemData.Category.RECYCLABLE, "Glass",
+		"bottles and jars, marked GL. Glass is recyclable however many times it has been used."],
+	[ItemData.Category.RECYCLABLE, "Clean plastic",
+		"marked PET 1 or HDPE 2. Clean means clean - rinse it or it is not recyclable."],
+	[ItemData.Category.RECYCLABLE, "Polyester and synthetic fabric",
+		"marked POLYESTER. It is plastic woven into cloth, not a natural fibre, so it goes here and NOT in ORGANIC."],
+	[ItemData.Category.RECYCLABLE, "Metal",
+		"aluminium and steel, marked ALU. Valuable and recycled over and over."],
+
+	[ItemData.Category.HAZARD, "Chemical residue",
+		"engine oil, solvent paint, expired medicine. Whatever held it is hazardous, whatever it is made of."],
+	[ItemData.Category.HAZARD, "Pesticide and toxic metals",
+		"a pesticide-soaked cloth, anything marked Pb (lead). It poisons the bay if it goes anywhere else."],
+
+	[ItemData.Category.LANDFILL, "A used cup, or anything with residue",
+		"a used paper cup is soaked through. Residue means it cannot be recycled - it goes to LANDFILL, unless the residue is chemical, which makes it HAZARDOUS."],
+	[ItemData.Category.LANDFILL, "Laminated packaging",
+		"paper bonded to plastic or foil, e.g. PAP 22 - PE liner. The layers cannot be separated, so nothing can be recovered."],
+	[ItemData.Category.LANDFILL, "Soiled tissue and the rest",
+		"used tissue, and anything that is not organic, not clean enough to recycle and not chemical."],
+]
+
 
 # resin codes off real packaging. fixed reference table, not per-item content,
 # so it stays here instead of becoming 14 more .tres files.

@@ -17,15 +17,13 @@ Short version: **same path, same pixel size, flat art, no baked lighting.**
 5. One PNG is one whole thing. A bottle is one file, not body + cap + label.
 6. State is a different drawing, not a tint. Locked tool, highlighted bin,
    selected slot - each gets its own PNG. The code never recolours art.
-7. Everything is displayed at scale 1 except these three (four now, with the
-   box):
+7. Everything is displayed at scale 1 except these three:
 
    | What | Authored | Displayed | Constant |
    |------|----------|-----------|----------|
    | Item in the inspect panel | 160×160 | 288×288 | `InspectPanel.BASE_SCALE` = 1.8 |
    | Tool icon in the rack | 96×96 | 60×60 | `InspectPanel.TOOL_ICON_SCALE` = 0.62 |
    | Bin on the desk | 200×240 | 144×173 | `BinRow.BIN_DISPLAY_SCALE` = 0.72 |
-   | Box on its inventory card | 160×160 | 64×64 | `InventoryPanel.BOX_CARD_SCALE` = 0.4 |
 
    Everywhere else the size in the table is the size on screen.
 
@@ -69,25 +67,21 @@ it just plays shorter.
 
 ## hotspots
 
-Items have 2-3 invisible hotspots (a seam, a label corner, a stain) and a tool
-only reveals its property if you click the right one. Positions are in
-`data/items/*.tres`.
+An item's `hotspots` in `data/items/*.tres` say which tool finds which property
+on it, e.g. `{"tool": "rinse", "reveals": "has_residue"}`. There are no
+positions and no rings: the whole item is the target, so a tool either has
+something to find on it or it does not.
 
-The rings are NOT part of the item art. They're a separate overlay,
-the .tres and re-run it.
-
-In the final art the hotspot should be an actual drawn feature at the same
-coords: the stain where the rinse ring is, the printed code where the magnifier
-ring is, the seam where the cutter ring is. Then the overlay is just an
-accessibility toggle instead of how you solve it.
-
-Ring colours come from `ToolData.color` - rinse blue, swab pink, magnifier
-yellow, cutter red.
+That means nothing has to be drawn at a particular coordinate. Draw the
+evidence into the art where it makes sense - the stain, the printed code, the
+seam - and it reads as the reason the tool found something.
 
 ## no AI art
 
-Nothing here, image or audio, is AI generated and nothing should be. The
-current files come out of `tools/gen_placeholders.py` and `gen_sounds.py`.
+No image or audio in this project is AI generated, and none may be. Every
+illustration is drawn by hand by the project's own artists. The remaining
+placeholder files are plain shapes and tones, and are being replaced as the
+real art arrives.
 
 ---
 
@@ -244,7 +238,7 @@ for, and the frame count the real thing should have. `static` = shown as-is.
 | `assets/tools/tool_cutter_using.png` | 96x96 | `using` 4 fr | Pemotong tool, using |
 | `assets/tools/tool_cutter_locked.png` | 96x96 | `locked` 1 fr | Pemotong tool, locked |
 | `assets/ui/panel_main.png` | 96x96 | static | Main UI panel. NinePatchRect, 24px margins. |
-| `assets/ui/panel_dark.png` | 96x96 | static | Modal / overlay panel: the rulebook, the calibration puzzle, and the blueprint component popup. NinePatchRect, 24px margins. |
+| `assets/ui/panel_dark.png` | 96x96 | static | Modal / overlay panel: the rulebook and the blueprint component popup. NinePatchRect, 24px margins. |
 | `assets/ui/panel_slot.png` | 96x96 | static | Inventory slot background. NinePatchRect, 24px margins. |
 | `assets/ui/panel_slot_selected.png` | 96x96 | static | Inventory slot, selected. A different PNG rather than a tint. NinePatchRect, 24px margins. |
 | `assets/ui/chip_surface.png` | 64x40 | static | Evidence chip, free surface info (grey). NinePatchRect, 24px margins. |
@@ -253,26 +247,13 @@ for, and the frame count the real thing should have. `static` = shown as-is.
 | `assets/ui/button_hover.png` | 64x64 | static | Button hover state. NinePatch, 20px margins. |
 | `assets/ui/button_pressed.png` | 64x64 | static | Button pressed state. NinePatch, 20px margins. |
 | `assets/ui/button_disabled.png` | 64x64 | static | Button disabled state. NinePatch, 20px margins. |
-| `assets/ui/icon_day.png` | 48x48 | static | HUD icon (H) |
-| `assets/ui/icon_quota.png` | 48x48 | static | HUD icon (T) |
-| `assets/ui/icon_grab.png` | 48x48 | static | HUD icon (C) |
-| `assets/ui/icon_health.png` | 48x48 | static | HUD icon (L) |
-| `assets/ui/icon_book.png` | 48x48 | static | HUD icon (A) |
-| `assets/ui/icon_close.png` | 48x48 | static | HUD icon (X) |
 | `assets/ui/icon_check.png` | 48x48 | static | HUD icon (V) |
 | `assets/ui/icon_cross.png` | 48x48 | static | HUD icon (X) |
 | `assets/ui/icon_pause.png` | 48x48 | static | HUD icon (II) |
 | `assets/ui/chip_match.png` | 64x40 | static | Evidence chip that satisfies an active rule (green). NinePatchRect, 24px margins. |
-| `assets/ui/minimap_bg.png` | 960x28 | static | **SUPERSEDED** by `assets/ui/machine_frame.png` and the machine_* buttons - nothing loads this any more. Do not redraw it. |
-| `assets/ui/minimap_view.png` | 64x28 | static | **SUPERSEDED** by `assets/ui/machine_frame.png` and the machine_* buttons - nothing loads this any more. Do not redraw it. |
 | `assets/ui/minimap_item.png` | 10x10 | static | Minimap dot for one item on the seabed |
-| `assets/ui/minimap_claw.png` | 12x20 | static | **SUPERSEDED** by `assets/ui/machine_frame.png` and the machine_* buttons - nothing loads this any more. Do not redraw it. |
 | `assets/ui/meter_bg.png` | 320x32 | static | Ocean health meter bg. Fill is clipped by width. |
 | `assets/ui/meter_fill.png` | 320x32 | static | Ocean health meter fill. Fill is clipped by width. |
-| `assets/ui/arrow_left.png` | 96x96 | static | **SUPERSEDED** by `assets/ui/machine_frame.png` and the machine_* buttons - nothing loads this any more. Do not redraw it. |
-| `assets/ui/arrow_right.png` | 96x96 | static | **SUPERSEDED** by `assets/ui/machine_frame.png` and the machine_* buttons - nothing loads this any more. Do not redraw it. |
-| `assets/ui/joystick_base.png` | 128x128 | static | **SUPERSEDED** by `assets/ui/machine_frame.png` and the machine_* buttons - nothing loads this any more. Do not redraw it. |
-| `assets/ui/joystick_knob.png` | 72x72 | static | **SUPERSEDED** by `assets/ui/machine_frame.png` and the machine_* buttons - nothing loads this any more. Do not redraw it. |
 | `assets/ui/slider_track.png` | 64x16 | static | Volume slider track. NinePatch, 8px margins, stretched to width. |
 | `assets/ui/slider_fill.png` | 64x16 | static | Volume slider fill, the part left of the knob. NinePatch, 8px margins. |
 | `assets/ui/slider_grabber.png` | 32x32 | static | Volume slider knob. |
@@ -285,8 +266,6 @@ for, and the frame count the real thing should have. `static` = shown as-is.
 | `assets/ui/textfield_normal.png` | 64x40 | static | Text field. NinePatch, 12px margins, stretched. |
 | `assets/ui/textfield_focus.png` | 64x40 | static | Text field, focused. NinePatch, 12px margins. |
 | `assets/ui/icon_pause_pressed.png` | 48x48 | static | Pause button, pressed state. |
-| `assets/ui/arrow_left_pressed.png` | 96x96 | static | **SUPERSEDED** by `assets/ui/machine_frame.png` and the machine_* buttons - nothing loads this any more. Do not redraw it. |
-| `assets/ui/arrow_right_pressed.png` | 96x96 | static | **SUPERSEDED** by `assets/ui/machine_frame.png` and the machine_* buttons - nothing loads this any more. Do not redraw it. |
 | `assets/env/water_bg.png` | 1280x720 | static | Deep-water backdrop. The furthest parallax layer inside the tank window - scaled from its own size to cover the window, never stretched. |
 | `assets/env/hull_wall.png` | 128x128 | static | Submarine hull, tiled at native size over everything outside the window. Must tile seamlessly. |
 | `assets/ui/machine_frame.png` | 1280x720 | static | The whole cockpit: hull, window surround, glass streaks, panels. Drawn over the tank; the window opening is the transparent rect at (216,122) 848x408. |
@@ -304,24 +283,18 @@ for, and the frame count the real thing should have. `static` = shown as-is.
 | `assets/env/coral_dead.png` | 174x140 | static | Far parallax scenery, planted along the back of the seabed. Cut-out; drawn at this size, so this row decides how big it reads. |
 | `assets/env/coral_healthy.png` | 157x190 | static | Mid parallax scenery, nearer than the dead coral. Cut-out, drawn at this size. |
 | `assets/env/seabed.png` | 1000x140 | static | Seabed floor inside the tank SubViewport, z_index -10 |
-| `assets/env/tank_frame.png` | 1040x460 | static | **SUPERSEDED** by `assets/ui/machine_frame.png` and the machine_* buttons - nothing loads this any more. Do not redraw it. |
-| `assets/env/glass_overlay.png` | 1000x420 | static | **SUPERSEDED** by `assets/ui/machine_frame.png` and the machine_* buttons - nothing loads this any more. Do not redraw it. |
-| `assets/env/machine_console.png` | 1280x220 | static | **SUPERSEDED** by `assets/ui/machine_frame.png` and the machine_* buttons - nothing loads this any more. Do not redraw it. |
 | `assets/env/bubble.png` | 24x24 | `rise` 6 fr | Bubble, count scales with the VFX slider |
 | `assets/env/cutscene_01.png` | 960x540 | static | Cutscene still 1 (placeholder) |
 | `assets/env/cutscene_02.png` | 960x540 | static | Cutscene still 2 (placeholder) |
 | `assets/env/cutscene_03.png` | 960x540 | static | Cutscene still 3 (placeholder) |
 | `assets/env/logo.png` | 640x200 | static | Title logo |
-| `assets/env/seabed_tier_0.png` | 1000x140 | static | Seabed backdrop for ocean tier 0. Tiled across the seabed width. |
-| `assets/env/seabed_tier_1.png` | 1000x140 | static | Seabed backdrop for ocean tier 1. Tiled across the seabed width. |
-| `assets/env/seabed_tier_2.png` | 1000x140 | static | Seabed backdrop for ocean tier 2. Tiled across the seabed width. |
-| `assets/env/seabed_tier_3.png` | 1000x140 | static | Seabed backdrop for ocean tier 3. Tiled across the seabed width. |
 | `assets/env/coral_healthy.png` | 120x140 | `idle` 6 fr | Coral overlay, in colour. Sways in place; count is per ocean tier. |
 | `assets/env/coral_dead.png` | 120x140 | `idle` 6 fr | Coral overlay, bleached. Sways in place; count is per ocean tier. |
-| `assets/env/debris_overlay.png` | 96x96 | `idle` 6 fr | Debris clutter on the seabed. Count falls as the ocean recovers. |
 | `assets/items/box_closed.png` | 160x160 | `closed` 2 fr, `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Mystery box, sealed. State `closed`. |
 | `assets/items/box_opened.png` | 160x160 | `opened` 2 fr | Mystery box, lid open. State `opened`. |
 | `assets/ui/blueprint_bg_cleaner_drone.png` | 960x540 | static | Blueprint schematic sheet for `cleaner_drone`. Parts sit on top from normalized coords in the .tres. |
+| `assets/ui/blueprint_bg_cleaner_drone_ready.png` | 628x396 | static | Cleaner Drone blueprint sheet, every part crafted and ready to build. |
+| `assets/ui/blueprint_bg_cleaner_drone_done.png` | 628x396 | static | Cleaner Drone blueprint sheet, stamped built. |
 | `assets/ui/blueprint_bg_penyaring_mikroplastik.png` | 960x540 | static | Blueprint schematic sheet for `penyaring_mikroplastik`. Parts sit on top from normalized coords in the .tres. |
 | `assets/ui/blueprint_bg_penetral_b3.png` | 960x540 | static | Blueprint schematic sheet for `penetral_b3`. Parts sit on top from normalized coords in the .tres. |
 | `assets/ui/comp_drone_body_done.png` | 128x128 | static | Blueprint component `drone_body`, done. |
@@ -357,5 +330,25 @@ one line to `assets/ui/ui_theme.tres` under `[resource]`:
 Sizes stay where they are (`default_font_size = 18`, buttons 20) so nothing
 re-lays out. Pick something that reads at 18px — this is a text-heavy game.
 
-Regenerate placeholders with `python3 tools/gen_placeholders.py`. Hotspot
-overlays are separate, see above.
+---
+
+## audio
+
+Eleven sound effects, played through the `SFX` bus by `Game.play_sfx()`. Each is
+requested by name, e.g. `Events.sfx_requested.emit(&"bin_accept")`, so replacing
+a sound is dropping a new `.wav` at the same path. There is no music yet; the
+`Music` bus and its volume slider exist and are wired, but nothing plays on it.
+
+| File | Length | Format | Played when |
+|------|--------|--------|-------------|
+| `assets/audio/bin_accept.wav` | 0.20 s | 22 kHz 16-bit mono | Bin takes the item (does NOT mean the answer was right). |
+| `assets/audio/bin_reject.wav` | 0.34 s | 22 kHz 16-bit mono | Bin refuses: nothing selected, sealed crate, or no shift time. |
+| `assets/audio/claw_drop.wav` | 0.22 s | 22 kHz 16-bit mono | Claw begins its descent. |
+| `assets/audio/claw_move.wav` | 0.05 s | 22 kHz 16-bit mono | Claw slides along the rail (retriggers every 0.22 s while held). |
+| `assets/audio/day_end.wav` | 0.54 s | 22 kHz 16-bit mono | Shift ends, and the day report opens. |
+| `assets/audio/grab_fail.wav` | 0.27 s | 22 kHz 16-bit mono | Grip roll failed, or the claw closed on nothing. |
+| `assets/audio/grab_success.wav` | 0.19 s | 22 kHz 16-bit mono | Grip roll succeeded, item is coming up. |
+| `assets/audio/reveal_nothing.wav` | 0.24 s | 22 kHz 16-bit mono | A tool was spent and found nothing on this item. |
+| `assets/audio/reveal_success.wav` | 0.26 s | 22 kHz 16-bit mono | A tool revealed a hidden property. |
+| `assets/audio/tool_use.wav` | 0.11 s | 22 kHz 16-bit mono | A tool is used on an item. |
+| `assets/audio/ui_click.wav` | 0.03 s | 22 kHz 16-bit mono | Any button, tab switch, or menu press. |

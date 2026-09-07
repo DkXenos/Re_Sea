@@ -62,7 +62,7 @@ offset_right = 752.0
 offset_bottom = 36.0
 theme_override_font_sizes/font_size = 13
 
-[node name="OceanLabel" type="Label" parent="BarLayer/Root"]
+[node name="MachinesLabel" type="Label" parent="BarLayer/Root"]
 offset_left = 20.0
 offset_top = 48.0
 offset_right = 420.0

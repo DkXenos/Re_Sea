@@ -9,7 +9,6 @@ extends Resource
 # a crate-opener and an inspection tool are different jobs. an opener finds
 # nothing on an ordinary item; every other tool bounces off a sealed crate.
 @export var opens_containers: bool = false
-@export var default_charges: int = 3
 @export var description: String
 @export var sort_order: int = 0
 # rings, armed cursor, evidence chips all read this
