@@ -9,8 +9,6 @@ var bad_mode := false
 var verbose := false
 # 0 = let the game pick. a fixed seed makes two runs comparable, which is how
 var fixed_seed := 0
-## "" leaves the claw unmodified; "first" fits whatever is available.
-var upgrade_choice := "first"
 ## Play the run without crafting anything, to read off the raw material supply.
 var no_craft := false
 
@@ -42,8 +40,6 @@ func _run() -> void:
 		fixed_seed = int(args[seed_at + 1])
 	game = root.get_node("/root/Game")
 	game.sfx_enabled = false  # see Game.sfx_enabled
-	if "--no-upgrade" in args:
-		upgrade_choice = ""
 	no_craft = "--no-craft" in args
 	main = load("res://main.tscn").instantiate()
 	root.add_child(main)
@@ -131,9 +127,10 @@ func _pool_line() -> String:
 	return "  ".join(parts)
 
 
-# crafts every finished blueprint, keeps the first available upgrade on.
-# driving the real buttons is the whole point - the old check called Game
-# directly and passed for ages without ever firing in a real run.
+# crafts every finished blueprint. driving the real buttons is the whole point -
+# the old check called Game directly and passed for ages without ever firing in
+# a real run. Nothing fits an upgrade here any more: a machine that gets built
+# switches its own on.
 func _drive_after_day(scene: Node) -> void:
 	# Skipping it is what a player who does not want it would do.
 	for child: Node in scene.get_children():
@@ -144,12 +141,6 @@ func _drive_after_day(scene: Node) -> void:
 	# sheet that's done. setting Game.crafted by hand proves nothing.
 	if _drive_tech(scene):
 		return
-	if game.equipped_upgrade == &"" and upgrade_choice != "":
-		for row: Control in scene.get_node("UiLayer/Root/GearPage/Scroll/Rows").get_children():
-			for child: Node in row.get_children():
-				if child is Button and not (child as Button).disabled:
-					(child as Button).pressed.emit()
-					return
 	scene.get_node("UiLayer/Root/NextButton").pressed.emit()
 
 
@@ -185,18 +176,35 @@ func _drive_tech(scene: Node) -> bool:
 	return false
 
 
-## Works the shift the way a player would: stay at the tank while there is
-## something worth grabbing, switch to the desk when there is not, and switch
-## back when the desk is clear. Driving both views at once would never exercise
+## How many items the driver lets pile up on the desk before it goes and bins
+## them. The number itself does not matter much; that there IS one does.
+const DESK_BATCH := 4
+
+
+## Works the shift the way a player would: pull a few things up, take them to
+## the desk, come back for more. Driving both views at once would never exercise
 ## the tab switch, and the desk only refreshes its inventory when it becomes
 ## the active view.
+##
+## The two rules below are what a player does without thinking about it, and
+## the driver used to do neither. It stayed at the tank for as long as it could
+## afford a drop, so on a day with a big pool it spent the whole shift grabbing
+## and reached the desk with twenty items and no budget left to bin any of
+## them: that day recovered almost nothing, whatever the day's data said. It
+## made the run's outcome a coin toss and it got worse every time a pool grew,
+## which reads as a broken economy when the economy is fine.
 func _drive_shift(shift: Node) -> void:
 	var claw_view: Node = shift.get_node("ClawView")
 	var desk_view: Node = shift.get_node("DeskView")
 	# unsorted_items() already counts a sealed box as work waiting, so the
 	# driver crosses to the desk to open one without needing to be told.
 	var unsorted: Array = game.unsorted_items()
-	var worth_grabbing: bool = game.can_afford(&"drop") and claw_view.has_work()
+	# 1. keep back enough of the shift to bin what is already up there, and
+	# 2. do not let the desk pile up past a batch before going to work on it
+	var reserve: int = unsorted.size() * game.cost_of(&"sort")
+	var worth_grabbing: bool = claw_view.has_work() \
+		and game.budget_left >= game.cost_of(&"drop") + reserve \
+		and unsorted.size() < DESK_BATCH
 	var on_claw: bool = shift._view == 0
 	if on_claw:
 		if worth_grabbing:

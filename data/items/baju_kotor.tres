@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="SpriteFrames" path="res://data/frames/item_baju_organik_frames.tres" id="1_fr"]
+[ext_resource type="Script" path="res://data/item_data.gd" id="2_sc"]
+[ext_resource type="Texture2D" path="res://assets/items/item_baju_organik.png" id="3_tx"]
+
+[resource]
+script = ExtResource("2_sc")
+id = &"baju_kotor"
+display_name = "Muddy Shirt"
+texture = ExtResource("3_tx")
+frames = ExtResource("1_fr")
+weight = 0.6
+surface_properties = Array[String](["soft", "stiff brown patch", "smells of river silt"])
+visible_material = "woven fabric"
+is_stained = true
+stain_type = "river mud"
+true_material = "cotton - natural fibre"
+hotspots = Array[Dictionary]([{
+"reveals": "stain_type",
+"tool": "swab"
+}, {
+"reveals": "true_material",
+"tool": "magnifier"
+}])
+correct_category = 0
+source_batch = &"textile_mill"

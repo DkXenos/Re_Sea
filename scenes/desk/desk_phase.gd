@@ -25,11 +25,12 @@ var _active: bool = true
 
 func _ready() -> void:
 	_day = Game.current_day()
-	_rulebook_button.text = Strings.t("desk_rulebook_short")
+	# the desk art already paints an "i" plate here, so a label of our own just
+	# lands on top of the drawn one. the button is the hit area and nothing else.
+	_rulebook_button.text = ""
 	_rulebook_button.tooltip_text = Strings.t("desk_rulebook_button")
 	_switch_button.text = Strings.t("shift_to_claw")
-	_end_button.text = Strings.t("shift_end")
-	_settings_button.tooltip_text = Strings.t("menu_settings")
+	_settings_button.tooltip_text = Strings.t("settings_open")
 	_switch_button.pressed.connect(func() -> void: Events.view_switch_requested.emit())
 	_end_button.pressed.connect(func() -> void: Events.shift_end_requested.emit())
 	_settings_button.pressed.connect(func() -> void: Events.pause_requested.emit())
@@ -59,6 +60,15 @@ func _refresh_readouts() -> void:
 	_day_label.text = Strings.tf("day_label", {"n": _day.day_number})
 	_quota_label.text = "%d / %d" % [int(Game.stats.get("sorted", 0)), _day.quota]
 	_budget_label.text = "%d" % Game.budget_left
+	# The day is over when the day's work is done. Until then the button says
+	# what is still owed rather than greying out and giving no reason - the
+	# quota readout is right beside it and now they agree.
+	var left := Game.quota_left()
+	_end_button.disabled = left > 0
+	_end_button.text = Strings.t("shift_end") if left == 0 \
+		else Strings.tf("shift_end_locked_button", {"n": left})
+	_end_button.tooltip_text = Strings.t("shift_end") if left == 0 \
+		else Strings.tf("shift_end_locked", {"n": left})
 
 
 # only the debug command that needs the inspected item

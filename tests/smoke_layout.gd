@@ -126,11 +126,11 @@ func _check_after_day() -> void:
 	for i in 20:
 		await process_frame
 	var ui: Control = scene.get_node("UiLayer/Root")
-	for tab in 3:
+	var pages: Array[String] = ["ResultPage", "TechPage"]
+	for tab in pages.size():
 		scene._show_tab(tab)
 		await process_frame
-		var page: Control = ui.get_node(["ResultPage", "TechPage", "GearPage"][tab])
-		_check_contained(page, "after-day tab %d" % tab)
+		_check_contained(ui.get_node(pages[tab]), "after-day tab %d" % tab)
 	_check_no_overlap(ui.get_node("Tabs"), ui.get_node("PageBg"), "tabs / page")
 	print("  after-day tabs stay inside their pages")
 	root.remove_child(scene)

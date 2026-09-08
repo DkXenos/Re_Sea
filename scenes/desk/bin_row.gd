@@ -14,15 +14,21 @@ signal bin_chosen(category: int)
 const OUTLINE := preload("res://assets/bins/bin_outline.png")
 
 # indexed by ItemData.Category, left to right - same order the rulebook reads in
+# the fourth plate is still named bin_landfill.png on disk - the category was
+# renamed to RESIDUE, the artwork was not redrawn
 const CATEGORY_ASSETS: Array[String] = ["organic", "recyclable", "hazard", "landfill"]
-const CATEGORY_KEYS: Array[String] = ["bin_organic", "bin_recyclable", "bin_hazard", "bin_landfill"]
+const CATEGORY_KEYS: Array[String] = ["bin_organic", "bin_recyclable", "bin_hazard", "bin_residue"]
 
 # the bin stands in a pedestal painted into desk_bg. these two put it in the
 # tray and put its name on the tray's front face, where the pale blue takes
 # dark text - white on that plate could not be read at all.
 const BIN_CENTRE_Y := 96.0
-const LABEL_WIDTH := 150.0
-const LABEL_Y := 162.0
+# the flat top of the tray is only ~125px across at this height, and RECYCLABLE
+# at 15pt ran the full width of it and out over both sloped sides. 13pt is the
+# largest that leaves a margin on the longest of the four names.
+const LABEL_WIDTH := 128.0
+const LABEL_FONT_SIZE := 13
+const LABEL_Y := 160.0
 const LABEL_COLOUR := Color(0.05, 0.19, 0.36)
 
 # TODO the four bins are hardcoded to four here. adding a fifth category means
@@ -62,9 +68,9 @@ func _ready() -> void:
 		# sized to the pedestal, not to the slot - a slot-wide label ran off
 		# both sides of the tray it is meant to be sitting on
 		label.position = Vector2(centre - LABEL_WIDTH * 0.5, LABEL_Y)
-		label.size = Vector2(LABEL_WIDTH, 26)
+		label.size = Vector2(LABEL_WIDTH, 24)
 		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		label.add_theme_font_size_override("font_size", 15)
+		label.add_theme_font_size_override("font_size", LABEL_FONT_SIZE)
 		label.add_theme_color_override("font_color", LABEL_COLOUR)
 		add_child(label)
 

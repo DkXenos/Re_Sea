@@ -7,11 +7,22 @@
 [resource]
 script = ExtResource("2_sc")
 id = &"baju_b3"
-display_name = "Pesticide-Soaked Shirt"
+display_name = "Stained Shirt"
 texture = ExtResource("3_tx")
 frames = ExtResource("1_fr")
 weight = 0.7
 surface_properties = Array[String](["dark stains", "sharp smell", "damp"])
-visible_material = "pesticide-soaked fabric"
-correct_category = 2
+visible_material = "stained woven fabric"
+is_stained = true
+stain_type = "pesticide concentrate"
+stain_hazardous = true
+true_material = "cotton - natural fibre"
+hotspots = Array[Dictionary]([{
+"reveals": "stain_type",
+"tool": "swab"
+}, {
+"reveals": "true_material",
+"tool": "magnifier"
+}])
+correct_category = 0
 source_batch = &"textile_mill"

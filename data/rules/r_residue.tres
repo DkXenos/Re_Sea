@@ -5,10 +5,10 @@
 [resource]
 script = ExtResource("1_f88a7")
 id = &"r_residue"
-text = "Anything with residue still on it cannot be recycled. It goes in LANDFILL."
-short_text = "Any residue left  ->  LANDFILL"
+text = "A stain still on it cannot be composted or recycled. Rinse it off and it is whatever it is made of again - leave it on and it goes in RESIDUE."
+short_text = "Still stained  ->  RESIDUE"
 applies_when = {
-"has_residue": true
+"is_stained": true
 }
 forces_category = 3
 priority = 10

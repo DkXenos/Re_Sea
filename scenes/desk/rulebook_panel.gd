@@ -1,11 +1,18 @@
 # open any time, pauses nothing. the challenge is hidden properties, not
 # remembering rules. also holds the baseline "where does this go" guide and the
-# PET/HDPE/PS glossary, since nobody who hasn't sorted waste before knows
-# either one.
+# glossary of every label and material an item can show, since nobody who
+# hasn't sorted waste before knows either one.
 extends Control
 
 # bin plate beside each group heading, big enough to read at a glance
 const GUIDE_ICON_HEIGHT := 44.0
+
+# panel_dark.png is a cream page despite the name, so everything on it is dark.
+# The pale blues the rest of the UI uses sit on navy panels and are all but
+# invisible here.
+const HEADING := Color(0.09, 0.30, 0.47)
+const BODY := Color(0.16, 0.18, 0.21)
+const NOTE := Color(0.30, 0.31, 0.32)
 
 @onready var _title: Label = $Title
 @onready var _list: VBoxContainer = $Scroll/List
@@ -14,6 +21,7 @@ const GUIDE_ICON_HEIGHT := 44.0
 
 func _ready() -> void:
 	_title.text = Strings.t("rulebook_title")
+	_title.add_theme_color_override("font_color", HEADING)
 	_close.text = Strings.t("rulebook_close")
 	_close.pressed.connect(toggle.bind(false))
 	visible = false
@@ -30,7 +38,7 @@ func _rebuild() -> void:
 	_clear(_list)
 	var day := Game.current_day()
 	if day == null or day.active_rules.is_empty():
-		_add_line(Strings.t("rulebook_empty"), 18, Color(0.7, 0.75, 0.8))
+		_add_line(Strings.t("rulebook_empty"), 18, NOTE)
 		_add_guide()
 		_add_glossary()
 		return
@@ -43,9 +51,9 @@ func _rebuild() -> void:
 			groups[key] = []
 		groups[key].append(rule)
 	for group_name: String in groups:
-		_add_line(group_name, 21, Color(0.95, 0.83, 0.42))
+		_add_line(group_name, 21, HEADING)
 		for rule: RuleData in groups[group_name]:
-			_add_line("-  " + rule.text, 17, Color(0.86, 0.91, 0.95))
+			_add_line("-  " + rule.text, 17, BODY)
 		_add_line("", 8, Color.WHITE)
 	_add_guide()
 	_add_glossary()
@@ -55,8 +63,8 @@ func _rebuild() -> void:
 # the same left-to-right order as the bins on the desk. driven off
 # Strings.GUIDANCE - adding a line there is the whole edit.
 func _add_guide() -> void:
-	_add_line(Strings.t("rulebook_where"), 21, Color(0.95, 0.83, 0.42))
-	_add_line(Strings.t("rulebook_where_note"), 15, Color(0.72, 0.78, 0.85))
+	_add_line(Strings.t("rulebook_where"), 21, HEADING)
+	_add_line(Strings.t("rulebook_where_note"), 15, NOTE)
 	for category in ItemData.Category.values():
 		var entries: Array = []
 		for entry: Array in Strings.GUIDANCE:
@@ -66,8 +74,7 @@ func _add_guide() -> void:
 			continue
 		_list.add_child(_guide_heading(category))
 		for entry: Array in entries:
-			_add_line("-  %s  -  %s" % [entry[1], entry[2]], 16,
-				Color(0.86, 0.91, 0.95))
+			_add_line("-  %s  -  %s" % [entry[1], entry[2]], 16, BODY)
 		_add_line("", 8, Color.WHITE)
 
 
@@ -82,17 +89,17 @@ func _guide_heading(category: int) -> Control:
 	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	label.add_theme_font_size_override("font_size", 19)
-	label.add_theme_color_override("font_color", Color(0.95, 0.83, 0.42))
+	label.add_theme_color_override("font_color", HEADING)
 	row.add_child(label)
 	return row
 
 
-# what the codes on the items mean
+# what the label printed on an item, or the material under it, means
 func _add_glossary() -> void:
-	_add_line(Strings.t("rulebook_codes"), 21, Color(0.95, 0.83, 0.42))
-	_add_line(Strings.t("rulebook_codes_note"), 15, Color(0.72, 0.78, 0.85))
-	for entry: Array in Strings.CODES:
-		_add_line("%s  -  %s" % [entry[0], entry[1]], 16, Color(0.86, 0.91, 0.95))
+	_add_line(Strings.t("rulebook_codes"), 21, HEADING)
+	_add_line(Strings.t("rulebook_codes_note"), 15, NOTE)
+	for entry: Array in Strings.MATERIALS:
+		_add_line("%s  -  %s" % [entry[0], entry[1]], 16, BODY)
 
 
 func _add_line(text: String, font_size: int, color: Color) -> void:

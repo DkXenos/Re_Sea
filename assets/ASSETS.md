@@ -68,7 +68,8 @@ it just plays shorter.
 ## hotspots
 
 An item's `hotspots` in `data/items/*.tres` say which tool finds which property
-on it, e.g. `{"tool": "rinse", "reveals": "has_residue"}`. There are no
+on it, e.g. `{"tool": "swab", "reveals": "stain_type"}`. The rinse is not in there -
+it changes the item rather than reading it. There are no
 positions and no rings: the whole item is the target, so a tool either has
 something to find on it or it does not.
 
@@ -105,6 +106,39 @@ Two consequences worth knowing:
   `bin_outline.png` moved behind the bin, and "this tool is armed" is
   `tool_row_selected.png` slid behind the row. The art itself never changes and
   is never recoloured.
+- **The one exception: the trash in the tank.** Items on the seabed run
+  `scenes/claw/trash_outline.gdshader`, which reads the alpha of whatever png
+  you delivered and lays a soft dark contact edge just outside the silhouette,
+  plus a faint rim light along its top edge. It is not a drawing and it is not
+  a recolour - it invents nothing and works on art at any size, which is why it
+  sits on the right side of the "no shaders" rule. It draws into the png's
+  transparent margin, so **leave a couple of pixels of margin around an item**;
+  `box_closed.png` runs to its own bottom edge and loses the edge there. Turn
+  `ring_alpha` down on the material in `scenes/claw/tank_item.tscn` if it ever
+  reads as an outline rather than as a shadow.
+
+The same trash gets its **grab box measured off the drawing, not off the
+frame**. Every item png is the same 160x160 canvas but each drawing fills a
+different part of it, so `scenes/claw/tank_item.gd` reads the png's own alpha
+box on spawn and cuts the collision shape to it, plus a few pixels of
+forgiveness. A flat newspaper is caught where a newspaper looks and a tall
+toothbrush where the toothbrush is; nothing here needs to be told a size, so
+draw an item at whatever proportions it wants inside the frame.
+
+## the display-size constants
+
+Code never picks a size for a piece of art except through one of these, and the
+automated rule check fails on any other `.scale =` in the project:
+
+| Constant | Where | What it sizes |
+|---|---|---|
+| `BASE_SCALE` | `scenes/desk/inspect_panel.gd` | the item under the magnifier, before the player's own zoom |
+| `TOOL_ICON_SCALE` | `scenes/desk/inspect_panel.gd` | the four tool drawings inside the rack's painted slots |
+| `BIN_CENTRE_Y` | `scenes/desk/bin_row.gd` | (position, not scale) the bin standing in its painted pedestal |
+| `DRIFT_HOME` | `scenes/cutscene/cutscene.gd` | the resting size of the cutscene stills, which drift `DRIFT_SCALE` either side of it |
+| `_fit_scale` | `scenes/claw/claw_phase.gd` | the opposite case - it reads the delivered texture and fits it to the window, so parallax art at any resolution lands correctly |
+
+Everything else is installed at the size it is drawn at.
 
 ## fonts
 
@@ -138,24 +172,28 @@ an animation in without touching code.
 | `assets/items/item_baju_b3.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `baju_b3` |
 | `assets/items/item_baju_daur_ulang.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `baju_daur_ulang` |
 | `assets/items/item_baju_organik.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `baju_organik` |
+| `assets/items/item_baju_organik.png` | 160x160 | reused | Trash item `baju_kotor` - **wants its own art**: same shirt with a visible mud patch |
 | `assets/items/item_banana_peel.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `banana_peel` |
 | `assets/items/item_botol_kaca.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `botol_kaca` |
 | `assets/items/item_cangkang_telur.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `cangkang_telur` |
 | `assets/items/item_daun.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `daun` |
 | `assets/items/item_gelas_kertas_bersih.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `gelas_kertas_bersih` |
 | `assets/items/item_kantong_plastik.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `kantong_plastik` |
+| `assets/items/item_botol_kaca.png` | 160x160 | reused | Trash item `botol_kaca_kotor` - **wants its own art**: same jar with sauce crust at the rim |
 | `assets/items/item_koran.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `koran` |
 | `assets/items/item_paper_cup.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `paper_cup` |
 | `assets/items/item_pizza.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `pizza` |
 | `assets/items/item_tisu_b3.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `tisu_b3` |
 | `assets/items/item_tisu_bekas.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `tisu_bekas` |
+| `assets/items/item_teddy_bear.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `teddy_bear`. Waterlogged soft toy, plain RESIDUE. |
+| `assets/items/item_toothbrush.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `toothbrush`. Reads as recyclable PP; the magnifier finds the nylon and the multilayer rule sends it to RESIDUE. |
 
 ### Sorting bins
 
 | File | Size | Animation | What it is |
 |------|------|-----------|------------|
 | `assets/bins/bin_hazard.png` | 101x116 | `idle` 1 fr | hazard bin, idle state |
-| `assets/bins/bin_landfill.png` | 101x115 | `idle` 1 fr | landfill bin, idle state |
+| `assets/bins/bin_landfill.png` | 101x115 | `idle` 1 fr | RESIDUE bin, idle state. The file keeps the old name; the category was renamed, the art was not redrawn |
 | `assets/bins/bin_organic.png` | 101x116 | `idle` 1 fr | organic bin, idle state |
 | `assets/bins/bin_outline.png` | 119x133 | static | Highlight ring shown behind whichever bin the revealed evidence points at. One drawing, moved between the four slots. Sized to the bins - redraw both together. |
 | `assets/bins/bin_recyclable.png` | 101x116 | `idle` 1 fr | recyclable bin, idle state |
@@ -177,13 +215,20 @@ an animation in without touching code.
 | `assets/env/bubble.png` | 24x24 | `rise` 6 fr | Bubble, count scales with the VFX slider |
 | `assets/env/coral_dead.png` | 174x140 | `idle` 6 fr | Coral overlay, bleached. Sways in place; count is per ocean tier. |
 | `assets/env/coral_healthy.png` | 157x190 | `idle` 6 fr | Coral overlay, in colour. Sways in place; count is per ocean tier. |
+| `assets/env/reef_coral_1.png` | 78x150 | static | Tank parallax scenery, planted on the seabed. Sized to the water column above the sand: the tank window is 848x408 and the sand line is at y=268, so nothing here is taller than that. |
+| `assets/env/reef_coral_2.png` | 159x170 | static | Tank parallax scenery, planted on the seabed. Sized to the water column above the sand: the tank window is 848x408 and the sand line is at y=268, so nothing here is taller than that. |
+| `assets/env/reef_coral_3.png` | 109x205 | static | Tank parallax scenery, planted on the seabed. Sized to the water column above the sand: the tank window is 848x408 and the sand line is at y=268, so nothing here is taller than that. |
+| `assets/env/reef_coral_4.png` | 226x120 | static | Tank parallax scenery, planted on the seabed. Nearest depth. |
+| `assets/env/reef_fish_1.png` | 423x100 | static | Tank parallax shoal. Hangs in midwater rather than standing on the sand (`base_y` on its row). |
 | `assets/env/cutscene_01.png` | 1280x720 | static | Cutscene still 1 (placeholder) |
 | `assets/env/cutscene_02.png` | 1280x720 | static | Cutscene still 2 (placeholder) |
 | `assets/env/cutscene_03.png` | 1280x720 | static | Cutscene still 3 (placeholder) |
 | `assets/env/cutscene_04.png` | 1280x720 | static | Opening beat 4: the diver, face to face with what lives in the bay. |
 | `assets/env/cutscene_05.png` | 1280x720 | static | Opening beat 5: the three schematics on the workshop desk. |
-| `assets/env/ending_bad.png` | 1280x720 | static | Ending still, 0 machines built. |
-| `assets/env/ending_good.png` | 1280x720 | static | Ending still, all machines built. |
+| `assets/env/ending_0.png` | 1280x720 | static | Ending still, 0 machines built - the bay left as it was. One file per tier, named by the number of machines running in it: a fourth blueprint needs an `ending_4.png` beside these and no code change. The 2x originals are in `assets/ui/endings/`. |
+| `assets/env/ending_1.png` | 1280x720 | static | Ending still, 1 machine built. |
+| `assets/env/ending_2.png` | 1280x720 | static | Ending still, 2 machines built. |
+| `assets/env/ending_3.png` | 1280x720 | static | Ending still, all three machines built. |
 | `assets/env/hull_wall.png` | 128x128 | static | Submarine hull, tiled at native size over everything outside the window. Must tile seamlessly. |
 | `assets/env/logo.png` | 541x276 | static | Title logo |
 | `assets/env/menu_bg.png` | 1280x720 | static | Main menu backdrop. Full-frame, opaque. |
@@ -211,9 +256,9 @@ an animation in without touching code.
 | File | Size | Animation | What it is |
 |------|------|-----------|------------|
 | `assets/tools/tool_cutter.png` | 59x72 | `idle` 1 fr | Cutter. Opens a sealed crate, and does nothing else. One drawing per tool - "armed" is a plate behind the row, not a second drawing. |
-| `assets/tools/tool_magnifier.png` | 56x72 | `idle` 1 fr | Magnifier. Reveals the printed code or label. One drawing per tool - "armed" is a plate behind the row, not a second drawing. |
-| `assets/tools/tool_rinse.png` | 64x72 | `idle` 1 fr | Rinse. Reveals whether residue is still on the item. One drawing per tool - "armed" is a plate behind the row, not a second drawing. |
-| `assets/tools/tool_swab.png` | 46x72 | `idle` 1 fr | Chem Swab. Reveals what kind of residue it is. One drawing per tool - "armed" is a plate behind the row, not a second drawing. |
+| `assets/tools/tool_magnifier.png` | 56x72 | `idle` 1 fr | Magnifier. Reveals what the item is really made of. One drawing per tool - "armed" is a plate behind the row, not a second drawing. |
+| `assets/tools/tool_rinse.png` | 64x72 | `idle` 1 fr | Rinse. Washes an ordinary stain off for good; a chemical one will not shift. One drawing per tool - "armed" is a plate behind the row, not a second drawing. |
+| `assets/tools/tool_swab.png` | 46x72 | `idle` 1 fr | Chem Swab. Names the stain, which is what says whether a rinse will do anything. One drawing per tool - "armed" is a plate behind the row, not a second drawing. |
 
 ### Interface chrome, schematics and parts
 
@@ -262,8 +307,10 @@ an animation in without touching code.
 | `assets/ui/meter_bg.png` | 320x32 | static | Track behind a blueprint's progress strip on the desk. Fill is clipped by width. |
 | `assets/ui/meter_fill.png` | 320x32 | static | Fill of a blueprint's progress strip on the desk. Clipped by width, never scaled. |
 | `assets/ui/minimap_item.png` | 10x10 | static | Minimap dot for one item on the seabed |
-| `assets/ui/panel_dark.png` | 96x96 | static | Modal / overlay panel: the rulebook and the blueprint component popup. NinePatchRect, 24px margins. |
-| `assets/ui/panel_main.png` | 96x96 | static | Main UI panel. NinePatchRect, 24px margins. |
+| `assets/ui/cursor.png` | 42x64 | static | The mouse pointer, set once in `main.gd`. A custom cursor goes to the OS at the png's own pixel size - it does not scale with the game or the display, so this file IS the size it appears at, and the arrow's point must stay at the top-left (`main.gd` CURSOR_HOTSPOT). |
+| `assets/ui/panel_dark.png` | 261x261 | static | Modal / overlay panel: the rulebook and the blueprint component popup. NinePatchRect, 24px margins. Square 1:1 plate, so it stretches to any rectangle. |
+| `assets/ui/panel_main.png` | 261x261 | static | Main UI panel, and the theme's Panel/PanelContainer. NinePatchRect, 24px margins. Same 1:1 plate, lighter. |
+| `assets/ui/panel_settings.png` | 636x366 | static | The settings dialog plate, used by the settings screen and the pause overlay. NinePatch margins 60 left / 100 top / 110 right / 60 bottom - the close X is painted into the art, and those margins are what keep it pinned in the top-right corner at any panel size. The button over it is a `CloseButton` theme variation, which draws nothing of its own. |
 | `assets/ui/panel_slot.png` | 173x83 | static | Inventory slot background. NinePatchRect, 24px margins. |
 | `assets/ui/panel_slot_selected.png` | 173x83 | static | Inventory slot, selected. A different PNG rather than a tint. NinePatchRect, 24px margins. |
 | `assets/ui/primary_button.png` | 422x121 | static | The one call to action on a screen - Start, Lower the Claw, Start the Next Day. Plate drawn at 408x108 inside the box; the padding is the room the hover state grows into. |
@@ -272,10 +319,10 @@ an animation in without touching code.
 | `assets/ui/scrollbar_grabber.png` | 16x64 | static | Scrollbar grabber. NinePatch, 8px margins, stretched to length. |
 | `assets/ui/scrollbar_grabber_hover.png` | 16x64 | static | Scrollbar grabber, hovered/dragged. |
 | `assets/ui/scrollbar_track.png` | 16x64 | static | Scrollbar track. NinePatch, 8px margins, stretched to length. |
-| `assets/ui/slider_fill.png` | 64x16 | static | Volume slider fill, the part left of the knob. NinePatch, 8px margins. |
-| `assets/ui/slider_grabber.png` | 32x32 | static | Volume slider knob. |
-| `assets/ui/slider_grabber_hover.png` | 32x32 | static | Volume slider knob, hovered/held. |
-| `assets/ui/slider_track.png` | 64x16 | static | Volume slider track. NinePatch, 8px margins, stretched to width. |
+| `assets/ui/slider_fill.png` | 519x26 | static | Volume slider fill, the part left of the knob. NinePatch, 8px margins. |
+| `assets/ui/slider_grabber.png` | 32x30 | static | Volume slider knob. |
+| `assets/ui/slider_grabber_hover.png` | 32x30 | static | Volume slider knob, hovered/held. |
+| `assets/ui/slider_track.png` | 519x32 | static | Volume slider track. NinePatch, 8px margins, stretched to width. The row height comes from `SettingsPanel.SLIDER_SIZE`, which is set from this art. |
 | `assets/ui/textfield_focus.png` | 64x40 | static | Text field, focused. NinePatch, 12px margins. |
 | `assets/ui/textfield_normal.png` | 64x40 | static | Text field. NinePatch, 12px margins, stretched. |
 | `assets/ui/toggle_off.png` | 64x32 | static | Settings toggle, off state. Own drawing, not a tint of the on state. |
@@ -305,3 +352,5 @@ a sound is dropping a new `.wav` at the same path. There is no music yet; the
 | `assets/audio/reveal_success.wav` | 0.26 s | 22 kHz 16-bit mono | A tool revealed a hidden property. |
 | `assets/audio/tool_use.wav` | 0.11 s | 22 kHz 16-bit mono | A tool is used on an item. |
 | `assets/audio/ui_click.wav` | 0.03 s | 22 kHz 16-bit mono | Any button, tab switch, or menu press. |
+| `assets/audio/music_game.mp3` | loops | mp3 stereo | The song. Started by `Game` for the whole session, Music bus at -8 dB. |
+| `assets/audio/amb_sea.mp3` | loops | mp3 stereo | Sea ambience, the room the song plays in. Started by `Game` for the whole session, Music bus at -4 dB. Both beds sit on the Music bus, so the one Music slider covers all of it. |

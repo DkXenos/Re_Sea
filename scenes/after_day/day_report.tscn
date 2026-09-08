@@ -1,0 +1,123 @@
+[gd_scene format=3 uid="uid://cmnhj5aqpcidb"]
+
+[ext_resource type="Script" path="res://scenes/report/day_report.gd" id="1_juf12"]
+[ext_resource type="Texture2D" uid="uid://bqoyx86g0v3fd" path="res://assets/env/water_bg.png" id="2_c6mj4"]
+[ext_resource type="Theme" uid="uid://bpxj4j7ei2hhx" path="res://assets/ui/ui_theme.tres" id="3_4hl0d"]
+[ext_resource type="Texture2D" uid="uid://dvjjme3fo4ea2" path="res://assets/ui/panel_dark.png" id="4_t3yul"]
+
+[node name="DayReport" type="Node2D" unique_id=950863523]
+script = ExtResource("1_juf12")
+
+[node name="BgLayer" type="CanvasLayer" parent="." unique_id=1650632731]
+layer = 0
+
+[node name="Bg" type="TextureRect" parent="BgLayer" unique_id=1679924243]
+offset_right = 1280.0
+offset_bottom = 720.0
+mouse_filter = 2
+texture = ExtResource("2_c6mj4")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="UiLayer" type="CanvasLayer" parent="." unique_id=1690282511]
+layer = 100
+
+[node name="Root" type="Control" parent="UiLayer" unique_id=1942694767]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("3_4hl0d")
+
+[node name="TitleLabel" type="Label" parent="UiLayer/Root" unique_id=423377784]
+layout_mode = 0
+offset_left = 40.0
+offset_top = 22.0
+offset_right = 700.0
+offset_bottom = 66.0
+theme_override_colors/font_color = Color(1, 0.99, 0.94, 1)
+theme_override_colors/font_outline_color = Color(0.04, 0.14, 0.28, 1)
+theme_override_constants/outline_size = 7
+theme_override_font_sizes/font_size = 32
+
+[node name="QuotaLabel" type="Label" parent="UiLayer/Root" unique_id=1279477050]
+layout_mode = 0
+offset_left = 42.0
+offset_top = 70.0
+offset_right = 700.0
+offset_bottom = 100.0
+theme_override_colors/font_color = Color(1, 0.99, 0.94, 1)
+theme_override_colors/font_outline_color = Color(0.04, 0.14, 0.28, 1)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/font_size = 19
+
+[node name="MistakesBg" type="NinePatchRect" parent="UiLayer/Root" unique_id=756898176]
+layout_mode = 0
+offset_left = 34.0
+offset_top = 108.0
+offset_right = 700.0
+offset_bottom = 690.0
+texture = ExtResource("4_t3yul")
+patch_margin_left = 24
+patch_margin_top = 24
+patch_margin_right = 24
+patch_margin_bottom = 24
+
+[node name="MistakesTitle" type="Label" parent="UiLayer/Root" unique_id=1677647024]
+layout_mode = 0
+offset_left = 52.0
+offset_top = 120.0
+offset_right = 686.0
+offset_bottom = 148.0
+theme_override_font_sizes/font_size = 20
+
+[node name="MistakesScroll" type="ScrollContainer" parent="UiLayer/Root" unique_id=866820913]
+layout_mode = 0
+offset_left = 48.0
+offset_top = 154.0
+offset_right = 688.0
+offset_bottom = 680.0
+
+[node name="Mistakes" type="VBoxContainer" parent="UiLayer/Root/MistakesScroll" unique_id=257781870]
+custom_minimum_size = Vector2(628, 0)
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="RecoveredBg" type="NinePatchRect" parent="UiLayer/Root" unique_id=1653717643]
+layout_mode = 0
+offset_left = 720.0
+offset_top = 108.0
+offset_right = 1246.0
+offset_bottom = 566.0
+texture = ExtResource("4_t3yul")
+patch_margin_left = 24
+patch_margin_top = 24
+patch_margin_right = 24
+patch_margin_bottom = 24
+
+[node name="RecoveredTitle" type="Label" parent="UiLayer/Root" unique_id=818115255]
+layout_mode = 0
+offset_left = 744.0
+offset_top = 124.0
+offset_right = 1214.0
+offset_bottom = 152.0
+theme_override_font_sizes/font_size = 20
+
+[node name="Recovered" type="VBoxContainer" parent="UiLayer/Root" unique_id=818115256]
+layout_mode = 0
+offset_left = 744.0
+offset_top = 162.0
+offset_right = 1214.0
+offset_bottom = 546.0
+theme_override_constants/separation = 8
+
+[node name="NextButton" type="Button" parent="UiLayer/Root" unique_id=453991622]
+layout_mode = 0
+offset_left = 866.0
+offset_top = 586.0
+offset_right = 1246.0
+offset_bottom = 695.0
+theme_type_variation = &"PrimaryButton"

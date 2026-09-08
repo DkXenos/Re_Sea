@@ -5,14 +5,14 @@ extends RefCounted
 
 
 # rule key -> the field the player has to reveal to know it. not always the
-# same name: is_multilayer is proved by the printed code, which is the one
-# thing on a laminated cup that admits to the liner.
+# same name: is_multilayer is proved by the magnifier reading the real
+# material, which is the one thing on a laminated cup that admits to the liner.
 const RULE_KEY_TO_REVEAL: Dictionary = {
-	"has_residue": "has_residue",
-	"residue_type": "residue_type",
+	"is_stained": "is_stained",
+	"stain_type": "stain_type",
+	"stain_hazardous": "stain_hazardous",
 	"true_material": "true_material",
-	"is_multilayer": "tag_text",
-	"tag_text": "tag_text",
+	"is_multilayer": "true_material",
 }
 
 # readable for free
@@ -21,11 +21,12 @@ const SURFACE_KEYS: Array[String] = ["visible_material", "visible_label", "weigh
 
 
 # {"category": int, "rule": RuleData or null}
-static func resolve(item: ItemData, rules: Array[RuleData]) -> Dictionary:
+static func resolve(item: ItemData, rules: Array[RuleData],
+		overrides: Dictionary = {}) -> Dictionary:
 	var category: int = item.correct_category
 	var winner: RuleData = null
 	for rule: RuleData in rules:
-		if rule == null or not rule.matches(item):
+		if rule == null or not rule.matches(item, overrides):
 			continue
 		if winner == null or rule.priority >= winner.priority:
 			winner = rule
@@ -48,7 +49,7 @@ static func required_fields(rule: RuleData) -> Array[String]:
 
 # rule matches AND the player actually uncovered what it keys on
 static func evidence_supports(entry: CarriedItem, rule: RuleData) -> bool:
-	if not rule.matches(entry.data):
+	if not rule.matches(entry.data, entry.rule_overrides()):
 		return false
 	for field: String in required_fields(rule):
 		if field != "" and not entry.is_revealed(field):
@@ -67,7 +68,7 @@ static func supported_rules(entry: CarriedItem, rules: Array[RuleData]) -> Array
 
 # writes the verdict onto the entry so the report can explain it later
 static func judge(entry: CarriedItem, chosen: int, rules: Array[RuleData]) -> bool:
-	var verdict := resolve(entry.data, rules)
+	var verdict := resolve(entry.data, rules, entry.rule_overrides())
 	entry.expected_category = int(verdict["category"])
 	entry.broken_rule = verdict["rule"]
 	entry.sorted_to = chosen

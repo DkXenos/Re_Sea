@@ -56,15 +56,11 @@ offset_bottom = 48.0
 theme_override_constants/separation = 11
 
 [node name="ResultTab" type="Button" parent="UiLayer/Root/Tabs"]
-custom_minimum_size = Vector2(299, 44)
+custom_minimum_size = Vector2(454, 44)
 theme_override_font_sizes/font_size = 16
 
 [node name="TechTab" type="Button" parent="UiLayer/Root/Tabs"]
-custom_minimum_size = Vector2(299, 44)
-theme_override_font_sizes/font_size = 16
-
-[node name="GearTab" type="Button" parent="UiLayer/Root/Tabs"]
-custom_minimum_size = Vector2(299, 44)
+custom_minimum_size = Vector2(454, 44)
 theme_override_font_sizes/font_size = 16
 
 [node name="PageBg" type="NinePatchRect" parent="UiLayer/Root"]
@@ -104,9 +100,9 @@ custom_minimum_size = Vector2(492, 0)
 theme_override_constants/separation = 10
 
 [node name="Summary" type="Label" parent="UiLayer/Root/ResultPage"]
-offset_left = 92.0
+offset_left = 116.0
 offset_top = 524.0
-offset_right = 520.0
+offset_right = 544.0
 offset_bottom = 620.0
 theme_override_font_sizes/font_size = 15
 theme_override_colors/font_color = Color(0.94, 0.97, 1, 1)
@@ -210,23 +206,6 @@ offset_top = 438.0
 offset_right = 672.0
 offset_bottom = 498.0
 theme_override_font_sizes/font_size = 20
-
-[node name="GearPage" type="Control" parent="UiLayer/Root"]
-offset_left = 20.0
-offset_top = 58.0
-offset_right = 1260.0
-offset_bottom = 580.0
-mouse_filter = 2
-
-[node name="Scroll" type="ScrollContainer" parent="UiLayer/Root/GearPage"]
-offset_left = 30.0
-offset_top = 26.0
-offset_right = 984.0
-offset_bottom = 496.0
-
-[node name="Rows" type="VBoxContainer" parent="UiLayer/Root/GearPage/Scroll"]
-custom_minimum_size = Vector2(936, 0)
-theme_override_constants/separation = 10
 
 [node name="NextButton" type="Button" parent="UiLayer/Root"]
 offset_left = 862.0

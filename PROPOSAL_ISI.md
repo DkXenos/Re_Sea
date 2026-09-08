@@ -287,8 +287,10 @@ Seluruh kontrol berikut diambil langsung dari peta masukan pada `project.godot`.
 | Menggeser gambar benda | Seret dengan klik kiri | Gratis |
 | Membuka `Rulebook` | `R` | Gratis, tidak menjeda permainan |
 | Melompat ke benda berikutnya | `I` | Memilih benda pertama yang belum dipilah |
-| Menjeda permainan | `Esc` | Juga dapat ditekan lewat tombol roda gigi pada konsol mesin |
+| Menjeda permainan | `Esc` | Juga dapat ditekan lewat tombol roda gigi pada konsol mesin dan pada meja pemilahan |
+| Membuka pengaturan dari layar judul | `Esc` | Layar judul tidak memiliki tombol sama sekali |
 | Melanjutkan layar naratif | `Enter` atau klik kiri | Pada layar judul, cutscene, dan `day_start` |
+| Melewati cutscene pembuka | `Esc` | Langsung menuju hari pertama |
 | Panel debug | `F1` | Hanya aktif pada build debug, tidak tersedia di build rilis |
 
 Setiap kontrol papan ketik memiliki padanan yang dapat diklik pada konsol mesin —
@@ -455,10 +457,13 @@ berhenti pada sentuhan pertama dengan benda apa pun atau pada kedalaman maksimum
 menutup selama 0,30 detik, lalu naik kembali. Selama capit bergerak, pemain tidak
 memiliki kendali sama sekali sampai capit kembali ke rel.
 
-Sebelum menjatuhkan, layar menampilkan pratinjau: deskripsi permukaan benda yang
-akan diraih dan **peluang cengkeramnya dalam persen**. Pratinjau ini mengunci
-sasaran ke benda yang benar-benar akan dijangkau oleh penurunan, bukan benda
-terdekat secara horizontal — keduanya dapat berbeda ketika dua benda bertumpuk.
+Penurunan mengunci sasarannya ke benda yang benar-benar akan dijangkau, bukan
+benda terdekat secara horizontal — keduanya dapat berbeda ketika dua benda
+bertumpuk. Sasaran itu tidak diumumkan lewat teks. Peluang cengkeram dan
+deskripsi permukaan benda sempat dicetak di bawah jendela mesin, dan keduanya
+dihapus: yang pertama mengubah pengangkatan menjadi keputusan aritmetika, yang
+kedua membocorkan cuma-cuma jawaban yang justru dijual oleh alat inspeksi di meja
+pemilahan. Yang tersisa adalah apa yang terlihat di dalam jendela.
 
 Bila cengkeraman gagal, benda tetap terangkat sesaat lalu **terlepas di ketinggian
 acak** dalam perjalanan naik dan jatuh kembali ke dasar. `Shift time` yang sudah
@@ -1113,6 +1118,23 @@ tombol aksi utama, yang kini dipakai pada tiga tombol yang paling menentukan alu
 laporan. Ilustrasi briefing bahkan sudah memuat soket gelap tempat tombol itu
 duduk, sehingga posisi tombol ditentukan oleh gambar, bukan oleh tebakan tata
 letak.
+
+**Perapian pascauji-main (7 September).** Satu putaran uji-main penuh oleh
+pengembang menghasilkan daftar perbaikan yang seluruhnya bersifat kejelasan,
+bukan mekanik. Dua di antaranya bersifat struktural. Pertama, laporan akhir hari
+ternyata terpecah menjadi dua layar berurutan yang menampilkan daftar kesalahan
+yang sama, sehingga keduanya disatukan (lihat 2.2.9). Kedua, komponen mesin yang
+belum dirakit memang tidak menggambar apa pun di atas lembar rancang bangun —
+lembar itu sudah memuat garis samarnya — sehingga sasaran klik yang tersedia
+benar-benar tidak terlihat oleh pemain. Tab `Technology` kini memuat daftar
+komponen yang terbaca beserta tombolnya masing-masing, dan lembar rancang bangun
+kembali ke perannya semula: gambar yang terisi seiring mesin dirakit.
+
+Sisanya adalah pengurangan teks. Layar judul kehilangan seluruh tombolnya dan
+menjadi satu ajakan "klik di mana saja"; tulisan seed, deskripsi sampah yang
+muncul saat capit menutup, peluang cengkeraman, dan daftar kontrol yang tercetak
+di bawah jendela mesin semuanya dihapus. Pembacaan yang tersisa dipasangkan pada
+pelat yang memang dilukis untuknya di dalam ilustrasi kokpit.
 
 ### 2.5.1 Playtest
 

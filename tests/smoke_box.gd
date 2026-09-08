@@ -114,7 +114,7 @@ func _check_open_through_the_desk() -> void:
 	# a bin refuses a sealed crate, and the refusal costs nothing
 	inspect.show_entry(box)
 	var budget_before: int = game.budget_left
-	bins.bin_chosen.emit(ItemData.Category.LANDFILL)
+	bins.bin_chosen.emit(ItemData.Category.RESIDUE)
 	await process_frame
 	assert(box.sorted_to == -1, "a bin took a sealed crate")
 	assert(game.budget_left == budget_before, "refusing a sealed crate cost budget")

@@ -13,7 +13,6 @@ const CLOSE_TIME := 0.30
 const CABLE_TEXTURE_HEIGHT := 64.0
 const GRAB_OFFSET := 110.0 ## grab point below the claw origin
 const GRAB_RADIUS := 46.0 ## must match GrabArea's CollisionShape2D
-const ITEM_RADIUS := 40.0 ## must match tank_item.tscn's CollisionShape2D
 
 enum State { IDLE, DESCEND, CLOSE, RISE }
 
@@ -130,24 +129,39 @@ func _process_rise(delta: float) -> void:
 # nearest in x. these two disagreed for ages and the preview kept naming the
 # wrong item when two overlapped.
 func predict_target(candidates: Array) -> Node2D:
-	var reach := GRAB_RADIUS + ITEM_RADIUS
 	var best: Node2D = null
 	var earliest := INF
 	for node: Node in candidates:
 		if not (node is Node2D) or not ("data" in node):
 			continue
 		var item := node as Node2D
-		var dx: float = absf(item.position.x - position.x)
-		if dx >= reach:
-			continue
-		# claw height where the grab circle first touches this one
-		var contact_y: float = item.position.y - sqrt(reach * reach - dx * dx) - GRAB_OFFSET
+		var contact_y := _contact_depth(item)
 		if contact_y > max_depth:
 			continue
 		if contact_y < earliest:
 			earliest = contact_y
 			best = item
 	return best
+
+
+# The rail height at which the grab circle first touches this item, or INF if
+# no depth ever gets them together. The item hands over the box its own drawing
+# fills, so a flat thing is reached late and a tall one early - the same answer
+# the descent will get from the physics, which is the whole point of this
+# living next to it.
+func _contact_depth(item: Node2D) -> float:
+	var box: Rect2 = item.grab_box() if item.has_method("grab_box") else Rect2()
+	var centre: Vector2 = item.position + box.position + box.size * 0.5
+	var half := box.size * 0.5
+	# how far outside the item's side the claw is lined up, if it is at all
+	var gap := absf(centre.x - position.x) - half.x
+	if gap >= GRAB_RADIUS:
+		return INF
+	# straight above the box it is the top edge that stops the circle, off to
+	# one side it catches the corner instead
+	var clearance: float = GRAB_RADIUS if gap <= 0.0 \
+		else sqrt(GRAB_RADIUS * GRAB_RADIUS - gap * gap)
+	return centre.y - half.y - clearance - GRAB_OFFSET
 
 
 func _resolve_grab() -> void:

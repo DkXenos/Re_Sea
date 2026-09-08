@@ -14,5 +14,10 @@ weight = 0.4
 surface_properties = Array[String](["stiff", "light", "dry"])
 visible_material = "paper"
 visible_label = "PAPER"
+true_material = "PAP 21 - plain unlined paper"
+hotspots = Array[Dictionary]([{
+"reveals": "true_material",
+"tool": "magnifier"
+}])
 correct_category = 1
 source_batch = &"beach_cafe"

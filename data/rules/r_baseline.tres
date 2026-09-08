@@ -5,5 +5,5 @@
 [resource]
 script = ExtResource("1_dmnmj")
 id = &"r_baseline"
-text = "Sort by material: natural matter goes in ORGANIC; clean plastic, metal, glass and paper go in RECYCLABLE; chemicals go in HAZARDOUS; everything else goes in LANDFILL."
+text = "Sort by what it is made of: natural matter goes in ORGANIC; clean plastic, metal, glass and paper go in RECYCLABLE; chemicals go in HAZARDOUS; everything else goes in RESIDUE."
 short_text = "What it is made of decides where it goes"

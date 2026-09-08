@@ -3,9 +3,9 @@ extends Control
 
 signal item_selected(entry: CarriedItem)
 
-const SLOT_BG := preload("res://assets/ui/panel_slot.png")
-# selected is a separate png, not a tint
-const SLOT_BG_SELECTED := preload("res://assets/ui/panel_slot_selected.png")
+# the card's whole layout - size, padding, icon, font sizes - is the scene's,
+# so it is dragged in the editor instead of typed here
+const CARD := preload("res://scenes/desk/item_card.tscn")
 
 
 @onready var _grid: GridContainer = $Scroll/Grid
@@ -13,10 +13,10 @@ const SLOT_BG_SELECTED := preload("res://assets/ui/panel_slot_selected.png")
 @onready var _empty: Label = $Empty
 
 var _selected: CarriedItem = null
-# the plate of every card on screen, so picking a different item can repaint
-# the two that changed instead of rebuilding the list. Rebuilding from inside
-# a card's own `pressed` would free the button that is still emitting.
-var _plates: Array[Dictionary] = []
+# every card on screen, so picking a different item can repaint the two that
+# changed instead of rebuilding the list. Rebuilding from inside a card's own
+# `pressed` would free the button that is still emitting.
+var _cards: Array[Control] = []
 
 
 func _ready() -> void:
@@ -26,94 +26,29 @@ func _ready() -> void:
 
 func refresh() -> void:
 	_clear(_grid)
-	_plates.clear()
+	_cards.clear()
 	var entries := Game.unsorted_items()
 	_empty.visible = entries.is_empty()
 	for entry: CarriedItem in entries:
-		_grid.add_child(_make_card(entry))
+		var card: Control = CARD.instantiate()
+		_grid.add_child(card)
+		card.setup(entry)
+		card.set_selected(entry == _selected)
+		card.pressed_card.connect(_on_card_pressed)
+		_cards.append(card)
 
 
-func _make_card(entry: CarriedItem) -> Control:
-	var card := Control.new()
-	# the desk art gives the list a 204px column, so the card has to fit inside
-	# it with room for the scrollbar - 250 ran off the edge and clipped every name
-	card.custom_minimum_size = Vector2(186, 76)
-
-	var bg := NinePatchRect.new()
-	# different png again, not a tint
-	bg.texture = SLOT_BG_SELECTED if entry == _selected else SLOT_BG
-	for side: String in ["left", "top", "right", "bottom"]:
-		bg.set("patch_margin_" + side, 18)
-	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
-	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	card.add_child(bg)
-	_plates.append({"entry": entry, "rect": bg})
-
-	# has to be a container. setting the label size by hand doesn't survive the
-	# layout pass and the property line runs off the card mid-word.
-	var columns := HBoxContainer.new()
-	columns.set_anchors_preset(Control.PRESET_FULL_RECT)
-	columns.offset_left = 8
-	columns.offset_top = 8
-	columns.offset_right = -10
-	columns.offset_bottom = -8
-	columns.add_theme_constant_override("separation", 8)
-	columns.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	card.add_child(columns)
-
-	var icon := TextureRect.new()
-	icon.texture = entry.display_texture()
-	icon.custom_minimum_size = Vector2(52, 52)
-	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	columns.add_child(icon)
-
-	var lines := VBoxContainer.new()
-	lines.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	lines.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	lines.add_theme_constant_override("separation", 2)
-	lines.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	columns.add_child(lines)
-
-	var label := Label.new()
-	label.text = entry.data.display_name
-	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	label.add_theme_font_size_override("font_size", 13)
-	lines.add_child(label)
-
-	# a sealed crate has no bin and no evidence - the only thing you can do to
-	# it is cut it, so the card says which tool does that
-	if entry.is_container() and not entry.opened:
-		var opener := Game.container_opener()
-		var hint := Label.new()
-		hint.text = Strings.t("box_no_tool") if opener == null \
-			else Strings.tf("box_needs_tool", {"tool": opener.display_name})
-		hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		hint.add_theme_font_size_override("font_size", 12)
-		hint.add_theme_color_override("font_color",
-			Color(0.72, 0.78, 0.85) if opener != null else Color(0.95, 0.72, 0.6))
-		lines.add_child(hint)
-
-	# invisible hit area over the card
-	var button := Button.new()
-	button.flat = true
-	button.set_anchors_preset(Control.PRESET_FULL_RECT)
-	button.pressed.connect(func() -> void:
-		_selected = entry
-		# without this the plate stayed on whatever was picked first
-		_apply_selection()
-		Events.sfx_requested.emit(&"ui_click")
-		item_selected.emit(entry))
-	card.add_child(button)
-	return card
+func _on_card_pressed(entry: CarriedItem) -> void:
+	_selected = entry
+	# without this the plate stayed on whatever was picked first
+	_apply_selection()
+	Events.sfx_requested.emit(&"ui_click")
+	item_selected.emit(entry)
 
 
-## One drawing per state, so this swaps the png rather than tinting one.
 func _apply_selection() -> void:
-	for row: Dictionary in _plates:
-		var rect: NinePatchRect = row["rect"]
-		rect.texture = SLOT_BG_SELECTED if row["entry"] == _selected else SLOT_BG
+	for card: Control in _cards:
+		card.set_selected(card.entry == _selected)
 
 
 # whatever is next to deal with. a sealed crate counts: it is not sortable,

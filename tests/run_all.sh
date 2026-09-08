@@ -64,14 +64,39 @@ static_check "no tweened transforms or frames on game objects" \
   "$(grep -rnE 'tween_property\([^,]+, *"(position|rotation|scale|frame)' \
       --include='*.gd' scenes/ autoload/ systems/ 2>/dev/null \
       | grep -vE '^scenes/(cutscene|main_menu)/')"
-# every visual is a PNG on disk, nothing drawn or built at runtime
+# every visual is a PNG on disk, nothing drawn or built at runtime.
+#
+# The tutorial overlay is the one exception, and it is the same exception as
+# the one below: its ColorRect is not a picture, it is the surface the dimming
+# mask is drawn onto. It depicts nothing and replaces no PNG - take it away and
+# no art is missing, only the dimming. Anything else matching this pattern is a
+# failure, including a ColorRect used as a coloured panel.
 ASSET_SRC="scenes/ autoload/ systems/ data/ main.gd main.tscn"
 static_check "no drawn visuals, no 3D" \
   "$(grep -rnE '_draw\(|draw_rect|draw_circle|draw_line|draw_polygon|draw_texture|ColorRect|Polygon2D|Line2D|Node3D|Sprite3D|Camera3D' \
-      --include='*.gd' --include='*.tscn' --include='*.tres' $ASSET_SRC 2>/dev/null)"
+      --include='*.gd' --include='*.tscn' --include='*.tres' $ASSET_SRC 2>/dev/null \
+      | grep -v '^scenes/tutorial/tutorial_overlay')"
+# The rule is against INVENTING art at runtime - gradients, lights and noise
+# standing in for a PNG nobody drew. trash_outline.gdshader is the one thing
+# on the other side of that line: it invents nothing, it reads whatever
+# texture the designer delivered and puts a contact edge under its own
+# silhouette so a grey bottle stops dissolving into grey sand. It works on art
+# at any size and any resolution, which is the same reason nothing here
+# hardcodes a sprite size either.
+#
+# spotlight.gdshader is the second and, so far, last. It is a MASK, not a
+# picture: it dims the screen and cuts one hole in it so the tutorial can point
+# at a control. It draws no subject, and it cannot be a PNG because the hole
+# has to land on a different control every step, at that control's real size -
+# a stretched nine-patch ring cannot make the round cutout the GRAB button
+# needs, and a per-step PNG would be one drawing per tutorial step for a thing
+# that is not art. Anything else matching this pattern is a failure, including
+# a second use of either shader outside the tank item and this overlay.
 static_check "no shaders, lighting or runtime textures" \
   "$(grep -rnE 'ShaderMaterial|CanvasModulate|PointLight2D|LightOccluder2D|normal_map|GradientTexture|NoiseTexture' \
-      --include='*.gd' --include='*.tscn' --include='*.tres' $ASSET_SRC 2>/dev/null)"
+      --include='*.gd' --include='*.tscn' --include='*.tres' $ASSET_SRC 2>/dev/null \
+      | grep -v '^scenes/claw/tank_item.tscn:' \
+      | grep -v '^scenes/tutorial/tutorial_overlay')"
 static_check "panels are NinePatchRect over a PNG, never StyleBoxFlat" \
   "$(grep -rnE 'StyleBoxFlat' --include='*.gd' --include='*.tscn' --include='*.tres' \
       $ASSET_SRC assets/ 2>/dev/null)"

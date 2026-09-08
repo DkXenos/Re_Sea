@@ -188,31 +188,35 @@ func _check_build_gate() -> void:
 	print("  CRAFT opens only on the last part and fires once")
 
 
-## The tool it opens joins the Peralatan list rather than starting a second
-## equipment system, and it is locked until the blueprint is built.
+## Building the machine is what fits its upgrade - there is no second step and
+## no gear tab to go and press. It is off until the blueprint is built and on
+## from then on, and it stays on while the next machine is built on top of it.
 func _check_unlocks_a_tool() -> void:
 	game.start_run(9182)
+	var running := 0
 	for bp: BlueprintData in game.blueprints:
-		assert(bp.unlocks_upgrade != &"", "%s opens no tool" % bp.id)
-		var up: UpgradeData = null
-		for candidate: UpgradeData in game.upgrades:
-			if candidate.id == bp.unlocks_upgrade:
-				up = candidate
-		assert(up != null, "%s names a tool that is not in data/upgrades/" % bp.id)
-		assert(not game.upgrade_unlocked(up),
-			"%s is available before its blueprint is built" % up.id)
+		assert(bp.unlocks_upgrade != &"", "%s fits nothing to the claw" % bp.id)
+		var up: UpgradeData = game.upgrade_for(bp)
+		assert(up != null, "%s names an upgrade that is not in data/upgrades/" % bp.id)
+		assert(not _is_running(up), "%s is on before its machine is built" % up.id)
 
 		for category in ItemData.Category.values():
 			game.materials[category] = 99
 		for component: ComponentData in bp.components:
 			game.craft_component(component)
 		game.build_blueprint(bp.id)
-		assert(game.upgrade_unlocked(up), "%s stayed locked after its blueprint" % up.id)
-		game.equip_upgrade(up.id)
-		assert(game.equipped_upgrade == up.id, "%s could not be equipped" % up.id)
-		game.equip_upgrade(up.id)
-		assert(game.equipped_upgrade == &"", "%s could not be taken off again" % up.id)
-	print("  three blueprints open three Peralatan entries, each equippable")
+		assert(_is_running(up), "%s did not switch on with its machine" % up.id)
+		running += 1
+		assert(game.active_upgrades().size() == running,
+			"building %s turned an earlier machine off" % bp.id)
+	print("  three machines switch on three upgrades, and they stay on together")
+
+
+func _is_running(up: UpgradeData) -> bool:
+	for active: UpgradeData in game.active_upgrades():
+		if active.id == up.id:
+			return true
+	return false
 
 
 # the whole point of the data model: a fourth part is a .tres, nothing else

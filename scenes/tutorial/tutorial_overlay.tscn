@@ -1,0 +1,77 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scenes/tutorial/tutorial_overlay.gd" id="1_tut"]
+[ext_resource type="Shader" path="res://assets/ui/spotlight.gdshader" id="2_shader"]
+[ext_resource type="Texture2D" path="res://assets/ui/panel_dark.png" id="3_plate"]
+[ext_resource type="Theme" path="res://assets/ui/ui_theme.tres" id="4_theme"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_spot"]
+shader = ExtResource("2_shader")
+shader_parameter/rect_size = Vector2(1280, 720)
+shader_parameter/hole_center = Vector2(-10000, -10000)
+shader_parameter/hole_half = Vector2(0, 0)
+shader_parameter/hole_radius = 0.0
+shader_parameter/feather = 14.0
+shader_parameter/ring_width = 3.0
+shader_parameter/dim_color = Color(0.02, 0.05, 0.12, 0.84)
+shader_parameter/ring_color = Color(1, 0.87, 0.45, 1)
+shader_parameter/ring_alpha = 0.0
+
+[node name="TutorialOverlay" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme = ExtResource("4_theme")
+script = ExtResource("1_tut")
+
+[node name="Dim" type="ColorRect" parent="."]
+material = SubResource("ShaderMaterial_spot")
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+color = Color(1, 1, 1, 1)
+
+[node name="Caption" type="NinePatchRect" parent="."]
+offset_left = 340.0
+offset_top = 250.0
+offset_right = 940.0
+offset_bottom = 470.0
+texture = ExtResource("3_plate")
+patch_margin_left = 24
+patch_margin_top = 24
+patch_margin_right = 24
+patch_margin_bottom = 24
+
+[node name="Title" type="Label" parent="Caption"]
+offset_left = 26.0
+offset_top = 18.0
+offset_right = 470.0
+offset_bottom = 50.0
+theme_override_font_sizes/font_size = 21
+theme_override_colors/font_color = Color(0.11, 0.29, 0.45, 1)
+vertical_alignment = 1
+
+[node name="Progress" type="Label" parent="Caption"]
+offset_left = 470.0
+offset_top = 18.0
+offset_right = 574.0
+offset_bottom = 50.0
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.45, 0.42, 0.36, 1)
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="Body" type="Label" parent="Caption"]
+offset_left = 26.0
+offset_top = 58.0
+offset_right = 574.0
+offset_bottom = 162.0
+theme_override_font_sizes/font_size = 15
+theme_override_colors/font_color = Color(0.16, 0.18, 0.21, 1)
+autowrap_mode = 3
+
+[node name="NextButton" type="Button" parent="Caption"]
+offset_left = 424.0
+offset_top = 162.0
+offset_right = 574.0
+offset_bottom = 206.0
+theme_override_font_sizes/font_size = 17

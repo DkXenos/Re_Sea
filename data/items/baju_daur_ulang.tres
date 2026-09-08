@@ -7,12 +7,16 @@
 [resource]
 script = ExtResource("2_sc")
 id = &"baju_daur_ulang"
-display_name = "Polyester Shirt"
+display_name = "Faded Shirt"
 texture = ExtResource("3_tx")
 frames = ExtResource("1_fr")
 weight = 0.6
-surface_properties = Array[String](["soft", "synthetic fibre", "dries fast"])
-visible_material = "polyester fabric"
-visible_label = "POLYESTER"
+surface_properties = Array[String](["soft", "faded print", "label washed out"])
+visible_material = "woven fabric"
+true_material = "polyester - plastic woven into cloth"
+hotspots = Array[Dictionary]([{
+"reveals": "true_material",
+"tool": "magnifier"
+}])
 correct_category = 1
 source_batch = &"textile_mill"

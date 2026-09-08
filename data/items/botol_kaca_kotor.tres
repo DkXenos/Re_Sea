@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="SpriteFrames" path="res://data/frames/item_botol_kaca_frames.tres" id="1_fr"]
+[ext_resource type="Script" path="res://data/item_data.gd" id="2_sc"]
+[ext_resource type="Texture2D" path="res://assets/items/item_botol_kaca.png" id="3_tx"]
+
+[resource]
+script = ExtResource("2_sc")
+id = &"botol_kaca_kotor"
+display_name = "Sauce Jar"
+texture = ExtResource("3_tx")
+frames = ExtResource("1_fr")
+weight = 0.8
+surface_properties = Array[String](["heavy", "crust around the rim", "smells sweet"])
+visible_material = "glass"
+visible_label = "GL 70"
+is_stained = true
+stain_type = "chilli sauce"
+true_material = "soda-lime glass"
+hotspots = Array[Dictionary]([{
+"reveals": "stain_type",
+"tool": "swab"
+}, {
+"reveals": "true_material",
+"tool": "magnifier"
+}])
+correct_category = 1
+source_batch = &"household"

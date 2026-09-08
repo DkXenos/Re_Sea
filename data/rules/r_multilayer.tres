@@ -5,8 +5,8 @@
 [resource]
 script = ExtResource("1_13lgy")
 id = &"r_multilayer"
-text = "Laminated packaging - paper, plastic and foil bonded together - cannot be separated. It goes in LANDFILL."
-short_text = "Laminated packaging  ->  LANDFILL"
+text = "Laminated packaging - paper, plastic and foil bonded together - cannot be separated, however clean it is. It goes in RESIDUE."
+short_text = "Laminated packaging  ->  RESIDUE"
 applies_when = {
 "is_multilayer": true
 }

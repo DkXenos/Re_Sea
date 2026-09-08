@@ -6,14 +6,11 @@
 script = ExtResource("1_script")
 id = &"rel_cepat"
 display_name = "Fast Rail"
-benefit_text = "The claw travels the rail 60% faster."
-cost_text = "After every drop the rail needs 2 seconds to reset before it will move again."
+benefit_text = "The claw travels the rail 60% faster, and keeps moving the moment a drop is over."
 drop_cost = -1
 tool_cost = -1
 grip_delta = 0.0
 coarse_readings = false
 move_speed_multiplier = 1.6
-post_drop_lockout = 2.0
-unlock_after_blueprints = 1
-unlock_text = "Unlocked once the Ocean Cleaning Drone is built."
-sort_order = 2
+post_drop_lockout = 0.0
+sort_order = 0

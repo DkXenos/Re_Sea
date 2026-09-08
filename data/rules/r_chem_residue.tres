@@ -5,10 +5,10 @@
 [resource]
 script = ExtResource("1_aglgl")
 id = &"r_chem_residue"
-text = "Engine oil, solvent paint or expired medicine turns whatever held it into hazardous waste. This rule beats the residue rule."
-short_text = "Oil / paint / medicine residue  ->  HAZARDOUS"
+text = "Engine oil, solvent paint, pesticide and expired medicine do not rinse off. Whatever they soaked into is hazardous waste. This rule beats the stain rule."
+short_text = "Chemical stain, will not rinse  ->  HAZARDOUS"
 applies_when = {
-"residue_type": ["engine oil", "solvent-based paint", "expired medicine"]
+"stain_hazardous": true
 }
 forces_category = 2
 priority = 40

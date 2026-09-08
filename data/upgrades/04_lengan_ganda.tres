@@ -6,14 +6,11 @@
 script = ExtResource("1_script")
 id = &"lengan_ganda"
 display_name = "Twin Arms"
-benefit_text = "Using a tool costs 3 shift time instead of 4."
-cost_text = "The extra arm weighs the rail down: the claw travels 25% slower."
+benefit_text = "A second arm works the desk: every tool costs 3 shift time instead of 4, at full accuracy."
 drop_cost = -1
 tool_cost = 3
 grip_delta = 0.0
 coarse_readings = false
-move_speed_multiplier = 0.75
+move_speed_multiplier = 1.0
 post_drop_lockout = 0.0
-unlock_after_blueprints = 3
-unlock_text = "Unlocked once the Reef Restoration Pod is built."
-sort_order = 4
+sort_order = 2

@@ -1,40 +1,43 @@
-[gd_scene load_steps=11 format=3]
+[gd_scene format=3 uid="uid://bg82xh5uesoce"]
 
-[ext_resource type="Script" path="res://scenes/desk/desk_phase.gd" id="1_desk"]
-[ext_resource type="Script" path="res://scenes/desk/inventory_panel.gd" id="2_inv"]
-[ext_resource type="Script" path="res://scenes/desk/inspect_panel.gd" id="3_insp"]
-[ext_resource type="Script" path="res://scenes/desk/bin_row.gd" id="4_bins"]
-[ext_resource type="Script" path="res://scenes/desk/rulebook_panel.gd" id="5_rule"]
-[ext_resource type="Script" path="res://scenes/desk/blueprint_panel.gd" id="9_bp"]
-[ext_resource type="Texture2D" path="res://assets/ui/desk_bg.png" id="6_bg"]
-[ext_resource type="Texture2D" path="res://assets/ui/panel_dark.png" id="7_pdark"]
-[ext_resource type="Texture2D" path="res://assets/ui/tool_rack_frame.png" id="10_rack"]
-[ext_resource type="Theme" path="res://assets/ui/ui_theme.tres" id="8_theme"]
+[ext_resource type="Script" uid="uid://blgmktu8aaxar" path="res://scenes/desk/desk_phase.gd" id="1_desk"]
+[ext_resource type="Script" uid="uid://br3lpgki1l3ur" path="res://scenes/desk/inventory_panel.gd" id="2_inv"]
+[ext_resource type="Script" uid="uid://kammheq70u4i" path="res://scenes/desk/inspect_panel.gd" id="3_insp"]
+[ext_resource type="Script" uid="uid://dhhxf2n7wh2qx" path="res://scenes/desk/bin_row.gd" id="4_bins"]
+[ext_resource type="Script" uid="uid://dvs3u247qfbut" path="res://scenes/desk/rulebook_panel.gd" id="5_rule"]
+[ext_resource type="Texture2D" uid="uid://cf3k0p6jxrt1e" path="res://assets/ui/desk_bg.png" id="6_bg"]
+[ext_resource type="Texture2D" uid="uid://dvjjme3fo4ea2" path="res://assets/ui/panel_dark.png" id="7_pdark"]
+[ext_resource type="Theme" uid="uid://bpxj4j7ei2hhx" path="res://assets/ui/ui_theme.tres" id="8_theme"]
+[ext_resource type="Script" uid="uid://dcjs7otf1jaow" path="res://scenes/desk/blueprint_panel.gd" id="9_bp"]
+[ext_resource type="Texture2D" uid="uid://mecknd8nbw58" path="res://assets/ui/tool_rack_frame.png" id="10_rack"]
 
-[node name="DeskPhase" type="Node2D"]
+[node name="DeskPhase" type="Node2D" unique_id=1323540538]
 script = ExtResource("1_desk")
 
-[node name="BgLayer" type="CanvasLayer" parent="."]
+[node name="BgLayer" type="CanvasLayer" parent="." unique_id=48263099]
 layer = 0
 
-[node name="Bg" type="TextureRect" parent="BgLayer"]
+[node name="Bg" type="TextureRect" parent="BgLayer" unique_id=393276425]
 offset_right = 1280.0
 offset_bottom = 720.0
 mouse_filter = 2
 texture = ExtResource("6_bg")
-stretch_mode = 6
 expand_mode = 1
+stretch_mode = 6
 
-[node name="UiLayer" type="CanvasLayer" parent="."]
+[node name="UiLayer" type="CanvasLayer" parent="." unique_id=1912532731]
 layer = 10
 
-[node name="Root" type="Control" parent="UiLayer"]
+[node name="Root" type="Control" parent="UiLayer" unique_id=1838093375]
+layout_mode = 3
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 2
 theme = ExtResource("8_theme")
 
-[node name="DayLabel" type="Label" parent="UiLayer/Root"]
+[node name="DayLabel" type="Label" parent="UiLayer/Root" unique_id=909048692]
+layout_mode = 0
 offset_left = 30.0
 offset_top = 40.0
 offset_right = 200.0
@@ -43,7 +46,8 @@ theme_override_font_sizes/font_size = 19
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="QuotaLabel" type="Label" parent="UiLayer/Root"]
+[node name="QuotaLabel" type="Label" parent="UiLayer/Root" unique_id=186100934]
+layout_mode = 0
 offset_left = 315.0
 offset_top = 40.0
 offset_right = 505.0
@@ -52,7 +56,8 @@ theme_override_font_sizes/font_size = 19
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="BudgetLabel" type="Label" parent="UiLayer/Root"]
+[node name="BudgetLabel" type="Label" parent="UiLayer/Root" unique_id=579622070]
+layout_mode = 0
 offset_left = 587.0
 offset_top = 40.0
 offset_right = 786.0
@@ -61,30 +66,34 @@ theme_override_font_sizes/font_size = 19
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="SwitchButton" type="Button" parent="UiLayer/Root"]
+[node name="SwitchButton" type="Button" parent="UiLayer/Root" unique_id=1479558429]
+layout_mode = 0
 offset_left = 805.0
 offset_top = 30.0
 offset_right = 973.0
 offset_bottom = 90.0
-flat = true
 theme_override_font_sizes/font_size = 15
+flat = true
 
-[node name="EndButton" type="Button" parent="UiLayer/Root"]
+[node name="EndButton" type="Button" parent="UiLayer/Root" unique_id=1677107097]
+layout_mode = 0
 offset_left = 984.0
 offset_top = 30.0
 offset_right = 1158.0
 offset_bottom = 90.0
-flat = true
 theme_override_font_sizes/font_size = 15
+flat = true
 
-[node name="SettingsButton" type="Button" parent="UiLayer/Root"]
+[node name="SettingsButton" type="Button" parent="UiLayer/Root" unique_id=133136547]
+layout_mode = 0
 offset_left = 1180.0
 offset_top = 30.0
 offset_right = 1234.0
 offset_bottom = 90.0
 flat = true
 
-[node name="BlueprintPanel" type="Control" parent="UiLayer/Root"]
+[node name="BlueprintPanel" type="Control" parent="UiLayer/Root" unique_id=1291862272]
+anchors_preset = 0
 offset_left = 419.0
 offset_top = 152.0
 offset_right = 1058.0
@@ -92,20 +101,23 @@ offset_bottom = 194.0
 mouse_filter = 2
 script = ExtResource("9_bp")
 
-[node name="Rows" type="HBoxContainer" parent="UiLayer/Root/BlueprintPanel"]
+[node name="Rows" type="HBoxContainer" parent="UiLayer/Root/BlueprintPanel" unique_id=556962274]
+layout_mode = 0
 offset_right = 639.0
 offset_bottom = 42.0
 theme_override_constants/separation = 8
 
-[node name="RulebookButton" type="Button" parent="UiLayer/Root"]
+[node name="RulebookButton" type="Button" parent="UiLayer/Root" unique_id=806457158]
+layout_mode = 0
 offset_left = 1066.0
 offset_top = 152.0
 offset_right = 1116.0
 offset_bottom = 194.0
-flat = true
 theme_override_font_sizes/font_size = 15
+flat = true
 
-[node name="InventoryPanel" type="Control" parent="UiLayer/Root"]
+[node name="InventoryPanel" type="Control" parent="UiLayer/Root" unique_id=255387447]
+anchors_preset = 0
 offset_left = 54.0
 offset_top = 206.0
 offset_right = 261.0
@@ -113,33 +125,37 @@ offset_bottom = 643.0
 mouse_filter = 2
 script = ExtResource("2_inv")
 
-[node name="Title" type="Label" parent="UiLayer/Root/InventoryPanel"]
-offset_left = 14.0
+[node name="Title" type="Label" parent="UiLayer/Root/InventoryPanel" unique_id=1851650879]
+layout_mode = 0
+offset_left = 12.0
 offset_top = 10.0
-offset_right = 196.0
+offset_right = 192.0
 offset_bottom = 34.0
 theme_override_font_sizes/font_size = 15
 
-[node name="Empty" type="Label" parent="UiLayer/Root/InventoryPanel"]
-offset_left = 14.0
+[node name="Empty" type="Label" parent="UiLayer/Root/InventoryPanel" unique_id=186295350]
+layout_mode = 0
+offset_left = 12.0
 offset_top = 44.0
-offset_right = 196.0
+offset_right = 192.0
 offset_bottom = 100.0
 theme_override_font_sizes/font_size = 13
 autowrap_mode = 3
 
-[node name="Scroll" type="ScrollContainer" parent="UiLayer/Root/InventoryPanel"]
-offset_left = 4.0
+[node name="Scroll" type="ScrollContainer" parent="UiLayer/Root/InventoryPanel" unique_id=1267056787]
+layout_mode = 0
+offset_left = 12.0
 offset_top = 44.0
-offset_right = 204.0
-offset_bottom = 432.0
+offset_right = 192.0
+offset_bottom = 404.0
 
-[node name="Grid" type="GridContainer" parent="UiLayer/Root/InventoryPanel/Scroll"]
-columns = 1
+[node name="Grid" type="GridContainer" parent="UiLayer/Root/InventoryPanel/Scroll" unique_id=318059842]
+layout_mode = 2
 theme_override_constants/h_separation = 6
 theme_override_constants/v_separation = 6
 
-[node name="InspectPanel" type="Control" parent="UiLayer/Root"]
+[node name="InspectPanel" type="Control" parent="UiLayer/Root" unique_id=2095428356]
+anchors_preset = 0
 offset_left = 339.0
 offset_top = 198.0
 offset_right = 1222.0
@@ -147,15 +163,17 @@ offset_bottom = 531.0
 mouse_filter = 2
 script = ExtResource("3_insp")
 
-[node name="Question" type="Label" parent="UiLayer/Root/InspectPanel"]
-clip_text = true
+[node name="Question" type="Label" parent="UiLayer/Root/InspectPanel" unique_id=956042088]
+layout_mode = 0
 offset_left = 288.0
 offset_top = 2.0
 offset_right = 870.0
 offset_bottom = 26.0
 theme_override_font_sizes/font_size = 15
+clip_text = true
 
-[node name="NameLabel" type="Label" parent="UiLayer/Root/InspectPanel"]
+[node name="NameLabel" type="Label" parent="UiLayer/Root/InspectPanel" unique_id=235676178]
+layout_mode = 0
 offset_left = 14.0
 offset_top = 2.0
 offset_right = 280.0
@@ -163,40 +181,35 @@ offset_bottom = 26.0
 theme_override_font_sizes/font_size = 16
 clip_text = true
 
-[node name="ViewportBox" type="SubViewportContainer" parent="UiLayer/Root/InspectPanel"]
+[node name="ViewportBox" type="SubViewportContainer" parent="UiLayer/Root/InspectPanel" unique_id=691385812]
+layout_mode = 0
 offset_left = 14.0
 offset_top = 32.0
 offset_right = 274.0
 offset_bottom = 292.0
 mouse_filter = 2
 
-[node name="ItemViewport" type="SubViewport" parent="UiLayer/Root/InspectPanel/ViewportBox"]
+[node name="ItemViewport" type="SubViewport" parent="UiLayer/Root/InspectPanel/ViewportBox" unique_id=1297937935]
 transparent_bg = true
 handle_input_locally = false
 gui_disable_input = true
 size = Vector2i(260, 260)
 render_target_update_mode = 4
 
-[node name="ItemRoot" type="Node2D" parent="UiLayer/Root/InspectPanel/ViewportBox/ItemViewport"]
+[node name="ItemRoot" type="Node2D" parent="UiLayer/Root/InspectPanel/ViewportBox/ItemViewport" unique_id=361695559]
 position = Vector2(130, 130)
 
-[node name="Sprite" type="Sprite2D" parent="UiLayer/Root/InspectPanel/ViewportBox/ItemViewport/ItemRoot"]
+[node name="Sprite" type="Sprite2D" parent="UiLayer/Root/InspectPanel/ViewportBox/ItemViewport/ItemRoot" unique_id=741635445]
 
-[node name="Surface" type="Control" parent="UiLayer/Root/InspectPanel"]
+[node name="Surface" type="Control" parent="UiLayer/Root/InspectPanel" unique_id=1027824641]
+anchors_preset = 0
 offset_left = 14.0
 offset_top = 32.0
 offset_right = 274.0
 offset_bottom = 292.0
 
-[node name="ZoomHint" type="Label" parent="UiLayer/Root/InspectPanel"]
-offset_left = 14.0
-offset_top = 292.0
-offset_right = 274.0
-offset_bottom = 308.0
-theme_override_font_sizes/font_size = 11
-horizontal_alignment = 1
-
-[node name="RackFrame" type="TextureRect" parent="UiLayer/Root/InspectPanel"]
+[node name="RackFrame" type="TextureRect" parent="UiLayer/Root/InspectPanel" unique_id=1214773825]
+layout_mode = 0
 offset_left = 288.0
 offset_top = 30.0
 offset_right = 475.0
@@ -204,47 +217,53 @@ offset_bottom = 317.0
 mouse_filter = 2
 texture = ExtResource("10_rack")
 expand_mode = 1
-stretch_mode = 0
 
-[node name="ToolRack" type="VBoxContainer" parent="UiLayer/Root/InspectPanel"]
+[node name="ToolRack" type="VBoxContainer" parent="UiLayer/Root/InspectPanel" unique_id=964193395]
+layout_mode = 0
 offset_left = 288.0
 offset_top = 34.0
 offset_right = 475.0
 offset_bottom = 318.0
 theme_override_constants/separation = 0
 
-[node name="RulesTitle" type="Label" parent="UiLayer/Root/InspectPanel"]
+[node name="RulesTitle" type="Label" parent="UiLayer/Root/InspectPanel" unique_id=390885562]
+layout_mode = 0
 offset_left = 492.0
 offset_top = 30.0
 offset_right = 870.0
 offset_bottom = 50.0
 theme_override_font_sizes/font_size = 14
 
-[node name="RulesList" type="VBoxContainer" parent="UiLayer/Root/InspectPanel"]
+[node name="RulesList" type="VBoxContainer" parent="UiLayer/Root/InspectPanel" unique_id=759502586]
+layout_mode = 0
 offset_left = 492.0
 offset_top = 54.0
 offset_right = 870.0
 offset_bottom = 146.0
 theme_override_constants/separation = 2
 
-[node name="EvidenceTitle" type="Label" parent="UiLayer/Root/InspectPanel"]
+[node name="EvidenceTitle" type="Label" parent="UiLayer/Root/InspectPanel" unique_id=152681571]
+layout_mode = 0
 offset_left = 492.0
 offset_top = 150.0
 offset_right = 870.0
 offset_bottom = 170.0
 theme_override_font_sizes/font_size = 14
 
-[node name="EvidenceScroll" type="ScrollContainer" parent="UiLayer/Root/InspectPanel"]
+[node name="EvidenceScroll" type="ScrollContainer" parent="UiLayer/Root/InspectPanel" unique_id=462717395]
+layout_mode = 0
 offset_left = 492.0
 offset_top = 174.0
 offset_right = 870.0
 offset_bottom = 296.0
 
-[node name="EvidenceLog" type="VBoxContainer" parent="UiLayer/Root/InspectPanel/EvidenceScroll"]
+[node name="EvidenceLog" type="VBoxContainer" parent="UiLayer/Root/InspectPanel/EvidenceScroll" unique_id=1632614819]
 custom_minimum_size = Vector2(368, 0)
+layout_mode = 2
 theme_override_constants/separation = 4
 
-[node name="Feedback" type="Label" parent="UiLayer/Root/InspectPanel"]
+[node name="Feedback" type="Label" parent="UiLayer/Root/InspectPanel" unique_id=586512680]
+layout_mode = 0
 offset_left = 492.0
 offset_top = 300.0
 offset_right = 870.0
@@ -252,7 +271,8 @@ offset_bottom = 332.0
 theme_override_font_sizes/font_size = 12
 autowrap_mode = 3
 
-[node name="BinRow" type="Control" parent="UiLayer/Root"]
+[node name="BinRow" type="Control" parent="UiLayer/Root" unique_id=57931397]
+anchors_preset = 0
 offset_left = 388.0
 offset_top = 501.0
 offset_right = 1154.0
@@ -260,7 +280,8 @@ offset_bottom = 695.0
 mouse_filter = 2
 script = ExtResource("4_bins")
 
-[node name="Toast" type="Label" parent="UiLayer/Root"]
+[node name="Toast" type="Label" parent="UiLayer/Root" unique_id=2031978724]
+layout_mode = 0
 offset_left = 20.0
 offset_top = 660.0
 offset_right = 340.0
@@ -269,45 +290,51 @@ theme_override_font_sizes/font_size = 14
 horizontal_alignment = 1
 autowrap_mode = 3
 
-[node name="RulebookLayer" type="CanvasLayer" parent="."]
+[node name="RulebookLayer" type="CanvasLayer" parent="." unique_id=414802812]
 layer = 100
 
-[node name="RulebookPanel" type="Control" parent="RulebookLayer"]
-theme = ExtResource("8_theme")
+[node name="RulebookPanel" type="Control" parent="RulebookLayer" unique_id=806498239]
+layout_mode = 3
+anchors_preset = 0
 offset_left = 220.0
 offset_top = 70.0
 offset_right = 1060.0
 offset_bottom = 650.0
+theme = ExtResource("8_theme")
 script = ExtResource("5_rule")
 
-[node name="Bg" type="NinePatchRect" parent="RulebookLayer/RulebookPanel"]
+[node name="Bg" type="NinePatchRect" parent="RulebookLayer/RulebookPanel" unique_id=802988317]
+layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
-mouse_filter = 2
 texture = ExtResource("7_pdark")
 patch_margin_left = 24
 patch_margin_top = 24
 patch_margin_right = 24
 patch_margin_bottom = 24
 
-[node name="Title" type="Label" parent="RulebookLayer/RulebookPanel"]
+[node name="Title" type="Label" parent="RulebookLayer/RulebookPanel" unique_id=416010177]
+layout_mode = 0
 offset_left = 26.0
 offset_top = 18.0
 offset_right = 600.0
 offset_bottom = 54.0
 theme_override_font_sizes/font_size = 24
 
-[node name="Scroll" type="ScrollContainer" parent="RulebookLayer/RulebookPanel"]
+[node name="Scroll" type="ScrollContainer" parent="RulebookLayer/RulebookPanel" unique_id=665091040]
+layout_mode = 0
 offset_left = 24.0
 offset_top = 62.0
 offset_right = 816.0
 offset_bottom = 512.0
 
-[node name="List" type="VBoxContainer" parent="RulebookLayer/RulebookPanel/Scroll"]
+[node name="List" type="VBoxContainer" parent="RulebookLayer/RulebookPanel/Scroll" unique_id=1008023598]
 custom_minimum_size = Vector2(780, 0)
+layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="CloseButton" type="Button" parent="RulebookLayer/RulebookPanel"]
+[node name="CloseButton" type="Button" parent="RulebookLayer/RulebookPanel" unique_id=87664592]
+layout_mode = 0
 offset_left = 620.0
 offset_top = 522.0
 offset_right = 816.0

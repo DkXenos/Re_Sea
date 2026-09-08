@@ -19,12 +19,26 @@ const PART_ICON := 56.0
 # the reading is the point, not the picture.
 const MISTAKE_ICON := 56
 
-enum Tab { RESULT, TECH, GEAR }
+# The Technology page sits on panel_dark.png, which is a cream page whatever its
+# name says, so its text is dark. The Result page is not on it - that one is the
+# blue paper art and keeps its pale text.
+const PAGE_HEADING := Color(0.09, 0.30, 0.47)
+const PAGE_BODY := Color(0.16, 0.18, 0.21)
+const PAGE_NOTE := Color(0.30, 0.31, 0.32)
+# still readable against cream, unlike the originals
+const PAGE_GOOD := Color(0.11, 0.42, 0.22)
+const PAGE_BAD := Color(0.65, 0.20, 0.12)
+
+# There used to be a third tab, Gear, where you fitted one upgrade at a time and
+# every one of them charged you for what it gave. It is gone: a machine built
+# out of five days of sorting now switches itself on and stays on, so there is
+# nothing left on that page to press. See Game.active_upgrades.
+enum Tab { RESULT, TECH }
 
 @onready var _tab_buttons: Array[Button] = [
-	$UiLayer/Root/Tabs/ResultTab, $UiLayer/Root/Tabs/TechTab, $UiLayer/Root/Tabs/GearTab]
+	$UiLayer/Root/Tabs/ResultTab, $UiLayer/Root/Tabs/TechTab]
 @onready var _pages: Array[Control] = [
-	$UiLayer/Root/ResultPage, $UiLayer/Root/TechPage, $UiLayer/Root/GearPage]
+	$UiLayer/Root/ResultPage, $UiLayer/Root/TechPage]
 
 # the result page is drawn art, the other two are a plain dark plate
 @onready var _report_art: TextureRect = $UiLayer/Root/ReportArt
@@ -38,7 +52,6 @@ enum Tab { RESULT, TECH, GEAR }
 @onready var _result_summary: Label = $UiLayer/Root/ResultPage/Summary
 @onready var _recovered_title: Label = $UiLayer/Root/ResultPage/RecoveredTitle
 @onready var _recovered: VBoxContainer = $UiLayer/Root/ResultPage/Recovered
-@onready var _gear_rows: VBoxContainer = $UiLayer/Root/GearPage/Scroll/Rows
 
 # technology tab
 @onready var _tech: Control = $UiLayer/Root/TechPage
@@ -68,7 +81,7 @@ func _ready() -> void:
 	_next.text = Strings.t("after_last_day") if Game.is_last_day() \
 		else Strings.t("after_next_day")
 	_next.pressed.connect(_finish)
-	var labels: Array[String] = ["after_tab_result", "after_tab_tech", "after_tab_gear"]
+	var labels: Array[String] = ["after_tab_result", "after_tab_tech"]
 	for i in _tab_buttons.size():
 		_tab_buttons[i].text = Strings.t(labels[i])
 		_tab_buttons[i].pressed.connect(_show_tab.bind(i as Tab))
@@ -77,12 +90,12 @@ func _ready() -> void:
 	_tech.get_node("PrevButton").pressed.connect(_page_sheet.bind(-1))
 	_tech.get_node("NextButton").pressed.connect(_page_sheet.bind(1))
 	_craft_button.pressed.connect(_on_craft_blueprint)
+	_paint_cream_pages()
 	_popup.get_node("CloseButton").text = Strings.t("tech_close")
 	_popup.get_node("CloseButton").pressed.connect(_close_popup)
 	_popup.get_node("CraftPartButton").pressed.connect(_on_craft_part)
 	_build_result()
 	_build_tech()
-	_build_gear()
 	_show_tab(Tab.RESULT)
 
 
@@ -198,6 +211,15 @@ func _build_tech() -> void:
 	_refresh_craft_button(bp)
 
 
+# The labels authored in the scene inherit the theme's pale Label colour, which
+# is meant for the navy panels everywhere else in the game.
+func _paint_cream_pages() -> void:
+	for path: String in ["BlueprintName", "PartsLabel"]:
+		_tech.get_node(path).add_theme_color_override("font_color", PAGE_HEADING)
+	for path: String in ["PoolLabel", "Flavour", "Unlocks"]:
+		_tech.get_node(path).add_theme_color_override("font_color", PAGE_NOTE)
+
+
 func _current_blueprint() -> BlueprintData:
 	if Game.blueprints.is_empty():
 		return null
@@ -224,13 +246,15 @@ func _pool_text() -> String:
 	return Strings.tf("tech_pool", {"v": "   ·   ".join(parts)})
 
 
+# What the machine does for you, on the sheet, before and after it is built.
+# Nothing to fit and nothing to choose, so this line is the whole story - it
+# says what building this changes about the claw, and then says it is on.
 func _unlocks_text(bp: BlueprintData) -> String:
-	if bp == null or bp.unlocks_upgrade == &"":
+	var up := Game.upgrade_for(bp)
+	if up == null:
 		return ""
-	for up: UpgradeData in Game.upgrades:
-		if up.id == bp.unlocks_upgrade:
-			return Strings.tf("tech_unlocks", {"v": up.display_name})
-	return ""
+	var key := "tech_fitted" if Game.blueprint_unlocked(bp.id) else "tech_unlocks"
+	return Strings.tf(key, {"v": up.display_name, "effect": up.benefit_text})
 
 
 # The sheet only ever showed a part once it was built, so an unbuilt blueprint
@@ -375,7 +399,7 @@ func _refresh_craft_button(bp: BlueprintData) -> void:
 		_craft_button.disabled = true
 
 
-# "6 organic, 2 landfill"
+# "6 organic, 2 residue"
 func _requirement_text(component: ComponentData) -> String:
 	var parts: Array[String] = []
 	for category: int in component.requirements:
@@ -387,9 +411,9 @@ func _requirement_text(component: ComponentData) -> String:
 # component popup
 
 # ONE row per material: the bin it comes out of, how many you have, how many it
-# takes. The old version printed a "Needs 2 LANDFILL (have 0)" line and then a
-# second "Short 2 LANDFILL" line under it - two lines saying the same thing,
-# and neither said where LANDFILL comes from, which is the actual question a
+# takes. The old version printed a "Needs 2 RESIDUE (have 0)" line and then a
+# second "Short 2 RESIDUE" line under it - two lines saying the same thing,
+# and neither said where RESIDUE comes from, which is the actual question a
 # player has. The shortfall now lives on the button, which is where it changes
 # what you can do.
 func _open_popup(component: ComponentData) -> void:
@@ -399,9 +423,13 @@ func _open_popup(component: ComponentData) -> void:
 
 	_popup.get_node("Icon").texture = component.done_texture if done \
 		else component.locked_texture
-	_popup.get_node("TitleLabel").text = component.display_name
-	_popup.get_node("StatusLabel").text = Strings.t("tech_part_done") if done \
+	var popup_title: Label = _popup.get_node("TitleLabel")
+	popup_title.text = component.display_name
+	popup_title.add_theme_color_override("font_color", PAGE_HEADING)
+	var popup_status: Label = _popup.get_node("StatusLabel")
+	popup_status.text = Strings.t("tech_part_done") if done \
 		else Strings.t("tech_part_todo")
+	popup_status.add_theme_color_override("font_color", PAGE_NOTE)
 
 	var lines: VBoxContainer = _popup.get_node("Lines")
 	_clear(lines)
@@ -411,8 +439,7 @@ func _open_popup(component: ComponentData) -> void:
 	MistakeView.add_line(lines, "", 6, Color.WHITE)
 	# names the door the material comes through. without it a part that wants a
 	# category the day never spawns reads as a bug.
-	MistakeView.add_line(lines, Strings.t("tech_material_source"), 12,
-		Color(0.72, 0.78, 0.85))
+	MistakeView.add_line(lines, Strings.t("tech_material_source"), 12, PAGE_NOTE)
 
 	var button: Button = _popup.get_node("CraftPartButton")
 	button.text = _craft_part_label(done, shortfall)
@@ -426,7 +453,7 @@ func _open_popup(component: ComponentData) -> void:
 func _requirement_row(category: int, need: int) -> Control:
 	var held: int = Game.material_count(category)
 	var enough: bool = held >= need
-	var colour := Color(0.6, 0.9, 0.7) if enough else Color(0.95, 0.72, 0.6)
+	var colour := PAGE_GOOD if enough else PAGE_BAD
 
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 10)
@@ -438,6 +465,7 @@ func _requirement_row(category: int, need: int) -> Control:
 	name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	name_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	name_label.add_theme_font_size_override("font_size", 15)
+	name_label.add_theme_color_override("font_color", PAGE_BODY)
 	row.add_child(name_label)
 
 	var count := Label.new()
@@ -460,17 +488,13 @@ func _requirement_row(category: int, need: int) -> Control:
 	return row
 
 
-# a dead button that says nothing teaches nothing, so it carries the shortfall
-func _craft_part_label(done: bool, shortfall: Dictionary) -> String:
-	if done:
-		return Strings.t("tech_rakit_done")
-	if shortfall.is_empty():
-		return Strings.t("tech_rakit")
-	if shortfall.size() == 1:
-		var category: int = int(shortfall.keys()[0])
-		return Strings.tf("tech_short", {"n": int(shortfall[category]),
-			"v": Strings.category_name(category)})
-	return Strings.t("tech_short_any")
+# Just "Build", greyed out when it cannot be pressed. The shortfall used to be
+# written on the button itself, and "Short 2 RECYCLABLE" is wider than the
+# button is - it ran out over both ends of it. The requirement line right next
+# to the button already turns red and names what is missing, and so does the
+# popup, so nothing was lost by taking it off.
+func _craft_part_label(done: bool, _shortfall: Dictionary) -> String:
+	return Strings.t("tech_rakit_done") if done else Strings.t("tech_rakit")
 
 
 func _on_craft_part() -> void:
@@ -493,58 +517,7 @@ func _on_craft_blueprint() -> void:
 		return
 	Events.sfx_requested.emit(&"bin_accept")
 	_build_tech()
-	_build_gear()
 	_build_result()
-
-
-# tab 3: gear
-
-# all four always listed. fitting one is free and reversible, there's no
-# currency anywhere in this game.
-func _build_gear() -> void:
-	_clear(_gear_rows)
-	for up: UpgradeData in Game.upgrades:
-		_gear_rows.add_child(_make_gear_row(up))
-
-
-func _make_gear_row(up: UpgradeData) -> Control:
-	var unlocked := Game.upgrade_unlocked(up)
-	var equipped := Game.equipped_upgrade == up.id
-
-	var row := _panel_row(92)
-	var lines := VBoxContainer.new()
-	lines.position = Vector2(16, 8)
-	lines.size = Vector2(700, 76)
-	lines.add_theme_constant_override("separation", 1)
-	row.add_child(lines)
-
-	MistakeView.add_line(lines, up.display_name, 18, Color(1, 1, 1))
-	if unlocked:
-		# benefit and cost together, always
-		MistakeView.add_line(lines, Strings.tf("upgrade_benefit", {"v": up.benefit_text}),
-			13, Color(0.6, 0.92, 0.72))
-		MistakeView.add_line(lines, Strings.tf("upgrade_cost", {"v": up.cost_text}),
-			13, Color(0.95, 0.72, 0.6))
-	else:
-		MistakeView.add_line(lines, up.unlock_text, 14, Color(0.72, 0.78, 0.85))
-
-	var button := Button.new()
-	button.position = Vector2(736, 24)
-	button.size = Vector2(180, 44)
-	button.disabled = not unlocked
-	if not unlocked:
-		button.text = Strings.t("upgrade_locked")
-	else:
-		button.text = Strings.t("upgrade_equipped") if equipped else Strings.t("upgrade_equip")
-		button.pressed.connect(_on_equip.bind(up))
-	row.add_child(button)
-	return row
-
-
-func _on_equip(up: UpgradeData) -> void:
-	Game.equip_upgrade(up.id)
-	Events.sfx_requested.emit(&"ui_click")
-	_build_gear()
 
 
 # helpers

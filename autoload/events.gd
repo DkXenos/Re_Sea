@@ -21,11 +21,14 @@ signal view_switch_requested()
 signal shift_end_requested()
 signal pause_requested()
 
+# the guided tour. a screen asks for a segment by name, the overlay runs it.
+signal tutorial_requested(segment: StringName)
+signal tutorial_segment_finished()
+
 signal sfx_requested(sfx_name: StringName)
 signal vfx_intensity_changed(value: float)
 signal blueprints_changed()
 signal component_crafted(component: ComponentData)
-signal upgrade_equipped(upgrade_id: StringName)
 signal toast_requested(text: String)
 
 # F1 overlay

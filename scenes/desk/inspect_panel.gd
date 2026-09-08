@@ -31,7 +31,6 @@ const TOOL_ROW_SELECTED := preload("res://assets/ui/tool_row_selected.png")
 @onready var _surface: Control = $Surface
 @onready var _name: Label = $NameLabel
 @onready var _question: Label = $Question
-@onready var _zoom_hint: Label = $ZoomHint
 @onready var _rack: VBoxContainer = $ToolRack
 @onready var _feedback: Label = $Feedback
 @onready var _rules_title: Label = $RulesTitle
@@ -51,7 +50,6 @@ var _tool_nodes: Dictionary = {}
 
 
 func _ready() -> void:
-	_zoom_hint.text = Strings.t("inspect_zoom_hint")
 	_evidence_title.text = Strings.t("evidence_title")
 	_rules_title.text = Strings.t("inspect_rules_title")
 	_question.text = ""
@@ -156,23 +154,24 @@ func _refresh_rack() -> void:
 			cost.text = Strings.tf("tools_cost_label", {"n": Game.cost_of(&"tool")})
 
 
+# Arming a tool used to swap the mouse cursor for that tool's own rack drawing.
+# Those are ~60x72 with the working end wherever the drawing puts it, so the
+# pointer turned into a picture several times the size of a cursor whose real
+# click point was somewhere out in the middle of it. Worse, a custom cursor is
+# set on Input rather than on this panel, so the magnifier followed you onto the
+# rest of the desk and over the pause menu. Armed is the plate behind the rack
+# row plus the toast, and the cursor stays a cursor.
 func _on_tool_pressed(tool_id: StringName) -> void:
 	_armed = &"" if _armed == tool_id else tool_id
 	Events.tool_armed.emit(_armed)
 	if _armed != &"":
-		var tool_data := Game.get_tool(_armed)
 		Events.toast_requested.emit(Strings.tf("tools_armed",
-			{"tool": tool_data.display_name}))
-		# cursor becomes the tool's own png
-		Input.set_custom_mouse_cursor(tool_data.icon, Input.CURSOR_ARROW, Vector2(12, 12))
-	else:
-		Input.set_custom_mouse_cursor(null)
+			{"tool": Game.get_tool(_armed).display_name}))
 	_refresh_rack()
 
 
 func disarm() -> void:
 	_armed = &""
-	Input.set_custom_mouse_cursor(null)
 	_refresh_rack()
 
 
@@ -207,16 +206,20 @@ func _set_identity(target: CarriedItem) -> void:
 	_name.text = "" if target == null else target.label()
 
 
-# the question isn't "which bin", it's "do i believe this"
+# Only the sealed crate says anything here, because "cut it open" is the one
+# thing on this line you cannot read anywhere else on the desk.
+#
+# There used to be a "Marked PAPER, looks like paper. Do you believe it?" line
+# for every item. Both of those facts are already the first two chips in the
+# evidence log, so it was the same information twice over, and the rhetorical
+# half is what the tutorial now says once, properly, instead of nagging it on
+# every single item for the whole run.
 func _question_for(target: CarriedItem) -> String:
 	if target == null:
 		return ""
 	if target.is_container() and not target.opened:
 		return Strings.t("box_question")
-	if target.data.visible_label != "":
-		return Strings.tf("inspect_question_labeled",
-			{"label": target.data.visible_label, "mat": target.data.visible_material})
-	return Strings.tf("inspect_question", {"mat": target.data.visible_material})
+	return ""
 
 
 # don't assume the png size, designers might hand over 256 or 512
@@ -281,6 +284,9 @@ func _use_tool() -> void:
 		Events.toast_requested.emit(Strings.tf("tool_wrong_for_box",
 			{"tool": tool_data.display_name}))
 		return
+	if tool_data.cleans_stains:
+		_rinse()
+		return
 	var field := _reveal_for_tool(tool_id)
 	# coarse scanner probes cheap and needs a 2nd use at full price to read
 	# properly. working out which click this is costs nothing.
@@ -317,6 +323,51 @@ func _use_tool() -> void:
 		_set_identity(entry)
 		_rebuild_log()
 		_rebuild_rules()
+	_refresh_rack()
+
+
+## The rinse is the one tool that does not read the item, it changes it. A
+## stain it can shift is gone for good and every rule that keyed on the stain
+## stops firing, so the cup that was heading for RESIDUE is recyclable again.
+##
+## A chemical stain never comes off. The rinse still costs the shift time -
+## refusing to work is not the same as declining to try - and the refusal
+## itself is the finding: whatever that is, it is not food. It does not name
+## the chemical, which is what the swab is for and why swabbing first is the
+## cheaper way round.
+func _rinse() -> void:
+	if entry.cleaned:
+		Events.toast_requested.emit(Strings.t("rinse_already"))
+		return
+	var cost: int = Game.cost_of(&"tool")
+	if not Game.spend_amount(cost):
+		Events.toast_requested.emit(Strings.t("budget_too_low"))
+		return
+	Game.stats["tool_uses"] = int(Game.stats.get("tool_uses", 0)) + 1
+	Events.sfx_requested.emit(&"tool_use")
+	var item := entry.data
+	if not item.is_stained:
+		# not a wasted click: "there was never anything on it" is worth knowing
+		entry.reveal("is_stained")
+		Events.sfx_requested.emit(&"reveal_nothing")
+		_set_feedback(Strings.tf("rinse_none", {"n": cost}), Color(0.86, 0.88, 0.6))
+		reveal_happened.emit("is_stained", true)
+	elif item.stain_hazardous:
+		entry.reveal("stain_hazardous")  # implies is_stained, not stain_type
+		Events.sfx_requested.emit(&"reveal_nothing")
+		Events.toast_requested.emit(Strings.t("rinse_toast_hazard"))
+		_set_feedback(Strings.tf("rinse_hazard", {"n": cost}), Color(0.95, 0.72, 0.55))
+		reveal_happened.emit("stain_hazardous", true)
+	else:
+		entry.cleaned = true
+		entry.reveal("is_stained")
+		Events.sfx_requested.emit(&"reveal_success")
+		Events.toast_requested.emit(Strings.t("rinse_toast_clean"))
+		_set_feedback(Strings.tf("rinse_clean", {"n": cost}), Color(0.6, 0.92, 0.72))
+		Events.tool_used.emit(&"rinse", "is_stained")
+		reveal_happened.emit("is_stained", true)
+	_rebuild_log()
+	_rebuild_rules()
 	_refresh_rack()
 
 
@@ -406,18 +457,21 @@ func _rebuild_log() -> void:
 		false, lit)
 	_add_chip("weight", Strings.tf("chip_weight", {"v": "%.1f" % item.weight}), false, lit)
 	# everything below cost budget
-	if entry.is_revealed("has_residue"):
-		_add_chip("has_residue", Strings.tf("chip_residue",
-			{"v": item.get_field_text("has_residue")}), true, lit)
-	if entry.is_revealed("residue_type"):
-		_add_chip("residue_type", Strings.tf("chip_residue_type",
-			{"v": item.get_field_text("residue_type")}), true, lit)
+	# a rinsed item reads as clean whatever its ItemData still says
+	if entry.cleaned:
+		_add_chip("is_stained", Strings.t("chip_rinsed"), true, lit)
+	elif entry.is_revealed("is_stained"):
+		_add_chip("is_stained", Strings.tf("chip_stain",
+			{"v": item.get_field_text("is_stained")}), true, lit)
+	if not entry.cleaned and entry.is_revealed("stain_hazardous"):
+		_add_chip("stain_hazardous", Strings.tf("chip_stain_hazardous",
+			{"v": item.get_field_text("stain_hazardous")}), true, lit)
+	if not entry.cleaned and entry.is_revealed("stain_type"):
+		_add_chip("stain_type", Strings.tf("chip_stain_type",
+			{"v": item.get_field_text("stain_type")}), true, lit)
 	if entry.is_revealed("true_material"):
 		_add_chip("true_material", Strings.tf("chip_true_material",
 			{"v": item.get_field_text("true_material")}), true, lit)
-	if entry.is_revealed("tag_text"):
-		_add_chip("tag_text", Strings.tf("chip_tag", {"v": item.get_field_text("tag_text")}),
-			true, lit)
 
 
 func _add_chip(key: String, text: String, revealed: bool, lit: Dictionary) -> void:

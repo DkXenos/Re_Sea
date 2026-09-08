@@ -233,6 +233,7 @@ offset_top = 416.0
 offset_right = 1040.0
 offset_bottom = 454.0
 theme_override_font_sizes/font_size = 24
+theme_override_colors/font_color = Color(0, 0, 0, 1)
 horizontal_alignment = 1
 
 [node name="GripLabel" type="Label" parent="HudLayer/HudRoot"]

@@ -15,15 +15,28 @@ const SCENES: Dictionary = {
 # esc means something else on the menu / in the cutscene
 const PAUSABLE_KEYS: Array[StringName] = [&"day_start", &"shift", &"after_day"]
 
+# The pointer is drawn art like everything else on screen. It is set once here
+# because it belongs to the whole game rather than to any scene, and Input
+# keeps it until something else takes it off.
+#
+# A custom cursor is handed to the OS at the png's own pixel size - it does not
+# scale with the game's 1280x720 or with the display, so cursor.png is
+# installed at the size it is meant to appear at and nothing here resizes it.
+const CURSOR := preload("res://assets/ui/cursor.png")
+# the point of the arrow inside its own drawing
+const CURSOR_HOTSPOT := Vector2(1, 0)
+
 @onready var _holder: Node = $SceneHolder
 @onready var _pause: Control = $PauseLayer/PauseOverlay
 @onready var _debug: Control = $DebugLayer/DebugOverlay
+@onready var _tutorial: Control = $TutorialLayer/TutorialOverlay
 
 var _current: Node = null
 var _current_key: StringName = &""
 
 
 func _ready() -> void:
+	Input.set_custom_mouse_cursor(CURSOR, Input.CURSOR_ARROW, CURSOR_HOTSPOT)
 	Events.scene_change_requested.connect(_on_scene_change_requested)
 	Events.phase_finished.connect(_on_phase_finished)
 	Events.debug_command.connect(_on_debug_command)
@@ -78,6 +91,9 @@ func _swap(path: String) -> void:
 	get_tree().paused = false
 	if is_instance_valid(_pause):
 		_pause.visible = false
+	# a tour that was still running belonged to the screen we just left
+	if is_instance_valid(_tutorial):
+		_tutorial.cancel()
 	if is_instance_valid(_current):
 		_holder.remove_child(_current)
 		_current.queue_free()
@@ -85,6 +101,9 @@ func _swap(path: String) -> void:
 	var packed: PackedScene = load(path)
 	_current = packed.instantiate()
 	_holder.add_child(_current)
+	# the tour resolves its node paths against whatever is on screen, so it has
+	# to be handed the new scene before any of it asks for a segment
+	_tutorial.set_scene_root(_current)
 
 
 func current_key() -> StringName:

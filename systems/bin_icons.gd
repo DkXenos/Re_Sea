@@ -9,7 +9,7 @@ const PATHS: Array[String] = [
 	"res://assets/bins/bin_organic.png",
 	"res://assets/bins/bin_recyclable.png",
 	"res://assets/bins/bin_hazard.png",
-	"res://assets/bins/bin_landfill.png",
+	"res://assets/bins/bin_landfill.png",  # RESIDUE - the png keeps its old name
 ]
 
 # the art is 101x116, so a box that isn't taller than it is wide squashes it

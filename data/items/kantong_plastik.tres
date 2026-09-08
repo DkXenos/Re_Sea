@@ -11,8 +11,18 @@ display_name = "Plastic Bag"
 texture = ExtResource("3_tx")
 frames = ExtResource("1_fr")
 weight = 0.2
-surface_properties = Array[String](["flexible", "light", "crinkly"])
+surface_properties = Array[String](["flexible", "light", "red smears inside"])
 visible_material = "plastic"
 visible_label = "HDPE 2"
+is_stained = true
+stain_type = "tomato ketchup"
+true_material = "HDPE - thick recyclable plastic"
+hotspots = Array[Dictionary]([{
+"reveals": "stain_type",
+"tool": "swab"
+}, {
+"reveals": "true_material",
+"tool": "magnifier"
+}])
 correct_category = 1
 source_batch = &"household"

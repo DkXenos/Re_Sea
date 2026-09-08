@@ -29,8 +29,11 @@ func _ready() -> void:
 	# buttons, so the shift bar is only a status line. The buttons on each screen
 	# ask for what they need through Events.
 	Events.view_switch_requested.connect(_toggle_view)
-	Events.shift_end_requested.connect(_end_shift)
+	Events.shift_end_requested.connect(_on_end_requested)
 	_apply_view()
+	# the cockpit tour, once, on the first shift of a tutorial run. the desk
+	# half fires from _apply_view the first time that view comes up.
+	Game.request_tutorial(&"claw")
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -54,9 +57,31 @@ func _toggle_view() -> void:
 func _apply_view() -> void:
 	_claw_view.set_view_active(_view == View.CLAW)
 	_desk_view.set_view_active(_view == View.DESK)
+	if _view == View.DESK:
+		Game.request_tutorial(&"desk")
 	# Both screens carry their own frame now, so the bar only ever surfaces to
 	# announce that the shift is over.
 	_bar.visible = false
+
+
+## Clocking off is a request, not a switch. The day's quota is the day's work,
+## and a shift you can walk out of on the first item is a shift you can skip -
+## so the button only answers once the quota is met.
+##
+## This is the ONLY path that can be refused. Running out of shift time, or
+## clearing the water with nothing left to sort, still ends the day through
+## _check_shift_over below: that is not leaving early, that is the day being
+## over, and refusing it would strand the player on a screen with nothing left
+## to do.
+func _on_end_requested() -> void:
+	if _finished:
+		return
+	if not Game.quota_met():
+		Events.toast_requested.emit(
+			Strings.tf("shift_end_locked", {"n": Game.quota_left()}))
+		Events.sfx_requested.emit(&"bin_reject")
+		return
+	_end_shift()
 
 
 # over when the budget can't buy anything useful. ending early once quota is

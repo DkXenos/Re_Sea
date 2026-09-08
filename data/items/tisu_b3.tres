@@ -13,14 +13,12 @@ frames = ExtResource("1_fr")
 weight = 0.2
 surface_properties = Array[String](["green stains", "acrid smell", "damp"])
 visible_material = "tissue"
-has_residue = true
-residue_type = "solvent-based paint"
+is_stained = true
+stain_type = "solvent-based paint"
+stain_hazardous = true
 hotspots = Array[Dictionary]([{
-"reveals": "has_residue",
-"tool": "rinse"
-}, {
-"reveals": "residue_type",
+"reveals": "stain_type",
 "tool": "swab"
 }])
-correct_category = 2
+correct_category = 3
 source_batch = &"coastal_workshop"

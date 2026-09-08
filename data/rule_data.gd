@@ -15,13 +15,16 @@ func label() -> String:
 	return short_text if short_text != "" else text
 
 
-func matches(item: ItemData) -> bool:
+## `overrides` is what the player has already changed about this particular
+## copy - a rinsed cup reports is_stained false even though the shared
+## ItemData still says true. Everything not in there comes off the ItemData.
+func matches(item: ItemData, overrides: Dictionary = {}) -> bool:
 	# empty applies_when = rulebook text only, never overrides anything
 	if applies_when.is_empty():
 		return false
 	for key: String in applies_when:
 		var expected: Variant = applies_when[key]
-		var actual: Variant = item.get(key)
+		var actual: Variant = overrides[key] if overrides.has(key) else item.get(key)
 		if actual == null:
 			return false
 		if expected is Array:

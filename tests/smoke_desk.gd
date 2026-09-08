@@ -44,6 +44,7 @@ func _run() -> void:
 
 	var hits := 0
 	var misses := 0
+	var rinses := 0
 	var guard := 0
 	var stopped_broke := false
 	while not game.unsorted_items().is_empty() and guard < 60:
@@ -72,9 +73,15 @@ func _run() -> void:
 		# Spending the whole rack on every item just runs the shift dry before
 		# it reaches the items worth inspecting.
 		var idle_tool: StringName = &""
+		var rinse_tool: StringName = &""
 		for tool_data: ToolData in game.tools:
 			var tool_id: StringName = tool_data.id
 			if tool_data.opens_containers or not game.tool_unlocked(tool_id):
+				continue
+			# the rinse does not read the item, it changes it - it has no
+			# hotspot to hit and it is not a "found nothing" candidate either
+			if tool_data.cleans_stains:
+				rinse_tool = tool_id
 				continue
 			if not entry.data.tool_can_reveal(tool_id):
 				idle_tool = tool_id
@@ -88,6 +95,13 @@ func _run() -> void:
 				"%s has something for %s but clicking the item revealed nothing"
 				% [entry.data.id, tool_id])
 			hits += 1
+		# a stained item is a decision the rinse exists for, so make it
+		if rinse_tool != &"" and entry.data.is_stained and game.can_afford(&"tool"):
+			inspect._armed = rinse_tool
+			inspect._use_tool()
+			assert(entry.cleaned != entry.data.stain_hazardous,
+				"%s rinsed the wrong way round" % entry.data.id)
+			rinses += 1
 		if idle_tool != &"" and game.can_afford(&"tool"):
 			var budget_before: int = game.budget_left
 			inspect._armed = idle_tool
@@ -98,7 +112,8 @@ func _run() -> void:
 		inspect._armed = &""
 		var chips: int = inspect.get_node("EvidenceScroll/EvidenceLog").get_child_count()
 		print("  %-16s revealed=%d chips=%d" % [entry.data.id, entry.revealed.size(), chips])
-		var verdict := RuleChecker.resolve(entry.data, day.active_rules)
+		var verdict := RuleChecker.resolve(entry.data, day.active_rules,
+			entry.rule_overrides())
 		var choice: int = int(verdict["category"])
 		var intended_wrong := guard % 4 == 0
 		if intended_wrong:
@@ -112,7 +127,8 @@ func _run() -> void:
 
 	assert(hits > 0, "no tool ever revealed anything - the click never landed")
 	assert(misses > 0, "a tool that finds nothing was never exercised")
-	print("tool hits=%d  budget-burning misses=%d%s" % [hits, misses,
+	assert(rinses > 0, "the rinse was never exercised on a stained item")
+	print("tool hits=%d  rinses=%d  budget-burning misses=%d%s" % [hits, rinses, misses,
 		"  (shift ran out of budget mid-desk)" if stopped_broke else ""])
 	print("sorted=%d correct=%d wrong=%d (deliberate mistakes %d) | budget left %d" %
 		[game.stats["sorted"], game.stats["correct"], game.stats["wrong"], deliberate_wrong,

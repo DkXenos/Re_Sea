@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://scenes/settings/settings.gd" id="1_set"]
 [ext_resource type="PackedScene" path="res://scenes/settings/settings_panel.tscn" id="2_panel"]
 [ext_resource type="Texture2D" path="res://assets/env/water_bg.png" id="3_bg"]
-[ext_resource type="Texture2D" path="res://assets/ui/panel_dark.png" id="4_pd"]
+[ext_resource type="Texture2D" path="res://assets/ui/panel_settings.png" id="4_pd"]
 [ext_resource type="Theme" path="res://assets/ui/ui_theme.tres" id="5_theme"]
 
 [node name="Settings" type="Node2D"]
@@ -30,32 +30,52 @@ mouse_filter = 2
 theme = ExtResource("5_theme")
 
 [node name="Panel" type="NinePatchRect" parent="UiLayer/Root"]
-offset_left = 340.0
-offset_top = 90.0
-offset_right = 940.0
-offset_bottom = 630.0
+offset_left = 320.0
+offset_top = 140.0
+offset_right = 960.0
+offset_bottom = 600.0
 mouse_filter = 2
 texture = ExtResource("4_pd")
-patch_margin_left = 24
-patch_margin_top = 24
-patch_margin_right = 24
-patch_margin_bottom = 24
+patch_margin_left = 60
+patch_margin_top = 100
+patch_margin_right = 110
+patch_margin_bottom = 60
+
+[node name="CloseButton" type="Button" parent="UiLayer/Root"]
+offset_left = 862.0
+offset_top = 177.0
+offset_right = 902.0
+offset_bottom = 218.0
+theme_type_variation = &"CloseButton"
 
 [node name="TitleLabel" type="Label" parent="UiLayer/Root"]
-offset_left = 380.0
-offset_top = 120.0
-offset_right = 900.0
-offset_bottom = 164.0
+offset_left = 360.0
+offset_top = 172.0
+offset_right = 840.0
+offset_bottom = 216.0
+theme_override_colors/font_color = Color(0.05, 0.11, 0.32, 1)
 theme_override_font_sizes/font_size = 30
 
 [node name="SettingsPanel" parent="UiLayer/Root" instance=ExtResource("2_panel")]
 offset_left = 380.0
-offset_top = 190.0
+offset_top = 250.0
 offset_right = 900.0
-offset_bottom = 530.0
+offset_bottom = 430.0
+
+[node name="TutorialButton" type="Button" parent="UiLayer/Root"]
+offset_left = 400.0
+offset_top = 424.0
+offset_right = 880.0
+offset_bottom = 468.0
 
 [node name="BackButton" type="Button" parent="UiLayer/Root"]
-offset_left = 540.0
-offset_top = 552.0
-offset_right = 740.0
-offset_bottom = 604.0
+offset_left = 400.0
+offset_top = 476.0
+offset_right = 880.0
+offset_bottom = 520.0
+
+[node name="ExitButton" type="Button" parent="UiLayer/Root"]
+offset_left = 400.0
+offset_top = 528.0
+offset_right = 880.0
+offset_bottom = 572.0

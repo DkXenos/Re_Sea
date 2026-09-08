@@ -7,6 +7,15 @@ const UPGRADE_DIR := "res://data/upgrades/"
 const SFX_DIR := "res://assets/audio/"
 const SFX_POOL_SIZE := 6
 
+# Two beds, both looping for the whole session and both on the Music bus, so
+# the one Music slider covers everything that is not a one-shot. The song sits
+# under the ambience rather than over it - the sea is the room, the song is the
+# thing playing in it.
+const MUSIC_TRACK := "res://assets/audio/music_game.mp3"
+const AMBIENCE_TRACK := "res://assets/audio/amb_sea.mp3"
+const MUSIC_DB := -8.0
+const AMBIENCE_DB := -4.0
+
 # big prime, keeps box streams from colliding
 const CONTAINER_STREAM := 104729
 
@@ -29,7 +38,6 @@ var crafted: Dictionary = {}
 var unlocked_blueprints: Array[StringName] = []
 
 var upgrades: Array[UpgradeData] = []
-var equipped_upgrade: StringName = &""
 
 var inventory: Array[CarriedItem] = []
 var containers_grabbed: int = 0
@@ -45,6 +53,24 @@ var budget_left: int = 0
 var settings: Dictionary = {}
 var vfx_intensity: float = 1.0
 
+## The guided tour is not a choice: it runs on the first run of every launch, so
+## nobody reaches the desk without having been told what a bin does.
+##
+## It used to run once on a machine and never again, remembered in
+## user://settings.cfg. That is right for one player on their own laptop and
+## wrong for everything else this game actually does: the second person to sit
+## down never saw it, playtesting a change to the tour meant editing a settings
+## file by hand, and on a machine it is being demoed on it showed up for the
+## first player of the day and nobody after. Once per launch costs a repeat
+## viewing to whoever restarts the game, and costs nobody the explanation.
+##
+## `tutorial_seen` keeps the cockpit half and the desk half to one showing each,
+## so switching views doesn't replay them; `tutorial_shown_this_launch` is what
+## stops the next run in the same sitting from starting the tour over.
+var tutorial_active: bool = false
+var tutorial_seen: Dictionary = {}
+var tutorial_shown_this_launch: bool = false
+
 var force_grip: int = 0  # 1 always, -1 never, 0 roll
 
 # headless runs turn this off or godot yells about leaked streams
@@ -52,6 +78,7 @@ var sfx_enabled: bool = true
 
 var _sfx_players: Array[AudioStreamPlayer] = []
 var _sfx_cache: Dictionary = {}
+var _beds: Array[AudioStreamPlayer] = []
 
 
 func _ready() -> void:
@@ -59,12 +86,14 @@ func _ready() -> void:
 	settings = SaveSettings.load_all()
 	for key: String in settings:
 		apply_setting(key, float(settings[key]), false)
+	_start_music()
 	_load_days()
 	_load_tools()
 	_load_blueprints()
 	_load_upgrades()
 	Events.sfx_requested.connect(play_sfx)
 	Events.debug_command.connect(_on_debug_command)
+	Events.tutorial_segment_finished.connect(_on_tutorial_segment_finished)
 
 
 func _load_days() -> void:
@@ -124,9 +153,43 @@ func start_run(seed_value: int = 0) -> void:
 	materials = {}
 	crafted = {}
 	unlocked_blueprints = []
-	equipped_upgrade = &""
 	last_breakdown = {}
+	tutorial_seen = {}
+	# armed here rather than by the menu - the menu is a splash with nothing to
+	# press, and a first-timer should not have to opt in to being taught
+	tutorial_active = not tutorial_shown_this_launch
 	begin_day()
+
+
+## Asks for a tour segment the first time that screen is reached in a tutorial
+## run, and never again. Returns whether it actually asked.
+func request_tutorial(segment: StringName) -> bool:
+	if not tutorial_active or tutorial_seen.has(segment):
+		return false
+	tutorial_seen[segment] = true
+	Events.tutorial_requested.emit(segment)
+	return true
+
+
+## Puts the guided tour back for whoever is sitting down next. A run already in
+## progress picks it up at the next screen that asks - the desk on the next tab
+## switch, the cockpit at the start of the next shift - and a new run runs the
+## whole thing from the top.
+func replay_tutorial() -> void:
+	tutorial_shown_this_launch = false
+	tutorial_active = true
+	tutorial_seen = {}
+
+
+# Both halves seen means this player has been shown the game. Drop the flag so
+# a retry from the game-over screen doesn't sit them through it again, and
+# remember it for the rest of this launch.
+func _on_tutorial_segment_finished() -> void:
+	if not tutorial_active:
+		return
+	if tutorial_seen.has(&"claw") and tutorial_seen.has(&"desk"):
+		tutorial_active = false
+		tutorial_shown_this_launch = true
 
 
 func current_day() -> DayData:
@@ -238,17 +301,18 @@ func base_cost(action: StringName) -> int:
 	return int(ACTION_COST.get(action, 0))
 
 
+## Cheapest wins. Two machines that both touch a price is not a conflict, it is
+## just the better of the two.
 func cost_of(action: StringName) -> int:
-	var up := upgrade()
-	if up != null:
+	var cost := base_cost(action)
+	for up: UpgradeData in active_upgrades():
+		var fitted: int = -1
 		match action:
-			&"drop":
-				if up.drop_cost >= 0:
-					return up.drop_cost
-			&"tool":
-				if up.tool_cost >= 0:
-					return up.tool_cost
-	return base_cost(action)
+			&"drop": fitted = up.drop_cost
+			&"tool": fitted = up.tool_cost
+		if fitted >= 0:
+			cost = mini(cost, fitted)
+	return cost
 
 
 func can_afford(action: StringName) -> bool:
@@ -267,6 +331,24 @@ func spend_amount(cost: int) -> bool:
 	stats["spent"] = int(stats.get("spent", 0)) + cost
 	Events.budget_changed.emit(budget_left, budget_max)
 	return true
+
+
+## The day's target, and how much of it is left.
+##
+## Sorted is sorted: a wrong bin counts here exactly as much as a right one.
+## The desk never says which was which - that is what the report at the end of
+## the day is for - so a quota that only counted correct sorts would be a score
+## the player cannot see, and would tell them they got one wrong the moment the
+## number failed to move.
+func quota_left() -> int:
+	var day := current_day()
+	if day == null:
+		return 0
+	return maxi(0, day.quota - int(stats.get("sorted", 0)))
+
+
+func quota_met() -> bool:
+	return quota_left() == 0
 
 
 func can_still_act() -> bool:
@@ -405,6 +487,9 @@ func build_blueprint(blueprint_id: StringName) -> BlueprintData:
 			continue
 		unlocked_blueprints.append(bp.id)
 		Events.blueprints_changed.emit()
+		# the machine is running from here, and it may have just changed what a
+		# drop or a tool costs - anything showing a price has to hear about it
+		Events.budget_changed.emit(budget_left, budget_max)
 		return bp
 	return null
 
@@ -413,45 +498,61 @@ func blueprint_unlocked(blueprint_id: StringName) -> bool:
 	return blueprint_id in unlocked_blueprints
 
 
-func upgrade() -> UpgradeData:
+## What the machines you have built are doing to the claw right now.
+##
+## There is no gear tab and nothing to fit: a blueprint that has been built is
+## a machine that is running, and its upgrade is on from that moment until the
+## end of the run. Three machines means all three, together - which is why the
+## getters below combine rather than pick.
+func active_upgrades() -> Array[UpgradeData]:
+	var out: Array[UpgradeData] = []
+	for bp: BlueprintData in blueprints:
+		if bp.unlocks_upgrade == &"" or not blueprint_unlocked(bp.id):
+			continue
+		for up: UpgradeData in upgrades:
+			if up.id == bp.unlocks_upgrade:
+				out.append(up)
+	return out
+
+
+## The upgrade a blueprint will bolt on, built or not, for the sheet to show.
+func upgrade_for(bp: BlueprintData) -> UpgradeData:
+	if bp == null or bp.unlocks_upgrade == &"":
+		return null
 	for up: UpgradeData in upgrades:
-		if up.id == equipped_upgrade:
+		if up.id == bp.unlocks_upgrade:
 			return up
 	return null
 
 
-func upgrade_unlocked(up: UpgradeData) -> bool:
-	for bp: BlueprintData in blueprints:
-		if bp.unlocks_upgrade == up.id:
-			return blueprint_unlocked(bp.id)
-	return unlocked_blueprints.size() >= up.unlock_after_blueprints
-
-
-# pass the one already equipped to take it off again
-func equip_upgrade(upgrade_id: StringName) -> void:
-	equipped_upgrade = &"" if upgrade_id == equipped_upgrade else upgrade_id
-	Events.upgrade_equipped.emit(equipped_upgrade)
-	Events.budget_changed.emit(budget_left, budget_max)
-
-
+# points of grip add up
 func grip_delta() -> float:
-	var up := upgrade()
-	return up.grip_delta if up != null else 0.0
+	var out := 0.0
+	for up: UpgradeData in active_upgrades():
+		out += up.grip_delta
+	return out
 
 
 func coarse_readings() -> bool:
-	var up := upgrade()
-	return up != null and up.coarse_readings
+	for up: UpgradeData in active_upgrades():
+		if up.coarse_readings:
+			return true
+	return false
 
 
+# speeds multiply - two machines that each move the rail move it together
 func move_speed_multiplier() -> float:
-	var up := upgrade()
-	return up.move_speed_multiplier if up != null else 1.0
+	var out := 1.0
+	for up: UpgradeData in active_upgrades():
+		out *= up.move_speed_multiplier
+	return out
 
 
 func post_drop_lockout() -> float:
-	var up := upgrade()
-	return up.post_drop_lockout if up != null else 0.0
+	var out := 0.0
+	for up: UpgradeData in active_upgrades():
+		out = maxf(out, up.post_drop_lockout)
+	return out
 
 
 ## Which ending this run earned: one tier per machine actually built, so 0 is
@@ -462,15 +563,16 @@ func ending_tier() -> int:
 	return clampi(unlocked_blueprints.size(), 0, blueprints.size())
 
 
-## Only the two extremes have their own painting so far; the tiers between fall
-## back to a neutral still until that art arrives.
+## One painting per tier, named by the number of machines running in it, so a
+## fourth blueprint needs `ending_4.png` beside the other four and nothing else.
+## Falls back to the bay-as-it-was still rather than showing a blank screen if
+## that file is ever missing.
 func ending_still() -> String:
-	var tier := ending_tier()
-	if tier <= 0:
-		return "res://assets/env/ending_bad.png"
-	if tier >= blueprints.size():
-		return "res://assets/env/ending_good.png"
-	return "res://assets/env/cutscene_04.png"
+	var path := "res://assets/env/ending_%d.png" % ending_tier()
+	if not ResourceLoader.exists(path):
+		push_warning("No ending still for tier %d" % ending_tier())
+		return "res://assets/env/ending_0.png"
+	return path
 
 
 func apply_setting(key: String, value: float, persist: bool = true) -> void:
@@ -502,6 +604,36 @@ func _build_sfx_pool() -> void:
 		_sfx_players.append(player)
 
 
+# One player per bed. Godot imports an .mp3 as a one-shot, so the loop flag is
+# set here rather than asked for in the .import - that way dropping in a
+# different track needs no import settings.
+func _start_music() -> void:
+	if not sfx_enabled or DisplayServer.get_name() == "headless":
+		return
+	for row: Array in [[MUSIC_TRACK, MUSIC_DB], [AMBIENCE_TRACK, AMBIENCE_DB]]:
+		var path := String(row[0])
+		if not ResourceLoader.exists(path):
+			push_warning("Music track missing: %s" % path)
+			continue
+		var stream: AudioStream = load(path)
+		if stream is AudioStreamMP3:
+			(stream as AudioStreamMP3).loop = true
+		var player := AudioStreamPlayer.new()
+		player.bus = "Music"
+		player.stream = stream
+		player.volume_db = float(row[1])
+		add_child(player)
+		player.play()
+		_beds.append(player)
+
+
+func stop_music() -> void:
+	for player: AudioStreamPlayer in _beds:
+		player.stop()
+		player.stream = null
+	_beds.clear()
+
+
 func play_sfx(sfx_name: StringName) -> void:
 	if not sfx_enabled:
 		return
@@ -525,6 +657,7 @@ func stop_all_sfx() -> void:
 		player.stop()
 		player.stream = null
 	_sfx_cache.clear()
+	stop_music()
 
 
 func _exit_tree() -> void:

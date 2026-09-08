@@ -4,10 +4,10 @@ class_name MistakeView
 extends RefCounted
 
 const FIELD_LABELS: Dictionary = {
-	"has_residue": "chip_residue",
-	"residue_type": "chip_residue_type",
+	"is_stained": "chip_stain",
+	"stain_type": "chip_stain_type",
+	"stain_hazardous": "chip_stain_hazardous",
 	"true_material": "chip_true_material",
-	"tag_text": "chip_tag",
 }
 
 

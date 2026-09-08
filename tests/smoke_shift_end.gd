@@ -1,3 +1,5 @@
+# When a shift is allowed to end, and what it says on the way out.
+#
 # The two shifts that end on a message rather than "time is up": one where
 # nothing was sorted, and one that cleared the water.
 #
@@ -30,6 +32,7 @@ func _run() -> void:
 	game.sfx_enabled = false  # see Game.sfx_enabled
 	game.start_run(6060)
 
+	await _check_quota_gates_the_button()
 	await _check_nothing_sorted()
 	await _check_sea_cleared()
 	await _check_ordinary_shift()
@@ -39,6 +42,39 @@ func _run() -> void:
 	for i in 10:
 		await process_frame
 	quit()
+
+
+## Clocking off early is what the button is for, but not before the day's work
+## is done. Sorted is sorted: the quota does not care whether the bin was right,
+## because the desk never tells you and the report is where that comes out.
+func _check_quota_gates_the_button() -> void:
+	game.begin_day()
+	var day: DayData = game.current_day()
+	var shift: Node = await _new_shift()
+	# the autoloads are not in scope in a --script file, see the note up top
+	var events: Node = root.get_node("/root/Events")
+	assert(day.quota > 0, "a day with no quota could be walked out of immediately")
+	assert(not game.quota_met(), "the day started with its quota already met")
+
+	events.shift_end_requested.emit()
+	await physics_frame
+	assert(not shift._finished,
+		"the shift ended with %d of the day's %d sorted" % [
+			int(game.stats.get("sorted", 0)), day.quota])
+
+	# every one of them in the WRONG bin still finishes the day's work
+	game.stats["sorted"] = day.quota
+	game.stats["correct"] = 0
+	game.stats["wrong"] = day.quota
+	assert(game.quota_met(), "%d of %d sorted did not meet the quota"
+		% [int(game.stats["sorted"]), day.quota])
+	events.shift_end_requested.emit()
+	await physics_frame
+	assert(shift._finished, "the shift refused to end with the quota met")
+	print("  quota %d: the button is refused at 0 sorted and answers at %d, right or wrong"
+		% [day.quota, day.quota])
+	shift.free()
+	await process_frame
 
 
 ## Ending without sorting anything says so, whatever else happened.

@@ -14,19 +14,15 @@ weight = 0.5
 surface_properties = Array[String](["stiff", "slick surface", "light"])
 visible_material = "paper"
 visible_label = "PAPER"
-has_residue = true
-residue_type = "coffee"
-true_material = "PE-lined paper"
+is_stained = true
+stain_type = "coffee"
+true_material = "PAP 22 - paper bonded to a PE liner"
 is_multilayer = true
-tag_text = "PAP 22 - PE liner"
 hotspots = Array[Dictionary]([{
-"reveals": "has_residue",
-"tool": "rinse"
-}, {
-"reveals": "residue_type",
+"reveals": "stain_type",
 "tool": "swab"
 }, {
-"reveals": "tag_text",
+"reveals": "true_material",
 "tool": "magnifier"
 }])
 correct_category = 1

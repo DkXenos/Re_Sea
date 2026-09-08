@@ -54,9 +54,6 @@ const KEY_BUTTONS: Array[Dictionary] = [
 # working. Hold it down long enough to see.
 const KEY_PRESS_HOLD := 0.12
 
-# mouse parallax, nearest layer. keep it small.
-const PARALLAX := [2.0, 4.0, 6.0]
-
 # The depth layers behind the seabed, furthest first. `scroll` is how much of
 # the camera's travel that layer takes:
 #
@@ -65,7 +62,9 @@ const PARALLAX := [2.0, 4.0, 6.0]
 #
 # `repeat` turns a row into scenery: that many copies of the cut-out spread
 # along the layer, planted on the seabed at the size the manifest installed it
-# at. Leave it out and the row is one continuous backdrop instead.
+# at. Leave it out and the row is one continuous backdrop instead. `base_y`
+# overrides where a scenery row's feet sit, for anything that floats rather
+# than standing on the sand.
 #
 # Add a row and it shows up. Nothing here says how big anything is: every layer
 # is sized from its own texture, so art at any resolution lands in the window at
@@ -74,8 +73,14 @@ const PARALLAX := [2.0, 4.0, 6.0]
 # stretched on one axis.
 const PARALLAX_LAYERS: Array[Dictionary] = [
 	{"texture": "res://assets/env/water_bg.png", "scroll": 0.12},
-	{"texture": "res://assets/env/coral_dead.png", "scroll": 0.4, "repeat": 7},
-	{"texture": "res://assets/env/coral_healthy.png", "scroll": 0.62, "repeat": 5},
+	{"texture": "res://assets/env/reef_coral_3.png", "scroll": 0.28, "repeat": 4},
+	{"texture": "res://assets/env/reef_coral_2.png", "scroll": 0.40, "repeat": 5},
+	# a shoal hangs in the water rather than standing on the sand, so this row
+	# says where its own feet are instead of taking the seabed
+	{"texture": "res://assets/env/reef_fish_1.png", "scroll": 0.50, "repeat": 3,
+		"base_y": Vector2(150.0, 215.0)},
+	{"texture": "res://assets/env/reef_coral_1.png", "scroll": 0.62, "repeat": 6},
+	{"texture": "res://assets/env/reef_coral_4.png", "scroll": 0.78, "repeat": 4},
 ]
 # far enough behind the seabed (-10) that nothing can land between them
 const PARALLAX_Z := -20
@@ -96,8 +101,6 @@ const PARALLAX_OVERSCAN := 8.0
 @export var fish_speed_min: float = 25.0
 @export var fish_speed_max: float = 65.0
 
-@onready var _tank_layer: CanvasLayer = $TankLayer
-@onready var _glass_layer: CanvasLayer = $GlassLayer
 @onready var _parallax: Node2D = $TankLayer/TankContainer/TankViewport/TankWorld/Parallax
 @onready var _seabed: Sprite2D = $TankLayer/TankContainer/TankViewport/TankWorld/Seabed
 @onready var _items: Node2D = $TankLayer/TankContainer/TankViewport/TankWorld/Items
@@ -159,7 +162,7 @@ func _ready() -> void:
 	console.get_node("SortingButton").tooltip_text = Strings.t("shift_to_desk")
 	console.get_node("SettingsButton").pressed.connect(
 		func() -> void: Events.pause_requested.emit())
-	console.get_node("SettingsButton").tooltip_text = Strings.t("menu_settings")
+	console.get_node("SettingsButton").tooltip_text = Strings.t("settings_open")
 	_key_hold.resize(KEY_BUTTONS.size())
 	_key_hold.fill(0.0)
 	Events.vfx_intensity_changed.connect(_rebuild_bubbles)
@@ -217,8 +220,9 @@ func _setup_parallax() -> void:
 		# slot on the layer and wanders inside it
 		var span := _layer_span(scroll) - texture.get_width()
 		var slot := span / float(copies)
+		var base_y: Vector2 = row.get("base_y", SCENERY_BASE_Y)
 		for j in copies:
-			var sprite := _scenery_sprite(texture, i, scatter)
+			var sprite := _scenery_sprite(texture, i, scatter, base_y)
 			_add_layer(sprite, scroll,
 				base + slot * (float(j) + scatter.randf_range(0.05, 0.95)))
 	_update_parallax_layers()
@@ -246,12 +250,13 @@ func _backdrop_sprite(texture: Texture2D, scroll: float, depth: int) -> Sprite2D
 
 
 # a cut-out at the size the manifest gave it, standing on the seabed
-func _scenery_sprite(texture: Texture2D, depth: int, scatter: RandomNumberGenerator) -> Sprite2D:
+func _scenery_sprite(texture: Texture2D, depth: int, scatter: RandomNumberGenerator,
+		base_y: Vector2 = SCENERY_BASE_Y) -> Sprite2D:
 	var sprite := Sprite2D.new()
 	sprite.texture = texture
 	sprite.centered = false
 	sprite.z_index = PARALLAX_Z + depth
-	sprite.position.y = scatter.randf_range(SCENERY_BASE_Y.x, SCENERY_BASE_Y.y) \
+	sprite.position.y = scatter.randf_range(base_y.x, base_y.y) \
 		- texture.get_height()
 	return sprite
 
@@ -399,7 +404,7 @@ func _process(delta: float) -> void:
 	_claw.can_drop = _active and Game.can_afford(&"drop")
 	$ConsoleLayer/GrabButton.disabled = not _claw.can_drop
 	_camera.position.x = _claw.position.x
-	_update_parallax()
+	_update_parallax_layers()
 	_update_bubbles(delta)
 	_update_grip_preview()
 	_update_console_keys(delta)
@@ -407,21 +412,14 @@ func _process(delta: float) -> void:
 	_update_readouts()
 
 
-# the tank and the glass are nudged by the mouse, the hull is not - we are
-# sitting in it, so it has no business moving.
-func _update_parallax() -> void:
-	var vp := get_viewport_rect().size
-	if vp.x <= 0.0:
-		return
-	var m := get_viewport().get_mouse_position() / vp - Vector2(0.5, 0.5)
-	_tank_layer.offset = -m * PARALLAX[1]
-	_glass_layer.offset = -m * PARALLAX[2]
-	_update_parallax_layers()
-
-
 # A sprite sitting still in the world slides a full pixel across the window for
 # every pixel the camera moves. Giving back (1 - scroll) of that movement is
 # what makes a layer look further away.
+#
+# The claw's travel is the only thing that moves these. The tank and the glass
+# used to be nudged by the mouse on top of it, which slid the whole picture -
+# the cockpit we are sitting still inside included - whenever the cursor moved,
+# and read as the screen wobbling rather than as depth.
 func _update_parallax_layers() -> void:
 	var centre := _camera.get_screen_center_position().x
 	for i in _layers.size():

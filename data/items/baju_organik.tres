@@ -7,11 +7,15 @@
 [resource]
 script = ExtResource("2_sc")
 id = &"baju_organik"
-display_name = "Natural Fibre Shirt"
+display_name = "Frayed Shirt"
 texture = ExtResource("3_tx")
 frames = ExtResource("1_fr")
 weight = 0.6
-surface_properties = Array[String](["soft", "natural fibre", "soaks up water"])
-visible_material = "cotton fabric"
-visible_label = "COTTON 100%"
+surface_properties = Array[String](["soft", "frayed hem", "label washed out"])
+visible_material = "woven fabric"
+true_material = "cotton - natural fibre"
+hotspots = Array[Dictionary]([{
+"reveals": "true_material",
+"tool": "magnifier"
+}])
 source_batch = &"textile_mill"
