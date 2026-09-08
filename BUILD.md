@@ -123,11 +123,19 @@ Batas lomba 300 MB. Kondisi saat ini jauh di bawahnya:
 | Build | Ukuran |
 |---|---|
 | Web (zip) | ±22 MB |
-| Windows (zip) | ±79 MB |
-| macOS (zip) | ±101 MB |
+| Windows (zip) | ±57 MB |
+| macOS (zip) | ±78 MB |
 
 Angka Windows/macOS didominasi runtime Godot itu sendiri; `.pck` game hanya
-±46 MB. Master ilustrasi berukuran penuh (2560×1440) **tidak** disimpan di dalam
+±21 MB.
+
+> Angka di atas berlaku sejak sumber mentah desainer (`assets/newaset/`,
+> `assets/ui/endings/`) dikeluarkan dari project. Preset memakai
+> `export_filter="all_resources"`, jadi **setiap** berkas di dalam `assets/`
+> ikut dipaket walau tidak ada satu pun scene yang memuatnya — itu sebabnya
+> `.pck` sempat 43,7 MB.
+
+Master ilustrasi berukuran penuh (2560×1440) **tidak** disimpan di dalam
 project — letaknya di `/Users/jaysn/Re-Sea-art-masters/`. Jangan memindahkannya
 kembali ke `assets/`, karena seluruh isinya akan ikut terpaket ke build. Hal yang
 sama berlaku untuk 23 bobot Fredoka yang tidak dipakai, di
