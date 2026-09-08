@@ -35,7 +35,7 @@ follows — you never touch a scene.**
 
 | Part | Files |
 |------|-------|
-| Button | `button_normal` / `button_hover` / `button_pressed` / `button_disabled` |
+| Button | `panel_main`, one plate for all four states (normal / hover / pressed / disabled), tinted apart by the font colours. |
 | Primary button | `primary_button` / `primary_button_hover`. Theme type variation `PrimaryButton`, not the default Button, so only the one call to action per screen wears it. |
 | Panels & boxes | `panel_dark`, `panel_slot`, `panel_slot_selected` |
 | Volume slider | `slider_track`, `slider_fill`, `slider_grabber`, `slider_grabber_hover` |
@@ -213,8 +213,6 @@ an animation in without touching code.
 | File | Size | Animation | What it is |
 |------|------|-----------|------------|
 | `assets/env/bubble.png` | 24x24 | `rise` 6 fr | Bubble, count scales with the VFX slider |
-| `assets/env/coral_dead.png` | 174x140 | `idle` 6 fr | Coral overlay, bleached. Sways in place; count is per ocean tier. |
-| `assets/env/coral_healthy.png` | 157x190 | `idle` 6 fr | Coral overlay, in colour. Sways in place; count is per ocean tier. |
 | `assets/env/reef_coral_1.png` | 78x150 | static | Tank parallax scenery, planted on the seabed. Sized to the water column above the sand: the tank window is 848x408 and the sand line is at y=268, so nothing here is taller than that. |
 | `assets/env/reef_coral_2.png` | 159x170 | static | Tank parallax scenery, planted on the seabed. Sized to the water column above the sand: the tank window is 848x408 and the sand line is at y=268, so nothing here is taller than that. |
 | `assets/env/reef_coral_3.png` | 109x205 | static | Tank parallax scenery, planted on the seabed. Sized to the water column above the sand: the tank window is 848x408 and the sand line is at y=268, so nothing here is taller than that. |
@@ -225,7 +223,7 @@ an animation in without touching code.
 | `assets/env/cutscene_03.png` | 1280x720 | static | Cutscene still 3 (placeholder) |
 | `assets/env/cutscene_04.png` | 1280x720 | static | Opening beat 4: the diver, face to face with what lives in the bay. |
 | `assets/env/cutscene_05.png` | 1280x720 | static | Opening beat 5: the three schematics on the workshop desk. |
-| `assets/env/ending_0.png` | 1280x720 | static | Ending still, 0 machines built - the bay left as it was. One file per tier, named by the number of machines running in it: a fourth blueprint needs an `ending_4.png` beside these and no code change. The 2x originals are in `assets/ui/endings/`. |
+| `assets/env/ending_0.png` | 1280x720 | static | Ending still, 0 machines built - the bay left as it was. One file per tier, named by the number of machines running in it: a fourth blueprint needs an `ending_4.png` beside these and no code change. |
 | `assets/env/ending_1.png` | 1280x720 | static | Ending still, 1 machine built. |
 | `assets/env/ending_2.png` | 1280x720 | static | Ending still, 2 machines built. |
 | `assets/env/ending_3.png` | 1280x720 | static | Ending still, all three machines built. |
@@ -271,10 +269,6 @@ an animation in without touching code.
 | `assets/ui/blueprint_reef_restoration_pod.png` | 810x590 | static | Reef Restoration Pod schematic, unbuilt: the sheet plus the faint lineart of every part. |
 | `assets/ui/blueprint_reef_restoration_pod_done.png` | 810x590 | static | Reef Restoration Pod schematic, fully inked. Shown once the machine is built. |
 | `assets/ui/briefing_bg.png` | 1280x720 | static | The before-shift briefing: desk, taped blueprint sheet, stickers, and the painted socket the Lower the Claw button drops into. Full-frame, opaque. |
-| `assets/ui/button_disabled.png` | 64x64 | static | Button disabled state. NinePatch, 20px margins. |
-| `assets/ui/button_hover.png` | 64x64 | static | Button hover state. NinePatch, 20px margins. |
-| `assets/ui/button_normal.png` | 64x64 | static | Button normal state. NinePatch, 20px margins. |
-| `assets/ui/button_pressed.png` | 64x64 | static | Button pressed state. NinePatch, 20px margins. |
 | `assets/ui/chat_bubble.png` | 907x178 | static | Dialogue plate for the cutscene and the ending screen. White inside, so text on it is dark. |
 | `assets/ui/chip_match.png` | 64x40 | static | Evidence chip that satisfies an active rule (green). NinePatchRect, 24px margins. |
 | `assets/ui/chip_reveal.png` | 64x40 | static | Evidence chip, tool reveal (gold). NinePatchRect, 24px margins. |
@@ -287,11 +281,8 @@ an animation in without touching code.
 | `assets/ui/comp_seeding_arm.png` | 90x189 | static | Reef Restoration Pod part `seeding_arm`, inked. Drawn over the sheet once crafted; before that the sheet's own lineart shows through, so there is no locked variant. |
 | `assets/ui/comp_sorting_belt.png` | 206x132 | static | Recycling Station part `sorting_belt`, inked. Drawn over the sheet once crafted; before that the sheet's own lineart shows through, so there is no locked variant. |
 | `assets/ui/desk_bg.png` | 1280x720 | static | The whole sorting desk - top bar, panel frames, bin slots. Full-frame, opaque. Every desk node is positioned into a slot painted in here. |
-| `assets/ui/desk_meter_frame.png` | 703x48 | static | Frame around the blueprint progress strip at the top of the desk. |
 | `assets/ui/icon_check.png` | 48x48 | static | HUD icon (V) |
 | `assets/ui/icon_cross.png` | 48x48 | static | HUD icon (X) |
-| `assets/ui/icon_pause.png` | 48x48 | static | HUD icon (II) |
-| `assets/ui/icon_pause_pressed.png` | 48x48 | static | Pause button, pressed state. |
 | `assets/ui/machine_frame.png` | 1280x720 | static | The whole cockpit: hull, window surround, glass streaks, panels. Drawn over the tank; the window opening is the transparent rect at (216,122) 848x408. |
 | `assets/ui/machine_grab.png` | 128x122 | static | GRAB button, resting. Drops the claw. |
 | `assets/ui/machine_grab_pressed.png` | 128x122 | static | GRAB button, pushed. Same crop as the resting state so it does not jump. |
@@ -304,8 +295,6 @@ an animation in without touching code.
 | `assets/ui/machine_slider.png` | 322x64 | static | The marker that slides along the top rail, showing which slice of the seabed the window is on. Moves in code; the rail behind it is part of machine_frame. |
 | `assets/ui/machine_sorting.png` | 216x135 | static | SORTING folder button, resting. Switches to the desk. |
 | `assets/ui/machine_sorting_hover.png` | 216x135 | static | SORTING folder button, hovered. |
-| `assets/ui/meter_bg.png` | 320x32 | static | Track behind a blueprint's progress strip on the desk. Fill is clipped by width. |
-| `assets/ui/meter_fill.png` | 320x32 | static | Fill of a blueprint's progress strip on the desk. Clipped by width, never scaled. |
 | `assets/ui/minimap_item.png` | 10x10 | static | Minimap dot for one item on the seabed |
 | `assets/ui/cursor.png` | 42x64 | static | The mouse pointer, set once in `main.gd`. A custom cursor goes to the OS at the png's own pixel size - it does not scale with the game or the display, so this file IS the size it appears at, and the arrow's point must stay at the top-left (`main.gd` CURSOR_HOTSPOT). |
 | `assets/ui/panel_dark.png` | 261x261 | static | Modal / overlay panel: the rulebook and the blueprint component popup. NinePatchRect, 24px margins. Square 1:1 plate, so it stretches to any rectangle. |

@@ -34,8 +34,6 @@ need a code change.
 
 Text is English, in `data/strings.gd`.
 
-See NOTES.md for the rules I keep breaking.
-
 ## state
 
 Playable start to finish. Most art is final; the tool icons are still
