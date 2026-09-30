@@ -13,10 +13,10 @@ frames = ExtResource("1_0j8tn")
 weight = 0.5
 surface_properties = Array[String](["stiff", "slick surface", "light"])
 visible_material = "paper"
-visible_label = "PAPER"
+visible_label = "paper"
 is_stained = true
 stain_type = "coffee"
-true_material = "PAP 22 - paper bonded to a PE liner"
+true_material = "paper with a thin plastic film bonded to the inside"
 is_multilayer = true
 hotspots = Array[Dictionary]([{
 "reveals": "stain_type",

@@ -3,6 +3,11 @@
 #
 # A step is:
 #   key      - the Strings key stem. "tut_<key>_title" and "tut_<key>_body".
+#   wait_for - an Events.tutorial_action_performed name. A step carrying one
+#              does not advance on a click: the caption's Next button goes away
+#              and the tour sits there until the player performs that action on
+#              the lit control for real. Everything else stays frozen, so the
+#              only thing they can do is the thing being asked for.
 #   targets  - node paths under the shift scene. The spotlight is the union of
 #              their rects, so a readout and the plate it sits on can be lit
 #              together. Empty = no hole, the screen just dims and the caption
@@ -61,8 +66,48 @@ const DESK: Array = [
 ]
 
 
+# The end-of-day screen. Two tabs that do completely different jobs - one
+# reads today's books, the other spends what they paid out - and a player who
+# only ever sees the one that opens by default never learns the run has a goal.
+# So the two halves are separated by the one step that makes them press the
+# tab themselves; being made to do it once is what makes it a place they know
+# how to get back to.
+const AFTER_DAY: Array = [
+	{"key": "after_intro", "targets": ["UiLayer/Root/TitleLabel"],
+		"pad": 12.0, "radius": 14.0},
+	{"key": "after_missed", "targets": [
+		"UiLayer/Root/ResultPage/MistakesTitle",
+		"UiLayer/Root/ResultPage/MistakesScroll"], "pad": 12.0, "radius": 18.0},
+	{"key": "after_recovered", "targets": [
+		"UiLayer/Root/ResultPage/RecoveredTitle",
+		"UiLayer/Root/ResultPage/Recovered"], "pad": 12.0, "radius": 18.0},
+	{"key": "after_summary", "targets": ["UiLayer/Root/ResultPage/Summary"],
+		"pad": 12.0, "radius": 14.0},
+	# the one step the player has to answer with a press
+	{"key": "after_switch", "targets": ["UiLayer/Root/Tabs/TechTab"],
+		"pad": 10.0, "radius": 18.0, "wait_for": &"after_tab_tech"},
+	{"key": "after_tech_sheet", "targets": [
+		"UiLayer/Root/TechPage/BlueprintName",
+		"UiLayer/Root/TechPage/Diagram"], "pad": 12.0, "radius": 18.0},
+	{"key": "after_tech_paging", "targets": [
+		"UiLayer/Root/TechPage/PrevButton",
+		"UiLayer/Root/TechPage/NextButton"], "pad": 10.0, "radius": 18.0},
+	{"key": "after_tech_parts", "targets": [
+		"UiLayer/Root/TechPage/PartsLabel",
+		"UiLayer/Root/TechPage/PartsScroll"], "pad": 12.0, "radius": 18.0},
+	{"key": "after_tech_pool", "targets": ["UiLayer/Root/TechPage/PoolLabel"],
+		"pad": 10.0, "radius": 14.0},
+	{"key": "after_tech_build", "targets": [
+		"UiLayer/Root/TechPage/CraftButton",
+		"UiLayer/Root/TechPage/Unlocks"], "pad": 12.0, "radius": 18.0},
+	{"key": "after_next", "targets": ["UiLayer/Root/NextButton"],
+		"pad": 10.0, "radius": 20.0},
+]
+
+
 static func segment(name: StringName) -> Array:
 	match name:
 		&"claw": return CLAW
 		&"desk": return DESK
+		&"after_day": return AFTER_DAY
 	return []

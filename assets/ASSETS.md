@@ -186,7 +186,7 @@ an animation in without touching code.
 | `assets/items/item_tisu_b3.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `tisu_b3` |
 | `assets/items/item_tisu_bekas.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `tisu_bekas` |
 | `assets/items/item_teddy_bear.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `teddy_bear`. Waterlogged soft toy, plain RESIDUE. |
-| `assets/items/item_toothbrush.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `toothbrush`. Reads as recyclable PP; the magnifier finds the nylon and the multilayer rule sends it to RESIDUE. |
+| `assets/items/item_toothbrush.png` | 160x160 | `idle` 2 fr, `wobble` 4 fr, `sinking` 6 fr | Trash item `toothbrush`. Reads as ordinary recyclable plastic; the magnifier finds the nylon bristles and metal staples, and the multilayer rule sends it to RESIDUE. |
 
 ### Sorting bins
 

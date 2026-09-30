@@ -13,6 +13,6 @@ frames = ExtResource("1_fr")
 weight = 0.9
 surface_properties = Array[String](["stiff", "dry", "stacked"])
 visible_material = "paper"
-visible_label = "PAPER"
+visible_label = "paper"
 correct_category = 1
 source_batch = &"household"

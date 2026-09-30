@@ -30,10 +30,11 @@ func _ready() -> void:
 	# ask for what they need through Events.
 	Events.view_switch_requested.connect(_toggle_view)
 	Events.shift_end_requested.connect(_on_end_requested)
+	Events.tutorial_replay_requested.connect(_on_tutorial_replay)
+	# _apply_view asks for the tour half belonging to whichever view it puts up,
+	# so the cockpit tour opens the first shift of a tutorial run and the desk
+	# half waits there until that tab is first switched to.
 	_apply_view()
-	# the cockpit tour, once, on the first shift of a tutorial run. the desk
-	# half fires from _apply_view the first time that view comes up.
-	Game.request_tutorial(&"claw")
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -44,6 +45,20 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _process(_delta: float) -> void:
 	_check_shift_over()
+
+
+# Asking for the tour from the pause menu has to start it here, on the view
+# being looked at. Segments are only ever requested when a screen opens, so
+# without this the desk half waited for a tab switch away and back - the tour
+# came back on the claw screen instead, which reads as the button not working.
+func _on_tutorial_replay() -> void:
+	if _finished:
+		return
+	Game.request_tutorial(_segment_for_view())
+
+
+func _segment_for_view() -> StringName:
+	return &"claw" if _view == View.CLAW else &"desk"
 
 
 func _toggle_view() -> void:
@@ -57,8 +72,10 @@ func _toggle_view() -> void:
 func _apply_view() -> void:
 	_claw_view.set_view_active(_view == View.CLAW)
 	_desk_view.set_view_active(_view == View.DESK)
-	if _view == View.DESK:
-		Game.request_tutorial(&"desk")
+	# each half is asked for once, when its view first comes up. after a replay
+	# both are owed again, so this is also what hands the second half over on
+	# the next tab switch.
+	Game.request_tutorial(_segment_for_view())
 	# Both screens carry their own frame now, so the bar only ever surfaces to
 	# announce that the shift is over.
 	_bar.visible = false

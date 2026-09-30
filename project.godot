@@ -28,13 +28,8 @@ window/stretch/mode="canvas_items"
 
 [gui]
 
-theme/custom="res://assets/ui/ui_theme.tres"
-; the menu logo bobs 7px over 2.6s and the cutscene stills drift 5% over 14s.
-; with control snapping on, both of those land on whole pixels and a motion
-; that slow turns into a visible step every few frames - it reads as a bad
-; framerate rather than as a drift. everything here is vector art on a
-; canvas_items stretch, so there is nothing that needs pixel alignment.
 common/snap_controls_to_pixels=false
+theme/custom="res://assets/ui/ui_theme.tres"
 
 [input]
 
@@ -100,6 +95,6 @@ debug_overlay={
 
 [rendering]
 
-textures/vram_compression/import_etc2_astc=true
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
+textures/vram_compression/import_etc2_astc=true

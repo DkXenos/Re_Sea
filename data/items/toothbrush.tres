@@ -13,8 +13,8 @@ frames = ExtResource("1_fr")
 weight = 0.3
 surface_properties = Array[String](["rigid", "light", "bristles still attached"])
 visible_material = "plastic"
-visible_label = "PP 5"
-true_material = "PP handle with nylon bristles set in metal staples"
+visible_label = "plastic"
+true_material = "a plastic handle with nylon bristles set in metal staples"
 is_multilayer = true
 hotspots = Array[Dictionary]([{
 "reveals": "true_material",

@@ -13,6 +13,6 @@ frames = ExtResource("1_fr")
 weight = 2.0
 surface_properties = Array[String](["see-through", "heavy", "slippery"])
 visible_material = "glass"
-visible_label = "GL 71"
+visible_label = "glass"
 correct_category = 1
 source_batch = &"drinks_plant"

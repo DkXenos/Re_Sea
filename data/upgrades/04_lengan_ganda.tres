@@ -6,7 +6,7 @@
 script = ExtResource("1_script")
 id = &"lengan_ganda"
 display_name = "Twin Arms"
-benefit_text = "A second arm works the desk: every tool costs 3 shift time instead of 4, at full accuracy."
+benefit_text = "A second arm works the desk: every tool costs 3 shift time instead of 4."
 drop_cost = -1
 tool_cost = 3
 grip_delta = 0.0

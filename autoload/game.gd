@@ -171,25 +171,35 @@ func request_tutorial(segment: StringName) -> bool:
 	return true
 
 
-## Puts the guided tour back for whoever is sitting down next. A run already in
-## progress picks it up at the next screen that asks - the desk on the next tab
-## switch, the cockpit at the start of the next shift - and a new run runs the
-## whole thing from the top.
+## Puts the guided tour back for whoever is sitting down next. The screen that
+## is already up asks again straight away - it is listening for the signal below
+## - and every other screen picks it up the first time it is reached, so a new
+## run still runs the whole thing from the top.
 func replay_tutorial() -> void:
 	tutorial_shown_this_launch = false
 	tutorial_active = true
 	tutorial_seen = {}
+	Events.tutorial_replay_requested.emit()
 
 
-# Both halves seen means this player has been shown the game. Drop the flag so
+# Every segment seen means this player has been shown the game. Drop the flag so
 # a retry from the game-over screen doesn't sit them through it again, and
 # remember it for the rest of this launch.
+#
+# The end-of-day screen is in here too, and it is the last one reached - the
+# cockpit and the desk are both behind the player by the time the day closes.
+# Leave it out and the flag drops on the desk, which switches the tour off
+# before the screen that explains what all the sorting was for.
+const TUTORIAL_SEGMENTS: Array[StringName] = [&"claw", &"desk", &"after_day"]
+
 func _on_tutorial_segment_finished() -> void:
 	if not tutorial_active:
 		return
-	if tutorial_seen.has(&"claw") and tutorial_seen.has(&"desk"):
-		tutorial_active = false
-		tutorial_shown_this_launch = true
+	for segment: StringName in TUTORIAL_SEGMENTS:
+		if not tutorial_seen.has(segment):
+			return
+	tutorial_active = false
+	tutorial_shown_this_launch = true
 
 
 func current_day() -> DayData:

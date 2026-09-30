@@ -57,9 +57,9 @@ theme_override_colors/font_color = Color(0.05, 0.11, 0.32, 1)
 theme_override_font_sizes/font_size = 30
 
 [node name="SettingsPanel" parent="UiLayer/Root" instance=ExtResource("2_panel")]
-offset_left = 380.0
+offset_left = 400.0
 offset_top = 250.0
-offset_right = 900.0
+offset_right = 880.0
 offset_bottom = 430.0
 
 [node name="TutorialButton" type="Button" parent="UiLayer/Root"]

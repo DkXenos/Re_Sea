@@ -152,7 +152,7 @@ check "boots (2 frames)"   godot --headless --quit-after 2
 check "boots (240 frames)" godot --headless --quit-after 240
 
 echo "Systems:"
-for t in claw desk shift shift_end inspect layout parallax report ending box tech upgrades upgrade_play settings debug extensibility full; do
+for t in claw desk shift shift_end inspect layout parallax report ending box tech upgrades upgrade_play settings debug extensibility tutorial full; do
   check "smoke_$t" godot --headless --script "tests/smoke_$t.gd"
 done
 check "smoke_claw --fail" godot --headless --script tests/smoke_claw.gd -- --fail

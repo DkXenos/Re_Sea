@@ -13,10 +13,10 @@ frames = ExtResource("1_fr")
 weight = 0.2
 surface_properties = Array[String](["flexible", "light", "red smears inside"])
 visible_material = "plastic"
-visible_label = "HDPE 2"
+visible_label = "plastic"
 is_stained = true
 stain_type = "tomato ketchup"
-true_material = "HDPE - thick recyclable plastic"
+true_material = "thick plastic, the recyclable kind"
 hotspots = Array[Dictionary]([{
 "reveals": "stain_type",
 "tool": "swab"

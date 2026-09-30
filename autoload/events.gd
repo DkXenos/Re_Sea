@@ -24,6 +24,14 @@ signal pause_requested()
 # the guided tour. a screen asks for a segment by name, the overlay runs it.
 signal tutorial_requested(segment: StringName)
 signal tutorial_segment_finished()
+# the pause menu put the tour back. only the screens ask for segments, so this
+# is how the one currently on show hears that it should ask again now rather
+# than the next time it happens to be opened.
+signal tutorial_replay_requested()
+# A tour step can ask the player to press something for real instead of just
+# reading about it. The screen announces the press, the overlay is what decides
+# whether any step was waiting for it.
+signal tutorial_action_performed(action: StringName)
 
 signal sfx_requested(sfx_name: StringName)
 signal vfx_intensity_changed(value: float)

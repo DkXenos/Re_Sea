@@ -29,6 +29,7 @@ func _run() -> void:
 		game.advance_day()
 
 	await _check_desk()
+	await _check_desk_text_fits()
 	await _check_after_day()
 	assert(failures == 0, "%d layout problem(s) - see above" % failures)
 	print("layout verified")
@@ -37,6 +38,78 @@ func _run() -> void:
 	for i in 10:
 		await process_frame
 	quit()
+
+
+# Wrapped text that needs more height than its box has does not clip - Godot
+# draws it straight out the bottom, over whatever is underneath. The MADE OF
+# chip on a laminated cup did exactly that, through the plate it sits on and
+# over the tool feedback below it.
+#
+# Item text lives in .tres files and every message here takes a substitution, so
+# how tall any of this ends up is not something reading the scene can tell you.
+# This asks the screen instead: every item, every field a tool can reveal, every
+# message the panel can print, on every day - and fails on anything that needs
+# more room than it was given.
+func _check_desk_text_fits() -> void:
+	var phase: Node = load("res://scenes/desk/desk_phase.tscn").instantiate()
+	root.add_child(phase)
+	for i in 3:
+		await process_frame
+	var inspect: Control = phase.get_node("UiLayer/Root/InspectPanel")
+	var feedback: Label = inspect.get_node("Feedback")
+
+	for file: String in DirAccess.get_files_at("res://data/items"):
+		if not file.ends_with(".tres"):
+			continue
+		var item: ItemData = load("res://data/items/" + file)
+		game.budget_left = game.budget_max
+		var carried = game.add_to_inventory(item)
+		for field: String in ["is_stained", "stain_type", "stain_hazardous",
+				"true_material"]:
+			carried.reveal(field)
+		inspect.show_entry(carried)
+		for i in 3:
+			await process_frame
+
+		for named: String in ["NameLabel", "Question", "RulesTitle", "EvidenceTitle"]:
+			var label: Label = inspect.get_node(named)
+			_check_text_fits(label, label.size.y, "%s on %s" % [named, item.id])
+		# A chip's label is anchored to the plate, but an anchored Control is
+		# still grown to its own minimum size - so an overlong chip does not
+		# clip, it draws a 60px label through a 32px plate. Measuring the label
+		# against itself always passes; the plate under it is the real bound.
+		for chip: Control in inspect.get_node("EvidenceScroll/EvidenceLog").get_children():
+			_check_text_fits(chip.get_child(0) as Label, chip.size.y,
+				"evidence chip on %s" % item.id)
+
+		# the transient line under the log, in every shape it can take. the
+		# reveal one carries item text, so it is the one that grows.
+		for key: String in ["inspect_found", "inspect_coarse", "inspect_nothing",
+				"rinse_clean", "rinse_hazard", "rinse_none"]:
+			var args := {"n": 4, "v": item.get_field_text("true_material")}
+			inspect._set_feedback(Strings.tf(key, args), Color.WHITE)
+			await process_frame
+			_check_text_fits(feedback, feedback.size.y, "%s on %s" % [key, item.id])
+			# it is capped at max_lines_visible so it can never spill onto the
+			# desk art below the panel - but a cap silently eats the shift-time
+			# cost off the end, so anything that hits it is still a failure
+			if feedback.get_line_count() > feedback.max_lines_visible:
+				_fail("%s on %s wraps to %d lines and is trimmed at %d: \"%s\""
+					% [key, item.id, feedback.get_line_count(),
+					feedback.max_lines_visible, feedback.text])
+
+	root.remove_child(phase)
+	phase.free()
+	await process_frame
+
+
+func _check_text_fits(label: Label, available: float, what: String) -> void:
+	if label.text.strip_edges().is_empty():
+		return
+	var needed: int = label.get_line_count() * label.get_line_height()
+	if float(needed) > available + 1.0:
+		_fail("%s needs %dpx of text in a %.0fpx box - it will draw outside it: \"%s\""
+			% [what, needed, available, label.text])
 
 
 func _fail(message: String) -> void:

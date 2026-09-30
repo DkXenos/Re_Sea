@@ -24,6 +24,12 @@ const TOOL_ICON_SCALE := 0.62
 # the rack has one drawing per tool and no locked/using variants, so "armed" is
 # a separate plate slid in behind the row rather than a second drawing
 const TOOL_ROW_SELECTED := preload("res://assets/ui/tool_row_selected.png")
+# One line of chip. Anything longer grows the plate instead of spilling out of
+# the bottom of it - see _fit_chip.
+const CHIP_MIN_HEIGHT := 32.0
+# what CHIP_MIN_HEIGHT leaves around a single 18px line, kept as the padding
+# every taller chip gets too, so a two-line chip looks like two of these
+const CHIP_TEXT_PADDING := 14.0
 
 @onready var _view: SubViewport = $ViewportBox/ItemViewport
 @onready var _item_root: Node2D = $ViewportBox/ItemViewport/ItemRoot
@@ -483,7 +489,7 @@ func _add_chip(key: String, text: String, revealed: bool, lit: Dictionary) -> vo
 		chip.texture = CHIP_REVEAL if revealed else CHIP_SURFACE
 	for side: String in ["left", "top", "right", "bottom"]:
 		chip.set("patch_margin_" + side, 12)
-	chip.custom_minimum_size = Vector2(0, 32)
+	chip.custom_minimum_size = Vector2(0, CHIP_MIN_HEIGHT)
 	var label := Label.new()
 	label.text = text
 	label.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -492,8 +498,28 @@ func _add_chip(key: String, text: String, revealed: bool, lit: Dictionary) -> vo
 	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	label.add_theme_font_size_override("font_size", 14)
+	# a chip is a plate behind a label, and the plate cannot know how tall the
+	# label wants to be until the layout has handed it a width to wrap against
+	label.resized.connect(_fit_chip.bind(chip, label))
 	chip.add_child(label)
 	_log.add_child(chip)
+	_fit_chip(chip, label)
+
+
+# Grow the plate to whatever the wrapped text actually needs. Item text is
+# authored in .tres files and translated strings are longer again, so a chip
+# sized for one line is a chip that will eventually be handed two - MADE OF on
+# a laminated cup already needs three, and used to draw them straight through
+# the bottom of the plate and over the tool feedback underneath.
+#
+# The guard is what stops this bouncing: setting the minimum re-runs the layout,
+# which resizes the label, which calls this again with the same answer.
+func _fit_chip(chip: NinePatchRect, label: Label) -> void:
+	var needed := float(label.get_line_count() * label.get_line_height()) \
+		+ CHIP_TEXT_PADDING
+	var height := maxf(CHIP_MIN_HEIGHT, needed)
+	if not is_equal_approx(chip.custom_minimum_size.y, height):
+		chip.custom_minimum_size.y = height
 
 
 # queue_free alone leaves them in the tree for the rest of the frame

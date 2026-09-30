@@ -13,8 +13,8 @@ frames = ExtResource("1_fr")
 weight = 0.4
 surface_properties = Array[String](["stiff", "light", "dry"])
 visible_material = "paper"
-visible_label = "PAPER"
-true_material = "PAP 21 - plain unlined paper"
+visible_label = "paper"
+true_material = "plain paper, with nothing bonded to it"
 hotspots = Array[Dictionary]([{
 "reveals": "true_material",
 "tool": "magnifier"

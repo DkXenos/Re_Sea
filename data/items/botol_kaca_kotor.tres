@@ -13,10 +13,10 @@ frames = ExtResource("1_fr")
 weight = 0.8
 surface_properties = Array[String](["heavy", "crust around the rim", "smells sweet"])
 visible_material = "glass"
-visible_label = "GL 70"
+visible_label = "glass"
 is_stained = true
 stain_type = "chilli sauce"
-true_material = "soda-lime glass"
+true_material = "ordinary bottle glass"
 hotspots = Array[Dictionary]([{
 "reveals": "stain_type",
 "tool": "swab"

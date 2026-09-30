@@ -28,7 +28,11 @@ const BIN_CENTRE_Y := 96.0
 # largest that leaves a margin on the longest of the four names.
 const LABEL_WIDTH := 128.0
 const LABEL_FONT_SIZE := 13
-const LABEL_Y := 160.0
+# the tray's front face: top edge, then how tall it is. the label is the size
+# of the face and centred inside it - a 24px box top-aligned on that edge left
+# the name tucked up under the recessed lip instead of sitting on the face.
+const LABEL_Y := 165.0
+const LABEL_HEIGHT := 35.0
 const LABEL_COLOUR := Color(0.05, 0.19, 0.36)
 
 # TODO the four bins are hardcoded to four here. adding a fifth category means
@@ -68,8 +72,9 @@ func _ready() -> void:
 		# sized to the pedestal, not to the slot - a slot-wide label ran off
 		# both sides of the tray it is meant to be sitting on
 		label.position = Vector2(centre - LABEL_WIDTH * 0.5, LABEL_Y)
-		label.size = Vector2(LABEL_WIDTH, 24)
+		label.size = Vector2(LABEL_WIDTH, LABEL_HEIGHT)
 		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		label.add_theme_font_size_override("font_size", LABEL_FONT_SIZE)
 		label.add_theme_color_override("font_color", LABEL_COLOUR)
 		add_child(label)

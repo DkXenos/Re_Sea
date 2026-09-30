@@ -478,9 +478,12 @@ func _update_rail() -> void:
 	var progress := inverse_lerp(_camera_min(), _camera_max(), centre)
 	_slider.position.x = RAIL.x + travel * clampf(progress, 0.0, 1.0)
 
-	# the dots go UNDER the marker - MapDots is declared before Slider in the
-	# scene for exactly that reason. swap them back and the marker vanishes
-	# behind whatever happens to be sitting at that spot on the seabed.
+	# the dots go OVER the marker - MapDots is declared after Slider in the
+	# scene for exactly that reason. The marker is an opaque bar 322px wide and
+	# a dot is 10px, so underneath it every item inside the slice you are
+	# actually looking at went invisible - which is the one moment the dot is
+	# worth anything. On top, the dots cost the marker a few pixels and stay
+	# readable all the way across the rail.
 	var children := _items.get_children()
 	while _dots.size() < children.size():
 		var dot := TextureRect.new()

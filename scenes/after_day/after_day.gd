@@ -97,6 +97,10 @@ func _ready() -> void:
 	_build_result()
 	_build_tech()
 	_show_tab(Tab.RESULT)
+	# Last thing, so both pages are built and sized before the spotlight goes
+	# looking for them. The tour is owed this screen once per run and asks for
+	# it here, the same way the cockpit and the desk ask for theirs.
+	Game.request_tutorial(&"after_day")
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -126,6 +130,10 @@ func _show_tab(tab: Tab) -> void:
 	_report_art.visible = tab == Tab.RESULT
 	_page_bg.visible = tab != Tab.RESULT
 	Events.sfx_requested.emit(&"ui_click")
+	# the tour has a step that asks the player to open Technology themselves and
+	# waits here for them to do it. nothing else listens.
+	Events.tutorial_action_performed.emit(
+		&"after_tab_tech" if tab == Tab.TECH else &"after_tab_result")
 
 
 func _finish() -> void:

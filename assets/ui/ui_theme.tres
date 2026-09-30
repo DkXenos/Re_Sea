@@ -28,6 +28,8 @@ texture_margin_top = 14.0
 texture_margin_right = 14.0
 texture_margin_bottom = 14.0
 
+[sub_resource type="StyleBoxEmpty" id="SBE_focus"]
+
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_45kcn"]
 content_margin_left = 14.0
 content_margin_top = 10.0
@@ -181,7 +183,7 @@ Button/colors/font_pressed_color = Color(0.08, 0.09, 0.1, 1)
 Button/font_sizes/font_size = 20
 Button/fonts/font = ExtResource("20_fontb")
 Button/styles/disabled = SubResource("StyleBoxTexture_e1g2j")
-Button/styles/focus = SubResource("StyleBoxTexture_45kcn")
+Button/styles/focus = SubResource("SBE_focus")
 Button/styles/hover = SubResource("StyleBoxTexture_45kcn")
 Button/styles/normal = SubResource("StyleBoxTexture_q4rak")
 Button/styles/pressed = SubResource("StyleBoxTexture_vsr3o")

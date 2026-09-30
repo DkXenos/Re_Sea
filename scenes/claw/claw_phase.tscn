@@ -112,11 +112,6 @@ texture = ExtResource("5_frame")
 [node name="ConsoleLayer" type="CanvasLayer" parent="."]
 layer = 40
 
-[node name="MapDots" type="Control" parent="ConsoleLayer"]
-offset_right = 1280.0
-offset_bottom = 130.0
-mouse_filter = 2
-
 [node name="Slider" type="TextureRect" parent="ConsoleLayer"]
 offset_left = 479.0
 offset_top = 34.0
@@ -124,6 +119,11 @@ offset_right = 801.0
 offset_bottom = 98.0
 mouse_filter = 2
 texture = ExtResource("18_slider")
+
+[node name="MapDots" type="Control" parent="ConsoleLayer"]
+offset_right = 1280.0
+offset_bottom = 130.0
+mouse_filter = 2
 
 [node name="ArrowLeft" type="TextureButton" parent="ConsoleLayer"]
 offset_left = 401.0

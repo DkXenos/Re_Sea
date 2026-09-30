@@ -33,6 +33,8 @@ layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
 theme = ExtResource("8_theme")
 
@@ -127,27 +129,28 @@ script = ExtResource("2_inv")
 
 [node name="Title" type="Label" parent="UiLayer/Root/InventoryPanel" unique_id=1851650879]
 layout_mode = 0
-offset_left = 12.0
-offset_top = 10.0
-offset_right = 192.0
-offset_bottom = 34.0
+offset_left = 36.84
+offset_top = 31.71
+offset_right = 162.84
+offset_bottom = 54.71
 theme_override_font_sizes/font_size = 15
 
 [node name="Empty" type="Label" parent="UiLayer/Root/InventoryPanel" unique_id=186295350]
 layout_mode = 0
 offset_left = 12.0
-offset_top = 44.0
+offset_top = 63.0
 offset_right = 192.0
-offset_bottom = 100.0
+offset_bottom = 119.0
 theme_override_font_sizes/font_size = 13
 autowrap_mode = 3
 
 [node name="Scroll" type="ScrollContainer" parent="UiLayer/Root/InventoryPanel" unique_id=1267056787]
 layout_mode = 0
 offset_left = 12.0
-offset_top = 44.0
+offset_top = 63.0
 offset_right = 192.0
-offset_bottom = 404.0
+offset_bottom = 420.0
+vertical_scroll_mode = 3
 
 [node name="Grid" type="GridContainer" parent="UiLayer/Root/InventoryPanel/Scroll" unique_id=318059842]
 layout_mode = 2
@@ -174,10 +177,10 @@ clip_text = true
 
 [node name="NameLabel" type="Label" parent="UiLayer/Root/InspectPanel" unique_id=235676178]
 layout_mode = 0
-offset_left = 14.0
-offset_top = 2.0
+offset_left = 81.35
+offset_top = 18.0
 offset_right = 280.0
-offset_bottom = 26.0
+offset_bottom = 41.0
 theme_override_font_sizes/font_size = 16
 clip_text = true
 
@@ -255,7 +258,7 @@ layout_mode = 0
 offset_left = 492.0
 offset_top = 174.0
 offset_right = 870.0
-offset_bottom = 296.0
+offset_bottom = 282.0
 
 [node name="EvidenceLog" type="VBoxContainer" parent="UiLayer/Root/InspectPanel/EvidenceScroll" unique_id=1632614819]
 custom_minimum_size = Vector2(368, 0)
@@ -265,11 +268,13 @@ theme_override_constants/separation = 4
 [node name="Feedback" type="Label" parent="UiLayer/Root/InspectPanel" unique_id=586512680]
 layout_mode = 0
 offset_left = 492.0
-offset_top = 300.0
+offset_top = 286.0
 offset_right = 870.0
-offset_bottom = 332.0
+offset_bottom = 318.0
 theme_override_font_sizes/font_size = 12
 autowrap_mode = 3
+text_overrun_behavior = 3
+max_lines_visible = 2
 
 [node name="BinRow" type="Control" parent="UiLayer/Root" unique_id=57931397]
 anchors_preset = 0
@@ -294,6 +299,7 @@ autowrap_mode = 3
 layer = 100
 
 [node name="RulebookPanel" type="Control" parent="RulebookLayer" unique_id=806498239]
+visible = false
 layout_mode = 3
 anchors_preset = 0
 offset_left = 220.0

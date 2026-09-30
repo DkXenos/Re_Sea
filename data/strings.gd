@@ -41,21 +41,46 @@ const TABLE: Dictionary = {
 	"tut_desk_item_title": "LOOK BEFORE YOU DECIDE",
 	"tut_desk_item_body": "The item as it appears, and what it appears to be. That is a guess, not a fact - a paper cup with a plastic lining looks exactly like one without.",
 	"tut_desk_tools_title": "THE TOOLS",
-	"tut_desk_tools_body": "Each one answers a different question. The MAGNIFIER reads the code stamped on a thing. The SWAB says whether a stain is chemical or just food. The RINSE actually washes a stain off. The CUTTER opens sealed crates. Every use costs shift time, so reach for the one that answers the question you actually have.",
+	"tut_desk_tools_body": "Each one answers a different question. The MAGNIFIER tells you what a thing is really made of, under whatever is printed on the outside. The SWAB says whether a stain is chemical or just food. The RINSE actually washes a stain off. The CUTTER opens sealed crates. Every use costs shift time, so reach for the one that answers the question you actually have.",
 	"tut_desk_outcome_title": "WHAT THE TOOLS TELL YOU",
-	"tut_desk_outcome_body": "Every answer lands here as a chip and stays there. \"MARKING: HDPE 2\" is the label printed on the thing, free with every item - the guidebook says what each one means. \"STAIN IS: chemical\" means the swab found something that will not wash off - that item is hazardous whatever it is made of. \"RINSED CLEAN\" means the rinse worked and the thing is now clean enough to recycle. A tool that finds nothing still costs you, and that is an answer too.",
+	"tut_desk_outcome_body": "Every answer lands here as a chip and stays there. \"MARKING: paper\" is simply what is printed on the thing, free with every item - a claim, not a fact. \"MADE OF: paper with a thin plastic film bonded to the inside\" is what the magnifier came back with, and that is how a cup that says paper turns out to be lined. \"STAIN IS: chemical\" means the swab found something that will not wash off - that item is hazardous whatever it is made of. \"RINSED CLEAN\" means the rinse worked and the thing is now clean enough to recycle. A tool that finds nothing still costs you, and that is an answer too.",
 	"tut_desk_rules_title": "TODAY'S RULES",
 	"tut_desk_rules_body": "The rules in force right now. A special rule always beats the plain \"what is it made of\" answer - a recyclable with a stain still on it is not recyclable until the stain is off.",
 	"tut_desk_rulebook_title": "THE GUIDEBOOK",
-	"tut_desk_rulebook_body": "Press this, or R, for the whole book: every rule in force today, which bin each kind of thing belongs in, and what every label and material printed on an item means. It costs nothing and you can open it as often as you want.",
+	"tut_desk_rulebook_body": "Press this, or R, for the whole book: every rule in force today and which bin each kind of thing belongs in. It costs nothing and you can open it as often as you want.",
 	"tut_desk_bins_title": "THE FOUR BINS",
-	"tut_desk_bins_body": "ORGANIC for what rots - food, garden waste, cotton and wool. RECYCLABLE for clean paper, glass, metal and clean plastic. HAZARDOUS for chemicals, and for anything a chemical soaked into. RESIDUE for the rest: still-stained things, laminated packaging, used tissue, and anything made of several materials that cannot be pulled apart.",
+	"tut_desk_bins_body": "ORGANIC for what rots - food, garden waste, cotton and wool. RECYCLABLE for clean paper, glass and clean plastic. HAZARDOUS for chemicals, and for anything a chemical soaked into. RESIDUE for the rest: still-stained things, laminated packaging, used tissue, and anything made of several materials that cannot be pulled apart.",
 	"tut_desk_commit_title": "SORTING IS FINAL",
 	"tut_desk_commit_body": "Click a bin and the item is gone. The right bin stores its material for the workshop; the wrong bin loses it for good. The desk will not say which - the end of the day will.",
 	"tut_desk_blueprints_title": "WHAT IT IS ALL FOR",
 	"tut_desk_blueprints_body": "Material from the right bins builds three machines. That is the run: sort well enough, for long enough, to get all three of them into the water.",
 	"tut_desk_end_title": "THAT IS EVERYTHING",
 	"tut_desk_end_body": "Look before you decide, and open the guidebook whenever you are not sure. Good luck out there.",
+
+	# the end-of-day screen. the tab switch in the middle is a step the player
+	# has to answer with a real press - see TutorialSteps.AFTER_DAY.
+	"tut_after_intro_title": "END OF THE DAY",
+	"tut_after_intro_body": "The claw is parked and the day's books are closed. Nothing more can be sorted now - this screen is where you find out how it went, and where you decide what to do with what you brought back. There are two tabs at the top, and they do very different jobs.",
+	"tut_after_missed_title": "WHAT WAS MISSED",
+	"tut_after_missed_body": "One row for every item that went in the wrong bin: what it was, the bin you chose, and the bin it belonged in. This is the only place the game ever tells you - the desk stays quiet on purpose. A day with nothing wrong on it says so instead.",
+	"tut_after_recovered_title": "WHAT THE DAY PAID OUT",
+	"tut_after_recovered_body": "Only the items that went in the RIGHT bin become material, counted here by bin. A wrong bin is not a smaller payout - that item is gone for good and never appears on this list. What is here is the store the second tab spends.",
+	"tut_after_summary_title": "THE DAY IN NUMBERS",
+	"tut_after_summary_body": "Whether you met the day's target, how many you got right and wrong, how many were left in the water, and how much shift time it took. Missing a target is not the end of a run by itself - running out of days with the machines unbuilt is.",
+	"tut_after_switch_title": "NOW OPEN TECHNOLOGY",
+	"tut_after_switch_body": "That is the whole of this page. The other tab is where everything you just recovered actually gets spent, and it is the half of this screen most people never open. Press Technology at the top - the tour waits here until you do.",
+	"tut_after_tech_sheet_title": "THE BLUEPRINT",
+	"tut_after_tech_sheet_body": "One machine per sheet: its name, what it is for, and a drawing of it. The faint lines on the drawing are the parts that are not built yet, and each one fills in as you build it - so the sheet is the progress bar as well as the picture.",
+	"tut_after_tech_paging_title": "THE OTHER SHEETS",
+	"tut_after_tech_paging_body": "There are three machines and these arrows move between them. Getting all three built and into the water is the run - that is what every day of sorting is for.",
+	"tut_after_tech_parts_title": "THE PARTS",
+	"tut_after_tech_parts_body": "A machine goes together one part at a time. Each row names a part, what it costs and out of which bins, and carries its own Build button. The cost turns red when your store will not cover it, and the button stays dead until it will.",
+	"tut_after_tech_pool_title": "WHAT YOU HAVE",
+	"tut_after_tech_pool_body": "Your whole store, bin by bin, carried across every day of the run. None of it expires - a part you cannot afford tonight is a part you can afford after another day of sorting well.",
+	"tut_after_tech_build_title": "SWITCHING IT ON",
+	"tut_after_tech_build_body": "Once every part is fitted, this assembles the machine, and the line beside it says what that changes about the claw. A machine you build stays on for the rest of the run - nothing to fit, nothing to choose, no way to turn it off again.",
+	"tut_after_next_title": "ON TO TOMORROW",
+	"tut_after_next_body": "This starts the next day whenever you are ready. Read what you want off this screen first: once tomorrow begins, today's report is gone.",
 
 	# --- settings ---
 	"settings_title": "SETTINGS",
@@ -151,7 +176,7 @@ const TABLE: Dictionary = {
 	"field_stain_hazard": "chemical, will not wash off",
 	"field_stain_washable": "washes off",
 	"field_none": "none",
-	"field_multilayer_suffix": " (laminated - the layers cannot be separated)",
+	"field_multilayer_suffix": " (the layers cannot be separated, so nothing is recovered)",
 
 	# --- mystery box ---
 	"box_opened_toast": "Crate opened: {n} items added to the list",
@@ -173,8 +198,6 @@ const TABLE: Dictionary = {
 	"rulebook_title": "RULEBOOK",
 	"rulebook_where": "WHERE THINGS GO",
 	"rulebook_where_note": "The baseline sorting guide. A special rule above always beats this - a recyclable with a stain still on it is not recyclable until the stain is off.",
-	"rulebook_codes": "WHAT THE LABELS AND MATERIALS MEAN",
-	"rulebook_codes_note": "The printed label is free, on the item card. The material under it is what the magnifier comes back with. Either one tells you what the thing is made of - never whether it is clean.",
 	"rulebook_close": "Close",
 	"rulebook_empty": "No special rules today",
 	"rulebook_general": "GENERAL",
@@ -249,10 +272,14 @@ const TABLE: Dictionary = {
 	"pause_menu": "Main Menu",
 }
 
-# the baseline sorting guide, in the same shape as MATERIALS: which bin a material
-# goes in and why. Fixed reference text, not per-item content - an item is
-# still judged by its own .tres plus the day's rules, this only explains the
-# reasoning so a new player isn't guessing.
+# the baseline sorting guide: which bin a material goes in and why. Fixed
+# reference text, not per-item content - an item is still judged by its own
+# .tres plus the day's rules, this only explains the reasoning so a new player
+# isn't guessing.
+#
+# Every line has to name things the player will actually be handed. A guide
+# that promises a bin for metal cans or for a tin of paint, when the game
+# contains neither, teaches a rule that can only ever be wrong.
 #
 # [category, what it is, why it goes there]
 const GUIDANCE: Array = [
@@ -261,60 +288,28 @@ const GUIDANCE: Array = [
 	[ItemData.Category.ORGANIC, "Garden waste",
 		"leaves, twigs, cuttings. Natural matter, same bin as food."],
 	[ItemData.Category.ORGANIC, "Natural fibre",
-		"cotton, wool, jute - a COTTON 100% shirt is plant matter and rots down."],
+		"cotton, wool, jute - a cotton shirt is plant matter and rots down."],
 
 	[ItemData.Category.RECYCLABLE, "Paper and card",
-		"newspaper, plain card, a clean paper cup. Marked PAPER or PAP. Clean and unlined only."],
+		"newspaper, plain card, a clean paper cup. Clean, and plain paper only - nothing bonded onto it."],
 	[ItemData.Category.RECYCLABLE, "Glass",
-		"bottles and jars, marked GL. Glass is recyclable however many times it has been used."],
+		"bottles and jars. Glass is recyclable however many times it has been used."],
 	[ItemData.Category.RECYCLABLE, "Clean plastic",
-		"marked HDPE 2 or PP 5. Clean means clean - rinse it or it is not recyclable."],
+		"bags, bottles, tubs, handles. Clean means clean - rinse it or it is not recyclable."],
 	[ItemData.Category.RECYCLABLE, "Polyester and synthetic fabric",
 		"plastic woven into cloth, not a natural fibre, so it goes here and NOT in ORGANIC. Only the magnifier can tell it from cotton."],
-	[ItemData.Category.RECYCLABLE, "Metal",
-		"aluminium and steel cans. Valuable and recycled over and over."],
 
 	[ItemData.Category.HAZARD, "Chemical stains",
 		"engine oil, solvent paint, pesticide, expired medicine. They do not rinse off, so whatever soaked them up is hazardous - whatever it is made of."],
-	[ItemData.Category.HAZARD, "Chemicals themselves",
-		"paint, solvent, pesticide, batteries, expired medicine. Hazardous in their own right, and they poison the bay if they go in any other bin."],
 
 	[ItemData.Category.RESIDUE, "Anything still stained",
 		"a stain that has not been rinsed off cannot be composted or recycled. Rinse it and it goes back to being whatever it is made of - leave it and it lands here."],
 	[ItemData.Category.RESIDUE, "Laminated packaging",
-		"paper bonded to plastic or foil, e.g. PAP 22 - PE liner. The layers cannot be separated, so no rinsing helps and nothing can be recovered."],
+		"paper with a thin plastic or foil film bonded onto it, the way a takeaway cup is lined. The layers cannot be pulled apart, so no rinsing helps and nothing can be recovered."],
 	[ItemData.Category.RESIDUE, "Things made of several materials",
-		"a toothbrush with nylon bristles stapled into a PP handle, a soft toy of fabric over polyester filling. The magnifier is what tells you - a single code on the outside does not mean the whole object is that one material."],
+		"a toothbrush with nylon bristles stapled into a plastic handle, a soft toy of fabric over polyester filling. The magnifier is what tells you - one word printed on the outside does not mean the whole object is that one material."],
 	[ItemData.Category.RESIDUE, "Soiled tissue and the rest",
 		"used tissue, and anything that is not organic, not clean enough to recycle and not chemical."],
-]
-
-
-# What the player can actually read off an item - the label printed on it, or
-# the material the magnifier names - and what that means for the bin. Fixed
-# reference text, not per-item content, so it stays here instead of becoming
-# 14 more .tres files.
-#
-# Only entries something in the game can actually show. This was a table of
-# resin codes off real packaging, most of which no item ever carries: a page of
-# PET, PVC, PA and Pb that never came up, while the two objects people got
-# stuck on - the soft toy and the plastic bag - had nothing written about them
-# at all. A code that appears on nothing teaches nothing. If an item starts
-# carrying one, it gets a line here.
-const MATERIALS: Array = [
-	["PAPER  /  PAP 21", "plain paper and card with nothing bonded to it. Clean and unlined, so it is recyclable."],
-	["PAP 22 - PE liner", "paper with a thin plastic film bonded onto it, the way a takeaway cup is lined. The layers cannot be pulled apart, so no amount of rinsing helps and nothing can be recovered."],
-	["HDPE 2", "thick plastic - carrier bags, jerrycans, soap bottles. Recyclable once it is actually clean, which for a bag means the smears inside it too."],
-	["PP 5", "stiff plastic for caps, tubs and handles. Recyclable on its own, but it is usually moulded or stapled onto something that is not."],
-	["PS 6", "styrofoam. Almost never accepted for recycling."],
-	["GL 70  /  GL 71", "glass. Recyclable however many times it has already been used."],
-	["Cotton, natural fibre", "plant matter woven into cloth. It rots down, so a cotton shirt is organic waste."],
-	["Polyester", "plastic drawn into thread and woven into cloth. It is recyclable and it is NOT organic, however much it looks and feels like the cotton shirt beside it. Nothing on the surface separates the two - that is what the magnifier is for."],
-	["Fabric over filling", "a soft toy: cloth, stuffing and thread that cannot be pulled back apart into any one material. Nothing can be recovered from it, so it is residue."],
-	["Handle with bristles", "a brush is a plastic handle with nylon bristles stapled into it. Several materials in one object, and the day the laminate rule is in force that puts it in residue."],
-	["Chemical stain", "solvent paint, pesticide, engine oil, expired medicine. It never rinses off, and whatever soaked it up is hazardous waste - whatever that thing is made of."],
-	["Food residue", "grease, sauce, coffee, ketchup, river mud. An ordinary stain: rinse it off and the item goes back to being whatever it is made of. Leave it on and it is residue."],
-	["No label at all", "nothing is printed on it, so nothing is promised. An unlabelled object with more than one material in it - a soft toy, a brush - is the magnifier's job."],
 ]
 
 static func t(key: String) -> String:

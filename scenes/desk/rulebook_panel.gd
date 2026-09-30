@@ -1,7 +1,11 @@
 # open any time, pauses nothing. the challenge is hidden properties, not
-# remembering rules. also holds the baseline "where does this go" guide and the
-# glossary of every label and material an item can show, since nobody who
-# hasn't sorted waste before knows either one.
+# remembering rules. also holds the baseline "where does this go" guide, since
+# nobody who hasn't sorted waste before knows it.
+#
+# There used to be a third section: a glossary of the resin and packaging codes
+# items were stamped with. Reading it was the price of entry for anyone who did
+# not already know them, which made this a memory test rather than a judgement
+# one. Items say "glass" and "paper" now, so there is nothing left to look up.
 extends Control
 
 # bin plate beside each group heading, big enough to read at a glance
@@ -40,7 +44,6 @@ func _rebuild() -> void:
 	if day == null or day.active_rules.is_empty():
 		_add_line(Strings.t("rulebook_empty"), 18, NOTE)
 		_add_guide()
-		_add_glossary()
 		return
 	# grouped by forced bin, rulebook-only ones go under UMUM
 	var groups: Dictionary = {}
@@ -56,7 +59,6 @@ func _rebuild() -> void:
 			_add_line("-  " + rule.text, 17, BODY)
 		_add_line("", 8, Color.WHITE)
 	_add_guide()
-	_add_glossary()
 
 
 # the baseline sorting guide, one block per bin, in enum order so it reads in
@@ -92,14 +94,6 @@ func _guide_heading(category: int) -> Control:
 	label.add_theme_color_override("font_color", HEADING)
 	row.add_child(label)
 	return row
-
-
-# what the label printed on an item, or the material under it, means
-func _add_glossary() -> void:
-	_add_line(Strings.t("rulebook_codes"), 21, HEADING)
-	_add_line(Strings.t("rulebook_codes_note"), 15, NOTE)
-	for entry: Array in Strings.MATERIALS:
-		_add_line("%s  -  %s" % [entry[0], entry[1]], 16, BODY)
 
 
 func _add_line(text: String, font_size: int, color: Color) -> void:
